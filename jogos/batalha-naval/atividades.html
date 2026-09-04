@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Gerador de atividades · Batalha Naval Matemática</title>
+  <style>
+    :root{--navy:#082f49;--blue:#0369a1;--sky:#e0f5ff;--line:#9bdcf5;--ink:#17364b;--yellow:#facc15}
+    *{box-sizing:border-box}body{margin:0;color:var(--ink);font-family:"Segoe UI",Arial,sans-serif;background:linear-gradient(145deg,#effbff,#c9efff);min-height:100vh}.topo{padding:18px;color:#fff;background:var(--navy)}.topo>div{width:min(1100px,calc(100% - 24px));margin:auto;display:flex;justify-content:space-between;align-items:center;gap:12px}.topo a{color:#fff;text-decoration:none;font-weight:800}.wrap{width:min(1100px,calc(100% - 24px));margin:28px auto}.painel,.folha{padding:24px;border-radius:24px;background:#fff;box-shadow:0 14px 38px rgba(8,47,73,.13)}h1,h2{color:var(--navy)}h1{margin:0 0 8px}.sub{color:#5a7485}.controles{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0}.campo label{display:block;margin-bottom:6px;font-weight:800}.campo select{width:100%;min-height:48px;padding:0 12px;border:2px solid var(--line);border-radius:12px;background:#fff;font:inherit}.acoes{display:flex;gap:10px;flex-wrap:wrap}.botao{min-height:48px;padding:0 18px;border:0;border-radius:12px;color:#fff;background:var(--blue);font:inherit;font-weight:900;cursor:pointer}.botao.sec{color:var(--navy);background:var(--yellow)}.botao.claro{color:var(--navy);background:#e5f6fd}.folha{display:none;margin-top:24px;border-radius:4px}.folha.ativa{display:block}.cabecalho-folha{text-align:center;border-bottom:2px solid var(--navy);padding-bottom:10px}.cabecalho-folha h2{margin:0}.dados{display:grid;grid-template-columns:1fr .45fr .45fr;gap:12px;margin:14px 0;font-size:13px}.linha{border-bottom:1px solid #444;height:20px}.habilidade{padding:8px 12px;border-left:5px solid var(--blue);background:var(--sky);font-size:12px}.questoes{display:grid;grid-template-columns:1fr 1fr;gap:10px 28px;margin-top:18px}.questao{min-height:86px;padding:8px 0;border-bottom:1px solid #bbb;font-size:15px}.questao strong{display:inline-block;min-width:24px}.resposta{display:block;margin-top:22px;border-bottom:1px solid #555}.gabarito{display:none;margin-top:20px;padding:16px;border:2px dashed var(--blue);background:#f4fbff}.gabarito.aberto{display:block}.rodape-folha{margin-top:18px;text-align:center;font-size:10px;color:#687b87}
+    @media(max-width:720px){.controles,.dados,.questoes{grid-template-columns:1fr}.questao{min-height:74px}.acoes .botao{width:100%}}
+    @media print{body{background:#fff}.topo,.painel,.acoes-impressao{display:none!important}.wrap{width:auto;margin:0}.folha{display:block!important;margin:0;padding:1.2cm;box-shadow:none}.gabarito{display:none!important}.questoes{grid-template-columns:1fr 1fr}.questao{break-inside:avoid}.rodape-folha{position:fixed;bottom:.25cm;left:0;right:0}@page{size:A4;margin:.8cm}}
+  </style>
+</head>
+<body>
+  <header class="topo"><div><a href="./">← Batalha Naval</a><strong>Leo Sardinha.Math</strong></div></header>
+  <main class="wrap">
+    <section class="painel">
+      <h1>Gerador de atividades do professor</h1><p class="sub">Escolha o ano e o conteúdo. O sistema cria uma atividade A4 pronta para imprimir, com gabarito separado.</p>
+      <div class="controles">
+        <div class="campo"><label for="ano">Ano escolar</label><select id="ano"><option value="1">1º ano</option><option value="2">2º ano</option><option value="3">3º ano</option><option value="4">4º ano</option><option value="5">5º ano</option></select></div>
+        <div class="campo"><label for="atividade">Atividade</label><select id="atividade"></select></div>
+        <div class="campo"><label for="quantidade">Quantidade de questões</label><select id="quantidade"><option>8</option><option selected>10</option><option>12</option></select></div>
+      </div>
+      <div class="acoes"><button class="botao" id="gerar">🎲 Gerar atividade</button><button class="botao sec" id="imprimir" disabled>🖨️ Imprimir / salvar PDF</button><button class="botao claro" id="ver-gabarito" disabled>✅ Mostrar gabarito</button></div>
+    </section>
+    <article class="folha" id="folha">
+      <header class="cabecalho-folha"><h2>Batalha Naval Matemática</h2><div id="subtitulo-folha"></div></header>
+      <div class="dados"><div>Nome:<div class="linha"></div></div><div>Turma:<div class="linha"></div></div><div>Data:<div class="linha"></div></div></div>
+      <p class="habilidade" id="habilidade"></p><p id="orientacao"></p><section class="questoes" id="questoes"></section>
+      <section class="gabarito" id="gabarito"><h3>Gabarito do professor</h3><p id="respostas"></p></section>
+      <footer class="rodape-folha">Leo Sardinha.Math · Atividade complementar · Ensino Fundamental - Anos Iniciais</footer>
+    </article>
+  </main>
+  <script>
+    const propostas={
+      1:[['adicao20','Adição até 20','EF01MA06'],['subtracao20','Subtração até 20','EF01MA08'],['comparacao','Comparação de quantidades','EF01MA05']],
+      2:[['adicao100','Adição e subtração','EF02MA05'],['dobro','Dobro e metade','EF02MA07 / EF02MA08'],['parcelas','Parcelas iguais','EF02MA07']],
+      3:[['quatro','Quatro operações','EF03MA05 a EF03MA08'],['tabuada','Multiplicação','EF03MA07'],['divisao','Divisão exata','EF03MA08']],
+      4:[['calculo','Cálculo com naturais','EF04MA03'],['multdiv','Multiplicação e divisão','EF04MA06 / EF04MA07'],['incognita','Termo desconhecido','EF04MA15']],
+      5:[['decimais','Adição com decimais','EF05MA07'],['fracoes','Frações','EF05MA03 / EF05MA04'],['porcentagem','Porcentagens usuais','EF05MA06']]
+    };
+    const ano=document.querySelector('#ano'),atividade=document.querySelector('#atividade'),folha=document.querySelector('#folha');
+    const inteiro=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+    function atualizarAtividades(){atividade.innerHTML=propostas[ano.value].map(([v,n,c])=>`<option value="${v}" data-codigo="${c}">${n}</option>`).join('')}
+    function criar(tipo){let a,b,q,r;switch(tipo){
+      case'adicao20':a=inteiro(1,15);b=inteiro(1,20-a);q=`${a} + ${b} =`;r=a+b;break;
+      case'subtracao20':a=inteiro(5,20);b=inteiro(1,a);q=`${a} - ${b} =`;r=a-b;break;
+      case'comparacao':a=inteiro(1,20);b=inteiro(1,20);q=`Complete com &gt;, &lt; ou =: ${a} ___ ${b}`;r=a>b?'&gt;':a<b?'&lt;':'=';break;
+      case'adicao100':a=inteiro(10,90);b=inteiro(5,90);if(Math.random()<.5){q=`${a} + ${b} =`;r=a+b}else{const m=Math.max(a,b),n=Math.min(a,b);q=`${m} - ${n} =`;r=m-n}break;
+      case'dobro':a=inteiro(2,20);if(Math.random()<.5){q=`O dobro de ${a} é`;r=a*2}else{q=`A metade de ${a*2} é`;r=a}break;
+      case'parcelas':a=inteiro(2,5);b=inteiro(2,8);q=`${a} grupos com ${b} elementos: ${a} × ${b} =`;r=a*b;break;
+      case'quatro':{const t=inteiro(1,4);a=inteiro(2,30);b=inteiro(2,10);if(t===1){q=`${a}+${b} =`;r=a+b}else if(t===2){q=`${a+b}-${b} =`;r=a}else if(t===3){q=`${a} × ${b} =`;r=a*b}else{q=`${a*b} ÷ ${b} =`;r=a}}break;
+      case'tabuada':a=inteiro(2,10);b=inteiro(2,10);q=`${a} × ${b} =`;r=a*b;break;
+      case'divisao':a=inteiro(2,10);b=inteiro(2,10);q=`${a*b} ÷ ${a} =`;r=b;break;
+      case'calculo':a=inteiro(100,999);b=inteiro(50,500);if(Math.random()<.5){q=`${a} + ${b} =`;r=a+b}else{q=`${a+b} - ${b} =`;r=a}break;
+      case'multdiv':a=inteiro(3,15);b=inteiro(2,12);if(Math.random()<.5){q=`${a} × ${b} =`;r=a*b}else{q=`${a*b} ÷ ${a} =`;r=b}break;
+      case'incognita':a=inteiro(10,90);b=inteiro(20,100);q=`□ + ${a} = ${a+b}.  □ =`;r=b;break;
+      case'decimais':a=inteiro(10,90)/10;b=inteiro(10,90)/10;q=`${String(a).replace('.',',')} + ${String(b).replace('.',',')} =`;r=(a+b).toFixed(1).replace('.',',');break;
+      case'fracoes':{const d=[2,3,4,5,10][inteiro(0,4)],n=inteiro(1,d-1);q=`Uma figura foi dividida em ${d} partes e ${n} foram pintadas. A fração é`;r=`${n}/${d}`}break;
+      case'porcentagem':{const p=[10,25,50,75][inteiro(0,3)],n=[20,40,60,80,100][inteiro(0,4)];q=`${p}% de ${n} =`;r=n*p/100}break;
+    }return{q,r}}
+    function gerar(){const qtd=Number(document.querySelector('#quantidade').value),tipo=atividade.value,itens=Array.from({length:qtd},()=>criar(tipo)),nome=atividade.options[atividade.selectedIndex].text,codigo=atividade.options[atividade.selectedIndex].dataset.codigo;document.querySelector('#subtitulo-folha').textContent=`${ano.value}º ano · ${nome}`;document.querySelector('#habilidade').innerHTML=`<strong>BNCC:</strong> ${codigo}`;document.querySelector('#orientacao').textContent='Resolva as questões. Registre os cálculos no espaço disponível.';document.querySelector('#questoes').innerHTML=itens.map((x,i)=>`<div class="questao"><strong>${i+1}.</strong> ${x.q}<span class="resposta"></span></div>`).join('');document.querySelector('#respostas').innerHTML=itens.map((x,i)=>`<strong>${i+1}.</strong> ${x.r}`).join(' &nbsp; · &nbsp; ');folha.classList.add('ativa');document.querySelector('#gabarito').classList.remove('aberto');document.querySelector('#imprimir').disabled=false;document.querySelector('#ver-gabarito').disabled=false;folha.scrollIntoView({behavior:'smooth'})}
+    ano.addEventListener('change',atualizarAtividades);document.querySelector('#gerar').addEventListener('click',gerar);document.querySelector('#imprimir').addEventListener('click',()=>print());document.querySelector('#ver-gabarito').addEventListener('click',e=>{document.querySelector('#gabarito').classList.toggle('aberto');e.currentTarget.textContent=document.querySelector('#gabarito').classList.contains('aberto')?'🙈 Ocultar gabarito':'✅ Mostrar gabarito'});atualizarAtividades();
+  </script>
+</body></html>
