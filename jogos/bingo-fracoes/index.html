@@ -34,7 +34,7 @@
     </section>
 
     <section class="professor" id="professor" hidden>
-      <div class="prof-head"><div><h2>Modo professor</h2><p>Escolha exatamente 9 frações para montar uma cartela específica ou gere outra combinação aleatória. O modo projetor permite sortear as frações livremente, sem exigir resposta entre um sorteio e outro.</p></div><span class="prof-count" id="profCount">9/9 selecionadas</span></div>
+      <div class="prof-head"><div><h2>Modo professor</h2><p>Escolha exatamente 9 frações para montar uma cartela específica ou gere outra combinação aleatória. O modo projetor permite sortear as frações livremente, sem exigir resposta entre um sorteio e outro. O sorteio não repete frações e usa denominadores de no máximo 10.</p></div><span class="prof-count" id="profCount">9/9 selecionadas</span></div>
       <div class="prof-grid" id="profGrid"></div>
       <div class="prof-actions"><button class="botao" id="aplicarSelecao" type="button">Aplicar as 9 selecionadas</button><button class="botao alt" id="aleatoriaProf" type="button">Escolher 9 aleatórias</button><button class="botao prof" id="projetor" type="button">Abrir modo projetor</button></div>
       <p class="prof-note" id="profNote">A seleção atual corresponde à cartela em jogo.</p>
@@ -71,7 +71,7 @@
     function fracHtml(s){const[n,d]=s.split('/');return `<span class="fracao" aria-label="${n} sobre ${d}"><span>${n}</span><i></i><span>${d}</span></span>`}
     function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
     function amostra(a,n){return shuffle(a).slice(0,n)}
-    function equivalente(key){let[n,d]=key.split('/').map(Number);if(key==='1/1'){const k=[2,3,4,5][Math.floor(Math.random()*4)];return `${k}/${k}`}const max=Math.max(1,Math.floor(12/d));const k=1+Math.floor(Math.random()*Math.min(3,max));return `${n*k}/${d*k}`}
+    function equivalente(key){let[n,d]=reduz(key).split('/').map(Number);if(n===d){const k=1+Math.floor(Math.random()*10);return `${k}/${k}`}const max=Math.max(1,Math.floor(10/d));const k=1+Math.floor(Math.random()*max);return `${n*k}/${d*k}`}
     function fracaoVisual(key){let[n,d]=key.split('/').map(Number);if(key==='1/1'){d=[3,4,5,6][Math.floor(Math.random()*4)];n=d}else{const max=Math.max(1,Math.floor(10/d));const k=1+Math.floor(Math.random()*Math.min(2,max));n*=k;d*=k}return {n,d}}
     function setor(cx,cy,r,a0,a1,fill){const x1=cx+r*Math.cos(a0),y1=cy+r*Math.sin(a0),x2=cx+r*Math.cos(a1),y2=cy+r*Math.sin(a1);return `<path d="M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2} Z" fill="${fill}" stroke="#123047" stroke-width="2"/>`}
     function svgVisual(item){const {n,d}=item.visual, cor=item.cor,forma=item.forma,off='#fff';
@@ -83,7 +83,7 @@
 
     let card=[],deck=[],deckIndex=-1,current=null,marked=new Set(),hits=0,errors=0,outside=[],revealed=false,waiting=false,plays=0;
     function criaItens(keys){return keys.map((key,i)=>({key,visual:fracaoVisual(key),cor:CORES[(i+Math.floor(Math.random()*CORES.length))%CORES.length],forma:FORMAS[Math.floor(Math.random()*FORMAS.length)]}))}
-    function buildDeck(){const calls=card.map(x=>equivalente(x.key));const extras=amostra(POOL.filter(x=>!card.some(c=>c.key===x)),Math.min(7,POOL.length-card.length)).map(equivalente);deck=shuffle([...calls,...extras]);deckIndex=-1}
+    function buildDeck(){const valoresCartela=[...new Set(card.map(x=>reduz(x.key)))];const extras=amostra(POOL.filter(x=>!valoresCartela.includes(reduz(x))),Math.min(7,POOL.length-valoresCartela.length));const bases=[...new Set([...valoresCartela,...extras.map(reduz)])];deck=shuffle(bases.map(equivalente));deckIndex=-1}
     function renderCard(){const root=$('#cartela');root.innerHTML='';card.forEach(item=>{const b=document.createElement('button');b.type='button';b.className='casa';b.dataset.key=item.key;b.setAttribute('aria-label',`Representação visual da fração ${item.key}`);b.innerHTML=`<span class="visual">${svgVisual(item)}</span><span class="revelada" hidden>${item.key}</span>`;b.addEventListener('click',()=>chooseCard(b,item.key));root.appendChild(b)})}
     function setCard(keys){card=criaItens(keys);marked.clear();hits=0;errors=0;outside=[];current=null;waiting=false;revealed=false;plays=0;buildDeck();renderCard();resetRoundUI();updateStats();updateDrawSelect();syncTeacherFromCard();clearCanvas()}
     function randomCard(){setCard(amostra(POOL,9))}
@@ -96,7 +96,7 @@
     function drawNext(){
       const projector=document.body.classList.contains('projetor');
       if(waiting&&!projector)return;
-      if(deckIndex+1>=deck.length){const remaining=card.filter(x=>!marked.has(x.key)).map(x=>equivalente(x.key));const extras=amostra(POOL.filter(x=>!card.some(c=>c.key===x)),5).map(equivalente);deck=shuffle([...remaining,...extras]);deckIndex=-1}
+      if(deckIndex+1>=deck.length){waiting=false;$('#sortear').disabled=true;$('#naoEsta').disabled=true;$('#mensagem').className='mensagem';$('#mensagem').textContent='Todas as frações disponíveis desta rodada já foram sorteadas, sem repetição.';return}
       current=deck[++deckIndex];$('#fracaoAtual').innerHTML=fracHtml(current);$('#equiv').textContent='';
       if(projector){
         waiting=false;plays++;addHistory('proj');updateRevealGate();$('#naoEsta').disabled=true;$('#sortear').disabled=false;$('#sortear').textContent='Sortear próxima fração';$('#mensagem').className='mensagem';$('#mensagem').innerHTML=`🎲 Sorteio livre: ${plays}ª fração exibida. Clique novamente para sortear sem responder.`;return;
@@ -117,7 +117,7 @@
     function pickTeacherRandom(){const keys=new Set(amostra(POOL,9));$$('#profGrid input').forEach(x=>x.checked=keys.has(x.value));teacherChanged({target:{checked:true}})}
     function applyTeacher(){const a=selectedTeacher();if(a.length!==9)return;setCard(a);$('#profNote').textContent='Cartela criada com as 9 frações selecionadas.';$('#profNote').className='prof-note'}
     function toggleTeacher(){const p=$('#professor'),opening=p.hidden;p.hidden=!p.hidden;$('#profBtn').textContent=opening?'Fechar modo professor':'Modo professor';if(opening)syncTeacherFromCard()}
-    function enterProjector(){document.body.classList.add('projetor');waiting=false;$('#sairProjetor').hidden=false;$('#profBtn').hidden=true;$('#nova').hidden=true;$('#naoEsta').disabled=true;$('#sortear').disabled=false;$('#sortear').textContent=current?'Sortear próxima fração':'Sortear primeira fração';$('#mensagem').className='mensagem';$('#mensagem').textContent='Modo projetor: sorteio livre ativado. Você pode sortear várias frações em sequência, sem responder.';window.scrollTo({top:0,behavior:'smooth'})}
+    function enterProjector(){document.body.classList.add('projetor');waiting=false;$('#sairProjetor').hidden=false;$('#profBtn').hidden=true;$('#nova').hidden=true;$('#naoEsta').disabled=true;$('#sortear').disabled=false;$('#sortear').textContent=current?'Sortear próxima fração':'Sortear primeira fração';$('#mensagem').className='mensagem';$('#mensagem').textContent='Modo projetor: sorteio livre ativado, sem repetição e com denominadores de no máximo 10. Você pode sortear várias frações em sequência, sem responder.';window.scrollTo({top:0,behavior:'smooth'})}
     function exitProjector(){document.body.classList.remove('projetor');waiting=false;$('#sairProjetor').hidden=true;$('#profBtn').hidden=false;$('#nova').hidden=false;$('#naoEsta').disabled=true;$('#sortear').disabled=false;$('#sortear').textContent=current?'Sortear próxima fração':'Sortear primeira fração';$('#mensagem').className='mensagem';$('#mensagem').textContent='Modo projetor encerrado. Sorteie a próxima fração para continuar no modo normal.'}
 
     $('#sortear').addEventListener('click',drawNext);$('#naoEsta').addEventListener('click',notOnCard);$('#revelar').addEventListener('click',toggleReveal);$('#nova').addEventListener('click',randomCard);$('#profBtn').addEventListener('click',toggleTeacher);$('#aleatoriaProf').addEventListener('click',pickTeacherRandom);$('#aplicarSelecao').addEventListener('click',applyTeacher);$('#projetor').addEventListener('click',enterProjector);$('#sairProjetor').addEventListener('click',exitProjector);
