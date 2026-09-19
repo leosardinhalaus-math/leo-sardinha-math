@@ -1,0 +1,56 @@
+name: Build Calculus Royale
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "jogos/calculus-royale-src/**"
+      - ".github/workflows/build-calculus-royale.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-calculus-royale
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        working-directory: jogos/calculus-royale-src
+        run: npm install --no-audit --no-fund
+
+      - name: TypeScript check
+        working-directory: jogos/calculus-royale-src
+        run: npm run check
+
+      - name: Build
+        working-directory: jogos/calculus-royale-src
+        run: npm run build
+
+      - name: Publish built game into site tree
+        run: |
+          rm -rf jogos/calculus-royale
+          mkdir -p jogos/calculus-royale
+          cp -R jogos/calculus-royale-src/dist/public/. jogos/calculus-royale/
+
+      - name: Commit built site files
+        run: |
+          if git diff --quiet -- jogos/calculus-royale; then
+            echo "Build unchanged."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add jogos/calculus-royale
+          git commit -m "Build Calculus Royale"
+          git push
