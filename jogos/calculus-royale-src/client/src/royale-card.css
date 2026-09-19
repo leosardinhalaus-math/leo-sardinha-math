@@ -92,3 +92,36 @@
 }
 
 /* animation-integration-batch-complete */
+
+
+/* Island maps v3 — generated fantasy maps integrated into progression */
+.screen-map .map-screen{
+  background:linear-gradient(180deg,rgba(3,13,28,.86),rgba(3,11,24,.94));
+  backdrop-filter:blur(2px);
+}
+.screen-map .arena-canvas{opacity:.16;filter:saturate(.9) contrast(1.05)}
+.screen-map .vignette{background:linear-gradient(180deg,rgba(2,8,20,.28),rgba(2,8,20,.76))}
+.island-button{overflow:hidden;isolation:isolate;background:#07162d}
+.island-map-art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;opacity:.86;filter:saturate(1.08) contrast(1.04);transform:scale(1.06);transition:transform .45s ease,filter .3s ease,opacity .3s ease}
+.island-map-shade{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(3,10,24,.08) 0%,rgba(3,10,24,.28) 42%,rgba(3,10,24,.9) 100%),radial-gradient(circle at 50% 34%,transparent 18%,rgba(2,8,20,.28) 100%);pointer-events:none}
+.island-glow{z-index:2;box-shadow:inset 0 0 24px color-mix(in srgb,var(--island-color) 16%,transparent)}
+.island-number,.island-button strong,.island-button small,.island-arrow,.island-lock,.island-check,.celebration-burst{position:relative;z-index:3;text-shadow:0 2px 8px rgba(0,0,0,.92)}
+.island-number{padding:3px 7px;border-radius:999px;background:rgba(3,13,28,.76);border:1px solid color-mix(in srgb,var(--island-color) 42%,transparent)}
+.island-button strong{padding:0 8px;color:#fff}
+.island-button small{padding:3px 7px;border-radius:7px;background:rgba(3,13,28,.68);color:#d5e9f0}
+.island-button:hover:not(:disabled) .island-map-art{transform:scale(1.14);filter:saturate(1.18) contrast(1.07) brightness(1.05)}
+.island-locked .island-map-art{filter:grayscale(.88) brightness(.56);opacity:.58}
+.island-done .island-map-art{filter:saturate(.88) brightness(.88)}
+.island-done .island-map-shade{background:linear-gradient(180deg,rgba(7,46,40,.16),rgba(3,20,22,.84))}
+.island-celebrating .island-map-art{filter:saturate(1.25) brightness(1.14)}
+.landing-visual img{object-fit:cover;object-position:center;aspect-ratio:16/9}
+
+@media(max-width:900px){
+  .island-map-art{object-position:center 42%}
+  .island-button{overflow:hidden}
+  .island-button strong{font-size:13px;margin-top:4px}
+  .island-button small{margin-top:4px}
+}
+@media(prefers-reduced-motion:reduce){
+  .island-map-art{transition:none!important}
+}

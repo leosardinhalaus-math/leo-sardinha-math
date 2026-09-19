@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 p=Path('client/src/components/GameCanvas.tsx')
 text=p.read_text(encoding='utf-8')
@@ -26,6 +27,22 @@ enter='''  const enterGame = (withName: boolean) => {
 '''
 if needle not in text: raise SystemExit('selectWorld marker not found')
 text=text.replace(needle, enter+needle, 1)
+
+# Premium island maps — one visual world per island.
+world_art_pattern=r'const worldArt\\s*=\\s*\\[[\\s\\S]*?world-1\\.svg[\\s\\S]*?\\];'
+if re.search(world_art_pattern,text):
+    if 'import { WORLD_MAPS } from "@/data/worldMaps";' not in text:
+        text='import { WORLD_MAPS } from "@/data/worldMaps";\\n'+text
+    text=re.sub(world_art_pattern,'const worldArt = WORLD_MAPS.map((item) => item.art);',text,count=1)
+else:
+    for old,new in [
+        ('"./assets/art/world-1.svg"','"./assets/maps/world-1.webp"'),
+        ('"./assets/art/world-2.svg"','"./assets/maps/world-2.webp"'),
+        ('"./assets/art/world-3.svg"','"./assets/maps/world-3.webp"'),
+        ('"./assets/art/world-4.svg"','"./assets/maps/world-4.webp"'),
+        ('"./assets/art/world-5.svg"','"./assets/maps/world-5.webp"'),
+    ]:
+        text=text.replace(old,new)
 
 # Match generated character art to gameplay names and add the two missing mathematical heroes.
 for old,new in [
@@ -74,8 +91,10 @@ if old_enemy not in text or old_ally not in text:
     raise SystemExit("unit render marker not found")
 text=text.replace(old_enemy,new_enemy,1)
 text=text.replace(old_ally,new_ally,1)
-idx=text.find('className="island-glow"')
-if idx >= 0:
-    print("DEBUG_ISLAND_SOURCE")
-    print(text[max(0,idx-1800):idx+3200])
+island_old="<span className=\"island-glow\" /><span className=\"island-number\">0{item.id}</span>"
+island_new="<img className=\"island-map-art\" src={worldArt[index]} alt=\"\" aria-hidden=\"true\" /><span className=\"island-map-shade\" /><span className=\"island-glow\" /><span className=\"island-number\">0{item.id}</span>"
+if island_old not in text:
+    raise SystemExit("island map marker not found")
+text=text.replace(island_old,island_new,1)
+text=text.replace('alt="Personagens do Calculus Royale"','alt="Mapa das ilhas do Calculus Royale"',1)
 p.write_text(text,encoding='utf-8')
