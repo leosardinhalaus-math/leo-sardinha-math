@@ -1,4 +1,4 @@
-import type { CSSProperties, MouseEvent } from "react";
+import { useState, type CSSProperties, type MouseEvent } from "react";
 import { getCardVisual } from "@/data/cardVisuals";
 import { getCardImage, getCardImageFallback } from "@/data/cardArt";
 
@@ -40,6 +40,7 @@ export default function RoyaleCard({
   onPlay,
   onEvolve,
 }: Props) {
+  const [casting, setCasting] = useState(false);
   const visual = getCardVisual(card.id);
   const effectivePower = Math.round(card.power * (1 + Math.max(0, level - 1) * 0.12));
   const style = {
@@ -50,18 +51,25 @@ export default function RoyaleCard({
   const image = getCardImage(card.id);
   const fallback = getCardImageFallback(card.id);
 
+  const handlePlay = () => {
+    if (disabled) return;
+    setCasting(true);
+    onPlay?.(card);
+    window.setTimeout(() => setCasting(false), 420);
+  };
+
   const handleEvolve = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     onEvolve?.(card);
   };
 
   return (
-    <article className={`royale-card rarity-${card.rarity} variant-${variant} ${selected ? "is-selected" : ""}`} style={style}>
+    <article className={`royale-card rarity-${card.rarity} variant-${variant} ${selected ? "is-selected" : ""} ${casting ? "is-casting" : ""}`} style={style}>
       <button
         className="royale-card-hitarea"
         type="button"
         disabled={disabled}
-        onClick={() => onPlay?.(card)}
+        onClick={handlePlay}
         aria-label={`${card.name}: ${card.formula}`}
       >
         <header className="royale-card-meta">
@@ -86,6 +94,7 @@ export default function RoyaleCard({
           <div className="royale-card-vignette" />
           <span className="royale-card-symbol">{visual?.symbol ?? card.icon ?? "∂"}</span>
           <span className="royale-card-formula">{card.formula}</span>
+          <span className="card-cast-glyph" aria-hidden="true">{visual?.symbol ?? card.icon ?? "∂"}</span>
         </div>
 
         <div className="royale-card-copy">
