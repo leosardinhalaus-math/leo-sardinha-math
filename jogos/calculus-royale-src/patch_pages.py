@@ -1,6 +1,8 @@
 from pathlib import Path
 p=Path('client/src/components/GameCanvas.tsx')
 text=p.read_text(encoding='utf-8')
+if 'import RoyaleCard from "./RoyaleCard";' not in text:
+    text='import RoyaleCard from "./RoyaleCard";\n'+text
 
 text=text.replace('type View = "map" | "battle" | "deck";', 'type View = "home" | "map" | "battle" | "deck";')
 text=text.replace('inventory: "calculus-royale:inventory" };', 'inventory: "calculus-royale:inventory", playerName: "calculus-royale:player-name" };')
@@ -39,8 +41,7 @@ text=text.replace(old,new,1)
 
 text=text.replace('<strong>Aprendiz do Limite</strong><small>Nível 07 · 1.240 XP</small>', '<strong>{playerName || "Visitante"}</strong><small>{completedWorlds.filter(Boolean).length}/5 ilhas · {wins} vitórias</small>')
 
-idx=text.find('className="card-art"')
-if idx >= 0:
-    print("DEBUG_CARD_ART_SNIPPET")
-    print(text[max(0,idx-900):idx+2200])
+if "<div className=\"card-stack\">{activeCards.map((card) => <button key={card.id} className={`spell-card ${rarityClass[card.rarity]}`} onClick={() => playCard(card)}><div className=\"card-top\"><span className=\"card-cost\">{card.cost}</span><span className=\"card-kind\">{card.kind}</span><span className=\"card-rarity\">{card.rarity}</span></div><div className=\"card-art\" style={{ \"--card-color\": world.color } as React.CSSProperties}><img src={getCardArt(card)} alt={`Personagem 2D ${card.name}, inspirado em ${card.formula}`} /><span className=\"formula-ribbon\">{card.formula}</span></div><div className=\"card-copy\"><strong>{card.name}</strong><small>{card.formula}</small><em>{card.effect}</em></div><div className=\"card-footer\"><span><Zap size={11} /> poder {Math.round(card.power * (1 + (cardLevels[card.id] ?? 0) * .12))} · Nv.{(cardLevels[card.id] ?? 0) + 1}</span><span onClick={(event) => { event.stopPropagation(); evolveCard(card); }} className=\"evolve-action\">✦ evoluir</span></div></button>)}</div>" not in text:
+    raise SystemExit("card render marker not found")
+text=text.replace("<div className=\"card-stack\">{activeCards.map((card) => <button key={card.id} className={`spell-card ${rarityClass[card.rarity]}`} onClick={() => playCard(card)}><div className=\"card-top\"><span className=\"card-cost\">{card.cost}</span><span className=\"card-kind\">{card.kind}</span><span className=\"card-rarity\">{card.rarity}</span></div><div className=\"card-art\" style={{ \"--card-color\": world.color } as React.CSSProperties}><img src={getCardArt(card)} alt={`Personagem 2D ${card.name}, inspirado em ${card.formula}`} /><span className=\"formula-ribbon\">{card.formula}</span></div><div className=\"card-copy\"><strong>{card.name}</strong><small>{card.formula}</small><em>{card.effect}</em></div><div className=\"card-footer\"><span><Zap size={11} /> poder {Math.round(card.power * (1 + (cardLevels[card.id] ?? 0) * .12))} · Nv.{(cardLevels[card.id] ?? 0) + 1}</span><span onClick={(event) => { event.stopPropagation(); evolveCard(card); }} className=\"evolve-action\">✦ evoluir</span></div></button>)}</div>", "<div className=\"card-stack\">{activeCards.map((card) => <RoyaleCard key={card.id} card={card} level={(cardLevels[card.id] ?? 0) + 1} disabled={energy < card.cost} variant={activeTab === \"deck\" ? \"deck\" : \"hand\"} onPlay={playCard} onEvolve={evolveCard} />)}</div>", 1)
 p.write_text(text,encoding='utf-8')
