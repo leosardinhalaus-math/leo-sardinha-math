@@ -90,3 +90,5 @@
   .unit-token,.unit-token::before,.unit-token .unit-avatar,.tower-tile{animation:none!important}
   .unit-token{transition:left .18s linear}
 }
+
+/* animation-integration-batch-complete */
