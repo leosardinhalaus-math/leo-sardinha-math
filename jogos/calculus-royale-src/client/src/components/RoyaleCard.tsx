@@ -1,6 +1,6 @@
 import type { CSSProperties, MouseEvent } from "react";
 import { getCardVisual } from "@/data/cardVisuals";
-import { getCardSpriteStyle } from "@/data/cardSprite";
+import { getCardImage, getCardImageFallback } from "@/data/cardArt";
 
 type GameCard = {
   id: string;
@@ -47,10 +47,7 @@ export default function RoyaleCard({
     "--visual-secondary": visual?.palette?.[1] ?? "#102A4D",
   } as CSSProperties;
 
-  const art = variant === "gallery" ? visual?.art : variant === "deck" ? visual?.thumb : visual?.thumb;
-  const fallback = visual?.fallback ?? "./assets/art/world-1.svg";
-  const spriteStyle = getCardSpriteStyle(card.id);
-
+  const image = getCardImage(card.id);\n  const fallback = getCardImageFallback(card.id);\n
   const handleEvolve = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     onEvolve?.(card);
@@ -72,22 +69,18 @@ export default function RoyaleCard({
         </header>
 
         <div className="royale-card-art">
-          {spriteStyle ? (
-            <div className="royale-card-sprite" style={spriteStyle} role="img" aria-label={`${card.name}, personagem inspirado em ${card.formula}`} />
-          ) : (
-            <img
-              src={art ?? fallback}
-              data-fallback={fallback}
-              alt={`${card.name}, personagem inspirado em ${card.formula}`}
-              loading="lazy"
-              decoding="async"
-              onError={(event) => {
-                const image = event.currentTarget;
-                if (image.src.endsWith(fallback)) return;
-                image.src = fallback;
-              }}
-            />
-          )}
+          <img
+            src={image}
+            alt={`${card.name}, personagem inspirado em ${card.formula}`}
+            loading="lazy"
+            decoding="async"
+            onError={(event) => {
+              const element = event.currentTarget;
+              if (element.dataset.fallbackApplied === "1") return;
+              element.dataset.fallbackApplied = "1";
+              element.src = fallback;
+            }}
+          />
           <div className="royale-card-vignette" />
           <span className="royale-card-symbol">{visual?.symbol ?? card.icon ?? "∂"}</span>
           <span className="royale-card-formula">{card.formula}</span>
