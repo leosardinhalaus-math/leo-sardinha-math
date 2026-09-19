@@ -26,6 +26,7 @@ jobs:
           python patch_pages.py
           cat .packed/index.css.gz.b64 | base64 -d | gunzip > client/src/index.css
           cat client/src/enhancements.css >> client/src/index.css
+          cat client/src/royale-card.css >> client/src/index.css
           cat client/src/navigation-lite.css >> client/src/index.css
 
       - name: Setup Node
