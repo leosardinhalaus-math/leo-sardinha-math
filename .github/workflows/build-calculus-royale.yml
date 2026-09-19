@@ -23,6 +23,9 @@ jobs:
           mkdir -p jogos/calculus-royale-src/client/src/components
           cat jogos/calculus-royale-src/.packed/GameCanvas.v2.part1 jogos/calculus-royale-src/.packed/GameCanvas.v2.part2 jogos/calculus-royale-src/.packed/GameCanvas.v2.part3 jogos/calculus-royale-src/.packed/GameCanvas.v2.part4 | base64 -d | gunzip > jogos/calculus-royale-src/client/src/components/GameCanvas.tsx
           cd jogos/calculus-royale-src
+          mkdir -p client/public/assets/cards
+          cat .packed/card-sprite.webp.b64.part1 .packed/card-sprite.webp.b64.part2 .packed/card-sprite.webp.b64.part3 .packed/card-sprite.webp.b64.part4 .packed/card-sprite.webp.b64.part5 .packed/card-sprite.webp.b64.part6 | base64 -d > client/public/assets/cards/card-sprite.webp
+          test "$(wc -c < client/public/assets/cards/card-sprite.webp)" -gt 50000
           python patch_pages.py
           cat .packed/index.css.gz.b64 | base64 -d | gunzip > client/src/index.css
           cat client/src/enhancements.css >> client/src/index.css
