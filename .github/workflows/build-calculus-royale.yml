@@ -30,6 +30,9 @@ jobs:
           mkdir -p client/public/assets/cards
           cat .packed/card-sprite.webp.b64.part1 .packed/card-sprite.webp.b64.part2 .packed/card-sprite.webp.b64.part3 .packed/card-sprite.webp.b64.part4 .packed/card-sprite.webp.b64.part5 .packed/card-sprite.webp.b64.part6 | base64 -d > client/public/assets/cards/card-sprite.webp
           test "$(wc -c < client/public/assets/cards/card-sprite.webp)" -gt 50000
+          python -m pip install --quiet pillow
+          python scripts/split_card_sprite.py
+          node scripts/validate-character-assets.mjs
           python patch_pages.py
           cat .packed/index.css.gz.b64 | base64 -d | gunzip > client/src/index.css
           cat client/src/enhancements.css >> client/src/index.css
