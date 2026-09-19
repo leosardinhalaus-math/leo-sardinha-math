@@ -39,4 +39,8 @@ text=text.replace(old,new,1)
 
 text=text.replace('<strong>Aprendiz do Limite</strong><small>Nível 07 · 1.240 XP</small>', '<strong>{playerName || "Visitante"}</strong><small>{completedWorlds.filter(Boolean).length}/5 ilhas · {wins} vitórias</small>')
 
+idx=text.find('className="card-art"')
+if idx >= 0:
+    print("DEBUG_CARD_ART_SNIPPET")
+    print(text[max(0,idx-900):idx+2200])
 p.write_text(text,encoding='utf-8')
