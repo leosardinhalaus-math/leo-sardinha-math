@@ -74,4 +74,8 @@ if old_enemy not in text or old_ally not in text:
     raise SystemExit("unit render marker not found")
 text=text.replace(old_enemy,new_enemy,1)
 text=text.replace(old_ally,new_ally,1)
+idx=text.find('className="island-glow"')
+if idx >= 0:
+    print("DEBUG_ISLAND_SOURCE")
+    print(text[max(0,idx-1800):idx+3200])
 p.write_text(text,encoding='utf-8')
