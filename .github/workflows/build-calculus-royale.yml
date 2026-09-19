@@ -56,5 +56,6 @@ jobs:
             echo "No generated changes to commit."
           else
             git commit -m "Build Calculus Royale"
-            git push
+            git pull --rebase origin main
+            git push origin HEAD:main
           fi
