@@ -25,6 +25,26 @@ enter='''  const enterGame = (withName: boolean) => {
 if needle not in text: raise SystemExit('selectWorld marker not found')
 text=text.replace(needle, enter+needle, 1)
 
+# Match generated character art to gameplay names and add the two missing mathematical heroes.
+for old,new in [
+    ('name:"Cavaleiro da Tangente"','name:"Arqueira da Derivada"'),
+    ('name:"Arqueira da Cadeia"','name:"Mago da Cadeia"'),
+    ('name:"Relógio de Taxas"','name:"Engenheiro das Taxas"'),
+    ('name:"Bardo de Taylor"','name:"Oráculo de Taylor"'),
+    ('name:"Cavaleiro Newton"','name:"Titã de Newton"'),
+    ('name:"Arquiteta da Área"','name:"Sacerdotisa da Integral"'),
+    ('name:"Oráculo Fundamental"','name:"Colosso Fundamental"'),
+]:
+    text=text.replace(old,new,1)
+
+slope_marker='effect:"Avança velozmente e perfura uma torre.",power:14},'
+if 'id:"limit"' not in text:
+    text=text.replace(slope_marker, slope_marker+'{id:"limit",name:"Guardião do Limite",icon:"lim",kind:"estrutura",cost:4,rarity:"rara",formula:"limₓ→ₐ f(x)",effect:"Estabiliza a defesa conforme a função se aproxima do alvo.",power:18},',1)
+
+trap_marker='effect:"Ataque estável mesmo sem fórmula fechada.",power:13},'
+if 'id:"series"' not in text:
+    text=text.replace(trap_marker, trap_marker+'{id:"series",name:"Feiticeiro da Série",icon:"Σ",kind:"tropa",cost:4,rarity:"rara",formula:"Σ aₙ",effect:"Invoca ecos do ataque enquanto a série converge.",power:20},',1)
+
 text=text.replace('const resetBattle = () => { setEnemyTower(82); setAllyTower(96); setUnits([]); setEnemyUnits([]); setEnergy(7); setEnemyEnergy(5); setDeckQueue(mainDeckIds); setView("battle");', 'const resetBattle = () => { setEnemyTower(getWorldEnemyHp(worldIndex)); setAllyTower(96); setUnits([]); setEnemyUnits([]); setEnergy(7); setEnemyEnergy(5); setDeckQueue(mainDeckIds); setView("battle");')
 
 text=text.replace('<main className="game-shell" style=', '<main className={`game-shell screen-${view}`} style=', 1)
