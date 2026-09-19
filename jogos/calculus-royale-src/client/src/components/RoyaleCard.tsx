@@ -47,7 +47,9 @@ export default function RoyaleCard({
     "--visual-secondary": visual?.palette?.[1] ?? "#102A4D",
   } as CSSProperties;
 
-  const image = getCardImage(card.id);\n  const fallback = getCardImageFallback(card.id);\n
+  const image = getCardImage(card.id);
+  const fallback = getCardImageFallback(card.id);
+
   const handleEvolve = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     onEvolve?.(card);
