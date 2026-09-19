@@ -1,0 +1,60 @@
+name: Build Calculus Royale
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'jogos/calculus-royale-src/**'
+      - '.github/workflows/build-calculus-royale.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Reconstruct packed source files
+        run: |
+          mkdir -p jogos/calculus-royale-src/client/src/components
+          cat jogos/calculus-royale-src/.packed/GameCanvas.tsx.gz.b64.part1 jogos/calculus-royale-src/.packed/GameCanvas.tsx.gz.b64.part2 | base64 -d | gunzip > jogos/calculus-royale-src/client/src/components/GameCanvas.tsx
+          cat jogos/calculus-royale-src/.packed/index.css.gz.b64 | base64 -d | gunzip > jogos/calculus-royale-src/client/src/index.css
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        working-directory: jogos/calculus-royale-src
+        run: npm install --no-audit --no-fund
+
+      - name: Check TypeScript
+        working-directory: jogos/calculus-royale-src
+        run: npm run check
+
+      - name: Build game
+        working-directory: jogos/calculus-royale-src
+        run: npm run build
+
+      - name: Publish built game into site
+        run: |
+          rm -rf jogos/calculus-royale
+          mkdir -p jogos/calculus-royale
+          cp -R jogos/calculus-royale-src/dist/public/. jogos/calculus-royale/
+
+      - name: Commit generated game
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add jogos/calculus-royale
+          if git diff --cached --quiet; then
+            echo "No generated changes to commit."
+          else
+            git commit -m "Build Calculus Royale"
+            git push
+          fi
