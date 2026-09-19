@@ -1,29 +1,36 @@
 export type CardVisualClass = "limite" | "derivada" | "integral" | "serie" | "suporte";
 export type CardVisualRarity = "comum" | "rara" | "épica" | "lendária";
-
 export interface CardVisual {
-  id: string;
-  name: string;
-  world: number;
-  class: CardVisualClass;
-  kind: string;
-  rarity: CardVisualRarity;
-  formula: string;
-  palette: string[];
-  symbol: string;
-  silhouette: string;
-  visualBrief: string;
-  art: string;
-  thumb: string;
-  battle: string;
-  fallback: string;
-  prompt: string;
+  id:string; name:string; world:number; class:CardVisualClass; kind:string; rarity:CardVisualRarity;
+  formula:string; palette:string[]; symbol:string; silhouette:string; visualBrief:string;
+  art:string; thumb:string; battle:string; fallback:string; prompt:string;
 }
-
 export const CARD_VISUALS: CardVisual[] = [
   {
+    "id": "limit",
+    "name": "Guardião do Limite",
+    "world": 1,
+    "class": "limite",
+    "kind": "estrutura",
+    "rarity": "rara",
+    "formula": "limₓ→ₐ f(x)",
+    "palette": [
+      "#2ED6E8",
+      "#102A4D",
+      "#F4FBFF"
+    ],
+    "symbol": "lim",
+    "silhouette": "guardião com escudo-portal circular e postura defensiva",
+    "visualBrief": "O escudo representa aproximação ao ponto sem atravessá-lo.",
+    "art": "./assets/cards/card-sprite.webp",
+    "thumb": "./assets/cards/card-sprite.webp",
+    "battle": "./assets/cards/card-sprite.webp",
+    "fallback": "./assets/art/world-1.svg",
+    "prompt": "guardião do limite, cavaleiro matemágico azul com escudo portal, cartoon 2D polido"
+  },
+  {
     "id": "slope",
-    "name": "Cavaleiro da Tangente",
+    "name": "Arqueira da Derivada",
     "world": 1,
     "class": "derivada",
     "kind": "tropa",
@@ -45,7 +52,7 @@ export const CARD_VISUALS: CardVisual[] = [
   },
   {
     "id": "chain",
-    "name": "Arqueira da Cadeia",
+    "name": "Mago da Cadeia",
     "world": 2,
     "class": "derivada",
     "kind": "tropa",
@@ -89,7 +96,7 @@ export const CARD_VISUALS: CardVisual[] = [
   },
   {
     "id": "rate",
-    "name": "Relógio de Taxas",
+    "name": "Engenheiro das Taxas",
     "world": 2,
     "class": "suporte",
     "kind": "feitiço",
@@ -133,7 +140,7 @@ export const CARD_VISUALS: CardVisual[] = [
   },
   {
     "id": "taylor",
-    "name": "Bardo de Taylor",
+    "name": "Oráculo de Taylor",
     "world": 3,
     "class": "serie",
     "kind": "tropa",
@@ -155,7 +162,7 @@ export const CARD_VISUALS: CardVisual[] = [
   },
   {
     "id": "newton",
-    "name": "Cavaleiro Newton",
+    "name": "Titã de Newton",
     "world": 3,
     "class": "suporte",
     "kind": "tropa",
@@ -177,7 +184,7 @@ export const CARD_VISUALS: CardVisual[] = [
   },
   {
     "id": "area",
-    "name": "Arquiteta da Área",
+    "name": "Sacerdotisa da Integral",
     "world": 4,
     "class": "integral",
     "kind": "tropa",
@@ -199,7 +206,7 @@ export const CARD_VISUALS: CardVisual[] = [
   },
   {
     "id": "ftc",
-    "name": "Oráculo Fundamental",
+    "name": "Colosso Fundamental",
     "world": 4,
     "class": "integral",
     "kind": "feitiço",
@@ -240,16 +247,30 @@ export const CARD_VISUALS: CardVisual[] = [
     "battle": "./assets/cards/battle/cavalieri.webp",
     "fallback": "./assets/art/world-4.svg",
     "prompt": "personagem lendário de card game fantasy cartoon 2D polido, mestre Cavalieri, arquiteto mágico dourado e verde, duas formas tridimensionais diferentes cortadas por planos horizontais luminosos equivalentes, pose de mestre, fundo simples, sem texto, sem moldura"
+  },
+  {
+    "id": "series",
+    "name": "Feiticeiro da Série",
+    "world": 5,
+    "class": "serie",
+    "kind": "tropa",
+    "rarity": "rara",
+    "formula": "Σ aₙ",
+    "palette": [
+      "#8D63FF",
+      "#2ED6E8",
+      "#102A4D"
+    ],
+    "symbol": "Σ",
+    "silhouette": "feiticeiro multiplicado em ecos sucessivos",
+    "visualBrief": "Ecos visuais representam termos sucessivos de uma série.",
+    "art": "./assets/cards/card-sprite.webp",
+    "thumb": "./assets/cards/card-sprite.webp",
+    "battle": "./assets/cards/card-sprite.webp",
+    "fallback": "./assets/art/world-5.svg",
+    "prompt": "feiticeiro da série, ecos violetas e sigma luminoso, cartoon 2D polido"
   }
 ] as CardVisual[];
-
-export const CARD_VISUAL_BY_ID = new Map(CARD_VISUALS.map((card) => [card.id, card]));
-
-export function getCardVisual(id: string): CardVisual | undefined {
-  return CARD_VISUAL_BY_ID.get(id);
-}
-
-export function getCardArt(id: string, variant: "art" | "thumb" | "battle" = "thumb"): string | undefined {
-  const visual = getCardVisual(id);
-  return visual?.[variant];
-}
+export const CARD_VISUAL_BY_ID = new Map(CARD_VISUALS.map((card)=>[card.id,card]));
+export function getCardVisual(id:string){ return CARD_VISUAL_BY_ID.get(id); }
+export function getCardArt(id:string, variant:"art"|"thumb"|"battle"="thumb"){ return getCardVisual(id)?.[variant]; }
