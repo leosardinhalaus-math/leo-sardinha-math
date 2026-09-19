@@ -1,0 +1,292 @@
+{
+  "version": 1,
+  "globalStyle": "fantasia matemágica, cartoon 2D polido, card game competitivo, silhueta forte, leitura em 120 px, sem texto embutido, sem moldura, fundo simples, iluminação cinematográfica",
+  "export": {
+    "format": "webp",
+    "size": "1024x1024",
+    "quality": 88,
+    "pathPattern": "client/public/assets/cards/characters/{id}.webp"
+  },
+  "remaining": [
+    {
+      "id": "power",
+      "name": "Mago da Potência",
+      "formula": "d/dx xⁿ = n·xⁿ⁻¹",
+      "effect": "Golpe pesado; quanto maior n, maior o impacto.",
+      "visual": "mago robusto erguendo cajado com expoente n como runa, ondas de potência crescendo",
+      "prompt": "mago robusto erguendo cajado com expoente n como runa, ondas de potência crescendo; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "sine",
+      "name": "Bailarina Seno",
+      "formula": "(sen x)' = cos x",
+      "effect": "Dança em ondas e distrai a defesa.",
+      "visual": "bailarina ágil desenhando uma senoide luminosa com fitas, movimento ondulatório",
+      "prompt": "bailarina ágil desenhando uma senoide luminosa com fitas, movimento ondulatório; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "euler",
+      "name": "Orbe de Euler",
+      "formula": "(eˣ)' = eˣ",
+      "effect": "Explosão auto-regenerativa no alvo.",
+      "visual": "orbe vivo exponencial, núcleo dourado auto-regenerativo, energia eˣ em espiral",
+      "prompt": "orbe vivo exponencial, núcleo dourado auto-regenerativo, energia eˣ em espiral; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "ln",
+      "name": "Ladina ln(x)",
+      "formula": "(ln x)' = 1/x",
+      "effect": "Fica mais precisa conforme se aproxima do alvo.",
+      "visual": "ladina furtiva verde-azulada com lâmina curva logarítmica, aproximação precisa",
+      "prompt": "ladina furtiva verde-azulada com lâmina curva logarítmica, aproximação precisa; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "cauchy",
+      "name": "Guardião de Cauchy",
+      "formula": "f'/g' = [f(b)−f(a)]/[g(b)−g(a)]",
+      "effect": "Equilibra razões de variação.",
+      "visual": "guardião de dois escudos equilibrados, duas curvas comparadas em simetria",
+      "prompt": "guardião de dois escudos equilibrados, duas curvas comparadas em simetria; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "opt",
+      "name": "Bússola Ótima",
+      "formula": "f'(x)=0 → candidato",
+      "effect": "Encontra o ponto de maior dano.",
+      "visual": "bússola arcana viva apontando para um extremo de uma curva, brilho de máximo/mínimo",
+      "prompt": "bússola arcana viva apontando para um extremo de uma curva, brilho de máximo/mínimo; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "cavalieri",
+      "name": "Mestre Cavalieri",
+      "formula": "mesmas seções → mesmo volume",
+      "effect": "Compara sólidos por seções.",
+      "visual": "arquiteto-mestre com dois sólidos diferentes cortados por planos equivalentes",
+      "prompt": "arquiteto-mestre com dois sólidos diferentes cortados por planos equivalentes; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "fractal",
+      "name": "Semente Fractal",
+      "formula": "padrão em toda escala",
+      "effect": "Duplica unidades pequenas.",
+      "visual": "semente mágica abrindo estruturas auto-semelhantes em múltiplas escalas",
+      "prompt": "semente mágica abrindo estruturas auto-semelhantes em múltiplas escalas; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "sub",
+      "name": "Alquimista u",
+      "formula": "u=g(x), du=g'(x)dx",
+      "effect": "Troca a variável e surpreende a torre.",
+      "visual": "alquimista transformando um símbolo x em u dentro de frasco luminoso",
+      "prompt": "alquimista transformando um símbolo x em u dentro de frasco luminoso; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "parts",
+      "name": "Duelista por Partes",
+      "formula": "∫u dv = uv − ∫v du",
+      "effect": "Divide o dano em dois golpes precisos.",
+      "visual": "duelista com duas lâminas complementares, uma u e outra dv, golpes cruzados",
+      "prompt": "duelista com duas lâminas complementares, uma u e outra dv, golpes cruzados; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "trap",
+      "name": "Engenheira Trapézio",
+      "formula": "Tₙ = h/2·[f₀+2Σfᵢ+fₙ]",
+      "effect": "Ataque estável mesmo sem fórmula fechada.",
+      "visual": "engenheira steampunk montando placas trapezoidais sob uma curva",
+      "prompt": "engenheira steampunk montando placas trapezoidais sob uma curva; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "improper",
+      "name": "Sentinela Imprópria",
+      "formula": "limite de uma integral",
+      "effect": "Resiste enquanto a série converge.",
+      "visual": "sentinela diante de portal infinito, integral se estendendo ao horizonte",
+      "prompt": "sentinela diante de portal infinito, integral se estendendo ao horizonte; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "continuity",
+      "name": "Sentinela Contínua",
+      "formula": "lim f(x) = f(a)",
+      "effect": "Mantém o fluxo sem saltos na defesa.",
+      "visual": "sentinela lisa e fluida protegendo uma curva contínua sem rupturas",
+      "prompt": "sentinela lisa e fluida protegendo uma curva contínua sem rupturas; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "quotient",
+      "name": "Ladina do Quociente",
+      "formula": "(u/v)' = (u'v−uv')/v²",
+      "effect": "Divide o alvo e acerta duas vezes.",
+      "visual": "ladina com duas adagas separando numerador e denominador em movimento",
+      "prompt": "ladina com duas adagas separando numerador e denominador em movimento; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "secant",
+      "name": "Cavaleiro Secante",
+      "formula": "(sec x)' = sec x·tan x",
+      "effect": "Ganha alcance quando a tangente cresce.",
+      "visual": "cavaleiro com lança cortando uma curva em dois pontos, linha secante brilhante",
+      "prompt": "cavaleiro com lança cortando uma curva em dois pontos, linha secante brilhante; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "bernoulli",
+      "name": "Alquimista Bernoulli",
+      "formula": "(1+1/n)ⁿ → e",
+      "effect": "Transforma limite em explosão exponencial.",
+      "visual": "alquimista lendário com frasco que converge para e e explode em energia exponencial",
+      "prompt": "alquimista lendário com frasco que converge para e e explode em energia exponencial; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "inverse",
+      "name": "Bruxa da Inversa",
+      "formula": "(f⁻¹)' = 1/f'(f⁻¹)",
+      "effect": "Devolve o dano pelo caminho inverso.",
+      "visual": "bruxa com espelho mágico invertendo uma curva e devolvendo projétil",
+      "prompt": "bruxa com espelho mágico invertendo uma curva e devolvendo projétil; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "expchain",
+      "name": "Elo Exponencial",
+      "formula": "(aˣ)' = aˣ ln a",
+      "effect": "Amplifica uma carta composta.",
+      "visual": "elo arcano flutuante ligando símbolos aˣ e ln a, corrente de energia",
+      "prompt": "elo arcano flutuante ligando símbolos aˣ e ln a, corrente de energia; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "root",
+      "name": "Mestre das Raízes",
+      "formula": "xᵖ/ᑫ = √[q]{xᵖ}",
+      "effect": "Encontra a raiz do escudo inimigo.",
+      "visual": "mestre guerreiro quebrando um escudo com símbolo radical luminoso",
+      "prompt": "mestre guerreiro quebrando um escudo com símbolo radical luminoso; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "mirror",
+      "name": "Espelho Implícito",
+      "formula": "dy/dx = −Fₓ/Fᵧ",
+      "effect": "Replica a última defesa lançada.",
+      "visual": "espelho arcano com duas variáveis refletidas e runas parciais",
+      "prompt": "espelho arcano com duas variáveis refletidas e runas parciais; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "mean",
+      "name": "Juiz de Cauchy",
+      "formula": "f'(c)/g'(c) = Δf/Δg",
+      "effect": "Redistribui a força entre as duas lanes.",
+      "visual": "juiz matemágico segurando balança com duas razões de variação",
+      "prompt": "juiz matemágico segurando balança com duas razões de variação; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "growth",
+      "name": "Batedora Crescente",
+      "formula": "f'(x)>0 ⇒ f cresce",
+      "effect": "Corre mais rápido em terreno positivo.",
+      "visual": "batedora veloz subindo uma curva crescente, trilha verde positiva",
+      "prompt": "batedora veloz subindo uma curva crescente, trilha verde positiva; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "taylor2",
+      "name": "Escriba de Taylor",
+      "formula": "P₂(x)=f(a)+f'(a)h+f''(a)h²/2",
+      "effect": "Prevê o próximo movimento inimigo.",
+      "visual": "escriba com pergaminho e termos polinomiais projetados como previsão",
+      "prompt": "escriba com pergaminho e termos polinomiais projetados como previsão; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "miner",
+      "name": "Mineradora Ótima",
+      "formula": "f'(x)=0; f''(x)<0",
+      "effect": "Escava o máximo local da torre.",
+      "visual": "mineradora heroica cavando o topo de uma montanha em forma de curva",
+      "prompt": "mineradora heroica cavando o topo de uma montanha em forma de curva; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "average",
+      "name": "Monge do Valor Médio",
+      "formula": "f̄ = 1/(b−a) ∫f",
+      "effect": "Equilibra a vida das duas torres.",
+      "visual": "monge sereno nivelando duas barras de energia pela média integral",
+      "prompt": "monge sereno nivelando duas barras de energia pela média integral; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "volume",
+      "name": "Tecelã de Volumes",
+      "formula": "V = ∫ A(x)dx",
+      "effect": "Constrói uma barreira em camadas.",
+      "visual": "tecelã formando volume sólido com seções luminosas empilhadas",
+      "prompt": "tecelã formando volume sólido com seções luminosas empilhadas; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "surface",
+      "name": "Navegadora de Superfície",
+      "formula": "S = ∫ 2πr ds",
+      "effect": "Cobre a arena com dano contínuo.",
+      "visual": "navegadora com mapa de superfície de revolução e fita orbital",
+      "prompt": "navegadora com mapa de superfície de revolução e fita orbital; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "gabriel",
+      "name": "Arauto de Gabriel",
+      "formula": "∫₁∞ 1/x² dx = 1",
+      "effect": "Vence uma distância infinita com precisão.",
+      "visual": "arauto angelical matemágico com trombeta em forma de chifre de Gabriel, infinito ao fundo",
+      "prompt": "arauto angelical matemágico com trombeta em forma de chifre de Gabriel, infinito ao fundo; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "cavalieri-advanced",
+      "name": "Arquiteto de Cavalieri",
+      "formula": "A₁(x)=A₂(x) ⇒ V₁=V₂",
+      "effect": "Compara seções e duplica a defesa por um instante.",
+      "visual": "arquiteto lendário projetando dois sólidos complexos com seções iguais",
+      "prompt": "arquiteto lendário projetando dois sólidos complexos com seções iguais; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "surface-flux",
+      "name": "Tecelã do Fluxo",
+      "formula": "∯_S F·n dS",
+      "effect": "Transforma fluxo acumulado em dano contínuo.",
+      "visual": "tecelã manipulando linhas vetoriais atravessando uma superfície fechada",
+      "prompt": "tecelã manipulando linhas vetoriais atravessando uma superfície fechada; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "parts2",
+      "name": "Mestre das Partes",
+      "formula": "∫u dv = uv−∫vdu",
+      "effect": "Troca posição e força com a unidade rival.",
+      "visual": "mestre duelista veterano alternando duas energias u e v entre as mãos",
+      "prompt": "mestre duelista veterano alternando duas energias u e v entre as mãos; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "simpson",
+      "name": "Mecânica Simpson",
+      "formula": "Sₙ ≈ h/3(f₀+4f₁+2f₂+…)",
+      "effect": "Aproxima o dano com três pontos.",
+      "visual": "mecânica construindo arcos parabólicos por três pontos com ferramenta arcana",
+      "prompt": "mecânica construindo arcos parabólicos por três pontos com ferramenta arcana; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "compare",
+      "name": "Oráculo da Comparação",
+      "formula": "0≤f≤g; ∫g converge ⇒ ∫f",
+      "effect": "Copia apenas o menor dano recebido.",
+      "visual": "oráculo diante de duas curvas ordenadas, escolhendo a menor sob proteção",
+      "prompt": "oráculo diante de duas curvas ordenadas, escolhendo a menor sob proteção; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "simpson-advanced",
+      "name": "Oráculo de Simpson",
+      "formula": "Sₙ → ∫ₐᵇ f(x)dx",
+      "effect": "Aproxima a torre com precisão numérica crescente.",
+      "visual": "oráculo lendário com sucessivos arcos parabólicos convergindo para uma integral",
+      "prompt": "oráculo lendário com sucessivos arcos parabólicos convergindo para uma integral; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    },
+    {
+      "id": "comparison",
+      "name": "Guardião da Comparação",
+      "formula": "0≤f≤g, ∫g converge",
+      "effect": "Bloqueia dano enquanto a série rival converge.",
+      "visual": "guardião épico segurando dois escudos-curva ordenados até a convergência",
+      "prompt": "guardião épico segurando dois escudos-curva ordenados até a convergência; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
+    }
+  ]
+}
