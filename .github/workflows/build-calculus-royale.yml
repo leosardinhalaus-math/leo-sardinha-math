@@ -21,9 +21,9 @@ jobs:
       - name: Reconstruct packed source files
         run: |
           mkdir -p jogos/calculus-royale-src/client/src/components
-          cat jogos/calculus-royale-src/.packed/GameCanvas.v2.part1 jogos/calculus-royale-src/.packed/GameCanvas.v2.part2 jogos/calculus-royale-src/.packed/GameCanvas.v2.part3 jogos/calculus-royale-src/.packed/GameCanvas.v2.part4 | base64 -d | gunzip > jogos/calculus-royale-src/client/src/components/GameCanvas.tsx
+          cat jogos/calculus-royale-src/.packed/GameCanvas.v3.part1 | base64 -d | gunzip > jogos/calculus-royale-src/client/src/components/GameCanvas.tsx
           cat jogos/calculus-royale-src/.packed/index.css.gz.b64 | base64 -d | gunzip > jogos/calculus-royale-src/client/src/index.css
-          cat jogos/calculus-royale-src/client/src/enhancements.css >> jogos/calculus-royale-src/client/src/index.css
+          cat jogos/calculus-royale-src/client/src/enhancements.css >> jogos/calculus-royale-src/client/src/index.css\n          cat jogos/calculus-royale-src/client/src/navigation-pages.css >> jogos/calculus-royale-src/client/src/index.css
 
       - name: Setup Node
         uses: actions/setup-node@v4
