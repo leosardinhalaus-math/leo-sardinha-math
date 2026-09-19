@@ -15,8 +15,30 @@
   },
   "cards": [
     {
+      "id": "limit",
+      "name": "Guardião do Limite",
+      "world": 1,
+      "class": "limite",
+      "kind": "estrutura",
+      "rarity": "rara",
+      "formula": "limₓ→ₐ f(x)",
+      "palette": [
+        "#2ED6E8",
+        "#102A4D",
+        "#F4FBFF"
+      ],
+      "symbol": "lim",
+      "silhouette": "guardião com escudo-portal circular e postura defensiva",
+      "visualBrief": "O escudo representa aproximação ao ponto sem atravessá-lo.",
+      "art": "./assets/cards/card-sprite.webp",
+      "thumb": "./assets/cards/card-sprite.webp",
+      "battle": "./assets/cards/card-sprite.webp",
+      "fallback": "./assets/art/world-1.svg",
+      "prompt": "guardião do limite, cavaleiro matemágico azul com escudo portal, cartoon 2D polido"
+    },
+    {
       "id": "slope",
-      "name": "Cavaleiro da Tangente",
+      "name": "Arqueira da Derivada",
       "world": 1,
       "class": "derivada",
       "kind": "tropa",
@@ -38,7 +60,7 @@
     },
     {
       "id": "chain",
-      "name": "Arqueira da Cadeia",
+      "name": "Mago da Cadeia",
       "world": 2,
       "class": "derivada",
       "kind": "tropa",
@@ -82,7 +104,7 @@
     },
     {
       "id": "rate",
-      "name": "Relógio de Taxas",
+      "name": "Engenheiro das Taxas",
       "world": 2,
       "class": "suporte",
       "kind": "feitiço",
@@ -126,7 +148,7 @@
     },
     {
       "id": "taylor",
-      "name": "Bardo de Taylor",
+      "name": "Oráculo de Taylor",
       "world": 3,
       "class": "serie",
       "kind": "tropa",
@@ -148,7 +170,7 @@
     },
     {
       "id": "newton",
-      "name": "Cavaleiro Newton",
+      "name": "Titã de Newton",
       "world": 3,
       "class": "suporte",
       "kind": "tropa",
@@ -170,7 +192,7 @@
     },
     {
       "id": "area",
-      "name": "Arquiteta da Área",
+      "name": "Sacerdotisa da Integral",
       "world": 4,
       "class": "integral",
       "kind": "tropa",
@@ -192,7 +214,7 @@
     },
     {
       "id": "ftc",
-      "name": "Oráculo Fundamental",
+      "name": "Colosso Fundamental",
       "world": 4,
       "class": "integral",
       "kind": "feitiço",
@@ -233,6 +255,28 @@
       "battle": "./assets/cards/battle/cavalieri.webp",
       "fallback": "./assets/art/world-4.svg",
       "prompt": "personagem lendário de card game fantasy cartoon 2D polido, mestre Cavalieri, arquiteto mágico dourado e verde, duas formas tridimensionais diferentes cortadas por planos horizontais luminosos equivalentes, pose de mestre, fundo simples, sem texto, sem moldura"
+    },
+    {
+      "id": "series",
+      "name": "Feiticeiro da Série",
+      "world": 5,
+      "class": "serie",
+      "kind": "tropa",
+      "rarity": "rara",
+      "formula": "Σ aₙ",
+      "palette": [
+        "#8D63FF",
+        "#2ED6E8",
+        "#102A4D"
+      ],
+      "symbol": "Σ",
+      "silhouette": "feiticeiro multiplicado em ecos sucessivos",
+      "visualBrief": "Ecos visuais representam termos sucessivos de uma série.",
+      "art": "./assets/cards/card-sprite.webp",
+      "thumb": "./assets/cards/card-sprite.webp",
+      "battle": "./assets/cards/card-sprite.webp",
+      "fallback": "./assets/art/world-5.svg",
+      "prompt": "feiticeiro da série, ecos violetas e sigma luminoso, cartoon 2D polido"
     }
   ]
 }
