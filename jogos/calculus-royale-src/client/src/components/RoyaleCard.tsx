@@ -47,7 +47,7 @@ export default function RoyaleCard({
   } as CSSProperties;
 
   const art = variant === "gallery" ? visual?.art : variant === "deck" ? visual?.thumb : visual?.thumb;
-  const fallback = visual?.fallback ?? "/assets/art/world-1.svg";
+  const fallback = visual?.fallback ?? "./assets/art/world-1.svg";
 
   const handleEvolve = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
