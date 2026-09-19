@@ -10,7 +10,7 @@ type GameCard = {
   rarity: string;
   cost: number;
   power: number;
-  icon?: string;
+  icon: string;
 };
 
 type Props = {
