@@ -6,8 +6,8 @@ type GameCard = {
   name: string;
   formula: string;
   effect: string;
-  kind: string;
-  rarity: string;
+  kind: "tropa" | "estrutura" | "feitiço" | "relíquia";
+  rarity: "comum" | "rara" | "épica" | "lendária";
   cost: number;
   power: number;
   icon: string;
