@@ -11,3 +11,82 @@
 .enemy-token .unit-avatar,.enemy-token .unit-avatar-fallback{box-shadow:inset 0 0 0 1px rgba(255,126,106,.35),0 4px 14px rgba(255,84,84,.25)}
 .unit-token:not(.enemy-token) .unit-avatar,.unit-token:not(.enemy-token) .unit-avatar-fallback{box-shadow:inset 0 0 0 1px rgba(99,230,232,.38),0 4px 14px rgba(46,214,232,.25)}
 @media(max-width:760px){.unit-token{min-width:56px;width:56px;height:64px}.unit-avatar,.unit-avatar-fallback{width:48px;height:48px;flex-basis:48px}.unit-token>span{font-size:6px;max-width:78px}}
+
+
+/* Animation system v1 — lightweight, mobile-first */
+@keyframes royale-card-idle{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-2px)}
+}
+@keyframes royale-card-cast{
+  0%{transform:translateY(0) scale(1)}
+  35%{transform:translateY(-9px) scale(1.045)}
+  70%{transform:translateY(-3px) scale(.985)}
+  100%{transform:translateY(0) scale(1)}
+}
+@keyframes royale-glyph-burst{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.35) rotate(-10deg)}
+  35%{opacity:1;transform:translate(-50%,-58%) scale(1.15) rotate(0)}
+  100%{opacity:0;transform:translate(-50%,-95%) scale(1.7) rotate(8deg)}
+}
+@keyframes unit-spawn{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.55);filter:brightness(1.8)}
+  70%{opacity:1;transform:translate(-50%,-50%) scale(1.08);filter:brightness(1.2)}
+  100%{opacity:1;transform:translate(-50%,-50%) scale(1);filter:brightness(1)}
+}
+@keyframes unit-march{
+  0%,100%{transform:translateY(0) rotate(-1deg)}
+  50%{transform:translateY(-4px) rotate(1deg)}
+}
+@keyframes unit-attack{
+  0%,100%{transform:translateX(0) scale(1)}
+  42%{transform:translateX(7px) scale(1.08)}
+  62%{transform:translateX(-2px) scale(.98)}
+}
+@keyframes enemy-attack{
+  0%,100%{transform:translateX(0) scale(1)}
+  42%{transform:translateX(-7px) scale(1.08)}
+  62%{transform:translateX(2px) scale(.98)}
+}
+@keyframes math-drift{
+  0%{transform:translate3d(-8%,18px,0);opacity:0}
+  20%{opacity:.18}
+  80%{opacity:.11}
+  100%{transform:translate3d(8%,-22px,0);opacity:0}
+}
+@keyframes unit-aura{
+  0%,100%{opacity:.28;transform:scale(.88)}
+  50%{opacity:.7;transform:scale(1.08)}
+}
+
+.variant-hand.royale-card:not(.is-casting){animation:royale-card-idle 3.2s ease-in-out infinite}
+.royale-card.is-casting{animation:royale-card-cast .42s cubic-bezier(.2,.8,.2,1) both;z-index:5}
+.card-cast-glyph{position:absolute;left:50%;top:47%;z-index:6;display:none;place-items:center;min-width:54px;height:54px;padding:0 8px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--visual-primary) 75%,white),color-mix(in srgb,var(--visual-secondary) 45%,transparent) 72%);border:1px solid rgba(255,255,255,.65);box-shadow:0 0 30px color-mix(in srgb,var(--visual-primary) 75%,transparent);color:#fff;font:900 20px 'DM Mono',monospace;pointer-events:none}
+.royale-card.is-casting .card-cast-glyph{display:grid;animation:royale-glyph-burst .42s ease-out both}
+.royale-card.is-casting .royale-card-art img{filter:brightness(1.22) saturate(1.14)}
+
+.battle-field{isolation:isolate}
+.battle-field::before{content:"∂   ∫   lim   Σ   f′   dx";position:absolute;inset:18% 8%;z-index:0;color:rgba(109,231,238,.18);font:700 13px 'DM Mono',monospace;letter-spacing:2.1rem;white-space:nowrap;pointer-events:none;animation:math-drift 8s linear infinite}
+.battle-field::after{content:"Σ   dy/dx   ∫   lim";position:absolute;inset:58% 10% auto;z-index:0;color:rgba(243,200,106,.11);font:700 10px 'DM Mono',monospace;letter-spacing:2.5rem;white-space:nowrap;pointer-events:none;animation:math-drift 10s linear infinite reverse}
+.unit-token{animation:unit-spawn .36s cubic-bezier(.2,.9,.2,1) both;transition:left .72s linear,filter .18s ease,box-shadow .18s ease}
+.unit-token::before{content:"";position:absolute;inset:-6px;z-index:-1;border-radius:18px;background:radial-gradient(circle,color-mix(in srgb,var(--glow) 28%,transparent),transparent 68%);animation:unit-aura 1.35s ease-in-out infinite;pointer-events:none}
+.unit-token.is-moving .unit-avatar{animation:unit-march .72s ease-in-out infinite}
+.unit-token.is-attacking{filter:brightness(1.08);z-index:6}
+.unit-token.is-attacking .unit-avatar{animation:unit-attack .44s cubic-bezier(.2,.8,.2,1) infinite}
+.unit-token.enemy-token.is-attacking .unit-avatar{animation-name:enemy-attack}
+.unit-token.is-attacking::after{content:"✦";position:absolute;top:8px;right:-9px;color:#fff;text-shadow:0 0 9px currentColor;font-size:11px;animation:unit-aura .5s ease-in-out infinite}
+.enemy-token.is-attacking::after{right:auto;left:-9px;color:#ff9a86}
+.tower-tile{animation:unit-aura 2.4s ease-in-out infinite}
+
+@media(hover:hover){
+  .royale-card:hover{transform:translateY(-5px) scale(1.012)}
+}
+@media(max-width:760px){
+  .battle-field::before,.battle-field::after{font-size:8px;letter-spacing:1.1rem;opacity:.65}
+  .unit-token.is-attacking .unit-avatar{animation-duration:.5s}
+}
+@media(prefers-reduced-motion:reduce){
+  .variant-hand.royale-card,.royale-card.is-casting,.card-cast-glyph,.battle-field::before,.battle-field::after,
+  .unit-token,.unit-token::before,.unit-token .unit-avatar,.tower-tile{animation:none!important}
+  .unit-token{transition:left .18s linear}
+}
