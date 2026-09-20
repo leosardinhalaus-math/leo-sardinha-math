@@ -5,7 +5,6 @@ on:
     branches: [main]
     paths:
       - 'jogos/calculus-royale-src/**'
-      - 'jogos/calculus-royale-map-parts/**'
       - '.github/workflows/build-calculus-royale.yml'
   workflow_dispatch:
 
@@ -29,15 +28,7 @@ jobs:
           cat jogos/calculus-royale-src/.packed/GameCanvas.v2.part1 jogos/calculus-royale-src/.packed/GameCanvas.v2.part2 jogos/calculus-royale-src/.packed/GameCanvas.v2.part3 jogos/calculus-royale-src/.packed/GameCanvas.v2.part4 | base64 -d | gunzip > jogos/calculus-royale-src/client/src/components/GameCanvas.tsx
           cd jogos/calculus-royale-src
           mkdir -p client/public/assets/cards
-          mkdir -p client/public/assets/maps
-          cat ../calculus-royale-map-parts/world-1.webp.b64.part1 ../calculus-royale-map-parts/world-1.webp.b64.part2 ../calculus-royale-map-parts/world-1.webp.b64.part3 | base64 -d > client/public/assets/maps/world-1.webp
-          cat ../calculus-royale-map-parts/world-2.webp.b64 ../calculus-royale-map-parts/world-2.webp.b64.part2 | base64 -d > client/public/assets/maps/world-2.webp
-          for n in 3 4 5; do
-            base64 -d "../calculus-royale-map-parts/world-${n}.webp.b64" > "client/public/assets/maps/world-${n}.webp"
-          done
-          for map in client/public/assets/maps/world-{1..5}.webp; do
-            test "$(wc -c < "$map")" -gt 5000
-          done
+          python scripts/extract_world_maps.py
           cat .packed/card-sprite.webp.b64.part1 .packed/card-sprite.webp.b64.part2 .packed/card-sprite.webp.b64.part3 .packed/card-sprite.webp.b64.part4 .packed/card-sprite.webp.b64.part5 .packed/card-sprite.webp.b64.part6 | base64 -d > client/public/assets/cards/card-sprite.webp
           test "$(wc -c < client/public/assets/cards/card-sprite.webp)" -gt 50000
           python -m pip install --quiet pillow
