@@ -1,0 +1,65 @@
+/* The live arena owns its scene; the rest of the page stays lightweight. */
+.screen-battle .arena-frame{isolation:isolate;padding:34px 12px;min-height:450px;background:#081b31;border-color:color-mix(in srgb,var(--accent) 42%,#233c58)}
+.arena-frame::before{display:none}
+.world-arena{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;border-radius:inherit;background:#07182d}
+.arena-backdrop{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.8}
+.world-arena-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;outline:none;opacity:0;transition:opacity .4s ease}
+.world-arena[data-scene-status="ready"] .world-arena-canvas{opacity:1}
+.arena-atmosphere{position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,12,25,.68),transparent 26%,transparent 68%,rgba(4,12,25,.82));box-shadow:inset 0 0 55px #02091644}
+.arena-world-name{position:absolute;top:16px;left:18px;text-shadow:0 2px 8px #000}
+.arena-world-name span{display:block;font:700 8px 'DM Mono',monospace;letter-spacing:.2em;color:var(--accent)}
+.arena-world-name strong{display:block;margin-top:5px;color:#effbff;font-size:16px}
+.arena-side{position:absolute;bottom:16px;font:700 8px 'DM Mono',monospace;letter-spacing:.1em;text-shadow:0 2px 8px #000}
+.ally-side{left:18px;color:#82f7ef}.enemy-side{right:18px;color:#ffb4a2}
+.arena-fallback-note{position:absolute;right:12px;bottom:36px;font-size:10px;color:#d8e9f0}
+.arena-frame .battle-field{position:absolute;inset:34px 12px;height:auto;min-height:0;z-index:2;pointer-events:none}
+.arena-frame .battle-field::before,.arena-frame .battle-field::after,.arena-frame .lane-line,.arena-frame .bridge-line,.arena-frame .tower-tile{display:none}
+.arena-frame .tower-label,.arena-frame .health-bar{z-index:5}
+.arena-frame .tower-label{width:145px;gap:10px}
+.arena-frame .enemy-label{top:13px;right:14px;left:auto;font-size:8px}
+.arena-frame .enemy-health{top:37px;right:14px;left:auto;width:92px}
+.arena-frame .ally-label{bottom:36px;left:14px;font-size:8px}
+.arena-frame .ally-health{bottom:29px;left:14px;width:92px}
+.arena-frame .unit-token{top:59%;width:60px;min-width:60px;height:64px;border-radius:50% 50% 12px 12px;box-shadow:0 8px 18px #0008!important}
+.arena-frame .enemy-token{top:41%}
+.arena-frame .unit-avatar{width:50px;height:50px;flex-basis:50px;border-radius:50% 50% 8px 8px}
+.arena-frame .unit-token::before{inset:auto -8px -9px;height:14px;background:radial-gradient(ellipse,#5debec88,transparent 70%);border-radius:50%}
+.arena-frame .enemy-token::before{background:radial-gradient(ellipse,#ff887388,transparent 70%)}
+.arena-frame .battle-hint{z-index:3;left:50%;top:50%;transform:translate(-50%,-50%);padding:12px 18px;border:1px solid #82e5ed44;border-radius:12px;background:#031025ad;backdrop-filter:blur(4px);color:#e0faff}
+.survival-hand-art{display:block;width:48px;height:48px;border-radius:8px;object-fit:cover}
+.selected-symbol img,.library-art img{object-fit:cover}
+@media(max-width:720px){
+ .screen-battle .arena-frame{min-height:360px}
+ .arena-world-name{left:12px;top:12px}.arena-world-name strong{font-size:13px}
+ .arena-frame .unit-token{width:46px;min-width:46px;height:50px;padding:3px}
+ .arena-frame .unit-avatar{width:38px;height:38px;flex-basis:38px}
+ .arena-frame .unit-token>span{font-size:6px;max-width:70px}
+ .arena-caption{font-size:9px}
+}
+@media(prefers-reduced-motion:reduce){.world-arena-canvas{transition:none}}
+/* Keep the arena and the entire hand together on desktop. */
+.screen-battle .content-grid{grid-template-columns:minmax(0,1fr) 360px;align-items:start}
+.screen-battle .battle-column{align-self:start;min-width:0}
+.screen-battle .arena-frame{flex:none;height:clamp(400px,60vh,560px);min-height:0}
+.screen-battle .right-panel{min-width:0;padding:12px}
+.screen-battle .card-stack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.screen-battle .royale-card-meta{grid-template-columns:24px 1fr auto;font-size:6px;padding:5px;gap:3px}
+.screen-battle .royale-card-cost{width:24px;height:24px;font-size:11px}
+.screen-battle .royale-card-copy{padding:7px;min-height:76px}
+.screen-battle .royale-card-copy strong{font-size:11px}
+.screen-battle .royale-card-copy p{font-size:8px}
+.screen-battle .royale-card-symbol{min-width:23px;height:23px;font-size:12px;border-radius:6px}
+.screen-battle .royale-card-formula{left:3px;right:3px;bottom:3px;font-size:6px;padding:4px 2px}
+.screen-battle .royale-card-footer{padding:6px;font-size:7px}
+.screen-battle .deck-tip{margin-top:10px}
+@media(max-width:1050px){
+ .screen-battle .content-grid{grid-template-columns:1fr}
+ .screen-battle .right-panel{grid-column:1}
+ .screen-battle .card-stack{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .screen-battle .arena-frame{height:420px}
+}
+@media(max-width:600px){
+ .screen-battle .arena-frame{height:340px}
+ .screen-battle .card-stack{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .screen-battle .arena-caption{max-width:115px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+}
