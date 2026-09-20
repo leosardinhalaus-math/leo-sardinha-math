@@ -6,5 +6,6 @@ import "./enhancements.css";
 import "./royale-card.css";
 import "./navigation-lite.css";
 import "./world-arena.css";
+import "./battle-preparation.css";
 
 createRoot(document.getElementById("root")!).render(<App />);

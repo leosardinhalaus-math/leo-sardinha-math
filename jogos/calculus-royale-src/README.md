@@ -29,6 +29,12 @@ npm run check
 npm run dev
 ```
 
+## Preparação e desafios
+
+O fluxo é Início → Preparação → Arena. A preparação reúne deck/evoluções, mapa, inventário, sobrevivência, perfil e ranking. Escolher uma ilha volta para a preparação e preserva o deck selecionado; o combate só avança na arena. A mão usa quatro cartas lado a lado na faixa inferior, com altura observada para reservar espaço no conteúdo. Os power-ups ficam junto à mão.
+
+`client/src/data/powerUpChallenges.ts` contém 40 perguntas (8 por ilha), com alternativas embaralhadas e sorteio sem repetição até esgotar cada grupo. A virada de grupo também evita repetir a última pergunta. O combate pausa durante os desafios e ao abrir inventário ou sobrevivência.
+
 ## Artes atuais e futuro 3D
 
 Os dez recortes de `card-sprite.webp` vêm da prancha ilustrada original (Guardião, Arqueira, Mago, Golem, Sacerdotisa, Colosso, Feiticeiro, Oráculo, Engenheiro e Titã). As outras 35 imagens foram produzidas pelo gerador procedural legado; não são 35 ilustrações novas aprovadas em IA.

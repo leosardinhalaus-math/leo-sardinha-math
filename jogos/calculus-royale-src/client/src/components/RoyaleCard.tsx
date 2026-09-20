@@ -19,7 +19,7 @@ type Props = {
   level?: number;
   disabled?: boolean;
   selected?: boolean;
-  variant?: "hand" | "deck" | "gallery";
+  variant?: "hand" | "deck" | "gallery" | "compact";
   onPlay?: (card: GameCard) => void;
   onEvolve?: (card: GameCard) => void;
 };
@@ -70,7 +70,8 @@ export default function RoyaleCard({
         type="button"
         disabled={disabled}
         onClick={handlePlay}
-        aria-label={`${card.name}: ${card.formula}`}
+        title={`${card.name}: ${card.formula}. ${card.effect}`}
+        aria-label={`${card.name}: ${card.formula}. ${card.effect}. Custo: ${card.cost} elixir`}
       >
         <header className="royale-card-meta">
           <span className="royale-card-cost">{card.cost}</span>
@@ -99,6 +100,7 @@ export default function RoyaleCard({
 
         <div className="royale-card-copy">
           <strong>{card.name}</strong>
+          {variant === "compact" && <span className="compact-formula">{card.formula}</span>}
           <small>{visual?.class ? visual.class.toUpperCase() : "CÁLCULO"}</small>
           <p>{card.effect}</p>
         </div>
