@@ -30,21 +30,9 @@ enter='''  const enterGame = (withName: boolean) => {
 if needle not in text: raise SystemExit('selectWorld marker not found')
 text=text.replace(needle, enter+needle, 1)
 
-# Premium island maps — one visual world per island.
-world_art_pattern=r'const worldArt\\s*=\\s*\\[[\\s\\S]*?world-1\\.svg[\\s\\S]*?\\];'
-if re.search(world_art_pattern,text):
-    if 'import { WORLD_MAPS } from "@/data/worldMaps";' not in text:
-        text='import { WORLD_MAPS } from "@/data/worldMaps";\\n'+text
-    text=re.sub(world_art_pattern,'const worldArt = WORLD_MAPS.map((item) => item.art);',text,count=1)
-else:
-    for old,new in [
-        ('"./assets/art/world-1.svg"','"./assets/maps/world-1.webp"'),
-        ('"./assets/art/world-2.svg"','"./assets/maps/world-2.webp"'),
-        ('"./assets/art/world-3.svg"','"./assets/maps/world-3.webp"'),
-        ('"./assets/art/world-4.svg"','"./assets/maps/world-4.webp"'),
-        ('"./assets/art/world-5.svg"','"./assets/maps/world-5.webp"'),
-    ]:
-        text=text.replace(old,new)
+# Premium island maps — external WebPs, one visual world per island.
+for world_no in range(1, 6):
+    text=text.replace(f'assets/art/world-{world_no}.svg', f'assets/maps/world-{world_no}.webp')
 
 # Match generated character art to gameplay names and add the two missing mathematical heroes.
 for old,new in [
@@ -68,18 +56,8 @@ if 'id:"series"' not in text:
 
 text=text.replace('const resetBattle = () => { setEnemyTower(82); setAllyTower(96); setUnits([]); setEnemyUnits([]); setEnergy(7); setEnemyEnergy(5); setDeckQueue(mainDeckIds); setView("battle");', 'const resetBattle = () => { setEnemyTower(getWorldEnemyHp(worldIndex)); setAllyTower(96); setUnits([]); setEnemyUnits([]); setEnergy(7); setEnemyEnergy(5); setDeckQueue(mainDeckIds); setView("battle");')
 
-# Replace legacy island art with the five new optimized fantasy maps.
-for world_no in range(1, 6):
-    replacements = [
-        f'`${{assetBase}}assets/art/world-{world_no}.svg`',
-        f'`${{ASSET_BASE}}assets/art/world-{world_no}.svg`',
-        f'"./assets/art/world-{world_no}.svg"',
-        f"'./assets/art/world-{world_no}.svg'",
-    ]
-    for old_map in replacements:
-        text=text.replace(old_map, f'worldMap({world_no - 1})')
 text=text.replace('<main className="game-shell" style=', '<main className={`game-shell screen-${view}`} style=', 1)
-landing='''      {view === "home" && <section className="landing-page"><div className="landing-copy"><span className="landing-eyebrow">ARENA EDUCACIONAL · CÁLCULO EM BATALHA</span><div className="landing-logo"><span>∂</span><h1>Calculus <em>Royale</em></h1></div><p>Domine derivadas, integrais, limites e séries usando personagens, fórmulas, baús e estratégia.</p><div className="landing-name-box"><label htmlFor="player-name">NOME DO JOGADOR · OPCIONAL</label><input id="player-name" value={nameDraft} maxLength={24} placeholder="Ex.: Léo Sardinha" onChange={(event) => setNameDraft(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && nameDraft.trim()) enterGame(true); }} /><button className="landing-play" disabled={!nameDraft.trim()} onClick={() => enterGame(true)}><Swords size={17} /> JOGUE AGORA</button><button className="landing-anon" onClick={() => enterGame(false)}>Jogar sem nome</button></div><div className="landing-links"><a href="./perfil/">Perfil online</a><a href="./ranking/">Ranking</a><a href="../../educacao.html">Leo Sardinha.Math</a></div></div><div className="landing-visual"><img src={worldArt[0]} alt="Personagens do Calculus Royale" /><div className="landing-badges"><span>5 ilhas</span><span>personagens + fórmulas</span><span>baús por fase</span><span>ranking online</span></div></div></section>}
+landing='''      {view === "home" && <section className="landing-page"><div className="landing-copy"><span className="landing-eyebrow">ARENA EDUCACIONAL · CÁLCULO EM BATALHA</span><div className="landing-logo"><span>∂</span><h1>Calculus <em>Royale</em></h1></div><p>Domine derivadas, integrais, limites e séries usando personagens, fórmulas, baús e estratégia.</p><div className="landing-name-box"><label htmlFor="player-name">NOME DO JOGADOR · OPCIONAL</label><input id="player-name" value={nameDraft} maxLength={24} placeholder="Ex.: Léo Sardinha" onChange={(event) => setNameDraft(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && nameDraft.trim()) enterGame(true); }} /><button className="landing-play" disabled={!nameDraft.trim()} onClick={() => enterGame(true)}><Swords size={17} /> JOGUE AGORA</button><button className="landing-anon" onClick={() => enterGame(false)}>Jogar sem nome</button></div><div className="landing-links"><a href="./perfil/">Perfil online</a><a href="./ranking/">Ranking</a><a href="../../educacao.html">Leo Sardinha.Math</a></div></div><div className="landing-visual"><img src={WORLD_MAPS[0].art} alt="Mapa das ilhas do Calculus Royale" /><div className="landing-badges"><span>5 ilhas</span><span>personagens + fórmulas</span><span>baús por fase</span><span>ranking online</span></div></div></section>}
 '''
 marker='      <div className="vignette" />\n'
 if marker not in text: raise SystemExit('vignette marker not found')
@@ -104,7 +82,7 @@ if old_enemy not in text or old_ally not in text:
 text=text.replace(old_enemy,new_enemy,1)
 text=text.replace(old_ally,new_ally,1)
 island_old="<span className=\"island-glow\" /><span className=\"island-number\">0{item.id}</span>"
-island_new="<img className=\"island-map-art\" src={worldArt[index]} alt=\"\" aria-hidden=\"true\" /><span className=\"island-map-shade\" /><span className=\"island-glow\" /><span className=\"island-number\">0{item.id}</span>"
+island_new="<img className=\"island-map-art\" src={WORLD_MAPS[index]?.art ?? WORLD_MAPS[0].art} alt=\"\" aria-hidden=\"true\" /><span className=\"island-map-shade\" /><span className=\"island-glow\" /><span className=\"island-number\">0{item.id}</span>"
 if island_old not in text:
     raise SystemExit("island map marker not found")
 text=text.replace(island_old,island_new,1)
