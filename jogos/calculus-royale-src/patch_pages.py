@@ -6,8 +6,9 @@ if 'import RoyaleCard from "./RoyaleCard";' not in text:
     text='import RoyaleCard from "./RoyaleCard";\n'+text
 if 'import { getCardImage, getCardImageFallback } from "@/data/cardArt";' not in text:
     text='import { getCardImage, getCardImageFallback } from "@/data/cardArt";\n'+text
-if 'import { worldMap } from "@/data/worldMapsData";' not in text:
-    text='import { worldMap } from "@/data/worldMapsData";\n'+text
+text=text.replace('import { worldMap } from "@/data/worldMapsData";\n','')
+if 'import { WORLD_MAPS } from "@/data/worldMaps";' not in text:
+    text='import { WORLD_MAPS } from "@/data/worldMaps";\n'+text
 
 text=text.replace('type View = "map" | "battle" | "deck";', 'type View = "home" | "map" | "battle" | "deck";')
 text=text.replace('inventory: "calculus-royale:inventory" };', 'inventory: "calculus-royale:inventory", playerName: "calculus-royale:player-name" };')
