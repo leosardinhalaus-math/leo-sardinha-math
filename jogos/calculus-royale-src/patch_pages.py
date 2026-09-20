@@ -6,6 +6,8 @@ if 'import RoyaleCard from "./RoyaleCard";' not in text:
     text='import RoyaleCard from "./RoyaleCard";\n'+text
 if 'import { getCardImage, getCardImageFallback } from "@/data/cardArt";' not in text:
     text='import { getCardImage, getCardImageFallback } from "@/data/cardArt";\n'+text
+if 'import { worldMap } from "@/data/worldMapsData";' not in text:
+    text='import { worldMap } from "@/data/worldMapsData";\n'+text
 
 text=text.replace('type View = "map" | "battle" | "deck";', 'type View = "home" | "map" | "battle" | "deck";')
 text=text.replace('inventory: "calculus-royale:inventory" };', 'inventory: "calculus-royale:inventory", playerName: "calculus-royale:player-name" };')
@@ -66,6 +68,16 @@ if 'id:"series"' not in text:
 
 text=text.replace('const resetBattle = () => { setEnemyTower(82); setAllyTower(96); setUnits([]); setEnemyUnits([]); setEnergy(7); setEnemyEnergy(5); setDeckQueue(mainDeckIds); setView("battle");', 'const resetBattle = () => { setEnemyTower(getWorldEnemyHp(worldIndex)); setAllyTower(96); setUnits([]); setEnemyUnits([]); setEnergy(7); setEnemyEnergy(5); setDeckQueue(mainDeckIds); setView("battle");')
 
+# Replace legacy island art with the five new optimized fantasy maps.
+for world_no in range(1, 6):
+    replacements = [
+        f'`${{assetBase}}assets/art/world-{world_no}.svg`',
+        f'`${{ASSET_BASE}}assets/art/world-{world_no}.svg`',
+        f'"./assets/art/world-{world_no}.svg"',
+        f"'./assets/art/world-{world_no}.svg'",
+    ]
+    for old_map in replacements:
+        text=text.replace(old_map, f'worldMap({world_no - 1})')
 text=text.replace('<main className="game-shell" style=', '<main className={`game-shell screen-${view}`} style=', 1)
 landing='''      {view === "home" && <section className="landing-page"><div className="landing-copy"><span className="landing-eyebrow">ARENA EDUCACIONAL · CÁLCULO EM BATALHA</span><div className="landing-logo"><span>∂</span><h1>Calculus <em>Royale</em></h1></div><p>Domine derivadas, integrais, limites e séries usando personagens, fórmulas, baús e estratégia.</p><div className="landing-name-box"><label htmlFor="player-name">NOME DO JOGADOR · OPCIONAL</label><input id="player-name" value={nameDraft} maxLength={24} placeholder="Ex.: Léo Sardinha" onChange={(event) => setNameDraft(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && nameDraft.trim()) enterGame(true); }} /><button className="landing-play" disabled={!nameDraft.trim()} onClick={() => enterGame(true)}><Swords size={17} /> JOGUE AGORA</button><button className="landing-anon" onClick={() => enterGame(false)}>Jogar sem nome</button></div><div className="landing-links"><a href="./perfil/">Perfil online</a><a href="./ranking/">Ranking</a><a href="../../educacao.html">Leo Sardinha.Math</a></div></div><div className="landing-visual"><img src={worldArt[0]} alt="Personagens do Calculus Royale" /><div className="landing-badges"><span>5 ilhas</span><span>personagens + fórmulas</span><span>baús por fase</span><span>ranking online</span></div></div></section>}
 '''
