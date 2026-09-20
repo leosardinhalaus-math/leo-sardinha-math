@@ -35,6 +35,12 @@ text=text.replace(needle, enter+needle, 1)
 for world_no in range(1, 6):
     text=text.replace(f'assets/art/world-{world_no}.svg', f'assets/maps/world-{world_no}.webp')
 
+# Align generated maps with the current five gameplay islands:
+# 1 Limites, 2 Derivadas, 3 Séries, 4 Integrais, 5 Aplicações.
+text=text.replace('assets/maps/world-3.webp', 'assets/maps/__world-swap__.webp')
+text=text.replace('assets/maps/world-4.webp', 'assets/maps/world-3.webp')
+text=text.replace('assets/maps/__world-swap__.webp', 'assets/maps/world-4.webp')
+
 # Match generated character art to gameplay names and add the two missing mathematical heroes.
 for old,new in [
     ('name:"Cavaleiro da Tangente"','name:"Arqueira da Derivada"'),
@@ -87,5 +93,6 @@ island_new="<img className=\"island-map-art\" src={WORLD_MAPS[index]?.art ?? WOR
 if island_old not in text:
     raise SystemExit("island map marker not found")
 text=text.replace(island_old,island_new,1)
+text=text.replace('<strong>{item.title.split(" ").slice(0, 3).join(" ")}</strong>', '<strong>{WORLD_MAPS[index]?.title ?? item.title}</strong>', 1)
 text=text.replace('alt="Personagens do Calculus Royale"','alt="Mapa das ilhas do Calculus Royale"',1)
 p.write_text(text,encoding='utf-8')
