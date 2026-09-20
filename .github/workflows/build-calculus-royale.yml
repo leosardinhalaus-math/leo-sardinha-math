@@ -75,6 +75,9 @@ jobs:
             echo "No generated changes to commit."
           else
             git commit -m "Build Calculus Royale"
+            # Generated source assets are build-time temporaries; remove them before rebasing.
+            git reset --hard HEAD
+            git clean -fd jogos/calculus-royale-src/client/public/assets/maps jogos/calculus-royale-src/client/public/assets/cards
             git pull --rebase origin main
             git push origin HEAD:main
           fi
