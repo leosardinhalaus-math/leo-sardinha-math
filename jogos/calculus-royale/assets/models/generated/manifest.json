@@ -1,0 +1,184 @@
+{
+  "characters": {
+    "slope": {
+      "url": "./assets/models/generated/slope.glb",
+      "height": 2.15
+    },
+    "limit": {
+      "url": "./assets/models/generated/limit.glb",
+      "height": 2.15
+    },
+    "power": {
+      "url": "./assets/models/generated/power.glb",
+      "height": 2.15
+    },
+    "sine": {
+      "url": "./assets/models/generated/sine.glb",
+      "height": 2.15
+    },
+    "euler": {
+      "url": "./assets/models/generated/euler.glb",
+      "height": 2.15
+    },
+    "chain": {
+      "url": "./assets/models/generated/chain.glb",
+      "height": 2.15
+    },
+    "ln": {
+      "url": "./assets/models/generated/ln.glb",
+      "height": 2.15
+    },
+    "implicit": {
+      "url": "./assets/models/generated/implicit.glb",
+      "height": 2.15
+    },
+    "rate": {
+      "url": "./assets/models/generated/rate.glb",
+      "height": 2.15
+    },
+    "cauchy": {
+      "url": "./assets/models/generated/cauchy.glb",
+      "height": 2.15
+    },
+    "taylor": {
+      "url": "./assets/models/generated/taylor.glb",
+      "height": 2.15
+    },
+    "newton": {
+      "url": "./assets/models/generated/newton.glb",
+      "height": 2.15
+    },
+    "opt": {
+      "url": "./assets/models/generated/opt.glb",
+      "height": 2.15
+    },
+    "area": {
+      "url": "./assets/models/generated/area.glb",
+      "height": 2.15
+    },
+    "ftc": {
+      "url": "./assets/models/generated/ftc.glb",
+      "height": 2.15
+    },
+    "cavalieri": {
+      "url": "./assets/models/generated/cavalieri.glb",
+      "height": 2.15
+    },
+    "fractal": {
+      "url": "./assets/models/generated/fractal.glb",
+      "height": 2.15
+    },
+    "sub": {
+      "url": "./assets/models/generated/sub.glb",
+      "height": 2.15
+    },
+    "parts": {
+      "url": "./assets/models/generated/parts.glb",
+      "height": 2.15
+    },
+    "trap": {
+      "url": "./assets/models/generated/trap.glb",
+      "height": 2.15
+    },
+    "improper": {
+      "url": "./assets/models/generated/improper.glb",
+      "height": 2.15
+    },
+    "continuity": {
+      "url": "./assets/models/generated/continuity.glb",
+      "height": 2.15
+    },
+    "quotient": {
+      "url": "./assets/models/generated/quotient.glb",
+      "height": 2.15
+    },
+    "secant": {
+      "url": "./assets/models/generated/secant.glb",
+      "height": 2.15
+    },
+    "bernoulli": {
+      "url": "./assets/models/generated/bernoulli.glb",
+      "height": 2.15
+    },
+    "inverse": {
+      "url": "./assets/models/generated/inverse.glb",
+      "height": 2.15
+    },
+    "expchain": {
+      "url": "./assets/models/generated/expchain.glb",
+      "height": 2.15
+    },
+    "root": {
+      "url": "./assets/models/generated/root.glb",
+      "height": 2.15
+    },
+    "mirror": {
+      "url": "./assets/models/generated/mirror.glb",
+      "height": 2.15
+    },
+    "mean": {
+      "url": "./assets/models/generated/mean.glb",
+      "height": 2.15
+    },
+    "growth": {
+      "url": "./assets/models/generated/growth.glb",
+      "height": 2.15
+    },
+    "taylor2": {
+      "url": "./assets/models/generated/taylor2.glb",
+      "height": 2.15
+    },
+    "miner": {
+      "url": "./assets/models/generated/miner.glb",
+      "height": 2.15
+    },
+    "average": {
+      "url": "./assets/models/generated/average.glb",
+      "height": 2.15
+    },
+    "volume": {
+      "url": "./assets/models/generated/volume.glb",
+      "height": 2.15
+    },
+    "surface": {
+      "url": "./assets/models/generated/surface.glb",
+      "height": 2.15
+    },
+    "gabriel": {
+      "url": "./assets/models/generated/gabriel.glb",
+      "height": 2.15
+    },
+    "cavalieri-advanced": {
+      "url": "./assets/models/generated/cavalieri-advanced.glb",
+      "height": 2.15
+    },
+    "surface-flux": {
+      "url": "./assets/models/generated/surface-flux.glb",
+      "height": 2.15
+    },
+    "parts2": {
+      "url": "./assets/models/generated/parts2.glb",
+      "height": 2.15
+    },
+    "simpson": {
+      "url": "./assets/models/generated/simpson.glb",
+      "height": 2.15
+    },
+    "compare": {
+      "url": "./assets/models/generated/compare.glb",
+      "height": 2.15
+    },
+    "series": {
+      "url": "./assets/models/generated/series.glb",
+      "height": 2.15
+    },
+    "simpson-advanced": {
+      "url": "./assets/models/generated/simpson-advanced.glb",
+      "height": 2.15
+    },
+    "comparison": {
+      "url": "./assets/models/generated/comparison.glb",
+      "height": 2.15
+    }
+  }
+}
