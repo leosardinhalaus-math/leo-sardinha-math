@@ -1,5 +1,3 @@
-import { getCardVisual } from "@/data/cardVisuals";
-
 const CHARACTER_ART: Record<string, string> = {
   "limit": "./assets/cards/characters/limit.webp",
   "slope": "./assets/cards/characters/slope.webp",
@@ -55,9 +53,9 @@ export function hasCharacterArt(cardId: string): boolean {
 }
 
 export function getCardImage(cardId: string): string {
-  return CHARACTER_ART[cardId] ?? "./assets/art/world-1.svg";
+  return `${CHARACTER_ART[cardId] ?? "./assets/cards/characters/fallback.webp"}?v=illustrated-20260921`;
 }
 
-export function getCardImageFallback(cardId: string): string {
-  return getCardVisual(cardId)?.fallback ?? "./assets/art/world-1.svg";
+export function getCardImageFallback(_cardId: string): string {
+  return "./assets/cards/characters/fallback.webp?v=illustrated-20260921";
 }

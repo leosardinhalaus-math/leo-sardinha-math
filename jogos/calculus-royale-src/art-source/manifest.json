@@ -1,0 +1,80 @@
+{
+  "version": "illustrated-20260921",
+  "source": "AI-generated fantasy portrait atlases; original ten portraits are preserved",
+  "columns": 3,
+  "rows": 2,
+  "atlases": [
+    {
+      "file": "atlas-1.webp",
+      "sha256": "34052ce9c5d32a0278f2e9d51d8e92a7f3612feaa2514ecae88c43b7c76c76bd",
+      "cards": [
+        "power",
+        "sine",
+        "euler",
+        "ln",
+        "cauchy",
+        "opt"
+      ]
+    },
+    {
+      "file": "atlas-2.webp",
+      "sha256": "af72dd5c509db55971d1bf8c52c24ccdd549d9bbaabc1854d26046c79b6934dc",
+      "cards": [
+        "cavalieri",
+        "fractal",
+        "sub",
+        "parts",
+        "trap",
+        "improper"
+      ]
+    },
+    {
+      "file": "atlas-3.webp",
+      "sha256": "7daaa005ff7331705cf8998d3810ca6cfd195b04be1db8b826981cf3766618ec",
+      "cards": [
+        "continuity",
+        "quotient",
+        "secant",
+        "bernoulli",
+        "inverse",
+        "expchain"
+      ]
+    },
+    {
+      "file": "atlas-4.webp",
+      "sha256": "a73d258d2f160b2b9aaff29ac2b7651846a21a0b1bd742bbc617ef77c40912e4",
+      "cards": [
+        "root",
+        "mirror",
+        "mean",
+        "growth",
+        "taylor2",
+        "miner"
+      ]
+    },
+    {
+      "file": "atlas-5.webp",
+      "sha256": "4c3332be360ed5b9835306ded9b1623c4ab942ce41279983c67035231c6993ca",
+      "cards": [
+        "average",
+        "volume",
+        "surface",
+        "gabriel",
+        "cavalieri-advanced",
+        "surface-flux"
+      ]
+    },
+    {
+      "file": "atlas-6.webp",
+      "sha256": "b28d5c838b42da540ce0a131e9a084dd22b0369f9b48e24bc6579c8b8e27e963",
+      "cards": [
+        "parts2",
+        "simpson",
+        "compare",
+        "simpson-advanced",
+        "comparison",
+        "fallback"
+      ]
+    }
+  ]
+}

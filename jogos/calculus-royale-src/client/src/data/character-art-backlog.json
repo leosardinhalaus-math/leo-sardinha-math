@@ -1,13 +1,13 @@
 {
-  "version": 1,
-  "globalStyle": "fantasia matemágica, cartoon 2D polido, card game competitivo, silhueta forte, leitura em 120 px, sem texto embutido, sem moldura, fundo simples, iluminação cinematográfica",
+  "version": 2,
+  "globalStyle": "fantasia semi-realista pintada, retratos detalhados, iluminação cinematográfica, coerente com as dez artes originais",
   "export": {
     "format": "webp",
     "size": "1024x1024",
     "quality": 88,
     "pathPattern": "client/public/assets/cards/characters/{id}.webp"
   },
-  "remaining": [
+  "completedIllustrations": [
     {
       "id": "power",
       "name": "Mago da Potência",
@@ -288,5 +288,7 @@
       "visual": "guardião épico segurando dois escudos-curva ordenados até a convergência",
       "prompt": "guardião épico segurando dois escudos-curva ordenados até a convergência; fantasia matemágica, cartoon 2D polido, personagem central, composição 3/4, silhueta forte, símbolo matemático integrado ao figurino ou magia, fundo simples, sem texto, sem moldura, alta legibilidade em miniatura"
     }
-  ]
+  ],
+  "remaining": [],
+  "sourceManifest": "art-source/manifest.json"
 }

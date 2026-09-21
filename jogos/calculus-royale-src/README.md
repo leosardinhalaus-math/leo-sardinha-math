@@ -37,7 +37,7 @@ O fluxo é Início → Preparação → Arena. A preparação reúne deck/evolu�
 
 ## Artes atuais e futuro 3D
 
-Os dez recortes de `card-sprite.webp` vêm da prancha ilustrada original (Guardião, Arqueira, Mago, Golem, Sacerdotisa, Colosso, Feiticeiro, Oráculo, Engenheiro e Titã). As outras 35 imagens foram produzidas pelo gerador procedural legado; não são 35 ilustrações novas aprovadas em IA.
+Os dez recortes de `card-sprite.webp` vêm da prancha ilustrada original (Guardião, Arqueira, Mago, Golem, Sacerdotisa, Colosso, Feiticeiro, Oráculo, Engenheiro e Titã). As outras 35 cartas agora usam ilustrações de fantasia geradas em IA no mesmo estilo. Os seis atlas em `art-source/` e seu manifesto preservam a associação de cada retrato à carta. `generate_character_assets.py` apenas extrai essas artes; não desenha mais personagens procedurais. O hash de cada atlas é verificado antes da extração.
 
 Os personagens atuais são imagens 2D com animações de deslocamento/ataque em CSS. A arquitetura da arena usa Babylon.js e geometria 3D. Não há modelos articulados de personagens integrados neste estágio.
 
