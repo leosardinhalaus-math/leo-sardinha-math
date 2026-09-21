@@ -1,0 +1,185 @@
+{
+  "version": "illustrated-20260921",
+  "portraits": {
+    "power": {
+      "atlas": "atlas-1.webp",
+      "cell": 0,
+      "sha256": "741043215778d1ebb5afbb6927f426536c17dfff623a162f4717dbeb5317761a"
+    },
+    "sine": {
+      "atlas": "atlas-1.webp",
+      "cell": 1,
+      "sha256": "a8f67ad9b395b1b82a065462727be9ac1b59b0d3b10dec729176ed83d700fb9f"
+    },
+    "euler": {
+      "atlas": "atlas-1.webp",
+      "cell": 2,
+      "sha256": "e25d42cd0a4ef63f291c3ce54cb1ae2dd1c0e2bf365320dd87c1629ecdd0a83d"
+    },
+    "ln": {
+      "atlas": "atlas-1.webp",
+      "cell": 3,
+      "sha256": "fde099983f249105f47648cc278d3e9a6ceb494808d87075b29b41c52bfe7e95"
+    },
+    "cauchy": {
+      "atlas": "atlas-1.webp",
+      "cell": 4,
+      "sha256": "83d49f1817ac19682d541f948ec76ad5bd5701822ad2dc75714e3b2d3ee67e0d"
+    },
+    "opt": {
+      "atlas": "atlas-1.webp",
+      "cell": 5,
+      "sha256": "195559535ded8eca83146c68323e7724b2e23e36e9c8ed823fe643edb8425261"
+    },
+    "cavalieri": {
+      "atlas": "atlas-2.webp",
+      "cell": 0,
+      "sha256": "b0027ef606dde7280be3e40a98445874a33d3052484e7af496d95a77312d18c1"
+    },
+    "fractal": {
+      "atlas": "atlas-2.webp",
+      "cell": 1,
+      "sha256": "7f43d32803e8526e12217e739e7f4f2658552a6d46051521d0fcee94c1553824"
+    },
+    "sub": {
+      "atlas": "atlas-2.webp",
+      "cell": 2,
+      "sha256": "f2a26231938beb91b98c4cca575bf21f72c14c93d724aad5634e4849d98ab032"
+    },
+    "parts": {
+      "atlas": "atlas-2.webp",
+      "cell": 3,
+      "sha256": "c0842cb4014a408ecdadef487c50a4e046404bbc1ca02f119296ff9fb0930396"
+    },
+    "trap": {
+      "atlas": "atlas-2.webp",
+      "cell": 4,
+      "sha256": "b26eac0a7763f30894bdd0ab98204c43c8b9d058b9beb549cf05ec787b6b9d3a"
+    },
+    "improper": {
+      "atlas": "atlas-2.webp",
+      "cell": 5,
+      "sha256": "a0ef7858bf288f68afc5136d7cc8fa16f0ae56eae567624f96af787d324fa346"
+    },
+    "continuity": {
+      "atlas": "atlas-3.webp",
+      "cell": 0,
+      "sha256": "c38fd8c72ef97bbea70560bf0aa4f2ce404004fddc88a4b4dcdf903a9e0e551a"
+    },
+    "quotient": {
+      "atlas": "atlas-3.webp",
+      "cell": 1,
+      "sha256": "8e15f7d2ac1038101695d0ffa06ff73d66894c01d2674bb77c3d31b4432111b5"
+    },
+    "secant": {
+      "atlas": "atlas-3.webp",
+      "cell": 2,
+      "sha256": "84a54ebedd296abdb604cf91226ffa338f06b44dd0bfed27d9c18caa8d3b8b7f"
+    },
+    "bernoulli": {
+      "atlas": "atlas-3.webp",
+      "cell": 3,
+      "sha256": "5a3f251e33570d6194078702d8c71b18beb9ba2e4bb4288d4e957b4fc64a4d22"
+    },
+    "inverse": {
+      "atlas": "atlas-3.webp",
+      "cell": 4,
+      "sha256": "c2ab5ed497f68007207e3b4c7fd51e123f6e0ff8ba59c8983920617b27087b0d"
+    },
+    "expchain": {
+      "atlas": "atlas-3.webp",
+      "cell": 5,
+      "sha256": "4eedfc8143f175e26c2072f12921a2bd3c8f33d7bbd71fa6b571e621343287ff"
+    },
+    "root": {
+      "atlas": "atlas-4.webp",
+      "cell": 0,
+      "sha256": "0f3ccc4e09e6b43362fd2c5ebab695737451a4dbd73b64cbfda52bf0cb1128e4"
+    },
+    "mirror": {
+      "atlas": "atlas-4.webp",
+      "cell": 1,
+      "sha256": "8dcd193a66aa145ba349086d88741bad7a2abffd6a5d273896d4aeaf9aa9f6cf"
+    },
+    "mean": {
+      "atlas": "atlas-4.webp",
+      "cell": 2,
+      "sha256": "c8bae91a97cd6dbb25c3e84c019c1dbcad98c6b18539823c309ee6375424a244"
+    },
+    "growth": {
+      "atlas": "atlas-4.webp",
+      "cell": 3,
+      "sha256": "eef53a0e3e5f4c9e809b746aab8b693c2b0cfef612fa9d86a8783a789af04c52"
+    },
+    "taylor2": {
+      "atlas": "atlas-4.webp",
+      "cell": 4,
+      "sha256": "bba30ca32b7885ce6d5104f1c33b714c04de3f4787064139d4d946775e89628d"
+    },
+    "miner": {
+      "atlas": "atlas-4.webp",
+      "cell": 5,
+      "sha256": "eb70d77f568afc4242b2f4340005272ffe02a84f24b22f828570bc9982f9f5fe"
+    },
+    "average": {
+      "atlas": "atlas-5.webp",
+      "cell": 0,
+      "sha256": "35471250bcd485a2fcc67d7b7bb4c46bb3bdb3c1dac21786b97f501971e88a4f"
+    },
+    "volume": {
+      "atlas": "atlas-5.webp",
+      "cell": 1,
+      "sha256": "c25ea7a50727322fff7bd4026b677669f9292e7384343c5da3b4db197cf0814c"
+    },
+    "surface": {
+      "atlas": "atlas-5.webp",
+      "cell": 2,
+      "sha256": "0c8487f18b76c29f16164467623f50405d13fbc02b7b15e1d983098e29228ed1"
+    },
+    "gabriel": {
+      "atlas": "atlas-5.webp",
+      "cell": 3,
+      "sha256": "03d76cc144320c9b9deaaae932f51ba50403e018e058bcf486bdab60c768a7c8"
+    },
+    "cavalieri-advanced": {
+      "atlas": "atlas-5.webp",
+      "cell": 4,
+      "sha256": "40b85418007ba8591f9828b32f3605ba4d54a11c49c33ba00951c1e758c953a6"
+    },
+    "surface-flux": {
+      "atlas": "atlas-5.webp",
+      "cell": 5,
+      "sha256": "95e28374fcb6039c638637ac2a36663b41a8f6e101caa63aea9e7d5a050b5787"
+    },
+    "parts2": {
+      "atlas": "atlas-6.webp",
+      "cell": 0,
+      "sha256": "c9f5e8bebe4995eb4f9fae744808352e391f14fb4337cba98840c3a2f9cc9c60"
+    },
+    "simpson": {
+      "atlas": "atlas-6.webp",
+      "cell": 1,
+      "sha256": "c50d7a635478d208fa86772d750431c004683291c97d0afb25227114f8b19a22"
+    },
+    "compare": {
+      "atlas": "atlas-6.webp",
+      "cell": 2,
+      "sha256": "0b1686b94be1f0a4b7b5b7ed53c10ff51b0e44eb5a2ec065f7b4023f2356a12d"
+    },
+    "simpson-advanced": {
+      "atlas": "atlas-6.webp",
+      "cell": 3,
+      "sha256": "a98a5abf436fdc4e12b597e11055cc4f14bd8f5ebd96d0c554c9b2f0be9c801e"
+    },
+    "comparison": {
+      "atlas": "atlas-6.webp",
+      "cell": 4,
+      "sha256": "60ecbc451cae6d0517b78af1cd3a3fc3d475ea5025578761cbb91585743ebb69"
+    },
+    "fallback": {
+      "atlas": "atlas-6.webp",
+      "cell": 5,
+      "sha256": "a7173b97ef4338835e363bc64ef53d859ac8008e6819c9923e090ff154e54972"
+    }
+  }
+}
