@@ -53,6 +53,10 @@ jobs:
         working-directory: jogos/calculus-royale-src
         run: npm run check
 
+      - name: Test Three.js integration
+        working-directory: jogos/calculus-royale-src
+        run: npm run test:three
+
       - name: Build game
         working-directory: jogos/calculus-royale-src
         run: npm run build

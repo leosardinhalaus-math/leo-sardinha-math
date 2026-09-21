@@ -1,61 +1,24 @@
-import { useEffect, useRef, useState } from "react";
-import { Engine } from "@babylonjs/core/Engines/engine";
-import { createGameScene, type GameHandle } from "@/game/scene";
-import { getWorldMap } from "@/data/worldMaps";
+import { useEffect, useRef, useState } from 'react';
+import { createGameScene, type ArenaUnit, type GameHandle } from '@/game/scene';
+import { getWorldMap } from '@/data/worldMaps';
+import { getCardImage } from '@/data/cardArt';
 
-export default function WorldArena({ worldIndex, active }: { worldIndex: number; active: boolean }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [status, setStatus] = useState("loading");
-  const world = getWorldMap(worldIndex);
-  useEffect(() => {
-    if (!active || !canvasRef.current) return;
-    const canvas = canvasRef.current;
-    let disposed = false;
-    let engine: Engine | undefined;
-    let handle: GameHandle | undefined;
-    let resizeObserver: ResizeObserver | undefined;
-    let stopVisibility = () => {};
-    setStatus("loading");
-    try {
-      engine = new Engine(canvas, true, { stencil: true, preserveDrawingBuffer: false });
-      engine.setHardwareScalingLevel(1 / Math.min(window.devicePixelRatio || 1, 1.5));
-      const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
-      handle = createGameScene(engine, canvas, worldIndex, motion.matches);
-      const render = () => handle?.scene.render();
-      const updateVisibility = () => {
-        engine?.stopRenderLoop(render);
-        if (!document.hidden) engine?.runRenderLoop(render);
-      };
-      updateVisibility();
-      document.addEventListener("visibilitychange", updateVisibility);
-      stopVisibility = () => document.removeEventListener("visibilitychange", updateVisibility);
-      resizeObserver = new ResizeObserver(() => handle?.resize());
-      resizeObserver.observe(canvas);
-      handle.scene.executeWhenReady(() => { if (!disposed) setStatus("ready"); });
-    } catch (error) {
-      console.warn("Arena: usando cenário ilustrado.", error);
-      setStatus("fallback");
-      resizeObserver?.disconnect();
-      stopVisibility();
-      handle?.dispose();
-      engine?.dispose();
-      handle = undefined;
-      engine = undefined;
-    }
-    return () => {
-      disposed = true;
-      resizeObserver?.disconnect();
-      stopVisibility();
-      handle?.dispose();
-      engine?.dispose();
-    };
-  }, [worldIndex, active]);
-  return <div className="world-arena" data-arena-theme={world.slug} data-scene-status={status}>
-    <img className="arena-backdrop" src={world.art} alt="" />
-    <canvas ref={canvasRef} className="world-arena-canvas" role="img" aria-label={`Arena da ${world.title}: torres, pontes e portais`} />
-    <div className="arena-atmosphere" aria-hidden="true" />
-    {status === "fallback" && <span className="arena-fallback-note">Cenário ilustrado</span>}
-    <div className="arena-world-name"><span>ILHA {String(world.id).padStart(2, "0")}</span><strong>{world.title}</strong></div>
-    <span className="arena-side ally-side">SUA BASE</span><span className="arena-side enemy-side">BASE RIVAL</span>
-  </div>;
+export default function WorldArena({worldIndex,active,allies=[],enemies=[],paused=false}:{worldIndex:number;active:boolean;allies?:ArenaUnit[];enemies?:ArenaUnit[];paused?:boolean}){
+ const canvasRef=useRef<HTMLCanvasElement>(null);const handle=useRef<GameHandle|undefined>(undefined);
+ const [status,setStatus]=useState('loading');const [warnings,setWarnings]=useState(0);const world=getWorldMap(worldIndex);
+ const latest=useRef({allies,enemies,paused});latest.current={allies,enemies,paused};
+ useEffect(()=>{if(!active||!canvasRef.current)return;setStatus('loading');setWarnings(0);
+  try{handle.current=createGameScene(canvasRef.current,worldIndex,count=>{setWarnings(count);setStatus('ready');},()=>setStatus('fallback'));handle.current.setState(latest.current);}catch(error){console.warn('Arena 3D indisponível.',error);setStatus('fallback');}
+  return()=>{handle.current?.dispose();handle.current=undefined;};
+ },[worldIndex,active]);
+ useEffect(()=>{handle.current?.setState({allies,enemies,paused});},[allies,enemies,paused]);
+ return <div className="world-arena" data-arena-theme={world.slug} data-scene-status={status}>
+  <img className="arena-backdrop" src={world.art} alt=""/>
+  <canvas ref={canvasRef} className="world-arena-canvas" tabIndex={0} aria-label={`Arena 3D da ${world.title}. Arraste para girar; pinça ou roda para zoom; WASD ou setas para mover a câmera; R para centralizar.`}/>
+  {status==='loading'&&<div className="arena-loading" role="status">Preparando arena 3D…</div>}
+  {status==='fallback'&&<><span className="arena-fallback-note">Modo ilustrado · 3D indisponível</span>{[...allies.map(u=>({u,enemy:false})),...enemies.map(u=>({u,enemy:true}))].map(({u,enemy})=><img key={`${enemy}${u.id}`} className="arena-fallback-unit" src={getCardImage(u.cardId)} alt={u.name} style={{left:`${enemy?82-u.progress*.64:18+u.progress*.64}%`,top:enemy?'40%':'60%'}}/>)}</>}
+  {warnings>0&&status==='ready'&&<span className="arena-fallback-note">Alguns modelos usam a versão provisória</span>}
+  <div className="arena-world-name"><span>ILHA {String(world.id).padStart(2,'0')}</span><strong>{world.title}</strong></div>
+  <div className="arena-camera-help"><span>Arraste para girar · pinça para zoom</span><button onClick={()=>handle.current?.resetCamera()} aria-label="Centralizar câmera">↺ Câmera</button></div>
+ </div>;
 }

@@ -63,3 +63,18 @@
  .screen-battle .card-stack{grid-template-columns:repeat(2,minmax(0,1fr))}
  .screen-battle .arena-caption{max-width:115px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 }
+
+/* A câmera recebe gestos; HUD e cartas continuam em HTML sobre o canvas. */
+.world-arena-canvas { pointer-events:auto; touch-action:none; }
+.world-arena-canvas:focus-visible { outline:2px solid #63e5f5; outline-offset:-3px; }
+.arena-world-name { pointer-events:none; }
+.arena-loading { position:absolute;inset:0;display:grid;place-items:center;background:#091826e8;color:#e7f8ff;font-size:18px;z-index:4; }
+.arena-camera-help { position:absolute;left:12px;right:12px;bottom:9px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;color:#e0f4ff;text-shadow:0 1px 4px #000; }
+.arena-camera-help button { pointer-events:auto;min-height:36px;padding:6px 10px;border:1px solid #759aa6;border-radius:8px;background:#0a2037dd;color:#e5f8ff;cursor:pointer; }
+.arena-fallback-unit { position:absolute;width:42px;height:52px;object-fit:cover;border:2px solid #62e6ec;border-radius:9px;transform:translate(-50%,-50%); }
+.world-arena[data-scene-status="fallback"] canvas { visibility:hidden; }
+.survival-3d { position:relative;height:320px;isolation:isolate;border-radius:12px;overflow:hidden; }
+.arena-frame .tower-label,.arena-frame .health-bar { pointer-events:none; }
+.arena-frame .ally-label { bottom:60px;font-size:10px; }
+.arena-frame .ally-health { bottom:51px; }
+.arena-frame .enemy-label { font-size:10px; }

@@ -1,46 +1,115 @@
-# Calculus Royale — fonte do jogo
+# Calculus Royale — Three.js
 
-URL: https://leosardinhalaus-math.github.io/leo-sardinha-math/jogos/calculus-royale/
+Jogo completo de estratégia com cartas, React/TypeScript (módulos JavaScript), Vite e Three.js. A batalha e a sobrevivência agora exibem personagens 3D animados. As 45 ilustrações das cartas continuam preservadas.
 
-## Código e publicação
+[Jogar](https://leosardinhalaus-math.github.io/leo-sardinha-math/jogos/calculus-royale/)
 
-- `client/src/components/GameCanvas.tsx` é o componente canônico, já com navegação, deck e progressão.
-- `client/src/components/WorldArena.tsx` gerencia o ciclo de vida da cena, dimensionamento, pausa fora da batalha e alternativa ilustrada se WebGL estiver indisponível.
-- `client/src/game/scene.ts` cria arquitetura própria para Limites, Derivadas, Séries, Integrais e Aplicações. A geometria é decorativa; as regras de combate continuam no componente principal.
-- `client/src/data/worldMaps.ts` é a correspondência entre índice da ilha, tema, imagem e cor.
-- `client/src/data/cardArt.ts` fornece as imagens para mão, editor, combate e sobrevivência.
-- `client/src/main.tsx` importa as folhas de estilo na ordem correta.
+## Rodar o projeto completo
 
-O workflow `.github/workflows/build-calculus-royale.yml` prepara imagens, instala dependências fixadas pelo lockfile, valida assets, verifica TypeScript e compila. O resultado em `jogos/calculus-royale/` é publicado pelo GitHub Pages. Não editar o bundle gerado.
-
-Os antigos `.packed/GameCanvas.*` e `patch_pages.py` são arquivos históricos; não executá-los sobre o componente canônico. O workflow não os usa mais para reconstruir código. Os dados compactados das imagens continuam sendo usados para preparar os assets.
-
-## Execução local
+Requisitos: Node.js 22, Python 3 e Pillow. Dentro de `jogos/calculus-royale-src`:
 
 ```sh
 npm ci
-mkdir -p client/public/assets/cards
-cat .packed/card-sprite.webp.b64.part{1,2,3,4,5,6} | base64 -d > client/public/assets/cards/card-sprite.webp
 python -m pip install pillow
-python scripts/extract_world_maps.py
-python scripts/split_card_sprite.py
-python scripts/generate_character_assets.py
-npm run check
-npm run dev
+python scripts/prepare-assets.py
+npm run dev -- --host 127.0.0.1
 ```
 
-## Preparação e desafios
+Abra o endereço mostrado pelo Vite. Para verificar e criar uma versão estática:
 
-O fluxo é Início → Preparação → Arena. A preparação reúne deck/evoluções, mapa, inventário, sobrevivência, perfil e ranking. Escolher uma ilha volta para a preparação e preserva o deck selecionado; o combate só avança na arena. A mão usa quatro cartas lado a lado na faixa inferior, com altura observada para reservar espaço no conteúdo. Os power-ups ficam junto à mão.
+```sh
+npm run check
+npm run test:three
+npm run build
+python -m http.server 8000 --directory dist/public
+```
 
-`client/src/data/powerUpChallenges.ts` contém 40 perguntas (8 por ilha), com alternativas embaralhadas e sorteio sem repetição até esgotar cada grupo. A virada de grupo também evita repetir a última pergunta. O combate pausa durante os desafios e ao abrir inventário ou sobrevivência.
+Abra http://localhost:8000. Não abra `index.html` por `file://`: módulos, manifesto e GLTFLoader precisam de servidor HTTP. O bundle inclui Three.js, sem depender de CDN em execução. `package-lock.json` fixa as versões.
 
-## Artes atuais e futuro 3D
+## Estrutura
 
-Os dez recortes de `card-sprite.webp` vêm da prancha ilustrada original (Guardião, Arqueira, Mago, Golem, Sacerdotisa, Colosso, Feiticeiro, Oráculo, Engenheiro e Titã). As outras 35 cartas agora usam ilustrações de fantasia geradas em IA no mesmo estilo. Os seis atlas em `art-source/` e seu manifesto preservam a associação de cada retrato à carta. `generate_character_assets.py` apenas extrai essas artes; não desenha mais personagens procedurais. O hash de cada atlas é verificado antes da extração.
+| Arquivo/pasta | Função |
+| --- | --- |
+| `client/src/components/GameCanvas.tsx` | Regras existentes, energia, dano, pontuação, fases, deck e menus HTML |
+| `client/src/components/WorldArena.tsx` | Integração React, carregamento, recuperação ilustrada e controles de câmera |
+| `client/src/game/scene.ts` | Renderer, câmera, GLTFLoader, sincronização das tropas, Clock, loop e descarte |
+| `client/src/game/characters.ts` | Avatares geométricos, clones de esqueletos, AnimationMixer e crossfades |
+| `client/src/game/world.ts` | Cinco ilhas procedurais com torres, pontes e ornamentos |
+| `client/src/game/collisions.ts` | Conversão de coordenadas e colisões Box3 com subpassos e deslize |
+| `client/public/assets/models/manifest.json` | Configuração opcional dos personagens e mapas externos |
+| `client/src/world-arena.css` | Canvas responsivo e HUD da arena |
+| `client/src/data/` | Cartas, mapas, artes e desafios |
+| `art-source/`, `.packed/`, `scripts/` | Fontes e preparação das imagens incluídas no projeto |
 
-Os personagens atuais são imagens 2D com animações de deslocamento/ataque em CSS. A arquitetura da arena usa Babylon.js e geometria 3D. Não há modelos articulados de personagens integrados neste estágio.
+## Decisões de adaptação
 
-Para um piloto 3D, começar pela Arqueira (`slope`): referência de corpo inteiro → modelo texturizado → esqueleto → animações `idle`, `walk`, `attack`, `hit`, `death` → exportação GLB → integração com a posição e os eventos de combate. Um vídeo gerado por IA não substitui esse modelo. O carregador GLB e a sincronização de animações ainda precisam ser implementados quando houver um asset real para validar.
+Este jogo já é uma batalha de cartas, não um jogo de personagem diretamente controlado. Mantivemos o controle pelas cartas, dano, energia, IA, fases, pontuação, armazenamento local e menus. Assumimos câmera estratégica elevada: arrastar gira, roda do mouse ou pinça aproxima; botão direito ou dois dedos deslocam. Com foco no canvas, WASD/setas deslocam a câmera e R centraliza. Não há movimento manual das tropas nem uma nova regra de salto.
 
-Meshy oferece imagem-para-3D, rigging e animação; Mixamo pode aplicar animações a personagens humanoides compatíveis. A fidelidade, a malha e o custo devem ser avaliados com um personagem antes de produzir o elenco inteiro.
+O avanço lógico de 0 a 100 vira X entre −9 e +9 (sentido invertido no rival); a faixa vira Z = ±1,65. Os snapshots são interpolados apenas na apresentação. As regras continuam no relógio original do jogo e o render usa requestAnimationFrame + Clock com delta limitado a 50 ms. Pausas dos desafios também congelam os personagens. Salto é uma animação de entrada; correr aparece nos avanços rápidos e atacar na aproximação da torre. Não introduzimos dano por contato ou bloqueio entre tropas, pois isso mudaria o combate existente.
+
+Box3 impede os avatares de entrar nos obstáculos estáticos, com pequenos subpassos para evitar atravessamento. As rotas e pontes ficam livres. Luz hemisférica e direcional, sombras, fundo e névoa compõem a cena. O pixel ratio é limitado a 1,5 e sombras a 1024²; câmera e canvas acompanham o tamanho do contêiner. Fora da arena a cena é descartada. Sem WebGL, o jogo continua no cenário ilustrado com os retratos se movimentando.
+
+## Modelos gratuitos e animações
+
+O jogo já funciona sem download adicional, usando personagens provisórios de cápsulas e caixas. Eles **não reproduzem a aparência das ilustrações**. Todos têm `idle`, `walk`, `run`, `jump` e `attack` via AnimationMixer, com crossfade de 0,2 s. Um GLB externo pode substituir qualquer carta ou o personagem padrão.
+
+Fonte gratuita: [Quaternius — Universal Base Characters](https://quaternius.com/packs/universalbasecharacters.html). Na página, use **Download here** ou **Download on Itch.io**, escolha o pacote gratuito e extraia a versão glTF. A página informa licença CC0 e formatos glTF, FBX e Blender. Os nomes e as animações podem variar entre arquivos: confira os clips do modelo escolhido. Se vier `.gltf`, mantenha também o `.bin` e as texturas nas posições relativas originais. Para converter um `.blend` ou FBX, importe no Blender e exporte **glTF 2.0 / GLB**, incluindo animações; prefira animações *in place* (sem deslocamento da raiz).
+
+Coloque seu arquivo em `client/public/assets/models/characters/hero.glb`. Substitua o conteúdo de `client/public/assets/models/manifest.json` por, por exemplo:
+
+```json
+{
+  "characters": {
+    "default": {
+      "url": "./assets/models/characters/hero.glb",
+      "height": 2,
+      "yaw": 0,
+      "animations": {
+        "idle": "Idle",
+        "walk": "Walk",
+        "run": "Run",
+        "jump": "Jump",
+        "attack": "Attack"
+      }
+    },
+    "slope": {
+      "url": "./assets/models/characters/archer.glb",
+      "height": 2
+    }
+  },
+  "worlds": {}
+}
+```
+
+A entrada `slope` só deve ser adicionada quando `archer.glb` existir. Troque os nomes acima pelos nomes exatos dos clips do seu GLB. Sem mapeamento explícito, o carregador procura nomes contendo idle/standing, walk, run/sprint, jump e attack/punch/slash. Se faltar uma ação, usa idle quando disponível; não cria animações esqueléticas que não existem no modelo. Cada instância ganha um esqueleto clonado e um mixer próprio. `height` normaliza a altura, e `yaw` é a correção de orientação em radianos. Os modelos devem estar voltados para +Z antes da orientação de equipe.
+
+Todos os URLs configurados são pré-carregados durante a tela de preparação 3D. Arquivo ausente ou inválido mantém o avatar provisório e mostra uma indicação discreta. O manifesto vazio é a configuração padrão funcional. Para este primeiro pipeline, exporte GLB/glTF sem compressão Draco/KTX2: esses decodificadores não foram incluídos.
+
+Referências oficiais: [GLTFLoader](https://threejs.org/docs/pages/GLTFLoader.html), [AnimationMixer](https://threejs.org/docs/pages/AnimationMixer.html).
+
+## Mapa GLB opcional
+
+Coloque `arena.glb` em `client/public/assets/models/maps/` e configure a ilha 1:
+
+```json
+{
+  "characters": {},
+  "worlds": {
+    "1": { "url": "./assets/models/maps/arena.glb" }
+  }
+}
+```
+
+Índices 1–5 correspondem às cinco ilhas. Use Y para cima, chão Y=0 e área de X=−11…11, Z=−5…5. Preserve corredores com pelo menos 1,2 unidade de largura centrados em Z=±1,65 ao longo de X=−9…9. Nomeie volumes de colisão `COL_parede`, `COL_rocha`, etc.; eles ficam invisíveis e fornecem suas caixas de colisão. A colisão é AABB, não uma malha física: não suporta rampas, gravidade ou pathfinding. Se colocar um obstáculo no corredor, o visual pode parar enquanto o relógio lógico continua; respeite o contrato do mapa para preservar a sincronização. Sem GLB de mapa, são usadas as ilhas procedurais incluídas.
+
+## Publicação e conteúdo preservado
+
+O workflow `.github/workflows/build-calculus-royale.yml` prepara as imagens, instala as dependências, verifica TypeScript e gera `jogos/calculus-royale/` para GitHub Pages. Edite o código-fonte, não o bundle. Os antigos `.packed/GameCanvas.*` e `patch_pages.py` são históricos e não devem reconstruir o componente atual.
+
+Fluxo: Início → Preparação → Arena. Preparação reúne deck, mapa, inventário, sobrevivência, perfil e ranking. A mão continua horizontal com quatro cartas no rodapé. Os power-ups usam 40 perguntas com alternativas embaralhadas e sem repetição até esgotar o grupo. Os 10 retratos originais e 35 ilustrações adicionais continuam usando os mesmos arquivos.
+
+## Três melhorias possíveis
+
+1. Modelos autorais que correspondam às 45 ilustrações, com animações próprias por classe.
+2. Partículas nos feitiços e sons espaciais de ataque.
+3. Pathfinding e combate físico entre tropas, como uma evolução explícita das regras atuais.
