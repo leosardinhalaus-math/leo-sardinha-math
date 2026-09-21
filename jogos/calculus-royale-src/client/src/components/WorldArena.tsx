@@ -23,6 +23,6 @@ export default function WorldArena({worldIndex,active,allies=[],enemies=[],pause
   {status==='fallback'&&placement&&<img className="arena-fallback-unit" src={getCardImage(placement.unit.cardId)} alt={`Prévia de ${placement.unit.name}`} style={{left:`${18+(SPAWN_ZONES.find(z=>z.id===placement.zoneId)?.progress??5)*.64}%`,top:(SPAWN_ZONES.find(z=>z.id===placement.zoneId)?.lane??0)<0?'40%':'60%',outline:'3px solid #ffe18c'}}/>}
   {warnings>0&&status==='ready'&&<span className="arena-fallback-note">Alguns modelos usam a versão provisória</span>}
   <div className="arena-world-name"><span>ILHA {String(world.id).padStart(2,'0')}</span><strong>{world.title}</strong></div>
-  <div className="arena-camera-help"><span>Arraste para girar · pinça para zoom</span><button onClick={()=>handle.current?.resetCamera()} aria-label="Centralizar câmera">↺ Câmera</button></div>
+  <div className="arena-camera-help"><span>Arraste · pinça para zoom</span><div className="arena-view-buttons"><button onClick={()=>handle.current?.viewIsland()} aria-label="Ver ilha inteira">Ilha inteira</button><button onClick={()=>handle.current?.resetCamera()} aria-label="Centralizar câmera">Combate</button></div></div>
  </div>;
 }

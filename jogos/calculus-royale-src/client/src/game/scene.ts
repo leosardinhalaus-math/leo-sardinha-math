@@ -10,26 +10,27 @@ import { SPAWN_ZONES, type CombatEvent } from './combat';
 export type ArenaUnit={id:number;cardId:string;name:string;kind:string;progress:number;color:string;lane?:number;hp?:number;maxHp?:number;lastAttack?:number};
 export type ArenaState={allies:ArenaUnit[];enemies:ArenaUnit[];paused:boolean;events?:CombatEvent[];placement?:{unit:ArenaUnit;zoneId:string;blocked:string[]};outcome?:'victory'|'defeat'|null};
 type Manifest={useGenerated?:boolean;characters?:Record<string,ModelSpec>;worlds?:Record<string,{url:string}>};
-export type GameHandle={setState:(state:ArenaState)=>void;resetCamera:()=>void;dispose:()=>void};
+export type GameHandle={setState:(state:ArenaState)=>void;resetCamera:()=>void;viewIsland:()=>void;dispose:()=>void};
 
 export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(warnings:number)=>void,onError:()=>void,onSelectZone?:(id:string)=>void):GameHandle{
  const renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:false});
  renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
- renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.35;
- const scene=new T.Scene();scene.background=new T.Color(0x091826);scene.fog=new T.FogExp2(0x091826,.016);
- scene.add(new T.HemisphereLight(0xd7eeff,0x253228,2.1));
- const sun=new T.DirectionalLight(0xffeed6,3);sun.position.set(-7,18,8);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-16,right:16,top:12,bottom:-12,near:.1,far:50});sun.shadow.bias=-.001;scene.add(sun);
+ renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;
+ const scene=new T.Scene();scene.background=new T.Color(0x84d5fb);scene.fog=new T.FogExp2(0x9bdcf6,.006);
+ scene.add(new T.HemisphereLight(0xc9efff,0x566635,1.65));
+ const sun=new T.DirectionalLight(0xfff0ce,2.5);sun.position.set(-12,25,10);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-20,right:20,top:18,bottom:-18,near:.1,far:70});sun.shadow.bias=-.0004;sun.shadow.normalBias=.035;sun.shadow.radius=2;scene.add(sun);
  const world=createWorld(index);scene.add(world.root);
  const camera=new T.PerspectiveCamera(42,1,.1,120);const controls=new OrbitControls(camera,canvas);
- controls.enableDamping=true;controls.minDistance=12;controls.maxDistance=45;controls.maxPolarAngle=Math.PI*.43;controls.minPolarAngle=.3;controls.enablePan=true;
+ controls.enableDamping=true;controls.minDistance=12;controls.maxDistance=65;controls.maxPolarAngle=Math.PI*.43;controls.minPolarAngle=.3;controls.enablePan=true;
  function resetCamera(){const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight);const distance=Math.max(21,13/(Math.tan(T.MathUtils.degToRad(21))*aspect));camera.position.set(0,distance*.78,distance*.7);controls.target.set(0,0,0);controls.update();}
- resetCamera();
+ function viewIsland(){const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight);const distance=Math.max(29,18/(Math.tan(T.MathUtils.degToRad(21))*aspect));camera.position.set(3,distance*.85,distance*.7);controls.target.set(0,.3,-.5);controls.update();}
+ viewIsland();
  const observer=new ResizeObserver(()=>{const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();});observer.observe(canvas);
  let state:ArenaState={allies:[],enemies:[],paused:false},disposed=false,ready=false,warnings=0;
  let manifest:Manifest={};const assets=new Map<string,GLTF>();
  const actors=new Map<string,{visual:ReturnType<typeof createCharacter>;unit:ArenaUnit;enemy:boolean;age:number;lane:number;exitAge?:number;exitMotion?:'victory'|'defeat';attackFor:number;lastAttack:number;health:T.Mesh}>();
  const zoneMeshes=SPAWN_ZONES.map(zone=>{const material=new T.MeshBasicMaterial({color:0x5bffcc,transparent:true,opacity:.35,side:T.DoubleSide,depthWrite:false});const mesh=new T.Mesh(new T.PlaneGeometry(1.35,1.2),material);mesh.rotation.x=-Math.PI/2;mesh.position.copy(arenaPosition(zone.progress,false,zone.lane));mesh.position.y=.13;mesh.userData.zoneId=zone.id;mesh.visible=false;scene.add(mesh);return mesh;});
- let preview:ReturnType<typeof createCharacter>|undefined,previewId='';
+ let preview:ReturnType<typeof createCharacter>|undefined,previewId='';let wasPlacing=false;let worldTime=0;
  const effects:ReturnType<typeof createAbilityEffect>[]=[];const seenEvents=new Set<string>();
  const raycaster=new T.Raycaster(),pointer=new T.Vector2();let down={x:0,y:0};
  const pointerDown=(e:PointerEvent)=>{down={x:e.clientX,y:e.clientY};};
@@ -72,6 +73,7 @@ export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(w
   canvas.dataset.units=String(live.size);canvas.dataset.effects=String(effects.length);
   for(const mesh of zoneMeshes){mesh.visible=Boolean(state.placement);mesh.material.color.set(state.placement?.blocked.includes(mesh.userData.zoneId)?0xf1746d:state.placement?.zoneId===mesh.userData.zoneId?0xffd77c:0x5bffcc);mesh.material.opacity=state.placement?.zoneId===mesh.userData.zoneId ? .65 : .25;}
   const placement=state.placement;
+  if(placement&&!wasPlacing)resetCamera();wasPlacing=Boolean(placement);
   if(!placement||previewId!==placement.unit.cardId){if(preview){scene.remove(preview.group);preview.dispose();preview=undefined;}previewId='';}
   if(placement){if(!preview){const spec=manifest.characters?.[placement.unit.cardId]??manifest.characters?.default;preview=createCharacter('#ffe18c',placement.unit.kind,spec?assets.get(spec.url):undefined,spec,placement.unit.cardId);previewId=placement.unit.cardId;scene.add(preview.group);}const zone=SPAWN_ZONES.find(z=>z.id===placement.zoneId)!;preview.group.position.copy(arenaPosition(zone.progress,false,zone.lane));preview.group.rotation.y=Math.PI/2;preview.play('idle');}
   canvas.dataset.previewCard=previewId;canvas.dataset.previewZone=placement?.zoneId??'';
@@ -81,6 +83,7 @@ export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(w
  function render(){
   if(disposed)return;frame=requestAnimationFrame(render);const dt=Math.min(clock.getDelta(),.05);
   if(document.hidden)return;
+  worldTime+=dt;world.update(worldTime);
   if(ready){synchronize();for(const actor of actors.values()){
    const {visual,unit,enemy,lane}=actor;
    actor.health.scale.x=Math.max(.01,(unit.hp??1)/(unit.maxHp??1));actor.health.quaternion.copy(camera.quaternion);actor.health.quaternion.premultiply(visual.group.quaternion.clone().invert());
@@ -100,5 +103,5 @@ export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(w
   canvas.dataset.frames=String(Number(canvas.dataset.frames??0)+1);
  }
  render();
- return {setState(next){state=next;},resetCamera,dispose(){disposed=true;abort.abort();cancelAnimationFrame(frame);observer.disconnect();controls.dispose();canvas.removeEventListener('keydown',keydown);window.removeEventListener('keyup',keyup);canvas.removeEventListener('blur',blur);canvas.removeEventListener('webglcontextlost',lost);canvas.removeEventListener('pointerdown',pointerDown);canvas.removeEventListener('pointerup',pointerUp);actors.forEach(a=>{a.visual.dispose();a.health.geometry.dispose();(a.health.material as T.Material).dispose();});preview?.dispose();zoneMeshes.forEach(m=>{m.geometry.dispose();m.material.dispose();});effects.forEach(e=>e.dispose());disposeObject(world.root);assets.forEach(a=>disposeObject(a.scene));sun.shadow.dispose();renderer.dispose();renderer.forceContextLoss();}};
+ return {setState(next){state=next;},resetCamera,viewIsland,dispose(){disposed=true;abort.abort();cancelAnimationFrame(frame);observer.disconnect();controls.dispose();canvas.removeEventListener('keydown',keydown);window.removeEventListener('keyup',keyup);canvas.removeEventListener('blur',blur);canvas.removeEventListener('webglcontextlost',lost);canvas.removeEventListener('pointerdown',pointerDown);canvas.removeEventListener('pointerup',pointerUp);actors.forEach(a=>{a.visual.dispose();a.health.geometry.dispose();(a.health.material as T.Material).dispose();});preview?.dispose();zoneMeshes.forEach(m=>{m.geometry.dispose();m.material.dispose();});effects.forEach(e=>e.dispose());disposeObject(world.root);assets.forEach(a=>disposeObject(a.scene));sun.shadow.dispose();renderer.dispose();renderer.forceContextLoss();}};
 }

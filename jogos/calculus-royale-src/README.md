@@ -134,3 +134,9 @@ Fluxo: Início → Preparação → Arena. Preparação reúne deck, mapa, inven
 3. Pathfinding entre faixas e colisões com obstáculos móveis.
 
 O raycast de seleção e o controle das ações seguem as APIs oficiais de [Raycaster](https://threejs.org/docs/pages/Raycaster.html) e [AnimationAction](https://threejs.org/docs/pages/AnimationAction.html).
+
+## Ilha cartunesca
+
+O cenário procedural tem oceano animado, praia, colinas verdes, cidade colorida, centro futurista, acampamento e moinho. Cada uma das cinco ilhas mantém sua paleta e pontos de interesse. A iluminação usa materiais Standard, sombras e névoa em Three.js; não depende de Unreal Engine, ray tracing ou texturas 8K.
+
+Use **Ilha inteira** para a vista aérea e **Combate** para aproximar a arena. A seleção de carta aproxima a câmera automaticamente. Os elementos decorativos ficam fora dos corredores e das seis zonas de invocação.
