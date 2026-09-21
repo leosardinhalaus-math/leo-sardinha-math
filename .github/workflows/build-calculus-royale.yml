@@ -55,11 +55,17 @@ jobs:
 
       - name: Test Three.js integration
         working-directory: jogos/calculus-royale-src
-        run: npm run test:three
+        run: |
+          npm run test:three
+          npm run test:combat
 
       - name: Build game
         working-directory: jogos/calculus-royale-src
         run: npm run build
+
+      - name: Validate generated GLB models
+        working-directory: jogos/calculus-royale-src
+        run: npm run test:models
 
       - name: Publish built game into site
         run: |

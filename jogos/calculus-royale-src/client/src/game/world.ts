@@ -18,7 +18,7 @@ export function createWorld(index:number){
   for(const side of [-1,1])add(new T.BoxGeometry(3,.35,.12),trim,0,.22,z+side*.8,true);
   for(const x of [-6,6])add(new T.BoxGeometry(9.5,.015,1.2),new T.MeshStandardMaterial({color:0xb5cbca,transparent:true,opacity:.12}),x,.07,z);
  }
- for(const x of [-9.5,9.5])for(const z of [-3.4,3.4]){
+ for(const x of [-9.5,9.5])for(const z of [-1.65,1.65]){
   add(new T.CylinderGeometry(.65,.85,1.5,6),stone,x,.8,z,true);
   add(new T.CylinderGeometry(.85,.7,.35,6),trim,x,1.7,z);
   add(new T.OctahedronGeometry(.5),trim,x,2.3,z);

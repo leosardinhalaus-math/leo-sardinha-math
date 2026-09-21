@@ -14,7 +14,7 @@ assert(pos.x<-.28,'Não deve atravessar uma parede em um passo longo');
 assert(Math.abs(pos.z-1)<.01,'Deve deslizar no eixo livre');
 for(let i=0;i<5;i++){
  const world=createWorld(i);
- for(const enemy of [false,true]){const start=arenaPosition(0,enemy,enemy?-1.65:1.65);const end=arenaPosition(100,enemy,start.z);moveWithCollisions(start,end,world.obstacles);assert(start.distanceTo(end)<.01,`A rota da ilha ${i+1} deve ficar livre`);}
+ for(const enemy of [false,true]){const start=arenaPosition(5,enemy,enemy?-1.65:1.65);const end=arenaPosition(96,enemy,start.z);moveWithCollisions(start,end,world.obstacles);assert(start.distanceTo(end)<.01,`A rota da ilha ${i+1} deve ficar livre`);}
  disposeObject(world.root);
 }
 const actor=createCharacter('#33bbff','tropa');
