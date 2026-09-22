@@ -5,3 +5,29 @@
 @media(max-width:600px){.spawn-panel{gap:7px}.spawn-heading strong{font-size:14px}.spawn-panel p{font-size:12px}.combat-feed p{font-size:12px}.battle-hand:has(.spawn-panel) .deck-tip{display:none}}
 .arena-frame .tower-label{background:#071928e8;border-radius:5px;padding:3px 6px;font-size:11px;width:auto;max-width:170px;text-shadow:0 1px 2px #000}.arena-frame .ally-label{bottom:62px}.arena-frame .enemy-label{top:12px}
 .arena-view-buttons{display:flex;gap:5px}.arena-camera-help{font-size:11px}.arena-camera-help button{font-size:12px;padding:6px 9px}.arena-world-name{padding:7px 9px;border-radius:8px;background:#08243bc9}.arena-camera-help>span{padding:4px 6px;border-radius:5px;background:#08243bce}.screen-battle .arena-frame{border-color:#61cadd}.arena-world-name span{color:#b1fcf2}
+
+/* A arena é o elemento principal; a mão permanece horizontal e fixa abaixo. */
+.screen-battle .hud{gap:7px;padding:7px clamp(6px,1vw,14px) calc(var(--hand-height,230px) + 10px)}
+.screen-battle .topbar{padding-bottom:5px}.screen-battle .battle-column{gap:7px}
+.screen-battle .battle-status{min-height:34px;margin:0;padding:4px 7px}
+.screen-battle .arena-frame{width:100%;height:clamp(350px,calc(100dvh - var(--hand-height,230px) - 105px),760px);min-height:350px;border-radius:14px}
+.screen-battle .battle-log{margin:0;padding:6px 9px}.screen-battle .combat-feed{margin:0;padding:6px 9px}
+.arena-camera-help{left:10px;right:10px;bottom:8px}.arena-camera-help>span{max-width:42%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:600px){
+ .screen-battle .hud{gap:5px;padding:5px 4px calc(var(--hand-height,270px) + 6px)}
+ .screen-battle .topbar{padding-bottom:3px}.screen-battle .battle-column{gap:5px}
+ .screen-battle .battle-status{min-height:30px;padding:2px 4px}.screen-battle .battle-status .arena-caption{font-size:12px;max-width:52vw}
+ .screen-battle .arena-frame{height:clamp(350px,calc(100dvh - var(--hand-height,270px) - 82px),590px);min-height:350px;padding:30px 5px;border-radius:10px}
+ .screen-battle .battle-log{font-size:12px;line-height:1.25;padding:5px 7px}.screen-battle .battle-log small{font-size:10px}
+ .screen-battle .combat-feed{padding:5px 7px}.screen-battle .combat-feed p{font-size:11px}
+ .arena-camera-help>span{display:none}.arena-camera-help{justify-content:flex-end;bottom:6px}.arena-camera-help button{min-height:32px;padding:5px 7px;font-size:11px}
+ .arena-frame .ally-label{bottom:48px}.arena-frame .ally-health{bottom:41px}
+}
+@media(min-width:1051px){
+ .screen-battle .variant-compact .royale-card-hitarea{grid-template-columns:72px minmax(0,1fr);min-height:98px}
+ .screen-battle .variant-compact .royale-card-art{width:72px;min-height:98px}
+ .screen-battle .variant-compact .royale-card-copy{padding:8px;min-height:0}
+ .screen-battle .variant-compact .royale-card-copy strong{font-size:14px}.screen-battle .variant-compact .royale-card-copy p{font-size:11px;margin-top:4px}
+ .screen-battle .variant-compact .royale-card-footer{padding:5px 8px;font-size:10px}
+}
+@media(max-height:700px) and (max-width:600px){.screen-battle .arena-frame{height:350px;min-height:350px}}

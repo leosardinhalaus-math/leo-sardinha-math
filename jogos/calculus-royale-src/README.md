@@ -64,7 +64,7 @@ Box3 impede os avatares de entrar nos obstáculos estáticos, com pequenos subpa
 
 ## Modelos gratuitos e animações
 
-O projeto gera **45 arquivos GLB jogáveis**, com `idle`, `walk`, `run`, `jump`, `attack`, `victory` e `defeat`, através de `npm run models` (também executado automaticamente antes de `dev` e `build`). Eles ficam em `client/public/assets/models/generated/`. São modelos low-poly procedurais inspirados nas paletas, silhuetas e acessórios observados nas cartas: arco, lâminas, escudos, cajados, livros, ferramentas, asas e relíquias flutuantes.
+O projeto gera **45 arquivos GLB jogáveis**, com `idle`, `walk`, `run`, `jump`, `summon`, `attack`, `power`, `hurt`, `victory` e `defeat`, através de `npm run models` (também executado automaticamente antes de `dev` e `build`). Eles ficam em `client/public/assets/models/generated/`. São personagens 3D estilizados, suavizados e rigados, construídos por geometria a partir das paletas, silhuetas, rostos, cabelos, roupas, armaduras e acessórios observados nas cartas. Nenhum retrato é aplicado como plano ou billboard no modelo.
 
 Os modelos são reconstruções 3D estilizadas a partir das referências visuais, com diferenças próprias de cabelo, rosto, roupa, armadura, arma e formação mágica. Eles usam hierarquias de pivôs animados (membros rígidos), enquanto o carregador também aceita modelos externos com esqueleto. As ilustrações originais do deck permanecem intactas.
 
@@ -100,7 +100,7 @@ Coloque seu arquivo em `client/public/assets/models/characters/hero.glb`. Substi
 }
 ```
 
-A entrada `slope` só deve ser adicionada quando `archer.glb` existir. Troque os nomes acima pelos nomes exatos dos clips do seu GLB. Sem mapeamento explícito, o carregador procura nomes contendo idle/standing, walk, run/sprint, jump attack/punch/slash, victory/win/celebrat e defeat/death/dying. Se faltar uma ação, usa idle quando disponível; não cria animações esqueléticas que não existem no modelo. Cada instância ganha um esqueleto clonado e um mixer próprio. `height` normaliza a altura, e `yaw` é a correção de orientação em radianos. Os modelos devem estar voltados para +Z antes da orientação de equipe.
+A entrada `slope` só deve ser adicionada quando `archer.glb` existir. Troque os nomes acima pelos nomes exatos dos clips do seu GLB. Sem mapeamento explícito, o carregador procura nomes contendo idle/standing, walk, run/sprint, jump, summon/spawn, attack/punch/slash, power/spell/cast, hurt/hit/damage, victory/win/celebrat e defeat/death/dying. Se faltar uma ação, usa idle quando disponível; não cria animações esqueléticas que não existem no modelo. Cada instância ganha um esqueleto clonado e um mixer próprio. `height` normaliza a altura, e `yaw` é a correção de orientação em radianos. Os modelos devem estar voltados para +Z antes da orientação de equipe.
 
 Todos os URLs configurados são pré-carregados durante a tela de preparação 3D. Arquivo ausente ou inválido mantém o avatar provisório e mostra uma indicação discreta. Um manifesto vazio desativa os GLBs gerados e mantém a geometria procedural funcional. Para este primeiro pipeline, exporte GLB/glTF sem compressão Draco/KTX2: esses decodificadores não foram incluídos.
 

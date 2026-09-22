@@ -1,113 +1,78 @@
 import * as T from 'three';
 
-// Ilha cartunesca original, construída em geometria 3D. Corredores de combate
-// mantêm X/Z e colisões do jogo; cidade, relevo e biomas ficam ao redor deles.
+type Theme={accent:number;accent2:number;grass:number;foliage:number;sky:number;fog:number;rock:number;path:number;water:number;kind:'limits'|'derivatives'|'series'|'integrals'|'applications'};
+
+// Cinco arquipélagos flutuantes inspirados diretamente nos mapas ilustrados.
+// As duas rotas funcionais permanecem em Z = ±1,65, livres de colisões.
 export function createWorld(index:number){
- const root=new T.Group();root.name='Ilha Royale';const obstacles:T.Box3[]=[];
- const themes=[
-  {accent:0x24d9fb,grass:0x64bd35,leaf:0x259c53,rock:0x987752,roof:0xfb7856},
-  {accent:0xff8154,grass:0x9dbc39,leaf:0x569642,rock:0xc87949,roof:0xec5a52},
-  {accent:0xa775ff,grass:0x68aa51,leaf:0x438e80,rock:0x7777ab,roof:0xad6ddc},
-  {accent:0x38e5aa,grass:0x43ba52,leaf:0x188865,rock:0x8b9279,roof:0x2d9fa5},
-  {accent:0xffd063,grass:0x8fbb35,leaf:0x428e4b,rock:0xb78a51,roof:0xee8a38},
+ const themes:Theme[]=[
+  {kind:'limits',accent:0x4fdcff,accent2:0xffd66b,grass:0x426d4c,foliage:0x173f31,sky:0x071d46,fog:0x28568a,rock:0x26344c,path:0xe8d79c,water:0x169bd2},
+  {kind:'derivatives',accent:0xff6a35,accent2:0xffd06a,grass:0x5f4d32,foliage:0x54251f,sky:0x35121c,fog:0x8c4436,rock:0x3d2c39,path:0xe8c88f,water:0xff5b2d},
+  {kind:'series',accent:0xa276ff,accent2:0xf7d480,grass:0x343d54,foliage:0x392c66,sky:0x0b1645,fog:0x34356f,rock:0x292e4b,path:0xe0d2ac,water:0x6d58ff},
+  {kind:'integrals',accent:0x59f0df,accent2:0xffda78,grass:0x3f6d4f,foliage:0x244b37,sky:0x083d54,fog:0x397f89,rock:0x33424d,path:0xeee1b2,water:0x39cad6},
+  {kind:'applications',accent:0x48b9ff,accent2:0xffd363,grass:0x426c4b,foliage:0x173e2d,sky:0x092758,fog:0x315f92,rock:0x27384f,path:0xe7d9aa,water:0x168fd4},
  ];
- const theme=themes[index]??themes[0],accent=theme.accent;
- let seed=1571+index*97;const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
- const mat=(color:number,roughness=.8,metalness=0)=>new T.MeshStandardMaterial({color,roughness,metalness});
- const grass=mat(theme.grass),leaf=mat(theme.leaf),lime=mat(0x8acb44),sand=mat(0xf4d78e),cliff=mat(theme.rock),wood=mat(0x995d36),woodLight=mat(0xdeab66),cream=mat(0xffedc3),roof=mat(theme.roof),navy=mat(0x304669),road=mat(0x53667a),metal=mat(0xc4dfeb,.36,.45),white=mat(0xe5f8ff,.4,.25);
- const neon=new T.MeshStandardMaterial({color:accent,emissive:accent,emissiveIntensity:.65,roughness:.3,metalness:.35});
- const glass=new T.MeshStandardMaterial({color:0x37c9ed,emissive:0x0d93bd,emissiveIntensity:.15,roughness:.15,metalness:.55});
- const gold=mat(0xffce55,.45,.3);const animated:T.Object3D[]=[];
- function add(geometry:T.BufferGeometry,material:T.Material,x:number,y:number,z:number,solid=false,parent:T.Object3D=root){const mesh=new T.Mesh(geometry,material);mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);if(solid){root.updateMatrixWorld(true);obstacles.push(new T.Box3().setFromObject(mesh));}return mesh;}
- const box=(w:number,h:number,d:number,m:T.Material,x:number,y:number,z:number,solid=false,parent:T.Object3D=root)=>add(new T.BoxGeometry(w,h,d),m,x,y,z,solid,parent);
- const ball=(r:number,m:T.Material,x:number,y:number,z:number,parent:T.Object3D=root)=>add(new T.IcosahedronGeometry(r,1),m,x,y,z,false,parent);
- function beam(from:T.Vector3,to:T.Vector3,r:number,m:T.Material,parent:T.Object3D=root){const delta=to.clone().sub(from);const mesh=add(new T.CylinderGeometry(r,r,delta.length(),5),m,0,0,0,false,parent);mesh.position.copy(from).add(to).multiplyScalar(.5);mesh.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),delta.normalize());return mesh;}
- // Contorno irregular, praia em anel e paredões da ilha acima do mar.
- const segments=72,contour=Array.from({length:segments},(_,i)=>{const angle=i/segments*Math.PI*2;const wobble=1+.035*Math.sin(angle*7)+.025*Math.cos(angle*11);return new T.Vector2(Math.cos(angle)*15.3*wobble,Math.sin(angle)*9.8*wobble);});
- function terrainRing(inner:number,outer:number,innerY:number,outerY:number,material:T.Material){const positions:number[]=[];for(let i=0;i<segments;i++){const a=contour[i],b=contour[(i+1)%segments];positions.push(a.x*inner,innerY,a.y*inner,a.x*outer,outerY,a.y*outer,b.x*outer,outerY,b.y*outer,a.x*inner,innerY,a.y*inner,b.x*outer,outerY,b.y*outer,b.x*inner,innerY,b.y*inner);}const geometry=new T.BufferGeometry();for(let offset=0;offset<positions.length;offset+=9){for(let axis=0;axis<3;axis++){const value=positions[offset+3+axis];positions[offset+3+axis]=positions[offset+6+axis];positions[offset+6+axis]=value;}}geometry.setAttribute('position',new T.Float32BufferAttribute(positions,3));geometry.computeVertexNormals();const mesh=new T.Mesh(geometry,material);mesh.receiveShadow=true;root.add(mesh);return mesh;}
- terrainRing(0,.87,.015,.015,grass);terrainRing(.87,.94,.015,-.35,sand);terrainRing(.94,1,-.35,-1.7,cliff);terrainRing(1,1.04,-1.7,-1.94,sand);
- // Oceano animado no shader: poucas geometrias e nenhum arquivo 8K pesado.
- const oceanMaterial=new T.ShaderMaterial({uniforms:{time:{value:0}},vertexShader:`varying vec3 world; void main(){world=(modelMatrix*vec4(position,1.)).xyz;gl_Position=projectionMatrix*viewMatrix*vec4(world,1.);}`,fragmentShader:`uniform float time;varying vec3 world;void main(){vec2 p=world.xz;float ripple=sin(p.x*1.8+p.y*.85-time*1.4)*sin(p.y*2.1-p.x*.5+time*.8);float broad=sin(p.x*.1+p.y*.07+time*.14);vec3 col=mix(vec3(.025,.35,.70),vec3(.035,.66,.81),.45+broad*.18);float sparkle=pow(max(0.,ripple),18.);col+=vec3(.42,.61,.60)*sparkle*.28;float distanceFade=smoothstep(35.,95.,length(p));gl_FragColor=vec4(mix(col,vec3(.48,.79,.93),distanceFade),1.);#include <tonemapping_fragment>\n#include <colorspace_fragment>
-}`});
- // Diretivas GLSL precisam começar numa linha própria.
- oceanMaterial.fragmentShader=oceanMaterial.fragmentShader.replace(';#include',';\n#include');
- const ocean=add(new T.PlaneGeometry(220,220),oceanMaterial,0,-2,0);ocean.rotation.x=-Math.PI/2;ocean.castShadow=false;
- const foam=new T.MeshBasicMaterial({color:0xb9f6ea,transparent:true,opacity:.5,side:T.DoubleSide,depthWrite:false});terrainRing(1.015,1.035,-1.98,-1.98,foam);
- // Rio e duas pontes rústicas: as faixas funcionais continuam em Z = ±1,65.
- const riverMaterial=new T.MeshStandardMaterial({color:0x159fda,roughness:.25,metalness:.35});
- box(1.9,.035,19,riverMaterial,0,.045,0);
- for(const x of [-1.08,1.08])box(.23,.11,17.2,sand,x,.035,0);
- for(const z of [-1.65,1.65]){
-  for(const x of [-5.5,5.5])box(8.4,.035,1.26,sand,x,.054,z);
-  box(2.85,.15,1.52,wood,0,.02,z);
-  for(let n=0;n<11;n++)box(.21,.045,1.48,woodLight,-1.25+n*.25,.112,z);
-  for(const side of [-1,1]){
-   box(2.9,.13,.075,wood,0,.54,z+side*.79,true);
-   for(const x of [-1.25,0,1.25])box(.12,.65,.12,wood,x,.3,z+side*.81);
-  }
+ const theme=themes[index]??themes[0],root=new T.Group(),obstacles:T.Box3[]=[],animated:T.Object3D[]=[];root.name=`Ilha ${theme.kind}`;
+ let seed=1471+index*811;const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
+ const std=(color:number,roughness=.68,metalness=0)=>new T.MeshStandardMaterial({color,roughness,metalness});
+ const rock=std(theme.rock,.92),grass=std(theme.grass,.82),foliage=std(theme.foliage,.86),path=std(theme.path,.72),gold=std(theme.accent2,.27,.74),stone=std(0xb9b5a7,.78,.12),dark=std(0x11182a,.72,.2),white=std(0xe7e0ca,.56,.16),wood=std(0x765038,.84);
+ const glow=new T.MeshStandardMaterial({color:theme.accent,emissive:theme.accent,emissiveIntensity:1.45,roughness:.18,metalness:.3});
+ const crystal=new T.MeshPhysicalMaterial({color:theme.accent,emissive:theme.accent,emissiveIntensity:1.8,roughness:.12,metalness:.25,transmission:.15,transparent:true,opacity:.9});
+ const water=new T.MeshPhysicalMaterial({color:theme.water,emissive:theme.water,emissiveIntensity:.25,roughness:.16,metalness:.35,transparent:true,opacity:.82});
+ function add(g:T.BufferGeometry,m:T.Material,x:number,y:number,z:number,solid=false,parent:T.Object3D=root){const o=new T.Mesh(g,m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);if(solid){root.updateMatrixWorld(true);obstacles.push(new T.Box3().setFromObject(o));}return o;}
+ const box=(w:number,h:number,d:number,m:T.Material,x:number,y:number,z:number,solid=false,parent:T.Object3D=root)=>add(new T.BoxGeometry(w,h,d,1,1,1),m,x,y,z,solid,parent);
+ const cylinder=(rt:number,rb:number,h:number,segments:number,m:T.Material,x:number,y:number,z:number,solid=false,parent:T.Object3D=root)=>add(new T.CylinderGeometry(rt,rb,h,segments),m,x,y,z,solid,parent);
+ const orb=(r:number,m:T.Material,x:number,y:number,z:number,parent:T.Object3D=root)=>add(new T.IcosahedronGeometry(r,2),m,x,y,z,false,parent);
+ function beam(a:T.Vector3,b:T.Vector3,r:number,m:T.Material,parent:T.Object3D=root){const d=b.clone().sub(a),o=cylinder(r,r,d.length(),10,m,0,0,0,false,parent);o.position.copy(a).add(b).multiplyScalar(.5);o.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),d.normalize());return o;}
+ function island(x:number,z:number,rx:number,rz:number,depth=3){const base=cylinder(1,.42,depth,40,rock,x,-depth/2+.03,z);base.scale.set(rx,1,rz);const top=cylinder(1,1,.18,40,grass,x,.06,z);top.scale.set(rx*1.01,1,rz*1.01);for(let i=0;i<Math.max(4,Math.floor(rx));i++){const a=random()*Math.PI*2,r=.55+random()*.38;const shard=add(new T.ConeGeometry(.2+random()*.28,.9+random()*1.4,6),rock,x+Math.cos(a)*rx*r,-depth-.2-random(),z+Math.sin(a)*rz*r);shard.rotation.z=(random()-.5)*.45;}return top;}
+ function bridge(x:number,z:number,length:number,width:number,alongX=true){const group=new T.Group();group.position.set(x,.24,z);root.add(group);const deck=box(alongX?length:width,.16,alongX?width:length,path,0,0,0,false,group);for(const side of [-1,1]){const a=alongX?new T.Vector3(-length/2,.58,side*width/2):new T.Vector3(side*width/2,.58,-length/2);const b=alongX?new T.Vector3(length/2,.58,side*width/2):new T.Vector3(side*width/2,.58,length/2);beam(a,b,.045,gold,group);for(let i=0;i<5;i++){const t=i/4;const px=T.MathUtils.lerp(a.x,b.x,t),pz=T.MathUtils.lerp(a.z,b.z,t);beam(new T.Vector3(px,.03,pz),new T.Vector3(px,.58,pz),.025,gold,group);}}deck.receiveShadow=true;}
+ function waterfall(x:number,z:number,w:number,h:number,rotation=0){const fall=box(w,h,.09,water,x,-h/2+.05,z);fall.rotation.y=rotation;fall.castShadow=false;const foam=orb(w*.45,glow,x,-h+.1,z);foam.scale.set(1,.18,.45);animated.push(fall);}
+ function crystalCluster(x:number,z:number,scale=1){for(let i=0;i<5;i++){const a=i*Math.PI*2/5+random()*.4,c=add(new T.OctahedronGeometry((.17+random()*.15)*scale),crystal,x+Math.cos(a)*.32*scale,.42+random()*.35,z+Math.sin(a)*.32*scale);c.scale.y=1.7+random();}}
+ function tree(x:number,z:number,h=1){cylinder(.07,.12,h*.5,8,wood,x,h*.25,z);for(let i=0;i<3;i++){const crown=orb(h*(.23-i*.03),i%2?foliage:grass,x+(i-1)*.1,h*(.62+i*.14),z+(i%2?.08:-.08));crown.scale.y=.9;}}
+ function spire(x:number,z:number,h:number,material:T.Material=white,parent:T.Object3D=root){cylinder(.18,.28,h*.72,10,material,x,h*.36,z,false,parent);const roof=add(new T.ConeGeometry(.3,h*.32,10),gold,x,h*.88,z,false,parent);roof.castShadow=true;return roof;}
+ function castle(x:number,z:number,scale=1){const g=new T.Group();g.position.set(x,.14,z);g.scale.setScalar(scale);root.add(g);box(2.5,1.25,1.7,white,0,.7,0,false,g);box(2.8,.16,1.95,gold,0,1.37,0,false,g);for(const sx of [-1.15,1.15])for(const sz of [-.72,.72])spire(sx,sz,2.25,stone,g);spire(0,-.1,3.2,white,g);const gate=box(.62,.9,.06,dark,0,.58,.88,false,g);const gateGlow=box(.38,.72,.07,glow,0,.58,.93,false,g);gateGlow.castShadow=false;for(let i=-2;i<=2;i++)spire(i*.38,-.65,1.9-i%2*.15,white,g);}
+ function portal(x:number,z:number,scale=1){const group=new T.Group();group.position.set(x,.2,z);group.scale.setScalar(scale);root.add(group);const outer=add(new T.TorusGeometry(.7,.11,12,48),gold,0,.85,0,false,group),inner=add(new T.TorusGeometry(.55,.035,10,48),glow,0,.85,.02,false,group);outer.rotation.x=inner.rotation.x=0;const vortex=add(new T.CircleGeometry(.49,48),new T.MeshBasicMaterial({color:theme.accent,transparent:true,opacity:.58,side:T.DoubleSide,blending:T.AdditiveBlending,depthWrite:false}),0,.85,.01,false,group);animated.push(inner,vortex);for(const sx of [-.7,.7])spire(sx,0,1.35,stone,group);}
+ function observatory(x:number,z:number,scale=1){const g=new T.Group();g.position.set(x,.18,z);g.scale.setScalar(scale);root.add(g);cylinder(.72,.85,.55,16,white,0,.28,0,false,g);const dome=add(new T.SphereGeometry(.69,20,12,0,Math.PI*2,0,Math.PI/2),dark,0,.55,0,false,g);const scope=cylinder(.13,.19,1.2,12,gold,.1,1.08,0,false,g);scope.rotation.z=-.8;dome.castShadow=true;}
+ function armillary(x:number,z:number,scale=1){const g=new T.Group();g.position.set(x,.62,z);g.scale.setScalar(scale);root.add(g);orb(.18,glow,0,.45,0,g);for(let i=0;i<4;i++){const r=add(new T.TorusGeometry(.48+i*.05,.025,8,40),i%2?gold:glow,0,.45,0,false,g);r.rotation.set(i*.55,i*.7,.25+i*.2);}cylinder(.17,.33,.34,10,stone,0,.1,0,false,g);animated.push(g);}
+ function marker(x:number,z:number,i:number){cylinder(.48,.58,.18,16,dark,x,.19,z);const ring=add(new T.TorusGeometry(.46,.045,8,32),gold,x,.3,z);ring.rotation.x=Math.PI/2;for(let n=0;n<(i%3)+1;n++)orb(.055,glow,x+(n-(i%3)/2)*.13,.42,z);}
+
+ // Massa principal e satélites em camadas, como nas cinco artes.
+ island(0,0,12.8,4.8,3.2);island(-5.8,-7,3.4,2.2,3.5);island(1,-7.2,3.2,2.05,3.2);island(7.5,-6.4,3.5,2.3,3.6);island(-7.2,6.5,3.4,2.2,3.5);island(6.8,6.6,3.8,2.35,3.8);
+ bridge(-5.7,-4.95,4.2,1,false);bridge(1,-5,4.3,1,false);bridge(7,-4.65,4,1,false);bridge(-7,4.55,3.8,1,false);bridge(6.8,4.65,4,1,false);
+ // Duas estradas de combate e a fenda central, ainda totalmente transitáveis.
+ for(const z of [-1.65,1.65]){for(let x=-10.5;x<=10.5;x+=.72){const tile=box(.58,.055,1.05,path,x,.19,z);tile.rotation.y=(Math.sin(x*1.7)*.015);}bridge(0,z,2.55,1.2,true);}
+ const river=box(1.55,.05,9.4,water,0,.17,0);river.castShadow=false;waterfall(0,4.55,1.4,5);waterfall(0,-4.55,1.4,5);
+ // Torres funcionais ganham a linguagem de portais do mapa.
+ for(const x of [-9.5,9.5])for(const z of [-1.65,1.65]){cylinder(.58,.78,.52,12,stone,x,.43,z,true);cylinder(.45,.55,.55,12,dark,x,.91,z);const crown=add(new T.ConeGeometry(.36,.65,8),gold,x,1.48,z);crown.castShadow=true;orb(.18,glow,x,1.82,z);}
+ castle(8.5,0,1.05);portal(-9.8,0,.9);observatory(-7.4,-3.7,.9);armillary(7.5,3.3,.9);
+ for(let i=0;i<8;i++){const x=-8+i*2.25,z=i%2?-3.35:3.35;marker(x,z,i);}
+ for(const [x,z] of [[-10,-3.8],[-8,3.8],[-5,4],[-3,-3.8],[3,3.8],[5,-3.8],[8,3.8],[10,-3.6],[-7,-7],[7,-6.5]])crystalCluster(x,z,.8+random()*.5);
+ for(let i=0;i<26;i++){const x=-11+random()*22,z=(random()>.5?1:-1)*(2.8+random()*1.45);if(Math.abs(x)<1.4)continue;tree(x,z,.75+random()*.65);}
+ for(const [x,z,w] of [[-10.5,-2.8,.8],[-6.5,4.55,1],[-1.8,-4.55,1.2],[4.2,4.5,1],[9,-3.6,.8]])waterfall(x,z,w,3.8+random()*1.4);
+ // Cristais sustentam a borda inferior das ilhas flutuantes.
+ for(let i=0;i<18;i++){const a=i/18*Math.PI*2,x=Math.cos(a)*11.8,z=Math.sin(a)*4.25;const c=add(new T.ConeGeometry(.22+random()*.18,1.4+random()*1.5,7),crystal,x,-3.25-random()*.4,z);c.rotation.z=(random()-.5)*.45;}
+
+ // Pontos de interesse específicos de cada referência.
+ if(theme.kind==='limits'){
+  const hourglass=new T.Group();hourglass.position.set(1,-.0,-7.1);root.add(hourglass);for(const y of [.35,1.35])cylinder(.5,.5,.1,16,gold,0,y,0,false,hourglass);const cone1=add(new T.ConeGeometry(.35,.48,16),crystal,0,.67,0,false,hourglass),cone2=add(new T.ConeGeometry(.35,.48,16),crystal,0,1.03,0,false,hourglass);cone2.rotation.z=Math.PI;animated.push(hourglass);
+  portal(7.7,-6.3,.9);armillary(6.8,6.5,1.05);
+ }else if(theme.kind==='derivatives'){
+  for(const z of [-.65,.65]){const target=cylinder(.28,.28,.06,20,white,-6.5,.68,-7+z);target.rotation.x=Math.PI/2;for(const r of [.22,.13,.05]){const t=add(new T.TorusGeometry(r,.025,6,24),r<.1?glow:gold,-6.5,.68,-7+z);t.rotation.x=Math.PI/2;}}
+  const tangent=beam(new T.Vector3(-1.1,.32,-7.4),new T.Vector3(2.4,1.45,-7.4),.035,glow);animated.push(tangent);portal(7.5,-6.3,.9);
+ }else if(theme.kind==='integrals'){
+  for(let i=0;i<7;i++){const a=i/7*Math.PI*2;const branch=beam(new T.Vector3(1,.35,-7.1),new T.Vector3(1+Math.cos(a)*.85,1.35+Math.sin(a)*.35,-7.1+Math.sin(a)*.55),.06,gold);branch.castShadow=true;}orb(.35,glow,1,1.45,-7.1);
+  const gear=add(new T.TorusGeometry(.72,.16,8,16),gold,7.4,.85,-6.4);gear.rotation.x=Math.PI/2;animated.push(gear);portal(-5.8,-7,.9);
+ }else if(theme.kind==='series'){
+  box(2.2,1.1,1.25,dark,-5.8,.75,-7);for(let i=0;i<5;i++)box(.32,.5,.18,i%2?gold:glow,-6.5+i*.35,.8,-6.32);
+  const convergence=orb(.6,crystal,1,1.05,-7.2);convergence.scale.y=1.7;animated.push(convergence);portal(7.5,-6.3,.9);
+ }else{
+  const globe=orb(.62,new T.MeshPhysicalMaterial({color:0x277fd0,metalness:.35,roughness:.25,clearcoat:1}),1,1.05,-7.2);for(let i=0;i<3;i++){const ring=add(new T.TorusGeometry(.78+i*.06,.025,8,40),gold,1,1.05,-7.2);ring.rotation.set(i*.7,i*.6,.3);}animated.push(globe);
+  observatory(7.4,-6.3,1.05);for(let i=0;i<2;i++){const sail=box(.05,.85,.65,white,-5.8+i*.7,.75,-7);sail.rotation.z=-.35;box(1,.08,.34,wood,-5.8+i*.7,.25,-7);}
  }
- // Bases futuristas contrastam com o terreno e as pontes de madeira.
- for(const x of [-9.5,9.5])for(const z of [-1.65,1.65]){
-  add(new T.CylinderGeometry(.65,.85,.62,8),white,x,.34,z,true);
-  add(new T.CylinderGeometry(.48,.59,.65,8),navy,x,.91,z);
-  add(new T.CylinderGeometry(.57,.57,.10,8),neon,x,1.25,z);
-  add(new T.OctahedronGeometry(.34),neon,x,1.72,z);
-  for(let i=0;i<4;i++){const angle=i*Math.PI/2;box(.14,.34,.14,metal,x+Math.cos(angle)*.56,.75,z+Math.sin(angle)*.56);}
- }
- // Colinas volumétricas facetadas; todas ficam fora dos corredores.
- const hills=[[-11,-4.8,1.4,.8],[-2,-6.5,2,1.4],[2.2,-6.6,2.1,1.2],[10.8,-4.8,1.4,1],[-11,4,1.5,.6],[7,5,1.8,.65]];
- for(const [x,z,r,h] of hills){const hill=add(new T.SphereGeometry(r,12,6,0,Math.PI*2,0,Math.PI/2),grass,x,.015,z);hill.scale.y=h/r;}
- function tree(x:number,z:number,height:number,pine=false){
-  add(new T.CylinderGeometry(.08,.13,height*.52,5),wood,x,height*.26,z,true);
-  if(pine){for(let i=0;i<3;i++)add(new T.ConeGeometry(height*(.30-i*.045),height*.5,7),i%2?lime:leaf,x,height*(.5+i*.19),z);}
-  else {const crown=ball(height*.36,leaf,x,height*.75,z);crown.scale.set(1.05,1,.9);ball(height*.28,lime,x+.15,height*.97,z-.08);}
- }
- const grove=[[-12,-2.9],[-11,-4],[-10,-6.4],[-8,-6.8],[-6.8,-6.6],[-4.5,-7.5],[-2,-7],[2.4,-7.8],[4,-7.4],[6.3,-7],[11,-4.3],[12,-2.8],[-12,2.3],[-11.7,4],[-7.5,5.9],[-5.7,6.5],[-3.3,6.8],[2.6,6.8],[5,6.8],[8,5.4],[11,3.6]];
- for(const [x,z] of grove)tree(x,z,1.1+random()*1.5,index===3||random()>.6);
- // Pequena cidade colorida, com telhados, vitrines, calçadas e rua marcada.
- box(7.8,.055,2.2,road,-6.1,.07,-4.5);box(8,.08,.2,cream,-6,.08,-3.3);
- for(let i=0;i<11;i++)box(.35,.015,.04,cream,-9.6+i*.65,.106,-4.45);
- function house(x:number,z:number,w:number,h:number,color:number,flat=false){
-  const facade=mat(color);box(w,h,1.05,facade,x,h/2+.1,z,true);
-  box(w+.16,.12,1.2,cream,x,h+.13,z);
-  if(flat){box(w+.1,.16,1.16,roof,x,h+.27,z);box(.3,.25,.3,metal,x+.22,h+.47,z);}
-  else {const gable=add(new T.CylinderGeometry(w*.75,w*.75,1.28,3),roof,x,h+.4,z);gable.rotation.x=Math.PI/2;gable.rotation.z=Math.PI/2;}
-  box(.25,.52,.025,navy,x-.18,.38,z+.536);
-  for(let row=0;row<Math.floor(h/.6);row++)for(const dx of [-w*.28,w*.28]){box(.24,.29,.035,cream,x+dx,.6+row*.58,z+.54);box(.18,.22,.045,glass,x+dx,.6+row*.58,z+.55);}
-  box(w*.8,.12,.35,roof,x,h*.48,z+.65);
- }
- house(-8.7,-5.3,1.25,1.7,0xffb850);house(-6.9,-5.6,1.15,2.5,0x6c83e9,true);house(-5.25,-5.1,1.25,1.5,0xef8292);house(-3.7,-5.2,1.05,1.9,0x63d5d1,true);
- // Veículo estilizado e postes completam o ponto de interesse da cidade.
- box(.72,.27,.35,mat(0xffd244),-7.8,.3,-4.4);box(.35,.2,.3,glass,-7.9,.52,-4.4);
- for(const x of [-8.05,-7.55])for(const z of [-4.62,-4.18]){const wheel=add(new T.CylinderGeometry(.1,.1,.055,8),navy,x,.19,z);wheel.rotation.x=Math.PI/2;}
- for(const x of [-9.8,-4.5]){add(new T.CylinderGeometry(.035,.04,1.3,6),navy,x,.7,-3.4);ball(.12,gold,x,1.38,-3.4);}
- // Centro de pesquisa: plataformas, anéis, antenas e painéis solares.
- box(4.8,.17,3.3,navy,6.8,.09,-4.9,true);
- for(const x of [5.3,7.1,8.9]){box(1.25,.12,2.7,metal,x,.24,-4.9);box(1.0,1.0,1.2,white,x,.8,-5.35,true);box(1.01,.24,1.22,glass,x,1.03,-5.35);box(1.2,.12,1.42,navy,x,1.37,-5.35);}
- const portal=add(new T.TorusGeometry(.77,.11,8,36),metal,7.1,2.35,-5.3);const portalLight=add(new T.TorusGeometry(.64,.035,6,36),neon,7.1,2.35,-5.29);portal.rotation.y=-.3;portalLight.rotation.y=-.3;
- const floating=add(new T.OctahedronGeometry(.33),neon,7.1,2.35,-5.3);animated.push(floating);
- for(const x of [5.4,8.8]){const panel=box(.85,.07,.6,glass,x,.65,-3.8);panel.rotation.x=-.35;box(.08,.5,.08,metal,x,.3,-3.8);}
- beam(new T.Vector3(9.4,.2,-4.5),new T.Vector3(9.4,2.2,-4.5),.04,metal);ball(.12,neon,9.4,2.25,-4.5);
- // Acampamento rústico e moinho em escala reduzida na costa dianteira.
- house(-7.9,3.9,1.25,.8,0xc58c52);
- add(new T.CylinderGeometry(.28,.42,1.8,7),cream,-9.8,.92,3.6,true);add(new T.ConeGeometry(.47,.56,7),roof,-9.8,2,3.6);
- const rotor=new T.Group();rotor.position.set(-9.8,1.65,3.93);root.add(rotor);rotor.name='moinho';
- for(let i=0;i<4;i++){const blade=box(.12,.8,.055,woodLight,0,.44,0,false,rotor);const pivot=new T.Group();rotor.remove(blade);blade.position.set(0,.42,0);pivot.rotation.z=i*Math.PI/2;pivot.add(blade);rotor.add(pivot);}animated.push(rotor);
- for(const x of [-6.7,-6.2])box(.38,.35,.4,wood,x,.21,3.8);
- // Píer, rochas e detalhes costeiros, sem ocupar as áreas de invocação.
- for(let i=0;i<12;i++)box(1.1,.07,.24,woodLight,4.5,-.1,7.0+i*.25);
- for(const z of [7.1,8.3,9.5])for(const x of [4,5])add(new T.CylinderGeometry(.055,.07,1.8,6),wood,x,-.65,z);
- for(let i=0;i<18;i++){const a=random()*Math.PI*2,x=Math.cos(a)*13.8,z=Math.sin(a)*8.8;const rock=add(new T.DodecahedronGeometry(.25+random()*.3),cliff,x,-.2,z);rock.scale.y=.7;}
- for(let i=0;i<20;i++){const x=-10+random()*20,z=(i%2?1:-1)*(3+random()*.55);if(Math.abs(x)<1.5)continue;const tuft=add(new T.ConeGeometry(.08,.28,4),i%3?lime:gold,x,.17,z);tuft.rotation.z=.2;}
- // Nuvens leves no horizonte: formas arredondadas, sem encobrir a arena.
- const cloudMaterial=new T.MeshBasicMaterial({color:0xf4fbff});
- for(const [x,z] of [[-26,-18],[23,-23],[-30,19],[31,14]])for(let i=0;i<4;i++){const puff=ball(1.2+i%2*.5,cloudMaterial,x+i*1.4,4.5+Math.sin(i)*.3,z);puff.scale.set(1.4,.5,.8);puff.castShadow=false;}
- // Assinatura de cada ilha: cristais, cânion, observatório, mata e forja.
- if(index===1){for(const x of [-3,1,4]){const mesa=add(new T.CylinderGeometry(.75,1.3,2.1,6),cliff,x,1.05,-7.5);mesa.rotation.y=x;add(new T.CylinderGeometry(.82,.8,.2,6),sand,x,2.15,-7.5);}}
- if(index===2){add(new T.CylinderGeometry(1.05,1.25,1.4,12),white,0,.73,-6.8);add(new T.SphereGeometry(1.08,16,10,0,Math.PI*2,0,Math.PI/2),mat(0x8b7ede,.4,.3),0,1.43,-6.8);const telescope=add(new T.CylinderGeometry(.14,.24,1.8,10),navy,0,2.2,-6.3);telescope.rotation.x=.95;}
- if(index===0){for(const x of [-3.2,2.8]){const crystal=add(new T.OctahedronGeometry(.55),neon,x,.85,-6.2);crystal.scale.y=1.7;}}
- if(index===3){for(const x of [-3.7,-2.3,2.3,3.8])tree(x,-5.7,2.7,true);}
- if(index===4){for(const x of [-2.3,2.3]){box(1.1,1.3,1.1,cliff,x,.7,-6.4);box(.5,.5,.05,gold,x,.55,-5.82);add(new T.CylinderGeometry(.22,.25,1.6,7),metal,x,2,-6.4);}}
- root.userData.biomes=['colinas','cidade','centro futurista','acampamento','praia'];
- return {root,obstacles,accent,update(time:number){oceanMaterial.uniforms.time.value=time;for(const object of animated){if(object.name==='moinho')object.rotation.z=time*.35;else {object.rotation.y=time*.7;object.position.y=2.35+Math.sin(time*1.2)*.12;}}}};
+ // Oceano/abismo e nuvens abaixo do arquipélago.
+ const oceanMaterial=new T.ShaderMaterial({uniforms:{time:{value:0},deep:{value:new T.Color(theme.sky)},bright:{value:new T.Color(theme.water)}},vertexShader:`varying vec3 world;void main(){world=(modelMatrix*vec4(position,1.)).xyz;gl_Position=projectionMatrix*viewMatrix*vec4(world,1.);}`,fragmentShader:`uniform float time;uniform vec3 deep,bright;varying vec3 world;void main(){float w=sin(world.x*.28+time*.35)*sin(world.z*.35-time*.22);vec3 c=mix(deep,bright,.24+w*.08);gl_FragColor=vec4(c,1.);#include <tonemapping_fragment>\n#include <colorspace_fragment>}`});
+ oceanMaterial.fragmentShader=oceanMaterial.fragmentShader.replace(';#include',';\n#include');const ocean=add(new T.PlaneGeometry(180,180),oceanMaterial,0,-7,0);ocean.rotation.x=-Math.PI/2;ocean.castShadow=false;
+ const cloudMat=new T.MeshBasicMaterial({color:0xd9efff,transparent:true,opacity:.32,depthWrite:false});for(let i=0;i<28;i++){const a=random()*Math.PI*2,r=13+random()*30,puff=orb(.9+random()*1.5,cloudMat,Math.cos(a)*r,-4.5+random()*2,Math.sin(a)*r);puff.scale.set(1.8,.35,.8);puff.castShadow=false;}
+ root.userData.biomes=['castelo','portais','pontes','cachoeiras','cristais'];
+ return {root,obstacles,accent:theme.accent,sky:theme.sky,fog:theme.fog,update(time:number){oceanMaterial.uniforms.time.value=time;for(const object of animated){if(object instanceof T.Group)object.rotation.y=time*.22;else if(object instanceof T.Mesh&&object.geometry instanceof T.CircleGeometry)object.rotation.z=time*.35;else object.rotation.y+=.006;}}};
 }

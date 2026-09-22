@@ -16,11 +16,11 @@ export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(w
  const renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:false});
  renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
  renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;
- const scene=new T.Scene();scene.background=new T.Color(0x84d5fb);scene.fog=new T.FogExp2(0x9bdcf6,.006);
+ const scene=new T.Scene();
  scene.add(new T.HemisphereLight(0xc9efff,0x566635,1.65));
  const sun=new T.DirectionalLight(0xfff0ce,2.5);sun.position.set(-12,25,10);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-20,right:20,top:18,bottom:-18,near:.1,far:70});sun.shadow.bias=-.0004;sun.shadow.normalBias=.035;sun.shadow.radius=2;scene.add(sun);
  const rim=new T.DirectionalLight(0x65cfff,1.15);rim.position.set(14,10,-12);scene.add(rim);
- const world=createWorld(index);scene.add(world.root);
+ const world=createWorld(index);scene.background=new T.Color(world.sky);scene.fog=new T.FogExp2(world.fog,.008);rim.color.set(world.accent);scene.add(world.root);
  const camera=new T.PerspectiveCamera(42,1,.1,120);const controls=new OrbitControls(camera,canvas);
  controls.enableDamping=true;controls.enableRotate=false;controls.enablePan=false;controls.enableZoom=true;controls.minDistance=12;controls.maxDistance=65;
  // Câmera fixa ao sul: aliados nascem embaixo e avançam para o norte da tela.
@@ -31,7 +31,7 @@ export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(w
  const observer=new ResizeObserver(()=>{const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();});observer.observe(canvas);
  let state:ArenaState={allies:[],enemies:[],paused:false},disposed=false,ready=false,warnings=0;
  let manifest:Manifest={};const assets=new Map<string,GLTF>();
- const actors=new Map<string,{visual:ReturnType<typeof createCharacter>;unit:ArenaUnit;enemy:boolean;age:number;lane:number;exitAge?:number;exitMotion?:'victory'|'defeat';attackFor:number;lastAttack:number;health:T.Mesh}>();
+ const actors=new Map<string,{visual:ReturnType<typeof createCharacter>;unit:ArenaUnit;enemy:boolean;age:number;lane:number;exitAge?:number;exitMotion?:'victory'|'defeat';attackFor:number;hurtFor:number;lastAttack:number;lastHp:number;health:T.Mesh}>();
  const zoneMeshes=SPAWN_ZONES.map(zone=>{const material=new T.MeshBasicMaterial({color:0x5bffcc,transparent:true,opacity:.35,side:T.DoubleSide,depthWrite:false});const mesh=new T.Mesh(new T.PlaneGeometry(1.35,1.2),material);mesh.rotation.x=-Math.PI/2;mesh.position.copy(arenaPosition(zone.progress,false,zone.lane));mesh.position.y=.13;mesh.userData.zoneId=zone.id;mesh.visible=false;scene.add(mesh);return mesh;});
  let preview:ReturnType<typeof createCharacter>|undefined,previewId='',focusedZone='';let worldTime=0;
  const effects:ReturnType<typeof createAbilityEffect>[]=[];const seenEvents=new Set<string>();
@@ -64,8 +64,8 @@ export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(w
   for(const [units,enemy] of [[state.allies,false],[state.enemies,true]] as const)for(const unit of units){
    const key=`${enemy?'e':'a'}${unit.id}`;live.add(key);let actor=actors.get(key);
    if(!actor){const spec=manifest.characters?.[unit.cardId]??manifest.characters?.default;const visual=createCharacter(enemy?'#ff816f':'#69f2e0',unit.kind,spec?assets.get(spec.url):undefined,spec,unit.cardId);const lane=unit.lane??(enemy?-1.65:1.65);visual.group.position.copy(arenaPosition(unit.progress,enemy,lane));visual.group.rotation.y=enemy?-Math.PI/2:Math.PI/2;
-    const health=new T.Mesh(new T.PlaneGeometry(.8,.08),new T.MeshBasicMaterial({color:enemy?0xff8866:0x67f5bd,side:T.DoubleSide}));health.position.y=2.4;visual.group.add(health);scene.add(visual.group);actor={visual,unit,enemy,age:0,lane,attackFor:0,lastAttack:0,health};actors.set(key,actor);
-   }actor.unit=unit;if((unit.lastAttack??0)!==actor.lastAttack){actor.lastAttack=unit.lastAttack??0;actor.attackFor=.7;}
+    const health=new T.Mesh(new T.PlaneGeometry(.8,.08),new T.MeshBasicMaterial({color:enemy?0xff8866:0x67f5bd,side:T.DoubleSide}));health.position.y=2.4;visual.group.add(health);scene.add(visual.group);actor={visual,unit,enemy,age:0,lane,attackFor:0,hurtFor:0,lastAttack:0,lastHp:unit.hp??1,health};actors.set(key,actor);
+   }if((unit.hp??1)<actor.lastHp)actor.hurtFor=.38;actor.lastHp=unit.hp??1;actor.unit=unit;if((unit.lastAttack??0)!==actor.lastAttack){actor.lastAttack=unit.lastAttack??0;actor.attackFor=.7;}
   }
   for(const [key,actor] of actors)if(!live.has(key)&&actor.exitAge===undefined){actor.exitAge=0;actor.exitMotion=state.events?.some(e=>e.sourceId===actor.unit.id&&e.enemy===actor.enemy&&e.type==='tower')?'victory':'defeat';}
   for(const event of state.events??[]){if(seenEvents.has(event.id))continue;seenEvents.add(event.id);if(event.type!=='defeat'){const effect=createAbilityEffect(event);effects.push(effect);scene.add(effect.group);}}
@@ -91,8 +91,8 @@ export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(w
    if(state.outcome){visual.play((state.outcome==='victory')!==enemy?'victory':'defeat');visual.mixer.update(dt);continue;}
    const target=arenaPosition(unit.progress,enemy,lane);const distance=visual.group.position.distanceTo(target);
    if(!state.paused){actor.age+=dt;const next=visual.group.position.clone().lerp(target,1-Math.exp(-8*dt));moveWithCollisions(visual.group.position,next,world.obstacles);}
-   actor.attackFor=Math.max(0,actor.attackFor-(state.paused?0:dt));
-   const motion=state.paused?'idle':actor.attackFor>0?'attack':actor.age<.65?'jump':distance>.7?'run':distance>.025?'walk':'idle';
+   actor.attackFor=Math.max(0,actor.attackFor-(state.paused?0:dt));actor.hurtFor=Math.max(0,actor.hurtFor-(state.paused?0:dt));
+   const motion=state.paused?'idle':actor.hurtFor>0?'hurt':actor.attackFor>0?'power':actor.age<.65?'summon':distance>.7?'run':distance>.025?'walk':'idle';
    visual.play(motion);visual.mixer.update(state.paused?0:dt);
   }}
   preview?.mixer.update(dt);

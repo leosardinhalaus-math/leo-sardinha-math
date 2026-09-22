@@ -3,7 +3,7 @@ import { clone } from 'three/addons/utils/SkeletonUtils.js';
 import { createProceduralCharacter } from './proceduralCharacters.ts';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 
-export type Motion = 'idle' | 'walk' | 'run' | 'jump' | 'attack' | 'victory' | 'defeat';
+export type Motion = 'idle' | 'walk' | 'run' | 'jump' | 'summon' | 'attack' | 'power' | 'hurt' | 'victory' | 'defeat';
 export type ModelSpec = { url: string; height?: number; yaw?: number; animations?: Partial<Record<Motion,string>> };
 
 export function createCharacter(color:string,kind:string,asset?:GLTF,spec?:ModelSpec,cardId="slope"){
@@ -13,10 +13,10 @@ export function createCharacter(color:string,kind:string,asset?:GLTF,spec?:Model
  const group=new T.Group();group.add(root);
  const ring=new T.Mesh(new T.RingGeometry(.48,.56,24),new T.MeshBasicMaterial({color,side:T.DoubleSide}));ring.rotation.x=-Math.PI/2;ring.position.y=.025;group.add(ring);
  const mixer=new T.AnimationMixer(root);const actions=new Map<Motion,T.AnimationAction>();
- const aliases={idle:/idle|standing/i,walk:/walk/i,run:/run|sprint/i,jump:/jump/i,attack:/attack|punch|slash/i,victory:/victory|win|celebrat/i,defeat:/defeat|death|dying/i};
+ const aliases={idle:/idle|standing/i,walk:/walk/i,run:/run|sprint/i,jump:/jump/i,summon:/summon|spawn|appear/i,attack:/attack|punch|slash/i,power:/power|spell|cast|special/i,hurt:/hurt|hit|damage/i,victory:/victory|win|celebrat/i,defeat:/defeat|death|dying/i};
  for(const name of Object.keys(aliases) as Motion[]){const clip=clips.find(c=>c.name===spec?.animations?.[name])??clips.find(c=>aliases[name].test(c.name));if(clip)actions.set(name,mixer.clipAction(clip));}
  let current:T.AnimationAction|undefined;
- return {group,mixer,play(name:Motion){const next=actions.get(name)??actions.get('idle');if(!next||next===current)return;next.reset();next.setLoop(name==='defeat'?T.LoopOnce:T.LoopRepeat,name==='defeat'?1:Infinity);next.clampWhenFinished=name==='defeat';next.play();if(current)next.crossFadeFrom(current,.2,false);current=next;},dispose(){mixer.stopAllAction();mixer.uncacheRoot(root);if(!asset)disposeObject(root);disposeObject(ring);}};
+ return {group,mixer,play(name:Motion){const next=actions.get(name)??actions.get('idle');if(!next||next===current)return;const once=['defeat','summon','power','hurt'].includes(name);next.reset();next.setLoop(once?T.LoopOnce:T.LoopRepeat,once?1:Infinity);next.clampWhenFinished=once;next.play();if(current)next.crossFadeFrom(current,.22,false);current=next;},dispose(){mixer.stopAllAction();mixer.uncacheRoot(root);if(!asset)disposeObject(root);disposeObject(ring);}};
 }
 export function disposeObject(root:T.Object3D){
  const geometries=new Set<T.BufferGeometry>(),materials=new Set<T.Material>(),textures=new Set<T.Texture>();

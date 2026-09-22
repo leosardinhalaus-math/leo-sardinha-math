@@ -2,7 +2,7 @@ export type Archetype = 'archer'|'mage'|'dancer'|'orb'|'rogue'|'guardian'|'golem
 export type AbilityKind = 'strike'|'double'|'shield'|'heal'|'slow'|'burn'|'haste'|'chain'|'reflect'|'pierce';
 export type CardProfile={archetype:Archetype;color:string;glow:string;hair:string;ability:string;kind:AbilityKind;factor:number;amount:number;duration:number;motif:'arrow'|'wave'|'rings'|'shards'|'beam'|'helix';symbol:string};
 function p(archetype:Archetype,color:string,glow:string,ability:string,kind:AbilityKind,factor:number,amount:number,motif:CardProfile['motif'],symbol:string,hair='#33221b',duration=3):CardProfile{return {archetype,color,glow,hair,ability,kind,factor,amount,motif,symbol,duration};}
-// Paletas e acessórios observados nas ilustrações; as malhas são interpretações low-poly.
+// Paletas, silhuetas e acessórios observados nas ilustrações das cartas.
 export const CARD_PROFILES:Record<string,CardProfile>={
  slope:p('archer','#9c2f30','#ffb458','Flecha tangente','pierce',.8,0,'arrow','f′'),
  limit:p('guardian','#294975','#63dfff','Barreira de aproximação','shield',.45,12,'rings','lim'),

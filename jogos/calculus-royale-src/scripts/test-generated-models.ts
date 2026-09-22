@@ -8,9 +8,9 @@ for(const id of Object.keys(CARD_PROFILES)){
  const bytes=await readFile(new URL(`../client/public/assets/models/generated/${id}.glb`,import.meta.url));
  const asset=await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');
  const bounds=new Box3().setFromObject(asset.scene).getSize(new Vector3());assert(bounds.y>1&&bounds.y<4);
- assert.deepEqual(asset.animations.map(a=>a.name).sort(),['idle','walk','run','jump','attack','victory','defeat'].sort());
+ assert.deepEqual(asset.animations.map(a=>a.name).sort(),['idle','walk','run','jump','summon','attack','power','hurt','victory','defeat'].sort());
  const mixer=new AnimationMixer(asset.scene);
  for(const clip of asset.animations){mixer.clipAction(clip).play();mixer.update(.3);asset.scene.traverse(node=>assert(node.quaternion.toArray().every(Number.isFinite)));mixer.stopAllAction();}
  mixer.uncacheRoot(asset.scene);disposeObject(asset.scene);
 }
-console.log('PASS: os 45 GLBs abrem com GLTFLoader, possuem sete animações válidas e escala consistente.');
+console.log('PASS: os 45 GLBs abrem com GLTFLoader, possuem dez animações válidas e escala consistente.');

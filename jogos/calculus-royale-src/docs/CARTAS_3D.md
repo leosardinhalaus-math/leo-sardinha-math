@@ -2,7 +2,7 @@
 
 As 45 cartas usam modelos low-poly gerados em código a partir das artes existentes, sem recortes ou retratos aplicados como placas. Cada combatente recebe uma silhueta própria, com variações de rosto, cabelo, roupa, armadura, arma, objeto mágico e paleta. Espelho, árvore fractal, anéis de Euler, corrente exponencial e vetor ótimo possuem malhas específicas.
 
-Todos os GLBs possuem idle, walk, run, jump, attack, victory e defeat. Ataques usam animações por arquétipo e partículas parametrizadas por carta. Os efeitos abaixo disparam no contato com tropas da mesma faixa, com intervalo de 1,2 s. No contato com a torre, aplica-se o poder integral uma vez e a unidade é consumida.
+Todos os GLBs possuem idle, walk, run, jump, summon, attack, power, hurt, victory e defeat. Ataques usam animações por arquétipo, transição suave e partículas parametrizadas por carta. Os efeitos abaixo disparam no contato com tropas da mesma faixa, com intervalo de 1,2 s. No contato com a torre, aplica-se o poder integral uma vez e a unidade é consumida.
 
 | Carta | Arquivo GLB (sem extensão) | Arquétipo | Habilidade no contato | Dano inicial |
 |---|---|---|---|---|

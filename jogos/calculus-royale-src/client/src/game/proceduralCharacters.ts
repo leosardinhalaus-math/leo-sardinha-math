@@ -22,7 +22,7 @@ const LOOKS:Record<string,HeroLook>={
 const OBJECTS=new Set(['euler','expchain','fractal','mirror','opt']);
 
 export function createProceduralCharacter(cardId:string){
- const p=getCardProfile(cardId),look=LOOKS[cardId]??{},root=new T.Group(),body=new T.Group();body.name='body';root.add(body);
+ const p=getCardProfile(cardId),look=LOOKS[cardId]??{},root=new T.Group(),body=new T.Bone();body.name='body';root.add(body);
  const material=(color:number|string,roughness=.65,metalness=0,emissive?:number|string)=>new T.MeshStandardMaterial({color,roughness,metalness,emissive:emissive??0x000000,emissiveIntensity:emissive?1.05:0});
  const cloth=material(p.color,.62,.08),gold=material(look.whiteGold?0xffefbd:0xd9a94f,.28,.7),steel=material(look.whiteGold?0xf4efe0:0x9db4c9,.3,.72);
  const glow=material(p.glow,.22,.25,p.glow),skin=material(look.skin??(look.female?0xd7a07e:0xb97858),.82),hair=material(p.hair,.86),dark=material(0x101a2b,.62,.15);
@@ -60,27 +60,29 @@ export function createProceduralCharacter(cardId:string){
  function createHero(){
   const armored=look.armor||['guardian','golem','titan'].includes(p.archetype),robed=['mage','priest','angel','dancer'].includes(p.archetype);
   const width=p.archetype==='golem'||p.archetype==='titan'?.45:look.female?.27:.31;
-  mesh(new T.CylinderGeometry(width*.82,width,.62,10),armored?steel:cloth,0,1.08,0);mesh(new T.BoxGeometry(width*2.15,.1,.43),gold,0,.78,0);
-  if(robed)mesh(new T.CylinderGeometry(width*.78,.43,.68,12),cloth,0,.54,0);
-  if(armored){mesh(new T.BoxGeometry(width*2.2,.12,.48),gold,0,1.32,0);for(const side of [-1,1])mesh(new T.SphereGeometry(.17,8,6),gold,side*(width+.08),1.34,0);}
-  if(!['dancer','engineer'].includes(p.archetype)){const cape=mesh(new T.ConeGeometry(.5,1.05,10,1,true,0,Math.PI),cloth,0,.88,-.18);cape.rotation.x=.08;}
-  mesh(new T.SphereGeometry(.23,14,10),skin,0,1.68,0);addHair();addFace();
+  mesh(new T.CapsuleGeometry(width*.88,.35,8,18),armored?steel:cloth,0,1.05,0);mesh(new T.BoxGeometry(width*2.15,.1,.43),gold,0,.78,0);
+  if(robed)mesh(new T.CylinderGeometry(width*.78,.43,.68,24),cloth,0,.54,0);
+  if(armored){mesh(new T.BoxGeometry(width*2.2,.12,.48),gold,0,1.32,0);for(const side of [-1,1])mesh(new T.SphereGeometry(.17,18,12),gold,side*(width+.08),1.34,0);}
+  if(!['dancer','engineer'].includes(p.archetype)){const cape=mesh(new T.ConeGeometry(.5,1.05,24,3,true,0,Math.PI),cloth,0,.88,-.18);cape.rotation.x=.08;}
+  mesh(new T.SphereGeometry(.23,28,20),skin,0,1.68,0);addHair();addFace();
+  const bones:T.Bone[]=[body];
   for(const side of [-1,1]){
-   const leg=new T.Group();leg.name=side<0?'legL':'legR';leg.position.set(side*.15,.72,0);body.add(leg);mesh(new T.CapsuleGeometry(.09,.36,4,7),armored?steel:dark,0,-.24,0,leg);mesh(new T.BoxGeometry(.21,.14,.34),dark,0,-.51,.07,leg);
-   const arm=new T.Group();arm.name=side<0?'armL':'armR';arm.position.set(side*(width+.08),1.3,0);body.add(arm);mesh(new T.CapsuleGeometry(.092,.32,4,7),armored?steel:cloth,0,-.22,0,arm);mesh(new T.SphereGeometry(.095,9,7),skin,0,-.48,.04,arm);
+   const leg=new T.Bone();leg.name=side<0?'legL':'legR';leg.position.set(side*.15,.72,0);body.add(leg);bones.push(leg);mesh(new T.CapsuleGeometry(.09,.36,8,14),armored?steel:dark,0,-.24,0,leg);mesh(new T.CapsuleGeometry(.105,.12,5,12),dark,0,-.51,.08,leg);
+   const arm=new T.Bone();arm.name=side<0?'armL':'armR';arm.position.set(side*(width+.08),1.3,0);body.add(arm);bones.push(arm);mesh(new T.CapsuleGeometry(.092,.32,8,14),armored?steel:cloth,0,-.22,0,arm);mesh(new T.SphereGeometry(.095,18,12),skin,0,-.48,.04,arm);
   }
+  const rigGeometry=new T.CylinderGeometry(width*.78,width,.58,20,5);rigGeometry.translate(0,1.08,0);const count=rigGeometry.attributes.position.count,indices=new Uint16Array(count*4),weights=new Float32Array(count*4);for(let i=0;i<count;i++)weights[i*4]=1;rigGeometry.setAttribute('skinIndex',new T.Uint16BufferAttribute(indices,4));rigGeometry.setAttribute('skinWeight',new T.Float32BufferAttribute(weights,4));const torso=new T.SkinnedMesh(rigGeometry,armored?steel:cloth);torso.name='riggedTorso';torso.castShadow=true;root.add(torso);torso.bind(new T.Skeleton(bones));
   addSignature(body.getObjectByName('armL')!,body.getObjectByName('armR')!);
  }
 
  function addHair(){
   const style=look.hair??'short';
-  if(style==='robot'){const helmet=mesh(new T.SphereGeometry(.25,10,7),steel,0,1.69,0);mesh(new T.BoxGeometry(.34,.09,.03),glow,0,1.69,.225);helmet.scale.y=1.05;return;}
-  if(style==='helmet'){mesh(new T.SphereGeometry(.255,10,7),steel,0,1.69,0);mesh(new T.BoxGeometry(.035,.34,.27),gold,0,1.74,.08);mesh(new T.BoxGeometry(.3,.08,.06),dark,0,1.67,.225);return;}
-  if(style==='hood'){const hood=mesh(new T.SphereGeometry(.32,12,8),cloth,0,1.7,-.04);hood.scale.set(1,1.13,.82);mesh(new T.SphereGeometry(.235,12,8),skin,0,1.66,.08);}
-  else if(style!=='bald')mesh(new T.SphereGeometry(.245,12,8,0,Math.PI*2,0,Math.PI*.55),hair,0,1.73,-.02);
-  if(style==='long')for(const side of [-1,1]){const lock=mesh(new T.CapsuleGeometry(.075,.72,4,7),hair,side*.19,1.34,-.1);lock.rotation.z=side*.14;}
-  if(style==='curly')for(let i=0;i<7;i++){const a=i/7*Math.PI*2;mesh(new T.SphereGeometry(.095,8,6),hair,Math.cos(a)*.22,1.64+Math.sin(a)*.16,-.1);}
-  if(look.beard){const beard=mesh(new T.ConeGeometry(.18,.38,9),hair,0,1.43,.11);beard.rotation.z=Math.PI;for(const side of [-1,1])mesh(new T.CapsuleGeometry(.025,.13,3,5),hair,side*.09,1.58,.22).rotation.z=side*.55;}
+  if(style==='robot'){const helmet=mesh(new T.SphereGeometry(.25,22,16),steel,0,1.69,0);mesh(new T.BoxGeometry(.34,.09,.03),glow,0,1.69,.225);helmet.scale.y=1.05;return;}
+  if(style==='helmet'){mesh(new T.SphereGeometry(.255,22,16),steel,0,1.69,0);mesh(new T.BoxGeometry(.035,.34,.27),gold,0,1.74,.08);mesh(new T.BoxGeometry(.3,.08,.06),dark,0,1.67,.225);return;}
+  if(style==='hood'){const hood=mesh(new T.SphereGeometry(.32,24,18),cloth,0,1.7,-.04);hood.scale.set(1,1.13,.82);mesh(new T.SphereGeometry(.235,24,18),skin,0,1.66,.08);}
+  else if(style!=='bald')mesh(new T.SphereGeometry(.245,24,18,0,Math.PI*2,0,Math.PI*.55),hair,0,1.73,-.02);
+  if(style==='long')for(const side of [-1,1]){const lock=mesh(new T.CapsuleGeometry(.075,.72,8,14),hair,side*.19,1.34,-.1);lock.rotation.z=side*.14;}
+  if(style==='curly')for(let i=0;i<11;i++){const a=i/11*Math.PI*2;mesh(new T.SphereGeometry(.082,16,12),hair,Math.cos(a)*.22,1.64+Math.sin(a)*.17,-.1);}
+  if(look.beard){const beard=mesh(new T.ConeGeometry(.18,.38,18),hair,0,1.43,.11);beard.rotation.z=Math.PI;for(const side of [-1,1])mesh(new T.CapsuleGeometry(.025,.13,5,10),hair,side*.09,1.58,.22).rotation.z=side*.55;}
   if(look.female)for(const side of [-1,1]){const earring=orb(.035,side*.22,1.59,.08);earring.material=gold;}
  }
 
@@ -121,12 +123,14 @@ export function createProceduralCharacter(cardId:string){
  }
 
  const clips:T.AnimationClip[]=[];
- for(const [name,duration,swing,bounce] of [['idle',2,.025,.025],['walk',.8,.5,.045],['run',.45,.8,.08],['jump',.65,.3,.5],['attack',.7,.2,.07],['victory',1.2,.6,.18],['defeat',.8,0,0]] as const){
+ for(const [name,duration,swing,bounce] of [['idle',2,.025,.025],['walk',.8,.5,.045],['run',.45,.8,.08],['jump',.65,.3,.5],['summon',.75,.25,.34],['attack',.7,.2,.07],['power',.9,.35,.12],['hurt',.45,.12,.04],['victory',1.2,.6,.18],['defeat',.8,0,0]] as const){
   const times=[0,duration*.25,duration*.5,duration*.75,duration];
-  const tracks:T.KeyframeTrack[]=[new T.NumberKeyframeTrack('body.position[y]',times,name==='defeat'?[0,-.05,-.18,-.3,-.45]:[0,bounce+(floating?.14:0),0,bounce,0]),new T.NumberKeyframeTrack('body.rotation[z]',times,name==='defeat'?[0,.15,.5,.9,1.4]:[0,0,0,0,0])];
+  const yValues=name==='defeat'?[0,-.05,-.18,-.3,-.45]:name==='summon'?[-.45,.2,.06,.13,0]:[0,bounce+(floating?.14:0),0,bounce,0];
+  const zValues=name==='defeat'?[0,.15,.5,.9,1.4]:name==='hurt'?[0,-.16,.13,-.07,0]:[0,0,0,0,0];
+  const tracks:T.KeyframeTrack[]=[new T.NumberKeyframeTrack('body.position[y]',times,yValues),new T.NumberKeyframeTrack('body.rotation[z]',times,zValues)];
   if(!floating)for(const [part,sign] of [['legL',1],['legR',-1],['armL',-1],['armR',1]] as const){
    let values=[0,swing*sign,0,-swing*sign,0];if(name==='victory'&&part.startsWith('arm'))values=[0,-2.5,-2.2,-2.5,-2.2];
-   if(name==='attack'&&part.startsWith('arm'))values=p.archetype==='archer'?(part==='armL'?[0,-1.5,-1.5,-1.5,0]:[0,-1.2,-.6,-1.6,0]):p.archetype==='dancer'?[0,-1,-2,-1,0]:p.archetype==='rogue'?[0,-2,1,-2,0]:['guardian','titan','golem'].includes(p.archetype)?[0,-2.7,-2.7,.5,0]:[0,-1.5,-1.7,-1.5,0];
+   if((name==='attack'||name==='power')&&part.startsWith('arm'))values=name==='power'?[0,-2.45,-2.2,-2.45,0]:p.archetype==='archer'?(part==='armL'?[0,-1.5,-1.5,-1.5,0]:[0,-1.2,-.6,-1.6,0]):p.archetype==='dancer'?[0,-1,-2,-1,0]:p.archetype==='rogue'?[0,-2,1,-2,0]:['guardian','titan','golem'].includes(p.archetype)?[0,-2.7,-2.7,.5,0]:[0,-1.5,-1.7,-1.5,0];
    tracks.push(new T.NumberKeyframeTrack(`${part}.rotation[x]`,times,values));
   }
   if(floating||p.archetype==='dancer')tracks.push(new T.NumberKeyframeTrack('body.rotation[y]',times,name==='attack'?[0,Math.PI*.5,Math.PI,Math.PI*1.5,Math.PI*2]:[0,.1,0,-.1,0]));clips.push(new T.AnimationClip(name,duration,tracks));
