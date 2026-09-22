@@ -33,4 +33,4 @@ for(const id of Object.keys(CARD_PROFILES)){
  characters[id]={url:`./assets/models/generated/${id}.glb`,height:2.15};disposeObject(root);
 }
 await writeFile(`${directory}manifest.json`,JSON.stringify({characters},null,2)+'\n');
-console.log(`Gerados ${Object.keys(characters).length} GLBs animados (${(bytes/1024/1024).toFixed(2)} MiB). Interpretações procedurais, não reproduções detalhadas dos retratos.`);
+console.log(`Gerados ${Object.keys(characters).length} GLBs animados (${(bytes/1024/1024).toFixed(2)} MiB), modelados em geometria a partir das referências das cartas.`);

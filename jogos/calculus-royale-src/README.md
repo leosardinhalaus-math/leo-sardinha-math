@@ -50,7 +50,7 @@ Abra http://localhost:8000. Não abra `index.html` por `file://`: módulos, mani
 
 ## Decisões de adaptação
 
-O jogo continua sendo comandado pelas cartas, com câmera estratégica elevada: arrastar gira, roda/pinça aproxima, botão direito/dois dedos deslocam; com foco no canvas, WASD/setas deslocam a câmera e R centraliza. As fases, recompensas, deck, retratos e desafios permanecem.
+O jogo continua sendo comandado pelas cartas, com câmera estratégica elevada e fixa do sul para o norte. Roda/pinça aproxima, R centraliza e os botões alternam entre a ilha inteira e o combate. As fases, recompensas, deck, retratos e desafios permanecem.
 
 A arena normal agora começa após a primeira invocação. Toque numa carta, escolha A1–A3 (faixa superior) ou B1–B3 (inferior), veja a prévia 3D e confirme. Também é possível tocar numa zona diretamente no canvas, usando Raycaster. A posição determina a faixa e o avanço inicial. Zonas ocupadas são bloqueadas. A batalha pausa durante a escolha; cancelar não gasta elixir nem altera o rodízio. A confirmação custa o elixir da carta uma única vez e requer a prévia carregada. Sem WebGL, os botões continuam disponíveis no modo ilustrado.
 
@@ -66,7 +66,7 @@ Box3 impede os avatares de entrar nos obstáculos estáticos, com pequenos subpa
 
 O projeto gera **45 arquivos GLB jogáveis**, com `idle`, `walk`, `run`, `jump`, `attack`, `victory` e `defeat`, através de `npm run models` (também executado automaticamente antes de `dev` e `build`). Eles ficam em `client/public/assets/models/generated/`. São modelos low-poly procedurais inspirados nas paletas, silhuetas e acessórios observados nas cartas: arco, lâminas, escudos, cajados, livros, ferramentas, asas e relíquias flutuantes.
 
-**Limite visual:** os modelos não são esculturas fiéis dos retratos. Não foi usada conversão imagem-para-3D por IA. São 12 arquétipos geométricos com variações por carta; rostos, armaduras detalhadas e proporções finas ainda precisam de modelagem artística. As ilustrações originais no deck permanecem intactas. Os GLBs usam hierarquias de pivôs animados (membros rígidos), não pele deformável; o carregador também aceita modelos externos com esqueleto.
+Os modelos são reconstruções 3D estilizadas a partir das referências visuais, com diferenças próprias de cabelo, rosto, roupa, armadura, arma e formação mágica. Eles usam hierarquias de pivôs animados (membros rígidos), enquanto o carregador também aceita modelos externos com esqueleto. As ilustrações originais do deck permanecem intactas.
 
 O exportador transforma as curvas em translações e quaternions glTF. Todos os modelos passam pelo parser real de GLTFLoader em `npm run test:models`. O conjunto atual soma aproximadamente 5 MiB sem compressão, pré-carregado sob a tela de carregamento. O manifesto padrão usa `"useGenerated": true`; entradas explícitas de `characters` substituem modelos de cartas específicas. Para usar apenas seus modelos, remova `useGenerated`. Se um GLB faltar, a mesma geometria é criada diretamente no navegador.
 
@@ -140,3 +140,5 @@ O raycast de seleção e o controle das ações seguem as APIs oficiais de [Rayc
 O cenário procedural tem oceano animado, praia, colinas verdes, cidade colorida, centro futurista, acampamento e moinho. Cada uma das cinco ilhas mantém sua paleta e pontos de interesse. A iluminação usa materiais Standard, sombras e névoa em Three.js; não depende de Unreal Engine, ray tracing ou texturas 8K.
 
 Use **Ilha inteira** para a vista aérea e **Combate** para aproximar a arena. A seleção de carta aproxima a câmera automaticamente. Os elementos decorativos ficam fora dos corredores e das seis zonas de invocação.
+
+Os 45 combatentes são malhas 3D geradas em GLB, sem recortes ou retratos planos. Cada modelo usa a carta como referência para silhueta, cabelo, roupa, armadura, arma, objeto mágico e paleta. Relíquias como o espelho, a árvore fractal e os anéis de Euler possuem geometria própria. Os poderes continuam associados às regras de cada carta e exibem partículas temáticas no contato. A câmera não gira: a batalha é mostrada do sul para o norte, com zoom e enquadramento automático da invocação.

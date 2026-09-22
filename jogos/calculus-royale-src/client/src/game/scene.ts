@@ -19,28 +19,28 @@ export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(w
  const scene=new T.Scene();scene.background=new T.Color(0x84d5fb);scene.fog=new T.FogExp2(0x9bdcf6,.006);
  scene.add(new T.HemisphereLight(0xc9efff,0x566635,1.65));
  const sun=new T.DirectionalLight(0xfff0ce,2.5);sun.position.set(-12,25,10);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-20,right:20,top:18,bottom:-18,near:.1,far:70});sun.shadow.bias=-.0004;sun.shadow.normalBias=.035;sun.shadow.radius=2;scene.add(sun);
+ const rim=new T.DirectionalLight(0x65cfff,1.15);rim.position.set(14,10,-12);scene.add(rim);
  const world=createWorld(index);scene.add(world.root);
  const camera=new T.PerspectiveCamera(42,1,.1,120);const controls=new OrbitControls(camera,canvas);
- controls.enableDamping=true;controls.minDistance=12;controls.maxDistance=65;controls.maxPolarAngle=Math.PI*.43;controls.minPolarAngle=.3;controls.enablePan=true;
- function resetCamera(){const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight);const distance=Math.max(21,13/(Math.tan(T.MathUtils.degToRad(21))*aspect));camera.position.set(0,distance*.78,distance*.7);controls.target.set(0,0,0);controls.update();}
- function viewIsland(){const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight);const distance=Math.max(29,18/(Math.tan(T.MathUtils.degToRad(21))*aspect));camera.position.set(3,distance*.85,distance*.7);controls.target.set(0,.3,-.5);controls.update();}
+ controls.enableDamping=true;controls.enableRotate=false;controls.enablePan=false;controls.enableZoom=true;controls.minDistance=12;controls.maxDistance=65;
+ // Câmera fixa ao sul: aliados nascem embaixo e avançam para o norte da tela.
+ function resetCamera(){const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight),distance=Math.max(24,11/(Math.tan(T.MathUtils.degToRad(21))*aspect));camera.position.set(-distance*.78,distance*.86,0);controls.target.set(0,.35,0);controls.update();}
+ function viewIsland(){const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight),distance=Math.max(34,12/(Math.tan(T.MathUtils.degToRad(21))*aspect));camera.position.set(-distance*.78,distance*.9,0);controls.target.set(0,.2,0);controls.update();}
+ function focusSpawn(x:number){const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight),distance=Math.max(14,6.5/(Math.tan(T.MathUtils.degToRad(21))*aspect));controls.target.set(x,.65,0);camera.position.set(x-distance*.78,distance*.86,0);controls.update();}
  viewIsland();
  const observer=new ResizeObserver(()=>{const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();});observer.observe(canvas);
  let state:ArenaState={allies:[],enemies:[],paused:false},disposed=false,ready=false,warnings=0;
  let manifest:Manifest={};const assets=new Map<string,GLTF>();
  const actors=new Map<string,{visual:ReturnType<typeof createCharacter>;unit:ArenaUnit;enemy:boolean;age:number;lane:number;exitAge?:number;exitMotion?:'victory'|'defeat';attackFor:number;lastAttack:number;health:T.Mesh}>();
  const zoneMeshes=SPAWN_ZONES.map(zone=>{const material=new T.MeshBasicMaterial({color:0x5bffcc,transparent:true,opacity:.35,side:T.DoubleSide,depthWrite:false});const mesh=new T.Mesh(new T.PlaneGeometry(1.35,1.2),material);mesh.rotation.x=-Math.PI/2;mesh.position.copy(arenaPosition(zone.progress,false,zone.lane));mesh.position.y=.13;mesh.userData.zoneId=zone.id;mesh.visible=false;scene.add(mesh);return mesh;});
- let preview:ReturnType<typeof createCharacter>|undefined,previewId='';let wasPlacing=false;let worldTime=0;
+ let preview:ReturnType<typeof createCharacter>|undefined,previewId='',focusedZone='';let worldTime=0;
  const effects:ReturnType<typeof createAbilityEffect>[]=[];const seenEvents=new Set<string>();
  const raycaster=new T.Raycaster(),pointer=new T.Vector2();let down={x:0,y:0};
  const pointerDown=(e:PointerEvent)=>{down={x:e.clientX,y:e.clientY};};
  const pointerUp=(e:PointerEvent)=>{if(!state.placement||Math.hypot(e.clientX-down.x,e.clientY-down.y)>8)return;const rect=canvas.getBoundingClientRect();pointer.set((e.clientX-rect.left)/rect.width*2-1,-(e.clientY-rect.top)/rect.height*2+1);raycaster.setFromCamera(pointer,camera);const hit=raycaster.intersectObjects(zoneMeshes)[0];if(hit&&!state.placement.blocked.includes(hit.object.userData.zoneId))onSelectZone?.(hit.object.userData.zoneId);};
  canvas.addEventListener('pointerdown',pointerDown);canvas.addEventListener('pointerup',pointerUp);
- const keys=new Set<string>();
- function keydown(e:KeyboardEvent){if(document.activeElement!==canvas)return;if(['w','a','s','d','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)){keys.add(e.key);e.preventDefault();}if(e.key.toLowerCase()==='r')resetCamera();}
- function keyup(e:KeyboardEvent){keys.delete(e.key);}
- function blur(){keys.clear();}
- canvas.addEventListener('keydown',keydown);window.addEventListener('keyup',keyup);canvas.addEventListener('blur',blur);
+ function keydown(e:KeyboardEvent){if(document.activeElement===canvas&&e.key.toLowerCase()==='r')resetCamera();}
+ canvas.addEventListener('keydown',keydown);
  const lost=(e:Event)=>{e.preventDefault();onError();};canvas.addEventListener('webglcontextlost',lost);
  // Carregamento opcional: sem GLB configurado, o jogo já funciona com avatares animados.
  const loader=new GLTFLoader();const abort=new AbortController();
@@ -73,7 +73,7 @@ export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(w
   canvas.dataset.units=String(live.size);canvas.dataset.effects=String(effects.length);
   for(const mesh of zoneMeshes){mesh.visible=Boolean(state.placement);mesh.material.color.set(state.placement?.blocked.includes(mesh.userData.zoneId)?0xf1746d:state.placement?.zoneId===mesh.userData.zoneId?0xffd77c:0x5bffcc);mesh.material.opacity=state.placement?.zoneId===mesh.userData.zoneId ? .65 : .25;}
   const placement=state.placement;
-  if(placement&&!wasPlacing)resetCamera();wasPlacing=Boolean(placement);
+  if(placement&&focusedZone!==placement.zoneId){const zone=SPAWN_ZONES.find(z=>z.id===placement.zoneId);if(zone)focusSpawn(arenaPosition(zone.progress,false,zone.lane).x);focusedZone=placement.zoneId;}else if(!placement)focusedZone='';
   if(!placement||previewId!==placement.unit.cardId){if(preview){scene.remove(preview.group);preview.dispose();preview=undefined;}previewId='';}
   if(placement){if(!preview){const spec=manifest.characters?.[placement.unit.cardId]??manifest.characters?.default;preview=createCharacter('#ffe18c',placement.unit.kind,spec?assets.get(spec.url):undefined,spec,placement.unit.cardId);previewId=placement.unit.cardId;scene.add(preview.group);}const zone=SPAWN_ZONES.find(z=>z.id===placement.zoneId)!;preview.group.position.copy(arenaPosition(zone.progress,false,zone.lane));preview.group.rotation.y=Math.PI/2;preview.play('idle');}
   canvas.dataset.previewCard=previewId;canvas.dataset.previewZone=placement?.zoneId??'';
@@ -97,11 +97,9 @@ export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(w
   }}
   preview?.mixer.update(dt);
   for(let i=effects.length-1;i>=0;i--)if(!effects[i].update(state.paused&&!state.outcome?0:dt)){scene.remove(effects[i].group);effects[i].dispose();effects.splice(i,1);}
-  const dx=(Number(keys.has('d')||keys.has('ArrowRight'))-Number(keys.has('a')||keys.has('ArrowLeft')))*dt*6;
-  const dz=(Number(keys.has('s')||keys.has('ArrowDown'))-Number(keys.has('w')||keys.has('ArrowUp')))*dt*6;
-  const old=controls.target.clone();controls.target.x=T.MathUtils.clamp(controls.target.x+dx,-8,8);controls.target.z=T.MathUtils.clamp(controls.target.z+dz,-4,4);camera.position.add(controls.target.clone().sub(old));controls.update();renderer.render(scene,camera);
+  controls.update();renderer.render(scene,camera);
   canvas.dataset.frames=String(Number(canvas.dataset.frames??0)+1);
  }
  render();
- return {setState(next){state=next;},resetCamera,viewIsland,dispose(){disposed=true;abort.abort();cancelAnimationFrame(frame);observer.disconnect();controls.dispose();canvas.removeEventListener('keydown',keydown);window.removeEventListener('keyup',keyup);canvas.removeEventListener('blur',blur);canvas.removeEventListener('webglcontextlost',lost);canvas.removeEventListener('pointerdown',pointerDown);canvas.removeEventListener('pointerup',pointerUp);actors.forEach(a=>{a.visual.dispose();a.health.geometry.dispose();(a.health.material as T.Material).dispose();});preview?.dispose();zoneMeshes.forEach(m=>{m.geometry.dispose();m.material.dispose();});effects.forEach(e=>e.dispose());disposeObject(world.root);assets.forEach(a=>disposeObject(a.scene));sun.shadow.dispose();renderer.dispose();renderer.forceContextLoss();}};
+ return {setState(next){state=next;},resetCamera,viewIsland,dispose(){disposed=true;abort.abort();cancelAnimationFrame(frame);observer.disconnect();controls.dispose();canvas.removeEventListener('keydown',keydown);canvas.removeEventListener('webglcontextlost',lost);canvas.removeEventListener('pointerdown',pointerDown);canvas.removeEventListener('pointerup',pointerUp);actors.forEach(a=>{a.visual.dispose();a.health.geometry.dispose();(a.health.material as T.Material).dispose();});preview?.dispose();zoneMeshes.forEach(m=>{m.geometry.dispose();m.material.dispose();});effects.forEach(e=>e.dispose());disposeObject(world.root);assets.forEach(a=>disposeObject(a.scene));sun.shadow.dispose();renderer.dispose();renderer.forceContextLoss();}};
 }
