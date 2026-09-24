@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#17324d">
+<meta name="description" content="190 listas de exercícios de Álgebra e Geometria, do 1º ao 5º ano: cinco listas com cinco questões para cada habilidade, com gabaritos e impressão.">
+<title>Listas por habilidade · Leo Sardinha.Math</title>
+<link rel="stylesheet" href="style.css">
+<script defer src="data.js"></script><script defer src="app.js"></script>
+</head>
+<body>
+<a class="skip" href="#worksheet">Pular para a lista</a>
+<header class="top"><nav aria-label="Navegação principal"><a class="brand" href="../../index.html">Leo Sardinha<span>.Math</span></a><a href="../">Área do Professor</a><a href="../../educacao.html">Educação</a></nav></header>
+<main class="wrap">
+<section class="hero"><p class="eyebrow">Álgebra + Geometria · 1º ao 5º ano</p><h1>Uma habilidade.<br>Cinco listas para praticar.</h1><p>Escolha o ano e a habilidade. Cada lista tem cinco questões, espaço para responder e um gabarito que você pode abrir separadamente.</p><div class="stats" aria-label="Quantidade de materiais"><span><b>38</b> habilidades</span><span><b>190</b> listas</span><span><b>950</b> questões</span></div></section>
+<nav class="section-nav" aria-label="Recursos do professor"><a href="../">Planejamento e atividades</a><a href="./" aria-current="page">Listas de exercícios</a></nav>
+<div class="layout">
+<aside class="filters" aria-label="Escolha da lista">
+<h2>Monte sua seleção</h2>
+<label for="area">Área</label><select id="area"><option value="algebra">Álgebra</option><option value="geometria">Geometria</option></select>
+<label for="year">Ano escolar</label><select id="year"><option value="1">1º ano</option><option value="2">2º ano</option><option value="3">3º ano</option><option value="4">4º ano</option><option value="5">5º ano</option></select>
+<label for="skill">Habilidade</label><select id="skill" aria-describedby="skill-summary"></select>
+<p id="skill-summary" class="muted"></p>
+<a id="guide-link" class="guide-link" href="../../algebra/">Ver atividades desta habilidade →</a>
+<p class="filter-note">Listas fixas: você pode voltar, compartilhar o endereço e encontrar as mesmas questões.</p>
+</aside>
+<section class="workspace" aria-label="Exercícios">
+<div class="list-buttons" id="list-buttons" role="group" aria-label="Escolha uma das cinco listas"></div>
+<div class="toolbar"><button type="button" id="answer-toggle" aria-expanded="false" aria-controls="answer-key">Mostrar gabarito</button><button type="button" id="print-one">Imprimir lista</button><button type="button" id="print-all">Imprimir 5 listas</button><button type="button" id="print-key">Imprimir gabarito</button></div>
+<p class="print-hint">Para PDF, escolha “Salvar como PDF” na janela de impressão. As folhas do aluno saem sem respostas.</p>
+<p id="selection-status" class="sr-only" role="status" aria-live="polite"></p>
+<article id="worksheet" tabindex="-1"></article>
+<section id="answer-key" hidden aria-label="Gabarito do professor"></section>
+</section>
+</div>
+<section class="usage"><h2>Para usar em sala</h2><p>As listas oferecem variações para retomar a mesma habilidade; não são uma escala automática de dificuldade. Nos anos iniciais, o professor pode ler os enunciados. Nas questões abertas, o gabarito traz exemplos e critérios de observação.</p><p>As descrições são sínteses pedagógicas das habilidades já presentes nos guias do site. Referência curricular: <a href="https://basenacionalcomum.mec.gov.br/" target="_blank" rel="noopener">BNCC · Ministério da Educação</a>.</p></section>
+<noscript><p>Ative o JavaScript para selecionar as listas e imprimir os exercícios.</p></noscript>
+</main>
+<div id="print-root" aria-hidden="true"></div>
+<footer>Leo Sardinha.Math · Exercícios por habilidade</footer>
+</body>
+</html>
