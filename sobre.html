@@ -24,16 +24,22 @@
     .about-areas .content-grid{padding:0}.about-areas .card:last-child{grid-column:1/-1}
     @media(max-width:800px){.about-hero{margin:24px 0 30px}.about-story p{font-size:1.04rem}.about-areas .card:last-child{grid-column:auto}}
 
-    .music-feature{max-width:980px;margin:0 auto 65px;padding:clamp(22px,5vw,42px);border-radius:28px;background:#082f49;color:#f5fbff;box-shadow:var(--shadow)}
-    .music-feature h2{font-family:Georgia,serif;font-size:clamp(1.8rem,4vw,2.7rem);margin:0 0 13px;color:#fff}
-    .music-feature p{color:#d9edf8;line-height:1.75;max-width:690px}
+    .music-feature{max-width:1050px;margin:0 auto 65px;padding:clamp(24px,5vw,46px);border-radius:28px;background:#082f49;color:#f5fbff;box-shadow:var(--shadow)}
+    .music-feature h2{font-family:Georgia,serif;font-size:clamp(1.9rem,4vw,2.8rem);margin:0 0 15px;color:#fff}
+    .music-feature p{color:#e0f2fe;line-height:1.75}
     .music-feature .eyebrow{color:#f4cf72}
-    .music-layout{display:grid;grid-template-columns:minmax(0,360px) 1fr;align-items:center;gap:clamp(20px,5vw,50px)}
-    .music-player{aspect-ratio:9/16;max-height:590px;max-width:360px;width:100%;border:3px solid rgba(255,255,255,.2);background:linear-gradient(145deg,#184a63,#041c2a);border-radius:22px;overflow:hidden;display:grid;place-items:center}
-    .music-player video{width:100%;height:100%;object-fit:contain;background:#000}
-    .music-placeholder{padding:22px;text-align:center}.music-placeholder span{font-size:3rem;display:block;margin-bottom:12px}.music-placeholder p{margin:0;color:#fff}
-    .music-feature .button{background:#f4cf72;color:#082f49;box-shadow:none;margin-top:12px}
-    @media(max-width:800px){.music-layout{grid-template-columns:1fr}.music-player{margin:0 auto}.music-feature .button{width:100%}}
+    .music-intro{max-width:780px;margin-bottom:30px}
+    .music-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin-top:28px}
+    .music-card{min-width:0;border:1px solid rgba(255,255,255,.22);border-radius:22px;background:rgba(255,255,255,.07);padding:clamp(16px,3vw,24px)}
+    .music-card h3{color:#fff;font-size:1.35rem;margin:18px 0 6px}
+    .music-card p{margin:0;font-size:1rem}
+    .music-player{aspect-ratio:9/16;width:min(100%,290px);margin:0 auto;overflow:hidden;border-radius:16px;background:#071f31;display:grid;place-items:center;border:2px solid rgba(255,255,255,.19)}
+    .music-player video{display:none;width:100%;height:100%;object-fit:contain;background:#000}
+    .music-placeholder{text-align:center;padding:22px}
+    .music-placeholder span{display:block;font-size:3rem;margin-bottom:10px;color:#f4cf72}
+    .music-placeholder p{font-size:1rem;color:#fff;line-height:1.5}
+    .music-footer{margin:26px 0 0}.music-feature .button{background:#f4cf72;color:#082f49;box-shadow:none}
+    @media(max-width:700px){.music-gallery{grid-template-columns:1fr}.music-feature .button{width:100%}}
   </style>
 </head>
 <body>
@@ -76,31 +82,50 @@
 
 
     <section class="music-feature" aria-labelledby="musica-fe">
-      <div class="music-layout">
-        <div class="music-player" id="vigilia-player">
-          <div class="music-placeholder" id="vigilia-placeholder"><span aria-hidden="true">♫</span><p>Vigília Pascal<br>“A minh’alma tem sede de Deus!”</p></div>
-          <video id="vigilia-video" controls playsinline preload="metadata" style="display:none" aria-label="Apresentação musical durante a Vigília Pascal">
-            <source src="media/vigilia-pascal.mp4" type="video/mp4">
-            Seu navegador não oferece suporte à reprodução deste vídeo.
-          </video>
-        </div>
-        <div>
-          <p class="eyebrow">Mais de 30 anos de música voluntária</p>
-          <h2 id="musica-fe">Música, fé e comunidade</h2>
-          <p>A música acompanha minha caminhada há mais de três décadas. No serviço voluntário à Igreja Católica, encontrei um espaço para aprender, compartilhar e viver a fé em comunidade.</p>
-          <p>Este registro da Vigília Pascal, com a mensagem “A minh’alma tem sede de Deus!”, é uma pequena parte dessa história: experiências que não cabem apenas em palavras, mas também em encontros, vozes e canções.</p>
-          <a class="button" href="https://www.tiktok.com/@leonardosardinha0" target="_blank" rel="noopener noreferrer">Acompanhe meu TikTok ↗</a>
-        </div>
+      <div class="music-intro">
+        <p class="eyebrow">Mais de 30 anos de música voluntária</p>
+        <h2 id="musica-fe">Música, fé e comunidade</h2>
+        <p>A música acompanha minha caminhada há mais de três décadas. No serviço voluntário à Igreja Católica, encontrei um espaço para aprender, compartilhar e viver a fé em comunidade.</p>
+        <p>Esses registros são pequenas partes dessa história: experiências que não cabem apenas em palavras, mas também em encontros, vozes e canções.</p>
+      </div>
+      <div class="music-gallery">
+        <article class="music-card">
+          <div class="music-player">
+            <div class="music-placeholder"><span aria-hidden="true">♫</span><p>Vigília Pascal<br>“A minh’alma tem sede de Deus!”</p></div>
+            <video controls playsinline preload="metadata" aria-label="Apresentação musical durante a Vigília Pascal">
+              <source src="media/vigilia-pascal.mp4" type="video/mp4">
+              Seu navegador não oferece suporte à reprodução deste vídeo.
+            </video>
+          </div>
+          <h3>Vigília Pascal</h3>
+          <p>“A minh’alma tem sede de Deus!” — música e celebração em comunidade.</p>
+        </article>
+        <article class="music-card">
+          <div class="music-player">
+            <div class="music-placeholder"><span aria-hidden="true">♫</span><p>Adoremos<br>Música e oração</p></div>
+            <video controls playsinline preload="metadata" aria-label="Registro musical Adoremos">
+              <source src="media/adoremos.mp4" type="video/mp4">
+              Seu navegador não oferece suporte à reprodução deste vídeo.
+            </video>
+          </div>
+          <h3>Adoremos</h3>
+          <p>Um registro de música e oração, vivido no encontro com a comunidade.</p>
+        </article>
+      </div>
+      <div class="music-footer">
+        <a class="button" href="https://www.tiktok.com/@leonardosardinha0" target="_blank" rel="noopener noreferrer">Acompanhe meu TikTok ↗</a>
       </div>
     </section>
     <script>
-      // Exibe o player somente quando o vídeo estiver hospedado no repositório.
-      // Enquanto isso, mantém a apresentação da seção e o link público do TikTok.
-      (function(){
-        const video = document.getElementById('vigilia-video');
-        const placeholder = document.getElementById('vigilia-placeholder');
-        video.addEventListener('loadedmetadata', function(){video.style.display='block';placeholder.style.display='none'});
-      })();
+      // Só mostra os players quando os respectivos arquivos tiverem sido publicados.
+      document.querySelectorAll('.music-player').forEach(function(player){
+        const video=player.querySelector('video');
+        const placeholder=player.querySelector('.music-placeholder');
+        video.addEventListener('loadedmetadata',function(){
+          video.style.display='block';
+          placeholder.style.display='none';
+        });
+      });
     </script>
     <section class="about-areas" aria-labelledby="areas">
       <h2 id="areas">Caminhos que se encontram</h2>
