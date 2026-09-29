@@ -13,6 +13,7 @@ main.inicio{max-width:1240px;padding-top:clamp(1rem,3vw,2rem);padding-bottom:3re
 .hero-acao:hover{background:var(--destaque);border-color:var(--destaque);transform:translateY(-2px)}
 .hero-acao span{font-size:1.2rem;line-height:1}
 .hero-nota{display:block;color:var(--sec);font-size:.78rem;margin-top:1.25rem}
+.hero-dica{display:block;color:var(--destaque);font-size:.78rem;font-weight:700;margin-top:.35rem}
 .hero-personagens{position:relative;min-height:360px;isolation:isolate}
 .hero-personagens img{position:absolute;width:min(48%,260px);height:auto;max-height:94%;object-fit:contain;bottom:0;left:50%;transform:translateX(-50%);z-index:2;filter:drop-shadow(0 13px 16px #30284455)}
 .hero-personagens .sprite-chibi{position:absolute;width:37%;max-width:205px;bottom:1rem;filter:drop-shadow(0 12px 14px #3028444d)}

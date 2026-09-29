@@ -73,7 +73,7 @@ app.addEventListener('click',event=>{
   if(!fala){fala=document.createElement('p');fala.className='fala-detetive';fala.setAttribute('role','status');personagem.closest('.detetive-banner').insertAdjacentElement('afterend',fala)}
   fala.textContent='A pista mora nos restos da divisão!';
   personagem.classList.remove('reagindo');void personagem.offsetWidth;personagem.classList.add('reagindo');
-  clearTimeout(fala._tempo);fala._tempo=setTimeout(()=>{fala.remove();personagem.classList.remove('reagindo')},2700);
+  clearTimeout(fala._tempo);fala._tempo=setTimeout(()=>{fala.remove();personagem.classList.remove('reagindo')},6000);
 });
 app.addEventListener('keydown',event=>{if((event.key==='Enter'||event.key===' ')&&event.target.matches('.detetive-art')){event.preventDefault();event.target.click()}});
 const M=[

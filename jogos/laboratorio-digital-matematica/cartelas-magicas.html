@@ -105,7 +105,7 @@ app.addEventListener('click',event=>{
   if(!fala){fala=document.createElement('p');fala.className='fala-jogo';fala.setAttribute('role','status');personagem.closest('.fig').insertAdjacentElement('afterend',fala)}
   fala.textContent=personagem.dataset.fala;
   personagem.classList.remove('reagindo');void personagem.offsetWidth;personagem.classList.add('reagindo');
-  clearTimeout(fala._tempo);fala._tempo=setTimeout(()=>{fala.remove();personagem.classList.remove('reagindo')},2700);
+  clearTimeout(fala._tempo);fala._tempo=setTimeout(()=>{fala.remove();personagem.classList.remove('reagindo')},6000);
 });
 app.addEventListener('keydown',event=>{
   if((event.key==='Enter'||event.key===' ')&&event.target.matches('.fig [data-fala]')){event.preventDefault();event.target.click()}
