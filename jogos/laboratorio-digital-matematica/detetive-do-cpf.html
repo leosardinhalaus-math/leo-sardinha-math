@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Agência Detetive do CPF · Laboratório Digital</title>
+<meta name="description" content="Aprenda dígitos verificadores, pesos e divisão com resto em missões matemáticas simuladas.">
+<style>
+:root{--bg:#f4f6fa;--grid:#dfe5f0;--card:#fff;--tx:#1a2238;--mut:#58627c;--pri:#2f4bd0;--ok:#1f7a3a;--bad:#c62828;--line:#c9d1e3;--gold:#b7791f;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141a2b;--grid:#1e2640;--card:#1c2338;--tx:#eaeefb;--mut:#a3adc9;--pri:#8ea2ff;--ok:#6fdc8c;--bad:#ff8a8a;--line:#34405f;--gold:#f6c453}}
+:root[data-theme="dark"]{--bg:#141a2b;--grid:#1e2640;--card:#1c2338;--tx:#eaeefb;--mut:#a3adc9;--pri:#8ea2ff;--ok:#6fdc8c;--bad:#ff8a8a;--line:#34405f;--gold:#f6c453}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;color:var(--tx);font:1rem/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background-color:var(--bg);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:1.5rem 1.5rem;min-height:100vh}
+main{max-width:38rem;margin:0 auto;padding:1rem}
+h1,h2{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;line-height:1.2;margin:.2rem 0 .5rem}
+h1{font-size:2rem}h2{font-size:1.3rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:.75rem;padding:1rem;margin:.8rem 0}
+.mut{color:var(--mut);font-size:.9rem}
+.badge{float:right;font-weight:700;color:var(--gold);text-align:right;font-size:.9rem}
+.cpf{display:flex;flex-wrap:wrap;gap:.25rem;justify-content:center;font-family:"Courier New",monospace;font-size:1.9rem;font-weight:700;letter-spacing:.05em;padding:.6rem;border:2px dashed var(--pri);border-radius:.5rem;background:var(--card)}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(3.6rem,1fr));gap:.5rem}
+.col{display:flex;flex-direction:column;align-items:center;gap:.15rem;font-family:"Courier New",monospace}
+.dg{font-size:1.5rem;font-weight:700}.dvx{color:var(--pri)}
+.pv{min-height:2.75rem;display:flex;align-items:center;font-size:1.1rem;font-weight:700;color:var(--ok)}
+button{font:inherit;min-height:3rem;padding:.6rem 1.1rem;border-radius:.6rem;border:2px solid var(--pri);background:var(--pri);color:#fff;font-weight:600;cursor:pointer;margin:.25rem .25rem .25rem 0}
+button.sec{background:transparent;color:var(--pri)}
+.map button{display:block;width:100%;text-align:left;margin:.4rem 0}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--tx);outline-offset:2px}
+input{width:100%;min-height:2.75rem;font:inherit;font-size:1.1rem;text-align:center;border:2px solid var(--line);border-radius:.5rem;background:var(--card);color:var(--tx)}
+input.ok{border-color:var(--ok)}input.bad{border-color:var(--bad)}
+.f{display:flex;align-items:center;gap:.6rem;margin:.5rem 0}.f label{flex:1}.f input{width:6rem}
+#msg{min-height:1.5rem;font-weight:600;margin:.5rem 0}
+.good{color:var(--ok)}.wrong{color:var(--bad)}
+summary{cursor:pointer;font-weight:600}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) button:not(.sec){color:#141a2b}}
+:root[data-theme="dark"] button:not(.sec){color:#141a2b}
+.back{font-size:.9rem;margin-bottom:.4rem}.back a{color:var(--pri);font-weight:600}
+</style>
+</head>
+<body>
+<main><nav class="back" aria-label="Voltar ao laboratório"><a href="./index.html#/">← Todos os jogos</a></nav><div id="app"></div></main>
+<script>
+const app=document.getElementById('app');
+const M=[
+ {n:'Multiplicando os pesos',ph:1,ask:'p',t:'Multiplique cada dígito pelo seu peso.'},
+ {n:'Somando e dividindo',ph:1,ask:'sqrv',pre:1,t:'Os produtos já estão prontos. Some tudo e divida por 11.'},
+ {n:'O 1º dígito completo',ph:1,ask:'psqrv',t:'Agora faça o cálculo inteiro.'},
+ {n:'O 2º dígito',ph:2,ask:'psqrv',t:'Desta vez são 10 dígitos: os 9 primeiros mais o 1º dígito verificador (em azul), com pesos de 11 a 2.'},
+ {n:'Caça-Fraudes',fraud:1}];
+let st=[0,0,0,0,0],G,D;
+const fmt=a=>{const s=a.concat(Array(11).fill('_')).slice(0,11);return s.slice(0,3).join('')+'.'+s.slice(3,6).join('')+'.'+s.slice(6,9).join('')+'-'+s.slice(9).join('')};
+const calc=b=>{let w=b.length+1,s=0;b.forEach(d=>s+=d*w--);const r=s%11;return{s,q:Math.floor(s/11),r,dv:r<2?0:11-r}};
+const novo=()=>{let d;do d=Array.from({length:9},()=>Math.random()*10|0);while(d.every(x=>x===d[0]));return d};
+const star=n=>'⭐'.repeat(n)+'☆'.repeat(3-n);
+const total=()=>st.reduce((a,b)=>a+b,0);
+const rank=()=>{const t=total();return t>=15?'Lenda da Agência':t>=10?'Detetive Chefe':t>=5?'Detetive':'Estagiário'};
+const $$=s=>document.querySelectorAll(s);
+
+function home(){
+  app.innerHTML=`<span class="badge">${rank()}<br>${total()} de 15 ⭐</span><h1>🕵️ Agência Detetive do CPF</h1>
+  <p>Agente, a agência recebeu sequências numéricas para investigar! Use os <b>dígitos verificadores</b> para encontrar erros de cálculo. Cumpra as missões e ganhe estrelas.</p>
+  <details class="card"><summary>📒 Manual do detetive</summary><ol>
+  <li>Multiplique cada dígito por um peso que diminui: de 10 a 2 para o 1º dígito verificador, de 11 a 2 para o 2º.</li>
+  <li>Some todos os produtos.</li>
+  <li>Divida a soma por 11. Ela é igual a 11 × quociente + resto.</li>
+  <li>Se o resto for 0 ou 1, o dígito é 0. Nos outros casos, o dígito é 11 − resto.</li></ol>
+  <p class="mut">Curiosidade: esses dígitos existem para achar erros de digitação. Se alguém troca um número, a conta quase sempre deixa de fechar.</p></details>
+  <div class="map">${M.map((m,i)=>`<button class="${i%2?'sec':''}" onclick="${m.fraud?'fraud()':`mission(${i})`}">${i+1}. ${m.n} ${star(st[i])}</button>`).join('')}</div>
+  <p class="mut">As sequências são geradas ao acaso para o exercício. Passar na conta não comprova a existência nem a titularidade de um CPF. Não digite dados pessoais neste jogo.</p>`;
+}
+
+function mission(i){G={i,d:novo(),err:0,done:false};rc()}
+function rc(){
+  const m=M[G.i],b=m.ph===1?G.d:G.d.concat(calc(G.d).dv),w=b.length+1,a=m.ask;
+  const fl=(k,l)=>`<div class="f"><label for="${k}">${l}</label><input id="${k}" data-k="${k}" inputmode="numeric"></div>`;
+  app.innerHTML=`<span class="badge">${rank()}</span><h2>Missão ${G.i+1}: ${m.n}</h2><p class="mut">${m.t}</p><div class="cpf">${fmt(b)}</div>
+  <div class="card"><p>${a.includes('p')?`Multiplique cada dígito pelo peso (${w} até 2):`:'Produtos (dígito × peso):'}</p><div class="row">
+  ${b.map((d,i)=>`<div class="col"><span class="dg ${m.ph===2&&i===9?'dvx':''}">${d}</span><span class="mut">× ${w-i}</span>${a.includes('p')?`<input data-k="p${i}" inputmode="numeric" aria-label="${d} vezes ${w-i}">`:`<span class="pv">${d*(w-i)}</span>`}</div>`).join('')}</div>
+  ${a.includes('s')?fl('s','Soma dos produtos'):''}${a.includes('q')?fl('q','Quociente: quantas vezes o 11 cabe na soma')+fl('r','Resto: soma − 11 × quociente'):''}${a.includes('v')?fl('v','Dígito verificador'):''}</div>
+  <div id="msg" role="status"></div><button id="go" onclick="check()">Conferir</button><button class="sec" onclick="home()">Menu</button>`;
+}
+function check(){
+  if(G.done){G.i<3?mission(G.i+1):fraud();return}
+  const m=M[G.i],b=m.ph===1?G.d:G.d.concat(calc(G.d).dv),w=b.length+1,c=calc(b),bad={};let first=null;
+  $$('#app input').forEach(i=>{
+    const k=i.dataset.k,n=+k.slice(1),exp=k==='s'?c.s:k==='q'?c.q:k==='r'?c.r:k==='v'?c.dv:b[n]*(w-n);
+    const ok=/^\d+$/.test(i.value.trim())&&Number(i.value.trim())===exp;i.className=ok?'ok':'bad';
+    if(!ok){bad[k[0]]=1;if(first===null)first=exp}
+  });
+  const el=document.getElementById('msg');
+  if(!Object.keys(bad).length){
+    G.done=true;const s=G.err===0?3:G.err<=2?2:1;st[G.i]=Math.max(st[G.i],s);
+    el.className='good';el.textContent=`Missão cumprida! ${star(s)}${m.ph===2?` CPF completo: ${fmt(b.concat(c.dv))}.`:''}`;
+    document.getElementById('go').textContent=G.i<3?'Próxima missão':'Ir para o Caça-Fraudes';
+    $$('#app input').forEach(i=>i.disabled=true);
+  }else{
+    G.err++;el.className='wrong';
+    let t=bad.p?'Confira os produtos: cada dígito vezes o seu peso.':bad.s?'Confira a soma: some todos os produtos.':(bad.q||bad.r)?'Quantas vezes o 11 cabe na soma? O resto é o que sobra.':`Confira a regra: resto ${c.r<2?'0 ou 1 dá dígito 0':'maior que 1 dá 11 − resto'}.`;
+    if(G.err>=3)t+=` Pista: o primeiro campo errado deveria ser ${first}.`;
+    el.textContent=t;
+  }
+}
+
+function fraud(){D={n:0,ok:0};nextQ()}
+function nextQ(){
+  if(D.n===5){
+    const s=D.ok===5?3:D.ok===4?2:D.ok>=3?1:0;st[4]=Math.max(st[4],s);
+    app.innerHTML=`<span class="badge">${rank()}</span><h2>Caso encerrado</h2><p>Você classificou ${D.ok} de 5 sequências corretamente. ${star(s)}</p><button onclick="fraud()">Jogar de novo</button><button class="sec" onclick="home()">Menu</button>`;return}
+  const d=novo(),a=calc(d).dv,b=calc(d.concat(a)).dv,valido=Math.random()<.5;let x=a,y=b;
+  if(!valido){const t=1+(Math.random()*9|0);Math.random()<.5?x=(a+t)%10:y=(b+t)%10}
+  D.q={cpf:d.concat(x,y),valido,a,b};
+  app.innerHTML=`<span class="badge">${rank()}</span><h2>Caso ${D.n+1} de 5</h2><p>Os dígitos verificadores passam na conta? Faça o cálculo e decida.</p>
+  <div class="cpf">${fmt(D.q.cpf)}</div><div id="msg" role="status"></div>
+  <div id="bt"><button onclick="ans(true)">Passa</button><button class="sec" onclick="ans(false)">Não passa</button></div>
+  <button class="sec" onclick="home()">Menu</button>`;
+}
+function ans(v){
+  const q=D.q,ok=v===q.valido;D.n++;if(ok)D.ok++;
+  const m=document.getElementById('msg');m.className=ok?'good':'wrong';
+  m.textContent=`${ok?'Boa, detetive!':'Tente conferir os dois dígitos.'} Para os 9 primeiros dígitos desta sequência, os verificadores calculados são ${q.a} e ${q.b}.`;
+  document.getElementById('bt').innerHTML=`<button onclick="nextQ()">${D.n===5?'Ver resultado':'Próximo caso'}</button>`;
+}
+home();
+</script>
+</body>
+</html>

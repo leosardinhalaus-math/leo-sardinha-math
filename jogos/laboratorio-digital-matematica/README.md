@@ -1,6 +1,6 @@
 # Laboratório Digital de Matemática
 
-PWA em português para estudantes do 6º ao 9º ano e professores. Oito objetos de aprendizagem interativos, quadro teórico, avaliador de OA, diário criativo e referências. HTML, CSS e JavaScript puros, sem bibliotecas, login ou servidor de dados. Os registros ficam no armazenamento local do navegador.
+PWA em português para estudantes do 6º ao 9º ano e professores. Dez objetos de aprendizagem interativos, quadro teórico, avaliador de OA, diário criativo e referências. HTML, CSS e JavaScript puros, sem bibliotecas, login ou servidor de dados. Os registros ficam no armazenamento local do navegador.
 
 ## Estrutura
 
@@ -11,11 +11,13 @@ service-worker.js          arquivos offline e atualização
 .nojekyll                  desativa Jekyll no Pages
 gerar-icones.html          gerador alternativo de PNG
 icons/                     ícones 192, 512 e maskable
-css/tema.css, estilos.css  tema e layout
+css/tema.css, estilos.css, inicio.css  tema e layout
 js/main.js                 inicialização
 js/core/                   roteador, estado, interface
 js/dados/                  textos, referências, regras da abelha
 js/modulos/<nome>/index.js módulos independentes montar/desmontar
+cartelas-magicas.html, detetive-do-cpf.html  jogos autônomos conectados à entrada
+images/laboratorio-hero.webp  fotografia da abertura
 ```
 
 ## Executar localmente
@@ -43,7 +45,7 @@ Os caminhos de todos os recursos são relativos à pasta do projeto; a navegaç�
 
 ## Atualizar
 
-Edite o conteúdo e troque `VERSAO='ldm-v3'` por `ldm-v4` (ou próximo número) em `service-worker.js` antes de publicar novamente. O app mostrará **Nova versão disponível. Atualizar** quando detectar o novo worker. Se o celular mantiver a versão antiga, feche e reabra o app conectado, toque em **Atualizar**, ou limpe os dados do site no navegador e visite o endereço novamente. Limpar os dados do site também apaga diário e avaliações locais; faça isso apenas se necessário.
+Edite o conteúdo e troque `VERSAO='ldm-v4'` por `ldm-v5` (ou próximo número) em `service-worker.js` antes de publicar novamente. O app mostrará **Nova versão disponível. Atualizar** quando detectar o novo worker. Se o celular mantiver a versão antiga, feche e reabra o app conectado, toque em **Atualizar**, ou limpe os dados do site no navegador e visite o endereço novamente. Limpar os dados do site também apaga diário e avaliações locais; faça isso apenas se necessário.
 
 ## Ícones
 
@@ -52,6 +54,8 @@ Os PNGs prontos estão em `icons/`. Para recriá-los, abra `gerar-icones.html` e
 ## Teste rápido
 
 - Adivinhação: palpites de 1 a 100, dicas e faixa da aba Estratégia.
+- Grimório: confira que 13 = 1 + 4 + 8 no ritual e na forja; vença um dragão com a soma exata.
+- Detetive: confira pesos, quociente, resto, verificador e a diferença entre passar no cálculo e ser um documento real.
 - Frac-Soma: leve peças das linhas à soma, revele equivalências, digite frações equivalentes e avance pelos oito desafios; teste também toque e teclado.
 - Abelha: jogue sozinho e em dupla, erre/acertе tipos, confira movimento e imprima a folha.
 - Polígonos: desenhe triângulo e hexágono, confira ângulos.

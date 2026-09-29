@@ -1,0 +1,35 @@
+/* Entrada do Laboratório */
+main.inicio{max-width:1240px;padding-top:clamp(1rem,3vw,2rem);padding-bottom:3rem}
+.hero-inicio{display:grid;grid-template-columns:1fr 1.02fr;min-height:430px;overflow:hidden;border:1px solid var(--linha);border-radius:1.35rem;background:var(--papel);box-shadow:var(--sombra)}
+.hero-texto{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:clamp(1.5rem,5vw,4.2rem)}
+.sobretitulo{display:block;color:var(--destaque);font-size:.73rem;font-weight:800;letter-spacing:.15em;line-height:1.4}
+.hero-texto h1{max-width:11ch;margin:1.1rem 0 1rem;font-family:Georgia,'Times New Roman',serif;font-size:clamp(2.6rem,4.8vw,4.6rem);font-weight:500;line-height:1.04;letter-spacing:-.05em}
+.hero-texto p{max-width:39ch;color:var(--sec);font-size:1.06rem;line-height:1.65;margin:0 0 1.6rem}
+.hero-acao{display:inline-flex;align-items:center;gap:1.5rem;background:var(--texto);border:1px solid var(--texto);border-radius:.55rem;color:var(--papel);font-weight:700;text-decoration:none;padding:.85rem 1.2rem;min-height:3rem;transition:transform .2s ease,background .2s ease}
+.hero-acao:hover{background:var(--destaque);border-color:var(--destaque);transform:translateY(-2px)}
+.hero-acao span{font-size:1.2rem;line-height:1}
+.hero-nota{display:block;color:var(--sec);font-size:.78rem;margin-top:1.35rem}
+.hero-foto{background:#e4ddd0 url('../images/laboratorio-hero.webp') center right/cover no-repeat;min-height:360px}
+.secao-inicio{margin-top:clamp(2.5rem,5vw,4.5rem)}
+.secao-cabecalho{display:flex;align-items:end;justify-content:space-between;gap:1.2rem;margin-bottom:1.25rem}
+.secao-cabecalho h2{margin:.35rem 0 0;font-family:Georgia,'Times New Roman',serif;font-weight:500;font-size:clamp(1.85rem,3vw,2.55rem);letter-spacing:-.035em}
+.secao-cabecalho p{color:var(--sec);margin:0 0 .2rem}
+.inicio .grade{gap:.85rem}
+.grade-destaques{grid-template-columns:repeat(3,minmax(0,1fr))}
+.grade-acervo{grid-template-columns:repeat(4,minmax(0,1fr))}
+.cartao-inicio{display:flex;flex-direction:column;min-height:220px;padding:1.35rem;border-radius:.85rem;box-shadow:none;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+.cartao-inicio:hover{border-color:var(--destaque);box-shadow:0 16px 30px #143d4a14}
+.cartao-topo{display:flex;justify-content:space-between;align-items:start;min-height:3.3rem}
+.cartao-inicio .icone{display:grid;place-items:center;width:2.8rem;height:2.8rem;border-radius:.6rem;background:var(--claro);font-family:Georgia,serif;font-size:1.6rem;color:var(--destaque)}
+.cartao-seta{font-size:1.25rem;color:var(--sec)}
+.cartao-assunto{font-size:.69rem;font-weight:800;letter-spacing:.12em;color:var(--destaque);margin-top:1.2rem}
+.cartao-inicio h3{font-size:1.2rem;line-height:1.2;letter-spacing:-.015em;margin:.45rem 0 .4rem}
+.cartao-inicio p{color:var(--sec);font-size:.89rem;line-height:1.5;margin:0}
+.cartao-inicio small{margin-top:.7rem;color:var(--destaque);font-weight:700}
+.grade-destaques .cartao-inicio{min-height:255px}
+.inicio-rodape{color:var(--sec);border-top:1px solid var(--linha);margin-top:3rem;padding-top:1.5rem;font-size:.85rem}
+@media(max-width:900px){.grade-acervo{grid-template-columns:repeat(2,minmax(0,1fr))}.hero-inicio{grid-template-columns:1.1fr 1fr}.hero-texto h1{font-size:clamp(2.5rem,5vw,3.6rem)}}
+@media(max-width:680px){.hero-inicio{display:flex;flex-direction:column-reverse}.hero-foto{min-height:230px;background-position:center 55%}.hero-texto{padding:1.5rem}.hero-texto h1{font-size:clamp(2.5rem,9vw,3.5rem);max-width:14ch}.hero-texto p{font-size:1rem}.grade-destaques{grid-template-columns:1fr}.grade-destaques .cartao-inicio{min-height:0}.secao-cabecalho{align-items:start;flex-direction:column;gap:.3rem}.secao-cabecalho p{font-size:.9rem}}
+@media(max-width:440px){.grade-acervo{grid-template-columns:1fr}.cartao-inicio{min-height:0}}
+@media(prefers-reduced-motion:reduce){.hero-acao,.cartao-inicio{transition:none}}
+@media print{.hero-foto{display:none}.hero-inicio{display:block}.inicio .grade{display:block}.inicio .cartao-inicio{break-inside:avoid}}

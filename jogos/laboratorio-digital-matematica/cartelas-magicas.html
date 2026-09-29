@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>O Grimório das Seis Runas · Laboratório Digital</title>
+<meta name="description" content="Cartelas mágicas, potências de 2 e base binária em quatro atividades interativas.">
+<style>
+:root{--bg:#f1eefb;--star:#d9d1f3;--card:#fff;--tx:#231a4a;--mut:#5d5488;--pri:#6a3fd6;--ok:#1f7a3a;--bad:#c62828;--line:#cfc6ee;--gold:#a8620a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#120d26;--star:#3a2f6b;--card:#1d1640;--tx:#efeaff;--mut:#b3a8dd;--pri:#b79cff;--ok:#79e29a;--bad:#ff8f8f;--line:#3d3270;--gold:#f4c95d}}
+:root[data-theme="dark"]{--bg:#120d26;--star:#3a2f6b;--card:#1d1640;--tx:#efeaff;--mut:#b3a8dd;--pri:#b79cff;--ok:#79e29a;--bad:#ff8f8f;--line:#3d3270;--gold:#f4c95d}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;color:var(--tx);font:1rem/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background-color:var(--bg);background-image:radial-gradient(var(--star) 1.2px,transparent 1.6px),radial-gradient(var(--star) 1px,transparent 1.4px);background-size:57px 57px,89px 89px;background-position:0 0,23px 41px;min-height:100vh}
+main{max-width:38rem;margin:0 auto;padding:1rem}
+h1,h2,h3{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;line-height:1.2;margin:.2rem 0 .5rem}
+h1{font-size:2rem;color:var(--gold)}h2{font-size:1.3rem}h3{font-size:1.1rem;text-align:center;margin:0 0 .5rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:.75rem;padding:1rem;margin:.8rem 0}
+.mut{color:var(--mut);font-size:.9rem}
+.tabs{display:flex;gap:.35rem;flex-wrap:wrap;margin:.6rem 0}
+button{font:inherit;min-height:3rem;padding:.5rem 1rem;border-radius:.6rem;border:2px solid var(--pri);background:var(--pri);color:#fff;font-weight:600;cursor:pointer;margin:.2rem .2rem .2rem 0}
+button.sec{background:transparent;color:var(--pri)}
+button.on{background:var(--gold);border-color:var(--gold);color:#120d26}
+button:focus-visible,input:focus-visible{outline:3px solid var(--tx);outline-offset:2px}
+.cartela{border:3px solid var(--rc,var(--pri));border-radius:.7rem;padding:.6rem;background:var(--card)}
+.cartela h3{color:var(--rc,var(--tx))}
+.nums{display:grid;grid-template-columns:repeat(4,1fr);gap:.3rem;font-family:"Courier New",monospace;font-size:1.35rem;font-weight:700;text-align:center}
+.nums span{padding:.2rem;border:1px solid var(--line);border-radius:.3rem}
+.big{font-family:"Iowan Old Style",Georgia,serif;font-size:3.6rem;font-weight:700;text-align:center;color:var(--gold)}
+.tt{text-align:center;font-weight:700;font-size:1.2rem}
+.runes{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;margin:.5rem 0}
+button.rn{min-width:0;width:100%;margin:0;background:transparent;color:var(--tx);border-color:var(--rc);flex-direction:column;line-height:1.2}
+button.rn[aria-pressed="true"]{background:var(--rc);color:#120d26}
+.dragon{text-align:center;font-size:3rem;line-height:1.1}
+.dragon b{display:block;font-size:1.1rem;font-family:"Courier New",monospace}
+input{width:6rem;min-height:2.75rem;font:inherit;font-size:1.1rem;text-align:center;border:2px solid var(--line);border-radius:.5rem;background:var(--card);color:var(--tx)}
+.good{color:var(--ok);font-weight:600}.wrong{color:var(--bad);font-weight:600}
+@media (prefers-reduced-motion:no-preference){.big{animation:glow 1.6s ease-in-out infinite alternate}@keyframes glow{from{text-shadow:0 0 4px transparent}to{text-shadow:0 0 18px var(--gold)}}}
+.fig{display:flex;justify-content:center;align-items:flex-end;gap:.5rem;margin-bottom:.5rem}.fig svg{width:min(9rem,38vw);height:auto}
+#print{display:none}
+@media print{main{display:none}#print{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}body{background:#fff;color:#000}.cartela{break-inside:avoid;border-color:#000}.cartela h3{color:#000}}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) button:not(.sec):not(.rn):not(.on){color:#120d26}}
+:root[data-theme="dark"] button:not(.sec):not(.rn):not(.on){color:#120d26}
+.back{font-size:.9rem;margin-bottom:.4rem}.back a{color:var(--pri);font-weight:600}
+</style>
+</head>
+<body>
+<main><nav class="back" aria-label="Voltar ao laboratório"><a href="./index.html#/">← Todos os jogos</a></nav><div id="app"></div></main>
+<div id="print"></div>
+<script>
+const app=document.getElementById('app');
+const R=[{e:'🔥',n:'Fogo',c:'#ff6b3d'},{e:'💧',n:'Água',c:'#3da5ff'},{e:'🌿',n:'Terra',c:'#3fae5a'},{e:'🌪️',n:'Vento',c:'#4cbfd6'},{e:'✨',n:'Luz',c:'#e0a800'},{e:'🌑',n:'Sombra',c:'#8e6bd6'}];
+const nums=k=>{const a=[];for(let n=1;n<64;n++)if(n>>k&1)a.push(n);return a};
+const val=a=>a.reduce((s,b,i)=>s+(b?1<<i:0),0);
+const rc=k=>`style="--rc:${R[k].c}"`;
+const cardHTML=k=>`<div class="cartela" ${rc(k)}><h3>${R[k].e} Runa de ${R[k].n} (vale ${1<<k})</h3><div class="nums">${nums(k).map(n=>`<span>${n}</span>`).join('')}</div></div>`;
+const conta=a=>{const t=a.map((b,i)=>b?`${R[i].e}${1<<i}`:'').filter(Boolean);return t.length?t.join(' + ')+' = '+val(a):'0'};
+const titulo=p=>p===63?'👑 LENDA: todas as runas!':p>=48?'🧙 Arquimago':p>=32?'⚡ Mago de Elite':p>=16?'🗡️ Aventureiro':'🌱 Aprendiz';
+const S=(inner,lbl,dim)=>`<svg viewBox="0 0 100 100" role="img" aria-label="${lbl}" ${dim?'style="opacity:.35"':''}><circle cx="50" cy="50" r="48" fill="var(--card)" stroke="var(--line)" stroke-width="2"/>${inner}</svg>`;
+const tier=p=>p>=63?4:p>=48?3:p>=32?2:p>=16?1:0;
+const O=' stroke="#2a1f57" stroke-width="2" stroke-linejoin="round"';
+const face=(y,d,dead)=>(dead?`<path d="M${50-d-3} ${y-3}l6 6M${50-d+3} ${y-3}l-6 6M${50+d-3} ${y-3}l6 6M${50+d+3} ${y-3}l-6 6" stroke="#2a1f57" stroke-width="2" stroke-linecap="round"/>`:`<ellipse cx="${50-d}" cy="${y}" rx="3.4" ry="4.4" fill="#2a1f57"/><ellipse cx="${50+d}" cy="${y}" rx="3.4" ry="4.4" fill="#2a1f57"/><circle cx="${50-d-1}" cy="${y-1.8}" r="1.4" fill="#fff"/><circle cx="${50+d-1}" cy="${y-1.8}" r="1.4" fill="#fff"/>`)+`<ellipse cx="${50-d-6}" cy="${y+7}" rx="4" ry="2.5" fill="#ff8fb0" opacity=".8"/><ellipse cx="${50+d+6}" cy="${y+7}" rx="4" ry="2.5" fill="#ff8fb0" opacity=".8"/><path d="M46 ${y+8}Q50 ${y+12} 54 ${y+8}" stroke="#2a1f57" stroke-width="1.8" fill="none" stroke-linecap="round"/>`;
+const wizard=()=>S(`<path d="M27 96Q28 64 50 62Q72 64 73 96Z" fill="#6a3fd6"${O}/><circle cx="40" cy="80" r="2" fill="#ffd84a"/><circle cx="60" cy="86" r="2" fill="#ffd84a"/><circle cx="50" cy="50" r="20" fill="#ffe0c2"${O}/><path d="M33 58Q33 84 50 86Q67 84 67 58Q50 68 33 58Z" fill="#fff"${O}/>${face(48,8)}<ellipse cx="50" cy="38" rx="29" ry="7" fill="#4b2fa8"${O}/><path d="M32 38Q46 22 58 5Q60 26 68 38Z" fill="#6a3fd6"${O}/><path d="M50 30l1.6 3.4 3.6.4-2.7 2.4.8 3.6-3.3-1.9-3.3 1.9.8-3.6-2.7-2.4 3.6-.4z" fill="#ffd84a"/><circle cx="58" cy="6" r="3.5" fill="#ffd84a"${O}/><path d="M87 92V34" stroke="#a06a35" stroke-width="4" stroke-linecap="round"/><circle cx="87" cy="28" r="7" fill="#ffd84a"${O}/><circle cx="85" cy="26" r="2" fill="#fff"/>`,'Mestre Arcano, o mago');
+const heroT=(t,dim)=>{const col=['#4fc46a','#4aa8ff','#9a78e6','#7a4fe0','#ffc21a'][t];
+ return S(`${t===4?'<circle cx="50" cy="50" r="45" fill="none" stroke="#ffd84a" stroke-width="2.5" stroke-dasharray="3 4" stroke-linecap="round"/>':''}${t>=2?`<path d="M32 60Q19 78 24 94Q50 99 76 94Q81 78 68 60Z" fill="#e0457b"${O}/>`:''}<rect x="36" y="62" width="28" height="30" rx="11" fill="${col}"${O}/><circle cx="50" cy="42" r="20" fill="#ffe0c2"${O}/>${t<3?`<path d="M30 42Q29 21 50 21Q71 21 70 42Q62 32 50 35Q38 32 30 42Z" fill="#7a4a24"${O}/>`:''}${face(45,8)}${t>=1?`<path d="M73 78V54" stroke="#cfd6e4" stroke-width="5" stroke-linecap="round"/><path d="M68.5 54L73 45L77.5 54Z" fill="#eef2f9"${O}/><path d="M66 78H80" stroke="#ffc21a" stroke-width="3.5" stroke-linecap="round"/><path d="M73 79V85" stroke="#a06a35" stroke-width="3.5" stroke-linecap="round"/>`:''}<circle cx="33" cy="76" r="4.6" fill="#ffe0c2"${O}/><circle cx="${t>=1?71:67}" cy="${t>=1?79:76}" r="4.6" fill="#ffe0c2"${O}/>${t===3?`<ellipse cx="50" cy="27" rx="26" ry="6.5" fill="#4b2fa8"${O}/><path d="M34 27Q46 15 56 3Q59 17 66 27Z" fill="#7a4fe0"${O}/>`:''}${t===4?`<path d="M35 25L37 9L44 17L50 6L56 17L63 9L65 25Z" fill="#ffd84a"${O}/><circle cx="50" cy="19" r="2.2" fill="#e0457b"/>`:''}`,'Herói de nível '+(t+1),dim)};
+const dragon=(n,dead)=>{const [c,dk,lt]=[['#6fd07a','#3f9a52','#d5f5da'],['#5aa9f0','#3a78c2','#d6e8fb'],['#a884e8','#7550c0','#e8dcfa'],['#ffa056','#d1712a','#ffe3cc'],['#ff7fae','#d14f80','#ffd9e7']][n%5];
+ return S(`<ellipse cx="22" cy="58" rx="9" ry="15" transform="rotate(-30 22 58)" fill="${dk}"${O}/><ellipse cx="78" cy="58" rx="9" ry="15" transform="rotate(30 78 58)" fill="${dk}"${O}/><path d="M68 80Q94 88 90 60Q84 74 70 72Z" fill="${c}"${O}/><ellipse cx="50" cy="70" rx="22" ry="19" fill="${c}"${O}/><ellipse cx="50" cy="74" rx="13" ry="12" fill="${lt}"/><ellipse cx="38" cy="89" rx="8" ry="4" fill="${dk}"${O}/><ellipse cx="62" cy="89" rx="8" ry="4" fill="${dk}"${O}/><path d="M34 26L29 8L44 20ZM66 26L71 8L56 20Z" fill="#fff3d1"${O}/><circle cx="50" cy="40" r="22" fill="${c}"${O}/><ellipse cx="50" cy="50" rx="11" ry="7.5" fill="${lt}"/><circle cx="46" cy="49" r="1.2" fill="#2a1f57"/><circle cx="54" cy="49" r="1.2" fill="#2a1f57"/>${face(38,10,dead)}${dead?'<path d="M47 57Q50 64 53 57Z" fill="#ff8fa3"/><circle cx="26" cy="22" r="2.5" fill="#ffd84a"/><circle cx="76" cy="20" r="2.5" fill="#ffd84a"/><circle cx="50" cy="14" r="2" fill="#ffd84a"/>':''}`,dead?'Dragão derrotado':'Dragão')};
+function nextD(){B.won=false;if(B.n<5)B.d=hpNew();draw()}
+document.getElementById('print').innerHTML=[0,1,2,3,4,5].map(cardHTML).join('');
+
+let tab='ritual',step=0,resp=[],started=false,pl=[0,0,0,0,0,0],B=null;
+const tabs=[['ritual','🔮 Ritual'],['forja','⚒️ Forja'],['batalha','🐉 Batalha'],['segredo','📜 Segredo']];
+const runeBtns=(a,fn)=>`<div class="runes">${a.map((b,i)=>`<button class="rn" ${rc(i)} aria-pressed="${!!b}" onclick="${fn}(${i})">${R[i].e}<br>${R[i].n}<br>${1<<i}</button>`).join('')}</div>`;
+function draw(){
+  const body={ritual,forja,batalha,segredo}[tab]();
+  app.innerHTML=`<h1>🔮 O Grimório das Seis Runas</h1><nav class="tabs" aria-label="Modos de jogo">${tabs.map(([k,t])=>`<button class="${k===tab?'on':'sec'}" aria-pressed="${k===tab}" onclick="tab='${k}';draw()">${t}</button>`).join('')}</nav>${body}`;
+  if(tab==='segredo')upd();
+}
+function ritual(){
+  if(!started)return `<div class="card"><div class="fig">${wizard()}</div><p>Eu sou o Mestre Arcano e leio mentes. Imagine o <b>nível de poder</b> do seu herói, um número de <b>1 a 63</b>, e não conte a ninguém.</p><p class="mut">Vou mostrar seis pergaminhos, um para cada runa. Diga se o seu número está neles.</p><button onclick="started=true;draw()">Já pensei!</button></div>`;
+  if(step<6)return `<p class="mut">Pergaminho ${step+1} de 6</p>${cardHTML(step)}<h2>A Runa de ${R[step].n} brilha no seu número?</h2><button onclick="resp[${step}]=1;step++;draw()">Sim (1)</button><button class="sec" onclick="resp[${step}]=0;step++;draw()">Não (0)</button>${step?'<button class="sec" onclick="step--;resp.length=step;draw()">Voltar</button>':''}`;
+  const v=val(resp);
+  return `<div class="card">${v?`<div class="fig">${heroT(tier(v))}</div><p style="text-align:center">Vejo tudo... O poder do seu herói é</p><div class="big">${v}</div><p class="tt">${titulo(v)}</p><p style="text-align:center"><b>${conta(resp)}</b></p><p class="mut">Cada runa acesa soma o seu valor. O truque: os valores 1, 2, 4, 8, 16 e 32 dobram a cada runa.</p>`:'<p>Nenhuma runa brilhou. Isso daria poder 0, mas o herói vai de 1 a 63. Tente de novo!</p>'}</div><button onclick="step=0;resp=[];started=false;draw()">Ler outra mente</button>`;
+}
+function forja(){
+  const v=val(pl);
+  return `<div class="card"><div class="fig">${heroT(tier(v),!v)}</div><p>Na Forja você acende as runas e cria um herói. Cada runa ativa (1) soma o seu valor; apagada (0), não soma nada.</p>${runeBtns(pl,'fg')}<div class="big">${v}</div><p class="tt">${v?titulo(v):'Sem poder algum'}</p><p style="text-align:center" class="mut">${conta(pl)}</p><p style="text-align:center" class="mut">Respostas: ${pl.map((b,i)=>`R${i+1}=${b}`).join(' ')}</p></div><button class="sec" onclick="pl=[0,0,0,0,0,0];draw()">Apagar todas</button>`;
+}
+function fg(i){pl[i]^=1;draw()}
+const RANGE=[[1,15],[8,30],[16,45],[30,63],[40,63]];
+function hpNew(){const [a,b]=RANGE[B.n];return a+(Math.random()*(b-a+1)|0)}
+function batalha(){
+  if(!B){B={n:0,xp:0,hp:3,miss:0,sel:[0,0,0,0,0,0],msg:'',cls:''};B.d=hpNew()}
+  if(B.won)return `<div class="card"><div class="fig">${heroT(Math.min(B.n,4))}${dragon(B.n-1,1)}</div><h2>Dragão derrotado! +${B.gain} XP</h2></div><button onclick="nextD()">${B.n===5?'Ver resultado':'Próximo dragão'}</button>`;
+  if(B.hp<=0)return `<div class="card"><div class="fig">${dragon(B.n)}</div><h2>O dragão venceu desta vez</h2><p>Você chegou ao dragão ${B.n+1} com ${B.xp} XP. Cuidado: se passar do dano, o dragão contra-ataca.</p></div><button onclick="B=null;draw()">Tentar de novo</button>`;
+  if(B.n===5)return `<div class="card"><div class="fig">${heroT(4)}</div><h2>Os cinco dragões caíram!</h2><p>XP total: <b>${B.xp}</b>. ${B.xp>=45?'Você é um Arquimago do Grimório!':B.xp>=30?'Você é um Mago de Elite!':'Você é um Aventureiro corajoso!'}</p></div><button onclick="B=null;draw()">Nova aventura</button>`;
+  const dano=val(B.sel);
+  return `<p class="mut">Dragão ${B.n+1} de 5 · XP ${B.xp} · ${'❤️'.repeat(B.hp)}${'🖤'.repeat(3-B.hp)}</p><div class="card"><div class="fig">${heroT(Math.min(B.n,4))}${dragon(B.n)}</div><p class="tt">🐉 Vida: ${B.d}</p><p style="text-align:center">Acenda as runas para causar <b>exatamente ${B.d}</b> de dano.</p>${runeBtns(B.sel,'bt')}<p class="tt">Dano do feitiço: ${dano}</p><p class="${B.cls}" role="status">${B.msg}</p></div><button onclick="cast()">Lançar feitiço</button>`;
+}
+function bt(i){B.sel[i]^=1;B.msg='';draw()}
+function cast(){
+  const dano=val(B.sel);
+  if(!dano){B.msg='Acenda pelo menos uma runa.';B.cls='wrong';return draw()}
+  if(dano===B.d){
+    B.gain=Math.max(10-2*B.miss,4);B.xp+=B.gain;B.n++;B.miss=0;B.sel=[0,0,0,0,0,0];B.msg='';B.won=true;
+  }else if(dano<B.d){B.miss++;B.msg=`Faltaram ${B.d-dano} de dano. Falta uma runa?`;B.cls='wrong'}
+  else{B.miss++;B.hp--;B.msg=`Passou ${dano-B.d} do dano! O dragão contra-ataca 💥`;B.cls='wrong'}
+  draw();
+}
+function segredo(){
+  return `<div class="card"><div class="fig">${wizard()}</div><p>O segredo do Mestre Arcano: os valores das runas <b>dobram</b> a cada uma (1, 2, 4, 8, 16, 32) e todo número de 1 a 63 tem uma única receita feita com elas. Em Matemática, isso é escrever o número em <b>base 2</b>.</p><p>Cada resposta Sim ou Não corta os números possíveis pela metade. Depois de 6 respostas, sobra só um.</p></div>
+  <div class="card"><label for="pn"><b>Escolha um poder de 1 a 63:</b></label> <input id="pn" inputmode="numeric" value="13" oninput="upd()"><div id="ex"></div></div>
+  <button class="sec" onclick="window.print()">Imprimir os 6 pergaminhos</button>`;
+}
+function upd(){
+  const n=+document.getElementById('pn').value,o=document.getElementById('ex');
+  if(!/^(?:[1-9]|[1-5]\d|6[0-3])$/.test(document.getElementById('pn').value.trim())){o.innerHTML='<p class="wrong">Digite um número de 1 a 63.</p>';return}
+  const a=[0,1,2,3,4,5].map(i=>n>>i&1);
+  o.innerHTML=`<p>Receita: <b>${conta(a)}</b></p><p>Em base 2: <b>${[...a].reverse().join('')}</b></p><p class="mut">Aparece nos pergaminhos: ${a.map((b,i)=>b?R[i].e+' '+R[i].n:'').filter(Boolean).join(', ')}</p>`;
+}
+draw();
+</script>
+</body>
+</html>
