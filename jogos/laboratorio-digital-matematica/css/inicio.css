@@ -63,6 +63,7 @@ main.modulo-com-personagem .mascote-modulo.falando::after{content:attr(data-fala
   .hero-personagens .sprite-fracsoma{animation:chibi-flutuar 4.2s ease-in-out -2.2s infinite}
   .cartao-inicio{animation:chibi-entrada .55s ease-out both;animation-delay:var(--delay,0ms)}
   .cartao-personagem,.grade-acervo .cartao-personagem{transition:scale .25s ease,translate .25s ease}
+  .cartao-inicio.visivel .cartao-personagem{animation:chibi-flutuar 4.8s ease-in-out infinite;animation-delay:var(--delay,0ms)}
   .cartao-inicio:hover .cartao-personagem,.cartao-inicio:focus-visible .cartao-personagem{scale:1.06;animation:chibi-ola .85s ease-in-out 1}
   main.modulo-com-personagem .mascote-modulo{animation:chibi-flutuar 4.5s ease-in-out infinite}
   .hero-personagens .personagem-hero.reagindo,main.modulo-com-personagem .mascote-modulo.reagindo{animation:chibi-ola .85s ease-in-out 2}

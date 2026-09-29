@@ -16,6 +16,7 @@ const falas={
   estacao:'Papel ou tela? Experimente!'
 };
 let atual=null;
+let visibilidade=null;
 
 function reagir(personagem,fala){
   personagem.classList.remove('reagindo');
@@ -46,6 +47,7 @@ function cartao(c,feitos,ordem=0){
 export async function navegar(){
   const slug=location.hash.replace(/^#\/?/,'').split('/')[0];
   const main=document.querySelector('main');
+  visibilidade?.disconnect();visibilidade=null;
   if(atual?.desmontar)atual.desmontar();
   atual=null;
   main.replaceChildren();
@@ -72,11 +74,18 @@ export async function navegar(){
       });
       ativarTeclado(personagem);
     });
+    const cartoes=main.querySelectorAll('.cartao-inicio');
+    if('IntersectionObserver' in window){
+      visibilidade=new IntersectionObserver(entradas=>{
+        entradas.forEach(entrada=>entrada.target.classList.toggle('visivel',entrada.isIntersecting));
+      },{rootMargin:'50px',threshold:.1});
+      cartoes.forEach(cartao=>visibilidade.observe(cartao));
+    }else cartoes.forEach(cartao=>cartao.classList.add('visivel'));
     main.focus({preventScroll:true});return;
   }
   if(!caminhos[slug]){main.innerHTML='<h1>Página não encontrada</h1><a href="#/">Voltar ao início</a>';return}
   try{
-    const revisao=slug==='fracsoma'?'?v=14':'';
+    const revisao=slug==='fracsoma'?'?v=15':'';
     const modulo=await import(`../modulos/${caminhos[slug]}/index.js${revisao}`);
     if(location.hash.replace(/^#\/?/,'').split('/')[0]!==slug)return;
     atual=modulo;modulo.montar(main);
