@@ -154,7 +154,7 @@ export class ChibiCharacter {
     return gltf;
   }
 
-  estado(nome,duracao=1){this.acao=nome;this.tempoAcao=Math.max(.2,duracao);this.silencio=0;
+  estado(nome,duracao=1){this.acao=nome;this.duracaoAcao=Math.max(.2,duracao);this.tempoAcao=this.duracaoAcao;this.silencio=0;
     if(this.mixer){
       const acao=this.clipes.get(nome)||this.clipes.get('idle');
       if(acao&&acao!==this.acaoModelo){acao.reset().fadeIn(.18).play();this.acaoModelo?.fadeOut(.18);this.acaoModelo=acao}
@@ -187,7 +187,7 @@ export class ChibiCharacter {
     this.tempoPiscar=Math.max(0,this.tempoPiscar-dt);
     const andando=['andar','correr'].includes(this.acao),vel=this.acao==='correr'?14:9;
     const marcha=andando?Math.sin(this.clock*vel):0;
-    const fase=1-Math.min(1,this.tempoAcao*4);
+    const fase=1-THREE.MathUtils.clamp(this.tempoAcao/(this.duracaoAcao||1),0,1);
     const impulso=['pular','cair','atacar','magia'].includes(this.acao)?Math.sin(Math.min(1,fase)*PI):0;
     const comemorando=this.acao==='comemorar',errando=['errar','dano','derrota'].includes(this.acao);
     const falar=!!this.elementoFala;

@@ -24,9 +24,23 @@ const falas={
   derrota:['Vamos respirar e tentar de novo.','Na próxima a gente consegue!','Cada tentativa ensina um pouco.'],
   parado:['Está pensando? Eu espero você.','Uma pista pode mudar tudo!','Vamos explorar mais um pouco?']
 };
+const falasTematicas={
+  mago:{inicio:['Acenda as runas e descubra seu poder!','Cada runa guarda uma pista matemática.','Um feitiço de cada vez, jovem aprendiz!'],acerto:['As runas brilharam! Boa soma!','O feitiço encaixou direitinho!']},
+  detetive:{inicio:['Uma pista está nos dígitos!','Vamos investigar esse resto?','Agente, observe os números!'],erro:['Revise os pesos; a pista está na conta.','Até detetive erra. Olhe o resto!']},
+  fracsoma:{inicio:['Vamos juntar as peças!','Uma fração de cada vez!','Qual peça completa a soma?'],acerto:['As peças se encaixaram!','Sua soma ficou certinha!']},
+  adivinhacao:{inicio:['Menos palpites, mais estratégia!','Divida as possibilidades ao meio!']},
+  abelha:{inicio:['A flor espera por nós!','Qual fração abre o caminho?']},
+  poligonos:{inicio:['Cada lado conta uma história!','Que giro forma esta figura?']},
+  divisores:{inicio:['Vamos formar pares de fatores!','Quantos divisores você encontra?']},
+  cpf:{inicio:['Confira os restos da conta!','Os dígitos verificadores dão pistas.']},
+  kente:{inicio:['Descubra o padrão do tecido!','As cores também contam histórias.']},
+  estacao:{inicio:['Papel e tela, duas formas de investigar!','Teste uma ideia em cada estação.']},
+  heroi:{inicio:['Escolha as runas e me dê poder!','Vamos enfrentar esse dragão juntos!'],vitoria:['Os cinco dragões caíram!','Vitória! A soma certa venceu!']},
+  dragao:{inicio:['Raa! Monte o dano exato!','Será que suas runas me alcançam?']}
+};
 const ultimas=new Map();
 function sortear(id,tipo){
-  const lista=falas[tipo]||falas.inicio,chave=`${id}:${tipo}`;
+  const lista=falasTematicas[id]?.[tipo]||falas[tipo]||falas.inicio,chave=`${id}:${tipo}`;
   const alternativas=lista.filter(f=>f!==ultimas.get(chave));
   const texto=alternativas[Math.floor(Math.random()*alternativas.length)];ultimas.set(chave,texto);return texto;
 }
@@ -83,7 +97,7 @@ function iniciar(){
       fala.lang='pt-BR';fala.rate=1.07;fala.pitch=1.27;speechSynthesis.speak(fala);
     }
   }
-  function limpar(item){item.balao?.remove();item.personagem.descartar();item.elemento.classList.remove('chibi3d-pronto')}
+  function limpar(item){item.balao?.remove();item.personagem.root.removeFromParent();item.personagem.descartar();item.elemento.classList.remove('chibi3d-pronto')}
   function sincronizar(){
     pendente=false;
     for(const [el,item] of ativos)if(!el.isConnected){limpar(item);ativos.delete(el)}
@@ -91,7 +105,7 @@ function iniciar(){
       if(ativos.has(elemento))continue;
       const id=idDe(elemento);if(!id)continue;
       const personagem=new ChibiCharacter(perfis[id]);cena.add(personagem.root);
-      const item={elemento,id,personagem,balao:null,ultimoIdle:0};ativos.set(elemento,item);
+      const item={elemento,id,personagem,balao:null};ativos.set(elemento,item);
       elemento.classList.add('chibi3d-pronto');
       if(!elemento.classList.contains('cartao-personagem')){
         elemento.addEventListener('click',()=>dizer(item,'inicio'));
@@ -132,9 +146,8 @@ function iniciar(){
       const r=item.elemento.getBoundingClientRect();
       if(r.width<45||r.height<45||r.bottom<0||r.top>altura||r.right<0||r.left>largura){if(item.balao)item.balao.hidden=true;continue}
       item.personagem.atualizar(dt);
-      if(item.personagem.silencio>16&&item.ultimoIdle!==Math.floor(item.personagem.silencio/16)&&
-        !item.elemento.classList.contains('cartao-personagem')){
-        item.ultimoIdle=Math.floor(item.personagem.silencio/16);dizer(item,'parado');
+      if(item.personagem.silencio>16&&!item.elemento.classList.contains('cartao-personagem')){
+        dizer(item,'parado');
       }
       if(item.balao&&!item.balao.hidden){
         item.balao.style.left=`${Math.min(largura-120,Math.max(120,r.left+r.width/2))}px`;
