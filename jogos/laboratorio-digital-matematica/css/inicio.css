@@ -1,48 +1,54 @@
-/* Entrada do Laboratório */
+/* Cenário e personagens do Laboratório */
 main[tabindex]:focus-visible{outline:none}
+body.pagina-inicio{background:linear-gradient(#f3eee0a3,#f3eee0d9),url('../images/laboratorio-chibi.webp') center center/cover fixed}
+body.pagina-modulo{background:linear-gradient(#f4f5eee8,#f4f5eef0),url('../images/laboratorio-chibi.webp') center center/cover fixed}
+body.pagina-inicio .cabecalho,body.pagina-modulo .cabecalho{background:color-mix(in srgb,var(--papel) 91%,transparent);backdrop-filter:blur(12px)}
 main.inicio{max-width:1240px;padding-top:clamp(1rem,3vw,2rem);padding-bottom:3rem}
-.hero-inicio{display:grid;grid-template-columns:1fr 1.02fr;min-height:430px;overflow:hidden;border:1px solid var(--linha);border-radius:1.35rem;background:var(--papel);box-shadow:var(--sombra)}
-.hero-texto{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:clamp(1.5rem,5vw,4.2rem)}
+.hero-inicio{display:grid;grid-template-columns:1fr 1fr;min-height:470px;overflow:hidden;border:1px solid #ffffff99;border-radius:1.6rem;background:linear-gradient(100deg,#fffdf5f2 0%,#fffaf0d9 49%,#fff6e777 100%);box-shadow:0 20px 60px #273b3d26;backdrop-filter:blur(5px)}
+.hero-texto{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:clamp(1.5rem,5vw,4.2rem);z-index:1}
 .sobretitulo{display:block;color:var(--destaque);font-size:.73rem;font-weight:800;letter-spacing:.15em;line-height:1.4}
-.hero-texto h1{max-width:11ch;margin:1.1rem 0 1rem;font-family:Georgia,'Times New Roman',serif;font-size:clamp(2.6rem,4.8vw,4.6rem);font-weight:500;line-height:1.04;letter-spacing:-.05em}
-.hero-texto p{max-width:39ch;color:var(--sec);font-size:1.06rem;line-height:1.65;margin:0 0 1.6rem}
-.hero-acao{display:inline-flex;align-items:center;gap:1.5rem;background:var(--texto);border:1px solid var(--texto);border-radius:.55rem;color:var(--papel);font-weight:700;text-decoration:none;padding:.85rem 1.2rem;min-height:3rem;transition:transform .2s ease,background .2s ease}
+.hero-texto h1{max-width:12ch;margin:1.1rem 0 1rem;font-family:Georgia,'Times New Roman',serif;font-size:clamp(2.6rem,4.7vw,4.5rem);font-weight:500;line-height:1.04;letter-spacing:-.05em}
+.hero-texto p{max-width:38ch;color:var(--sec);font-size:1.06rem;line-height:1.65;margin:0 0 1.5rem}
+.hero-acao{display:inline-flex;align-items:center;gap:1.5rem;background:var(--texto);border:1px solid var(--texto);border-radius:.75rem;color:var(--papel);font-weight:700;padding:.85rem 1.2rem;min-height:3rem;transition:transform .2s ease,background .2s ease}
 .hero-acao:hover{background:var(--destaque);border-color:var(--destaque);transform:translateY(-2px)}
 .hero-acao span{font-size:1.2rem;line-height:1}
-.hero-nota{display:block;color:var(--sec);font-size:.78rem;margin-top:1.35rem}
-.hero-foto{background:#e4ddd0 url('../images/laboratorio-hero.webp') center right/cover no-repeat;min-height:360px}
-.secao-inicio{margin-top:clamp(2.5rem,5vw,4.5rem)}
+.hero-nota{display:block;color:var(--sec);font-size:.78rem;margin-top:1.25rem}
+.hero-personagens{position:relative;min-height:360px;isolation:isolate}
+.hero-personagens img{position:absolute;width:min(48%,260px);height:auto;max-height:94%;object-fit:contain;bottom:0;left:50%;transform:translateX(-50%);z-index:2;filter:drop-shadow(0 13px 16px #30284455)}
+.hero-personagens .sprite-chibi{position:absolute;width:37%;max-width:205px;bottom:1rem;filter:drop-shadow(0 12px 14px #3028444d)}
+.hero-personagens .sprite-detetive{left:0;z-index:1}.hero-personagens .sprite-fracsoma{right:0;z-index:1}
+.secao-inicio{margin-top:clamp(2rem,4vw,3.5rem);padding:clamp(1rem,2.5vw,1.8rem);border:1px solid #ffffffa8;border-radius:1.5rem;background:color-mix(in srgb,var(--papel) 83%,transparent);box-shadow:0 14px 42px #2038371c;backdrop-filter:blur(12px)}
 .secao-cabecalho{display:flex;align-items:end;justify-content:space-between;gap:1.2rem;margin-bottom:1.25rem}
 .secao-cabecalho h2{margin:.35rem 0 0;font-family:Georgia,'Times New Roman',serif;font-weight:500;font-size:clamp(1.85rem,3vw,2.55rem);letter-spacing:-.035em}
 .secao-cabecalho p{color:var(--sec);margin:0 0 .2rem}
-.inicio .grade{gap:.85rem}
-.grade-destaques{grid-template-columns:repeat(3,minmax(0,1fr))}
-.grade-acervo{grid-template-columns:repeat(4,minmax(0,1fr))}
-.cartao-inicio{display:flex;flex-direction:column;min-height:220px;padding:1.35rem;border-radius:.85rem;box-shadow:none;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
-.cartao-inicio:hover{border-color:var(--destaque);box-shadow:0 16px 30px #143d4a14}
-.cartao-topo{display:flex;justify-content:space-between;align-items:start;min-height:3.3rem}
-.cartao-inicio .icone{display:grid;place-items:center;width:2.8rem;height:2.8rem;border-radius:.6rem;background:var(--claro);font-family:Georgia,serif;font-size:1.6rem;color:var(--destaque)}
+.inicio .grade{gap:.85rem}.grade-destaques{grid-template-columns:repeat(3,minmax(0,1fr))}.grade-acervo{grid-template-columns:repeat(4,minmax(0,1fr))}
+.cartao-inicio{position:relative;display:flex;flex-direction:column;min-height:315px;padding:1.25rem;border-radius:1.1rem;overflow:hidden;box-shadow:none;background:color-mix(in srgb,var(--papel) 83%,var(--cor));border-color:color-mix(in srgb,var(--linha) 70%,var(--cor));color:var(--texto);transition:transform .2s ease,box-shadow .2s ease}
+.cartao-inicio:hover{border-color:var(--destaque);transform:translateY(-3px);box-shadow:0 16px 30px #143d4a26}
+.cartao-topo,.cartao-assunto,.cartao-inicio h3,.cartao-inicio p,.cartao-inicio small{position:relative;z-index:1}
+.cartao-topo{display:flex;justify-content:space-between;align-items:start;min-height:3rem}
+.cartao-inicio .icone{display:grid;place-items:center;width:2.8rem;height:2.8rem;border-radius:.7rem;background:color-mix(in srgb,var(--papel) 65%,var(--cor));font-size:1.5rem;color:var(--texto)}
 .cartao-seta{font-size:1.25rem;color:var(--sec)}
-.cartao-assunto{font-size:.69rem;font-weight:800;letter-spacing:.12em;color:var(--destaque);margin-top:1.2rem}
-.cartao-inicio h3{font-size:1.2rem;line-height:1.2;letter-spacing:-.015em;margin:.45rem 0 .4rem}
-.cartao-inicio p{color:var(--sec);font-size:.89rem;line-height:1.5;margin:0}
+.cartao-assunto{font-size:.69rem;font-weight:800;letter-spacing:.12em;color:var(--destaque);margin-top:.8rem}
+.cartao-inicio h3{font-size:1.18rem;line-height:1.2;letter-spacing:-.015em;margin:.45rem 0 .4rem}
+.cartao-inicio p{color:var(--sec);font-size:.87rem;line-height:1.5;margin:0}
 .cartao-inicio small{margin-top:.7rem;color:var(--destaque);font-weight:700}
-.grade-destaques .cartao-inicio{min-height:255px}
-.inicio-rodape{color:var(--sec);border-top:1px solid var(--linha);margin-top:3rem;padding-top:1.5rem;font-size:.85rem}
-@media(max-width:900px){.grade-acervo{grid-template-columns:repeat(2,minmax(0,1fr))}.hero-inicio{grid-template-columns:1.1fr 1fr}.hero-texto h1{font-size:clamp(2.5rem,5vw,3.6rem)}}
-@media(max-width:680px){.hero-inicio{display:flex;flex-direction:column-reverse}.hero-foto{min-height:230px;background-position:center 55%}.hero-texto{padding:1.5rem}.hero-texto h1{font-size:clamp(2.5rem,9vw,3.5rem);max-width:14ch}.hero-texto p{font-size:1rem}.grade-destaques{grid-template-columns:1fr}.grade-destaques .cartao-inicio{min-height:0}.secao-cabecalho{align-items:start;flex-direction:column;gap:.3rem}.secao-cabecalho p{font-size:.9rem}}
-@media(max-width:440px){.grade-acervo{grid-template-columns:1fr}.cartao-inicio{min-height:0}}
+.grade-destaques .cartao-inicio h3{max-width:58%}.grade-destaques .cartao-inicio p{max-width:54%}
+.cartao-personagem{position:absolute;right:0;bottom:0;width:46%;max-width:190px;height:auto;max-height:77%;object-fit:contain;object-position:bottom;pointer-events:none;filter:drop-shadow(0 8px 8px #26373436)}
+.sprite-chibi{display:block;aspect-ratio:1;background-image:url('../images/personagens-chibi.webp');background-repeat:no-repeat;background-size:300% 300%}
+.sprite-detetive{background-position:0% 0%}.sprite-fracsoma{background-position:50% 0%}.sprite-adivinhacao{background-position:100% 0%}
+.sprite-abelha{background-position:0% 50%}.sprite-poligonos{background-position:50% 50%}.sprite-divisores{background-position:100% 50%}
+.sprite-cpf{background-position:0% 100%}.sprite-kente{background-position:50% 100%}.sprite-estacao{background-position:100% 100%}
+.grade-acervo .cartao-topo{min-height:9rem}.grade-acervo .cartao-personagem{width:9rem;max-width:55%;height:auto;max-height:none;top:.8rem;left:50%;right:auto;bottom:auto;transform:translateX(-50%)}
+.grade-acervo .cartao-inicio h3,.grade-acervo .cartao-inicio p{max-width:none}
+.inicio-rodape{color:var(--texto);background:color-mix(in srgb,var(--papel) 82%,transparent);border-radius:.8rem;margin-top:2rem;padding:1rem 1.2rem;font-size:.85rem}
+main.modulo-com-personagem .mascote-modulo{float:right;width:clamp(90px,16vw,160px);margin:-.8rem 0 .6rem 1rem;filter:drop-shadow(0 10px 10px #143d4a33)}
+main.modulo-com-personagem .objetivo{clear:left}
+:root[data-tema="escuro"] body.pagina-inicio{background-image:linear-gradient(#142229bd,#142229da),url('../images/laboratorio-chibi.webp')}
+:root[data-tema="escuro"] body.pagina-modulo{background-image:linear-gradient(#142229eb,#142229f0),url('../images/laboratorio-chibi.webp')}
+:root[data-tema="escuro"] .hero-inicio{background:linear-gradient(100deg,#1b3036f2,#233342c9,#42384c8e);border-color:#ffffff24}
+@media(prefers-color-scheme:dark){:root:not([data-tema]) body.pagina-inicio{background-image:linear-gradient(#142229bd,#142229da),url('../images/laboratorio-chibi.webp')}:root:not([data-tema]) body.pagina-modulo{background-image:linear-gradient(#142229eb,#142229f0),url('../images/laboratorio-chibi.webp')}:root:not([data-tema]) .hero-inicio{background:linear-gradient(100deg,#1b3036f2,#233342c9,#42384c8e);border-color:#ffffff24}}
+@media(max-width:920px){.grade-destaques{grid-template-columns:repeat(2,minmax(0,1fr))}.grade-destaques .cartao-inicio:last-child{grid-column:span 2}.grade-acervo{grid-template-columns:repeat(2,minmax(0,1fr))}.hero-texto h1{font-size:clamp(2.5rem,5vw,3.6rem)}}
+@media(max-width:680px){.hero-inicio{display:flex;flex-direction:column-reverse}.hero-personagens{min-height:250px}.hero-personagens img{width:180px}.hero-personagens .sprite-chibi{width:135px}.hero-texto{padding:1.5rem}.hero-texto h1{font-size:clamp(2.45rem,9vw,3.5rem);max-width:14ch}.hero-texto p{font-size:1rem}.grade-destaques{grid-template-columns:1fr}.grade-destaques .cartao-inicio:last-child{grid-column:auto}.grade-destaques .cartao-inicio{min-height:270px}.secao-cabecalho{align-items:start;flex-direction:column;gap:.3rem}.secao-cabecalho p{font-size:.9rem}}
+@media(max-width:440px){.grade-acervo{grid-template-columns:1fr}.grade-destaques .cartao-inicio h3{max-width:54%}.grade-destaques .cartao-inicio p{max-width:50%}}
 @media(prefers-reduced-motion:reduce){.hero-acao,.cartao-inicio{transition:none}}
-@media print{.hero-foto{display:none}.hero-inicio{display:block}.inicio .grade{display:block}.inicio .cartao-inicio{break-inside:avoid}}
-
-/* Mestre Arcano em destaque */
-.grade-destaques .cartao-inicio{min-height:300px}
-.cartao-mago{position:relative;overflow:hidden;background:#f4eefc;border-color:#d8cbea}
-.cartao-mago .cartao-topo,.cartao-mago .cartao-assunto,.cartao-mago h3,.cartao-mago p,.cartao-mago small{position:relative;z-index:1}
-.cartao-mago h3{max-width:55%}.cartao-mago p{max-width:52%}
-.cartao-mago .cartao-assunto{color:#633bb3}
-.cartao-personagem{position:absolute;right:-.35rem;bottom:0;width:45%;height:auto;max-height:95%;object-fit:contain;object-position:bottom;pointer-events:none}
-:root[data-tema="escuro"] .cartao-mago{background:#2a213b;border-color:#584a72}
-:root[data-tema="escuro"] .cartao-mago .cartao-assunto{color:#cbb1ff}
-@media(prefers-color-scheme:dark){:root:not([data-tema]) .cartao-mago{background:#2a213b;border-color:#584a72}:root:not([data-tema]) .cartao-mago .cartao-assunto{color:#cbb1ff}}
-@media(max-width:680px){.grade-destaques .cartao-inicio{min-height:0}.grade-destaques .cartao-mago{min-height:270px}}
+@media print{body.pagina-inicio,body.pagina-modulo{background:#fff}.hero-personagens,.cartao-personagem,.mascote-modulo{display:none!important}.inicio .grade{display:block}.inicio .cartao-inicio{break-inside:avoid}.secao-inicio{box-shadow:none}}

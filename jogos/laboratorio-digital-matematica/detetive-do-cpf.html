@@ -36,6 +36,19 @@ summary{cursor:pointer;font-weight:600}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) button:not(.sec){color:#141a2b}}
 :root[data-theme="dark"] button:not(.sec){color:#141a2b}
 .back{font-size:.9rem;margin-bottom:.4rem}.back a{color:var(--pri);font-weight:600}
+
+/* Agência chibi no laboratório */
+body{background-color:var(--bg);background-image:linear-gradient(#f4f6fae8,#f4f6faf1),url('./images/laboratorio-chibi.webp');background-size:cover;background-position:center;background-attachment:fixed}
+main{max-width:44rem}
+.card{border-radius:1.2rem;box-shadow:0 12px 30px #1a22381c;backdrop-filter:blur(10px)}
+button{border-radius:.85rem}
+.detetive-banner{display:flex;align-items:center;gap:1rem;background:var(--card);border:1px solid var(--line);border-radius:1.25rem;padding:1rem;box-shadow:0 12px 30px #1a22381c}
+.detetive-banner p{margin:0;flex:1}
+.detetive-art{display:block;flex:none;width:clamp(7rem,25vw,11rem);aspect-ratio:1;background:url('./images/personagens-chibi.webp') 0% 0%/300% 300% no-repeat;filter:drop-shadow(0 8px 10px #1a223833)}
+@media(max-width:420px){.detetive-banner{flex-direction:column;text-align:center}}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) body{background-image:linear-gradient(#141a2be9,#141a2bf2),url('./images/laboratorio-chibi.webp')}}
+:root[data-theme="dark"] body{background-image:linear-gradient(#141a2be9,#141a2bf2),url('./images/laboratorio-chibi.webp')}
+@media print{body{background:#fff}.detetive-art{display:none}}
 </style>
 </head>
 <body>
@@ -59,7 +72,7 @@ const $$=s=>document.querySelectorAll(s);
 
 function home(){
   app.innerHTML=`<span class="badge">${rank()}<br>${total()} de 15 ⭐</span><h1>🕵️ Agência Detetive do CPF</h1>
-  <p>Agente, a agência recebeu sequências numéricas para investigar! Use os <b>dígitos verificadores</b> para encontrar erros de cálculo. Cumpra as missões e ganhe estrelas.</p>
+  <div class="detetive-banner"><span class="detetive-art" role="img" aria-label="Detetive chibi com lupa"></span><p>Agente, a agência recebeu sequências numéricas para investigar! Use os <b>dígitos verificadores</b> para encontrar erros de cálculo. Cumpra as missões e ganhe estrelas.</p></div>
   <details class="card"><summary>📒 Manual do detetive</summary><ol>
   <li>Multiplique cada dígito por um peso que diminui: de 10 a 2 para o 1º dígito verificador, de 11 a 2 para o 2º.</li>
   <li>Some todos os produtos.</li>

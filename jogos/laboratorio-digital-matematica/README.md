@@ -17,7 +17,7 @@ js/core/                   roteador, estado, interface
 js/dados/                  textos, referências, regras da abelha
 js/modulos/<nome>/index.js módulos independentes montar/desmontar
 cartelas-magicas.html, detetive-do-cpf.html  jogos autônomos conectados à entrada
-images/  fotografia da abertura e personagem chibi do Grimório
+images/  cenário do laboratório, elenco chibi, herói e dragão do Grimório
 ```
 
 ## Executar localmente
@@ -45,11 +45,15 @@ Os caminhos de todos os recursos são relativos à pasta do projeto; a navegaç�
 
 ## Atualizar
 
-Edite o conteúdo e troque `VERSAO='ldm-v9'` por `ldm-v10` (ou próximo número) em `service-worker.js` antes de publicar novamente. O app mostrará **Nova versão disponível. Atualizar** quando detectar o novo worker. Se o celular mantiver a versão antiga, feche e reabra o app conectado, toque em **Atualizar**, ou limpe os dados do site no navegador e visite o endereço novamente. Limpar os dados do site também apaga diário e avaliações locais; faça isso apenas se necessário.
+Edite o conteúdo e troque `VERSAO='ldm-v10'` por `ldm-v11` (ou próximo número) em `service-worker.js` antes de publicar novamente. O app mostrará **Nova versão disponível. Atualizar** quando detectar o novo worker. Se o celular mantiver a versão antiga, feche e reabra o app conectado, toque em **Atualizar**, ou limpe os dados do site no navegador e visite o endereço novamente. Limpar os dados do site também apaga diário e avaliações locais; faça isso apenas se necessário.
 
 ## Ícones
 
 Os PNGs prontos estão em `icons/`. Para recriá-los, abra `gerar-icones.html` e baixe os três arquivos com os nomes indicados, substituindo os existentes em `icons/`. O ícone maskable mantém seu desenho na área central segura.
+
+## Identidade visual
+
+A entrada usa uma cena de laboratório como fundo e dez cartões com personagens chibi. Os nove personagens dos demais temas ocupam uma folha de sprites 3×3 em `images/personagens-chibi.webp`; o Mestre Arcano tem imagem própria. As atividades integradas exibem seu personagem no cabeçalho. O Grimório usa herói e dragão chibi, e os jogos autônomos compartilham o cenário. Tudo é carregado localmente pelo service worker.
 
 ## Teste rápido
 

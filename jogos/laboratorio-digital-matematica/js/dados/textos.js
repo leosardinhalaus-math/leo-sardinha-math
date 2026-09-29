@@ -1,14 +1,14 @@
 export const catalogo=[
- {id:'grimorio',href:'./cartelas-magicas.html',icone:'✧',assunto:'BASE 2 · POTÊNCIAS',titulo:'O Grimório das Seis Runas',resumo:'Descubra as runas, crie um herói e enfrente dragões.'},
- {id:'detetive',href:'./detetive-do-cpf.html',icone:'⌕',assunto:'PESOS · RESTOS',titulo:'Agência Detetive do CPF',resumo:'Resolva missões com dígitos verificadores e investigue padrões numéricos.'},
- {id:'adivinhacao',icone:'🔎',titulo:'Jogo da Adivinhação',resumo:'Encontre um número e descubra a busca binária.'},
- {id:'fracsoma',icone:'◐',assunto:'FRAÇÕES · SOMA',titulo:'Frac-Soma 235',resumo:'Monte somas de frações com barras visuais.'},
- {id:'abelha',icone:'🐝',titulo:'A Abelha Matemática',resumo:'Classifique frações e leve a abelha até a flor.'},
- {id:'poligonos',icone:'⬡',titulo:'Polígonos Regulares',resumo:'Desenhe lados e ângulos como uma tartaruga.'},
- {id:'divisores',icone:'▦',titulo:'Divisores de um Número',resumo:'Construa retângulos e encontre pares de fatores.'},
- {id:'cpf',icone:'#',titulo:'Dígitos Verificadores do CPF',resumo:'Entenda os pesos e restos em um exemplo didático.'},
- {id:'kente',icone:'🧵',titulo:'Matemática do Tecido Kente',resumo:'Crie padrões, encontre pares e resolva sequências.'},
- {id:'estacao',icone:'✎',titulo:'Estação Papel > Digital',resumo:'Compare maneiras de resolver a mesma questão.'}
+ {id:'grimorio',href:'./cartelas-magicas.html',icone:'✧',cor:'#9c73d4',assunto:'BASE 2 · POTÊNCIAS',titulo:'O Grimório das Seis Runas',resumo:'Descubra as runas, crie um herói e enfrente dragões.'},
+ {id:'detetive',href:'./detetive-do-cpf.html',icone:'⌕',cor:'#63a6cd',assunto:'PESOS · RESTOS',titulo:'Agência Detetive do CPF',resumo:'Investigue dígitos verificadores em missões.'},
+ {id:'adivinhacao',icone:'🔎',cor:'#e9bc67',titulo:'Jogo da Adivinhação',resumo:'Encontre um número e descubra a busca binária.'},
+ {id:'fracsoma',icone:'◐',cor:'#72c6bc',assunto:'FRAÇÕES · SOMA',titulo:'Frac-Soma 235',resumo:'Monte e some frações com peças visuais.'},
+ {id:'abelha',icone:'🐝',cor:'#eebd63',titulo:'A Abelha Matemática',resumo:'Classifique frações e leve a abelha até a flor.'},
+ {id:'poligonos',icone:'⬡',cor:'#8bc79c',titulo:'Polígonos Regulares',resumo:'Desenhe lados e ângulos como uma tartaruga.'},
+ {id:'divisores',icone:'▦',cor:'#75bcd5',titulo:'Divisores de um Número',resumo:'Construa retângulos e encontre pares de fatores.'},
+ {id:'cpf',icone:'#',cor:'#a7a3d9',titulo:'Dígitos Verificadores do CPF',resumo:'Entenda os pesos e restos em um exemplo didático.'},
+ {id:'kente',icone:'🧵',cor:'#e9a974',titulo:'Matemática do Tecido Kente',resumo:'Crie padrões, encontre pares e resolva sequências.'},
+ {id:'estacao',icone:'✎',cor:'#e0a9bb',titulo:'Estação Papel > Digital',resumo:'Compare maneiras de resolver a mesma questão.'}
 ];
 export const criterios={pedagogicas:['Interatividade','Autonomia','Cooperação','Cognição','Afetividade'],tecnologicas:['Disponibilidade','Acessibilidade','Confiabilidade','Portabilidade','Facilidade de instalação','Interoperabilidade','Usabilidade','Manutenibilidade','Granularidade','Agregação','Durabilidade','Reusabilidade']};
 export const conceitos=[
