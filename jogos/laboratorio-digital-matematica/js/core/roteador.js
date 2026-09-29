@@ -37,7 +37,7 @@ export async function navegar(){
   }
   if(!caminhos[slug]){main.innerHTML='<h1>Página não encontrada</h1><a href="#/">Voltar ao início</a>';return}
   try{
-    const revisao=slug==='fracsoma'?'?v=10':'';
+    const revisao=slug==='fracsoma'?'?v=11':'';
     const modulo=await import(`../modulos/${caminhos[slug]}/index.js${revisao}`);
     if(location.hash.replace(/^#\/?/,'').split('/')[0]!==slug)return;
     atual=modulo;modulo.montar(main);

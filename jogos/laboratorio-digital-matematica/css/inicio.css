@@ -34,10 +34,10 @@ main.inicio{max-width:1240px;padding-top:clamp(1rem,3vw,2rem);padding-bottom:3re
 .cartao-inicio small{margin-top:.7rem;color:var(--destaque);font-weight:700}
 .grade-destaques .cartao-inicio h3{max-width:58%}.grade-destaques .cartao-inicio p{max-width:54%}
 .cartao-personagem{position:absolute;right:0;bottom:0;width:46%;max-width:190px;height:auto;max-height:77%;object-fit:contain;object-position:bottom;pointer-events:none;filter:drop-shadow(0 8px 8px #26373436)}
-.sprite-chibi{display:block;aspect-ratio:1;background-image:url('../images/personagens-chibi.webp');background-repeat:no-repeat;background-size:300% 300%}
-.sprite-detetive{background-position:0% 0%}.sprite-fracsoma{background-position:50% 0%}.sprite-adivinhacao{background-position:100% 0%}
-.sprite-abelha{background-position:0% 50%}.sprite-poligonos{background-position:50% 50%}.sprite-divisores{background-position:100% 50%}
-.sprite-cpf{background-position:0% 100%}.sprite-kente{background-position:50% 100%}.sprite-estacao{background-position:100% 100%}
+.sprite-chibi{display:block;aspect-ratio:1;background-repeat:no-repeat;background-size:contain;background-position:center bottom}
+.sprite-detetive{background-image:url('../images/chibi-detetive.webp')}.sprite-fracsoma{background-image:url('../images/chibi-fracsoma.webp')}.sprite-adivinhacao{background-image:url('../images/chibi-adivinhacao.webp')}
+.sprite-abelha{background-image:url('../images/chibi-abelha.webp')}.sprite-poligonos{background-image:url('../images/chibi-poligonos.webp')}.sprite-divisores{background-image:url('../images/chibi-divisores.webp')}
+.sprite-cpf{background-image:url('../images/chibi-cpf.webp')}.sprite-kente{background-image:url('../images/chibi-kente.webp')}.sprite-estacao{background-image:url('../images/chibi-estacao.webp')}
 .grade-acervo .cartao-topo{min-height:9rem}.grade-acervo .cartao-personagem{width:9rem;max-width:55%;height:auto;max-height:none;top:.8rem;left:50%;right:auto;bottom:auto;transform:translateX(-50%)}
 .grade-acervo .cartao-inicio h3,.grade-acervo .cartao-inicio p{max-width:none}
 .inicio-rodape{color:var(--texto);background:color-mix(in srgb,var(--papel) 82%,transparent);border-radius:.8rem;margin-top:2rem;padding:1rem 1.2rem;font-size:.85rem}
