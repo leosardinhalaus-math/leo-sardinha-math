@@ -43,7 +43,7 @@ Os caminhos de todos os recursos são relativos à pasta do projeto; a navegaç�
 
 ## Atualizar
 
-Edite o conteúdo e troque `VERSAO='ldm-v1'` por `ldm-v2` (ou próximo número) em `service-worker.js` antes de publicar novamente. O app mostrará **Nova versão disponível. Atualizar** quando detectar o novo worker. Se o celular mantiver a versão antiga, feche e reabra o app conectado, toque em **Atualizar**, ou limpe os dados do site no navegador e visite o endereço novamente. Limpar os dados do site também apaga diário e avaliações locais; faça isso apenas se necessário.
+Edite o conteúdo e troque `VERSAO='ldm-v2'` por `ldm-v3` (ou próximo número) em `service-worker.js` antes de publicar novamente. O app mostrará **Nova versão disponível. Atualizar** quando detectar o novo worker. Se o celular mantiver a versão antiga, feche e reabra o app conectado, toque em **Atualizar**, ou limpe os dados do site no navegador e visite o endereço novamente. Limpar os dados do site também apaga diário e avaliações locais; faça isso apenas se necessário.
 
 ## Ícones
 
@@ -52,7 +52,7 @@ Os PNGs prontos estão em `icons/`. Para recriá-los, abra `gerar-icones.html` e
 ## Teste rápido
 
 - Adivinhação: palpites de 1 a 100, dicas e faixa da aba Estratégia.
-- Frac-Soma: selecione/arraste duas peças, confira e avance níveis; teste também teclado.
+- Frac-Soma: leve peças das linhas à soma, revele equivalências, digite frações equivalentes e avance pelos oito desafios; teste também toque e teclado.
 - Abelha: jogue sozinho e em dupla, erre/acertе tipos, confira movimento e imprima a folha.
 - Polígonos: desenhe triângulo e hexágono, confira ângulos.
 - Divisores: compare 1, 7 e 24; veja pares de fatores.
