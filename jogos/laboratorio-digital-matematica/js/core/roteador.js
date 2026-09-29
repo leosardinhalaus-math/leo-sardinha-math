@@ -85,7 +85,7 @@ export async function navegar(){
   }
   if(!caminhos[slug]){main.innerHTML='<h1>Página não encontrada</h1><a href="#/">Voltar ao início</a>';return}
   try{
-    const revisao=slug==='fracsoma'?'?v=16':'';
+    const revisao=slug==='fracsoma'?'?v=17':'';
     const modulo=await import(`../modulos/${caminhos[slug]}/index.js${revisao}`);
     if(location.hash.replace(/^#\/?/,'').split('/')[0]!==slug)return;
     atual=modulo;modulo.montar(main);
@@ -95,10 +95,10 @@ export async function navegar(){
         const figura=document.createElement('span');
         figura.className=`mascote-modulo sprite-chibi sprite-${slug}`;
         figura.setAttribute('role','button');figura.tabIndex=0;
-        figura.setAttribute('aria-label',`Conversar com o personagem: ${falas[slug]}`);
+        figura.setAttribute('aria-label',`Conversar com o personagem de ${catalogo.find(c=>c.id===slug).titulo}`);
         figura.dataset.fala=falas[slug];
         heading.insertAdjacentElement('afterend',figura);
-        const fala=document.createElement('span');fala.className='fala-modulo sr-only';fala.setAttribute('role','status');
+        const fala=document.createElement('span');fala.className='fala-modulo';fala.setAttribute('role','status');
         figura.append(fala);
         figura.addEventListener('click',()=>reagir(figura,fala));
         ativarTeclado(figura);
