@@ -17,7 +17,7 @@ js/core/                   roteador, estado, interface
 js/dados/                  textos, referências, regras da abelha
 js/modulos/<nome>/index.js módulos independentes montar/desmontar
 cartelas-magicas.html, detetive-do-cpf.html  jogos autônomos conectados à entrada
-images/laboratorio-hero.webp  fotografia da abertura
+images/  fotografia da abertura e personagem chibi do Grimório
 ```
 
 ## Executar localmente
@@ -45,7 +45,7 @@ Os caminhos de todos os recursos são relativos à pasta do projeto; a navegaç�
 
 ## Atualizar
 
-Edite o conteúdo e troque `VERSAO='ldm-v6'` por `ldm-v7` (ou próximo número) em `service-worker.js` antes de publicar novamente. O app mostrará **Nova versão disponível. Atualizar** quando detectar o novo worker. Se o celular mantiver a versão antiga, feche e reabra o app conectado, toque em **Atualizar**, ou limpe os dados do site no navegador e visite o endereço novamente. Limpar os dados do site também apaga diário e avaliações locais; faça isso apenas se necessário.
+Edite o conteúdo e troque `VERSAO='ldm-v7'` por `ldm-v8` (ou próximo número) em `service-worker.js` antes de publicar novamente. O app mostrará **Nova versão disponível. Atualizar** quando detectar o novo worker. Se o celular mantiver a versão antiga, feche e reabra o app conectado, toque em **Atualizar**, ou limpe os dados do site no navegador e visite o endereço novamente. Limpar os dados do site também apaga diário e avaliações locais; faça isso apenas se necessário.
 
 ## Ícones
 

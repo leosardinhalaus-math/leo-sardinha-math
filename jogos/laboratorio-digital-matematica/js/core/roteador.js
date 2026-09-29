@@ -7,7 +7,7 @@ let atual=null;
 
 function cartao(c,feitos){
   const href=c.href||`#/${c.id}`;
-  return `<a class="cartao cartao-inicio" href="${href}"><span class="cartao-topo"><span class="icone" aria-hidden="true">${c.icone}</span><span class="cartao-seta" aria-hidden="true">↗</span></span><span class="cartao-assunto">${c.assunto||'EXPERIMENTO'}</span><h3>${c.titulo}</h3><p>${c.resumo}</p>${feitos[c.id]?'<small>✓ Refletido</small>':''}</a>`;
+  return `<a class="cartao cartao-inicio${c.id==='grimorio'?' cartao-mago':''}" href="${href}"><span class="cartao-topo"><span class="icone" aria-hidden="true">${c.icone}</span><span class="cartao-seta" aria-hidden="true">↗</span></span><span class="cartao-assunto">${c.assunto||'EXPERIMENTO'}</span><h3>${c.titulo}</h3><p>${c.resumo}</p>${c.id==='grimorio'?'<img class="cartao-personagem" src="./images/mago-chibi.webp" alt="" loading="lazy">':''}${feitos[c.id]?'<small>✓ Refletido</small>':''}</a>`;
 }
 
 export async function navegar(){
@@ -31,7 +31,7 @@ export async function navegar(){
   }
   if(!caminhos[slug]){main.innerHTML='<h1>Página não encontrada</h1><a href="#/">Voltar ao início</a>';return}
   try{
-    const revisao=slug==='fracsoma'?'?v=6':'';
+    const revisao=slug==='fracsoma'?'?v=7':'';
     const modulo=await import(`../modulos/${caminhos[slug]}/index.js${revisao}`);
     if(location.hash.replace(/^#\/?/,'').split('/')[0]!==slug)return;
     atual=modulo;modulo.montar(main);main.focus();window.scrollTo(0,0);
