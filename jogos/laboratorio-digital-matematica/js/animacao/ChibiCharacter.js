@@ -46,13 +46,22 @@ export class ChibiCharacter {
     for(const lado of [-1,1]){
       oval(this.cabeca,cabelo,lado*.70,.49,.02,.17,.38,.38);
     }
-    this.olhos=[];this.pupilas=[];this.sobrancelhas=[];
+    this.olhos=[];this.pupilas=[];this.sobrancelhas=[];this.estrelas=[];
+    const estrela=new THREE.Shape();
+    for(let i=0;i<10;i++){
+      const angulo=-PI/2+i*PI/5,raio=i%2?.045:.10;
+      const x=Math.cos(angulo)*raio,y=Math.sin(angulo)*raio;
+      if(i===0)estrela.moveTo(x,y);else estrela.lineTo(x,y);
+    }
+    estrela.closePath();const formaEstrela=new THREE.ShapeGeometry(estrela);
     for(const lado of [-1,1]){
       const olho=oval(this.cabeca,branca,lado*.29,.67,.638,.205,.255,.095);
       const pupila=oval(this.cabeca,iris,lado*.29,.66,.735,.115,.16,.045);
       oval(pupila,branca,-.30,.33,.7,.25,.22,.18);
       const sobrancelha=oval(this.cabeca,cabelo,lado*.29,1.02,.59,.22,.046,.055);
       this.olhos.push(olho);this.pupilas.push(pupila);this.sobrancelhas.push(sobrancelha);
+      const brilho=new THREE.Mesh(formaEstrela,material('#ffe16a'));
+      brilho.position.set(lado*.29,.66,.790);brilho.visible=false;this.cabeca.add(brilho);this.estrelas.push(brilho);
     }
     oval(this.cabeca,pele,0,.43,.72,.12,.10,.10);
     this.boca=oval(this.cabeca,material('#813b57'),0,.19,.703,.16,.065,.045);
@@ -62,7 +71,7 @@ export class ChibiCharacter {
       const aba=new THREE.Mesh(new THREE.CylinderGeometry(.94,.99,.09,20),roupa);
       aba.position.y=1.30;this.cabeca.add(aba);
       const chapeu=new THREE.Mesh(new THREE.ConeGeometry(.61,.94,20),roupa);
-      chapeu.position.y=1.78;chapeu.rotation.z=-.16;this.cabeca.add(chapeu);
+      chapeu.position.y=1.78;chapeu.rotation.z=-.16;this.cabeca.add(chapeu);this.chapeu=chapeu;
       oval(this.cabeca,secundaria,.07,1.44,.54,.13,.11,.055);
     }else if(c.tipo==='detetive'){
       const boina=new THREE.Mesh(new THREE.CylinderGeometry(.62,.76,.28,16),roupa);
@@ -188,26 +197,29 @@ export class ChibiCharacter {
     const andando=['andar','correr'].includes(this.acao),vel=this.acao==='correr'?14:9;
     const marcha=andando?Math.sin(this.clock*vel):0;
     const fase=1-THREE.MathUtils.clamp(this.tempoAcao/(this.duracaoAcao||1),0,1);
-    const impulso=['pular','cair','atacar','magia'].includes(this.acao)?Math.sin(Math.min(1,fase)*PI):0;
+    const impulso=['pular','atacar','magia'].includes(this.acao)?Math.sin(Math.min(1,fase)*PI):0;
+    const queda=this.acao==='cair'?Math.max(0,(1-fase)*.30-Math.max(0,fase-.83)*.55):0;
     const comemorando=this.acao==='comemorar',errando=['errar','dano','derrota'].includes(this.acao);
     const falar=!!this.elementoFala;
     const respirar=Math.sin(this.clock*2.2);
-    this.corpo.position.y=suave(this.corpo.position.y,(andando?.055*Math.abs(marcha):.025*respirar)+impulso*.29+(comemorando?.14*Math.abs(Math.sin(this.clock*11)):0),10,dt);
+    this.corpo.position.y=suave(this.corpo.position.y,(andando?.055*Math.abs(marcha):.025*respirar)+impulso*.29+queda+(comemorando?.14*Math.abs(Math.sin(this.clock*11)):0),10,dt);
     this.tronco.scale.y=suave(this.tronco.scale.y,.7+(andando?-.025:.018*respirar)+impulso*-.07,9,dt);
     this.corpo.rotation.z=suave(this.corpo.rotation.z,(andando?.045*marcha:0)+(errando?.07*Math.sin(this.clock*9):0),7,dt);
     this.corpo.rotation.x=suave(this.corpo.rotation.x,this.acao==='correr'?.15:0,7,dt);
-    this.cabecaPivo.rotation.z=suave(this.cabecaPivo.rotation.z,(andando?-.07*marcha:0)+(falar?.055*Math.sin(this.clock*9):0)+(errando?-.13:0),6,dt);
+    this.cabecaPivo.rotation.z=suave(this.cabecaPivo.rotation.z,(andando?-.07*marcha:.025*Math.sin(this.clock*1.6))+(falar?.055*Math.sin(this.clock*9):0)+(errando?-.13:0),6,dt);
     this.cabeca.rotation.y=suave(this.cabeca.rotation.y,this.alvoOlhar.x*.24,5,dt);
     this.cabeca.rotation.x=suave(this.cabeca.rotation.x,-this.alvoOlhar.y*.13+(falar?.025*Math.sin(this.clock*8):0),5,dt);
     const bracos=andando?[.48*marcha,-.48*marcha]:comemorando?[-1.65,1.65]:this.acao==='magia'||this.acao==='atacar'?[.3,-1.45]:falar?[.14+.25*Math.sin(this.clock*8),-.15+.25*Math.sin(this.clock*8)]:errando?[.55,-.55]:[.05*Math.sin(this.clock*2),-.05*Math.sin(this.clock*2)];
     this.bracos.forEach((braco,i)=>{braco.rotation.x=suave(braco.rotation.x,bracos[i],10,dt);braco.rotation.z=suave(braco.rotation.z,comemorando?(i?-.50:.50):0,7,dt)});
     this.pernas.forEach((perna,i)=>{perna.rotation.x=suave(perna.rotation.x,andando?(i?.47:-.47)*marcha:impulso*(i?.36:-.36),10,dt)});
     this.capa.rotation.x=suave(this.capa.rotation.x,andando?.13+.09*Math.sin(this.clock*vel-1):.04*Math.sin(this.clock*2),4,dt);
+    if(this.chapeu)this.chapeu.rotation.z=suave(this.chapeu.rotation.z,-.16+(andando?.10*Math.sin(this.clock*vel-1):.025*Math.sin(this.clock*2-1)),4,dt);
     if(this.cajado)this.cajado.rotation.z=suave(this.cajado.rotation.z,andando?.08*Math.sin(this.clock*vel-1):this.acao==='magia'?.18:0,5,dt);
     if(this.asas)this.asas.forEach((asa,i)=>asa.rotation.y=suave(asa.rotation.y,(i?1:-1)*(.18+.14*Math.sin(this.clock*12)),9,dt));
     let emocao=this.expressao;
     if(comemorando)emocao='feliz';else if(errando)emocao='triste';else if(this.acao==='magia')emocao='surpreso';
     const olhoY=this.tempoPiscar>0?.025:emocao==='feliz'?.20:emocao==='bravo'?.18:.255;
+    this.estrelas.forEach(estrela=>{estrela.visible=comemorando;estrela.rotation.z+=dt*3});
     this.olhos.forEach((olho,i)=>{
       olho.scale.y=suave(olho.scale.y,olhoY,22,dt);
       this.pupilas[i].scale.y=suave(this.pupilas[i].scale.y,this.tempoPiscar>0?.01:emocao==='surpreso'?.21:.16,20,dt);
