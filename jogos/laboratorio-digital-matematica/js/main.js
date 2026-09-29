@@ -1,4 +1,4 @@
-import {navegar} from './core/roteador.js?v=4';import {ler,salvar} from './core/estado.js';
+import {navegar} from './core/roteador.js?v=5';import {ler,salvar} from './core/estado.js';
 const tema=ler('tema');if(tema)document.documentElement.dataset.tema=tema;
 document.querySelector('#tema').onclick=()=>{const escuro=document.documentElement.dataset.tema==='escuro';const novo=escuro?'claro':'escuro';document.documentElement.dataset.tema=novo;salvar('tema',novo)};
 addEventListener('hashchange',navegar);navegar();

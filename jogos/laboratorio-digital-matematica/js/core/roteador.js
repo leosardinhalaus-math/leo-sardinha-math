@@ -26,11 +26,11 @@ export async function navegar(){
     const principais=destacados.map(id=>catalogo.find(c=>c.id===id));
     const outros=catalogo.filter(c=>!destacados.includes(c.id));
     main.innerHTML=`<section class="hero-inicio" aria-labelledby="titulo-inicio"><div class="hero-texto"><span class="sobretitulo">LABORATÓRIO DIGITAL · MATEMÁTICA</span><h1 id="titulo-inicio">Um espaço para pensar com as mãos.</h1><p>Investigue padrões, monte ideias e descubra a matemática no seu ritmo. Atividades interativas para aprender fazendo.</p><a class="hero-acao" href="#experimentos">Explorar atividades <span aria-hidden="true">↗</span></a><span class="hero-nota">6º ao 9º ano · Gratuito · Sem cadastro</span></div><div class="hero-foto" role="img" aria-label="Peças de frações e formas geométricas sobre uma mesa de estudo"></div></section><section class="secao-inicio" id="experimentos" aria-labelledby="destaques-titulo"><div class="secao-cabecalho"><div><span class="sobretitulo">COMECE POR AQUI</span><h2 id="destaques-titulo">Novas experiências</h2></div><p>Três maneiras de jogar com números.</p></div><div class="grade grade-destaques">${principais.map(c=>cartao(c,feitos)).join('')}</div></section><section class="secao-inicio" aria-labelledby="acervo-titulo"><div class="secao-cabecalho"><div><span class="sobretitulo">CONTINUE EXPLORANDO</span><h2 id="acervo-titulo">Todo o laboratório</h2></div><p>Escolha um caminho e experimente.</p></div><div class="grade grade-acervo">${outros.map(c=>cartao(c,feitos)).join('')}</div></section><p class="inicio-rodape">As atividades funcionam no celular, tablet e computador. Após a primeira visita completa, também ficam disponíveis offline.</p>`;
-    main.focus();return;
+    main.focus({preventScroll:true});return;
   }
   if(!caminhos[slug]){main.innerHTML='<h1>Página não encontrada</h1><a href="#/">Voltar ao início</a>';return}
   try{
-    const revisao=slug==='fracsoma'?'?v=4':'';
+    const revisao=slug==='fracsoma'?'?v=5':'';
     const modulo=await import(`../modulos/${caminhos[slug]}/index.js${revisao}`);
     if(location.hash.replace(/^#\/?/,'').split('/')[0]!==slug)return;
     atual=modulo;modulo.montar(main);main.focus();window.scrollTo(0,0);
