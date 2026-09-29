@@ -45,7 +45,7 @@ Os caminhos de todos os recursos são relativos à pasta do projeto; a navegaç�
 
 ## Atualizar
 
-Edite o conteúdo e troque `VERSAO='ldm-v12'` por `ldm-v13` (ou próximo número) em `service-worker.js` antes de publicar novamente. O app mostrará **Nova versão disponível. Atualizar** quando detectar o novo worker. Se o celular mantiver a versão antiga, feche e reabra o app conectado, toque em **Atualizar**, ou limpe os dados do site no navegador e visite o endereço novamente. Limpar os dados do site também apaga diário e avaliações locais; faça isso apenas se necessário.
+Edite o conteúdo e troque `VERSAO='ldm-v13'` por `ldm-v14` (ou próximo número) em `service-worker.js` antes de publicar novamente. O app mostrará **Nova versão disponível. Atualizar** quando detectar o novo worker. Se o celular mantiver a versão antiga, feche e reabra o app conectado, toque em **Atualizar**, ou limpe os dados do site no navegador e visite o endereço novamente. Limpar os dados do site também apaga diário e avaliações locais; faça isso apenas se necessário.
 
 ## Ícones
 
@@ -53,7 +53,7 @@ Os PNGs prontos estão em `icons/`. Para recriá-los, abra `gerar-icones.html` e
 
 ## Identidade visual
 
-A entrada usa uma cena de laboratório como fundo e dez cartões com personagens chibi. Os nove personagens dos demais temas ocupam uma folha de sprites 3×3 em `images/personagens-chibi.webp`; o Mestre Arcano tem imagem própria. As atividades integradas exibem seu personagem no cabeçalho. O Grimório usa herói e dragão chibi, e os jogos autônomos compartilham o cenário. Tudo é carregado localmente pelo service worker.
+A entrada usa uma cena de laboratório como fundo e dez cartões com personagens chibi. Os nove personagens dos demais temas usam arquivos individuais `images/chibi-*.webp`; o Mestre Arcano tem imagem própria. As atividades integradas exibem seu personagem no cabeçalho. O Grimório usa herói e dragão chibi, e os jogos autônomos compartilham o cenário. As entradas, os personagens, as runas e as peças do Frac-Soma têm animações leves; a preferência do sistema por movimento reduzido desativa esses efeitos. Tudo é carregado localmente pelo service worker.
 
 ## Teste rápido
 

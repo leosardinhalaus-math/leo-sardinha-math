@@ -18,4 +18,12 @@
 .fs-linhas{margin-top:.7rem}.fs-linhas button[aria-pressed="true"]{background:var(--fs-azul);color:var(--fs-cartao)}
 .fs-resposta{display:flex;align-items:end;flex-wrap:wrap;gap:.6rem}.fs-resposta label{display:grid;gap:.2rem;font-size:.86rem}.fs-resposta input{width:5rem;min-height:3rem;text-align:center;font-size:1.1rem;border:2px solid var(--fs-linha);border-radius:.5rem;background:var(--fs-cartao);color:var(--fs-texto)}.fs-resposta button{min-height:3rem}
 .fs-mensagem{min-height:1.5rem;font-weight:700}.fs-mensagem.acerto{color:var(--fs-bom)}.fs-mensagem.erro{color:var(--fs-ruim)}.fs-fim{text-align:center;padding:2rem}
+@media(prefers-reduced-motion:no-preference){
+  @keyframes fs-peca-entra{from{opacity:.5;scale:.6 1}to{opacity:1;scale:1}}
+  @keyframes fs-acerto-entra{from{opacity:0;translate:0 6px}to{opacity:1;translate:0 0}}
+  .fs-bloco{transform-origin:left center;animation:fs-peca-entra .25s ease-out both}
+  .fs-mensagem.acerto{animation:fs-acerto-entra .3s ease-out both}
+  .fs-linhas button{transition:scale .18s ease}
+  .fs-linhas button:hover{scale:1.06}
+}
 @media(max-width:480px){.fs{padding:.5rem}.fs-quadro{padding:.4rem .3rem}.fs-parede{--fs-rotulo:2.8rem}.fs-linha strong{font-size:.72rem}}
