@@ -1,5 +1,5 @@
 export const catalogo=[
- {id:'grimorio',href:'./cartelas-magicas.html',icone:'✧',assunto:'BASE 2 · POTÊNCIAS',titulo:'O Grimório das Seis Runas',resumo:'Descubra o segredo das cartelas mágicas, crie um herói e enfrente dragões.'},
+ {id:'grimorio',href:'./cartelas-magicas.html',icone:'✧',assunto:'BASE 2 · POTÊNCIAS',titulo:'O Grimório das Seis Runas',resumo:'Descubra as runas, crie um herói e enfrente dragões.'},
  {id:'detetive',href:'./detetive-do-cpf.html',icone:'⌕',assunto:'PESOS · RESTOS',titulo:'Agência Detetive do CPF',resumo:'Resolva missões com dígitos verificadores e investigue padrões numéricos.'},
  {id:'adivinhacao',icone:'🔎',titulo:'Jogo da Adivinhação',resumo:'Encontre um número e descubra a busca binária.'},
  {id:'fracsoma',icone:'◐',assunto:'FRAÇÕES · SOMA',titulo:'Frac-Soma 235',resumo:'Monte somas de frações com barras visuais.'},
