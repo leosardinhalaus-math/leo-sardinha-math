@@ -57,13 +57,20 @@ button.rn:hover{transform:translateY(-2px)}
 .sprite-jogo.nivel-3,.sprite-jogo.nivel-4{filter:drop-shadow(0 0 18px #e7b842aa)}
 .sprite-jogo.cor-1{filter:hue-rotate(55deg) drop-shadow(0 10px 12px #2816573f)}.sprite-jogo.cor-2{filter:hue-rotate(115deg) drop-shadow(0 10px 12px #2816573f)}.sprite-jogo.cor-3{filter:hue-rotate(185deg) drop-shadow(0 10px 12px #2816573f)}.sprite-jogo.cor-4{filter:hue-rotate(245deg) drop-shadow(0 10px 12px #2816573f)}
 .sprite-jogo.vencido{filter:grayscale(.9);opacity:.55;transform:rotate(-9deg)}
+.fig [data-fala]{cursor:pointer}
+.fig [data-fala]:focus-visible{outline:3px solid var(--pri);outline-offset:4px;border-radius:1rem}
+.fala-jogo{width:fit-content;max-width:90%;margin:.3rem auto .7rem;padding:.55rem .8rem;border:1px solid var(--line);border-radius:1rem 1rem .2rem 1rem;background:color-mix(in srgb,var(--card) 85%,var(--star));color:var(--tx);font-weight:700;text-align:center}
 @media(prefers-reduced-motion:no-preference){
   @keyframes jogo-flutuar{0%,100%{translate:0 0}50%{translate:0 -9px}}
   @keyframes jogo-respirar{0%,100%{translate:0 0;rotate:-1deg}50%{translate:0 -6px;rotate:1deg}}
   @keyframes runa-acesa{from{scale:.94;box-shadow:0 0 0 0 transparent}to{scale:1;box-shadow:0 0 15px var(--rc)}}
+  @keyframes jogo-saudacao{0%,100%{translate:0 0;rotate:0deg}30%{translate:0 -17px;rotate:-9deg}60%{translate:0 -7px;rotate:9deg}}
+  @keyframes jogo-fala{from{opacity:0;scale:.9}to{opacity:1;scale:1}}
   .fig .mago-chibi{animation:jogo-flutuar 4s ease-in-out infinite}
   .fig .sprite-jogo.heroi{animation:jogo-flutuar 3.7s ease-in-out infinite}
   .fig .sprite-jogo.dragao:not(.vencido){animation:jogo-respirar 3.2s ease-in-out -1s infinite}
+  .fig [data-fala].reagindo,.fig .sprite-jogo.vencido.reagindo{animation:jogo-saudacao .8s ease-in-out 2}
+  .fala-jogo{animation:jogo-fala .25s ease-out both}
   button.rn[aria-pressed="true"]{animation:runa-acesa .3s ease-out both}
   .tabs button{transition:translate .18s ease,box-shadow .18s ease}
   .tabs button:hover{translate:0 -2px;box-shadow:0 7px 14px #28165733}
@@ -87,9 +94,22 @@ const cardHTML=k=>`<div class="cartela" ${rc(k)}><h3>${R[k].e} Runa de ${R[k].n}
 const conta=a=>{const t=a.map((b,i)=>b?`${R[i].e}${1<<i}`:'').filter(Boolean);return t.length?t.join(' + ')+' = '+val(a):'0'};
 const titulo=p=>p===63?'👑 LENDA: todas as runas!':p>=48?'🧙 Arquimago':p>=32?'⚡ Mago de Elite':p>=16?'🗡️ Aventureiro':'🌱 Aprendiz';
 const tier=p=>p>=63?4:p>=48?3:p>=32?2:p>=16?1:0;
-const wizard=()=>`<img class="mago-chibi" src="./images/mago-chibi.webp" width="900" height="1080" alt="Mestre Arcano, mago chibi de chapéu roxo, barba branca e cajado luminoso">`;
-const heroT=(t,dim)=>`<span class="sprite-jogo heroi nivel-${t}" role="img" aria-label="Herói chibi de nível ${t+1}"${dim?' style="opacity:.35"':''}></span>`;
-const dragon=(n,dead)=>`<span class="sprite-jogo dragao cor-${n%5}${dead?' vencido':''}" role="img" aria-label="${dead?'Dragão chibi derrotado':'Dragão chibi'}"></span>`;
+const wizard=()=>`<img class="mago-chibi" src="./images/mago-chibi.webp" width="900" height="1080" alt="Mestre Arcano, mago chibi de chapéu roxo, barba branca e cajado luminoso" role="button" tabindex="0" aria-label="Conversar com o Mestre Arcano" data-fala="Uma runa de cada vez. A magia está na soma!">`;
+const heroT=(t,dim)=>`<span class="sprite-jogo heroi nivel-${t}" role="button" tabindex="0" aria-label="Conversar com o herói chibi de nível ${t+1}" data-fala="Escolha as runas e me dê poder!"${dim?' style="opacity:.35"':''}></span>`;
+const dragon=(n,dead)=>`<span class="sprite-jogo dragao cor-${n%5}${dead?' vencido':''}" role="button" tabindex="0" aria-label="Conversar com o dragão chibi" data-fala="${dead?'Você acertou meu número!':'Raa! Monte o dano exato para me vencer!'}"></span>`;
+app.addEventListener('click',event=>{
+  const personagem=event.target.closest('.fig [data-fala]');
+  if(!personagem||!app.contains(personagem))return;
+  const cartao=personagem.closest('.card');
+  let fala=cartao.querySelector('.fala-jogo');
+  if(!fala){fala=document.createElement('p');fala.className='fala-jogo';fala.setAttribute('role','status');personagem.closest('.fig').insertAdjacentElement('afterend',fala)}
+  fala.textContent=personagem.dataset.fala;
+  personagem.classList.remove('reagindo');void personagem.offsetWidth;personagem.classList.add('reagindo');
+  clearTimeout(fala._tempo);fala._tempo=setTimeout(()=>{fala.remove();personagem.classList.remove('reagindo')},2700);
+});
+app.addEventListener('keydown',event=>{
+  if((event.key==='Enter'||event.key===' ')&&event.target.matches('.fig [data-fala]')){event.preventDefault();event.target.click()}
+});
 function nextD(){B.won=false;if(B.n<5)B.d=hpNew();draw()}
 document.getElementById('print').innerHTML=[0,1,2,3,4,5].map(cardHTML).join('');
 

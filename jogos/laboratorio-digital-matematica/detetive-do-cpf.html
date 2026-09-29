@@ -45,9 +45,15 @@ button{border-radius:.85rem}
 .detetive-banner{display:flex;align-items:center;gap:1rem;background:var(--card);border:1px solid var(--line);border-radius:1.25rem;padding:1rem;box-shadow:0 12px 30px #1a22381c}
 .detetive-banner p{margin:0;flex:1}
 .detetive-art{display:block;flex:none;width:clamp(7rem,25vw,11rem);aspect-ratio:1;background:url('./images/chibi-detetive.webp') center bottom/contain no-repeat;filter:drop-shadow(0 8px 10px #1a223833)}
+.detetive-art{cursor:pointer}.detetive-art:focus-visible{outline:3px solid var(--pri);outline-offset:3px;border-radius:1rem}
+.fala-detetive{width:fit-content;max-width:95%;margin:.5rem 0;padding:.55rem .8rem;border:1px solid var(--line);border-radius:1rem 1rem .2rem 1rem;background:var(--card);font-weight:700;box-shadow:0 7px 16px #1723491c}
 @media(prefers-reduced-motion:no-preference){
   @keyframes detetive-investiga{0%,100%{translate:0 0;rotate:-1deg}50%{translate:0 -7px;rotate:1deg}}
+  @keyframes detetive-saudacao{0%,100%{translate:0 0;rotate:0deg}30%{translate:0 -15px;rotate:-8deg}60%{translate:0 -5px;rotate:8deg}}
+  @keyframes detetive-fala{from{opacity:0;translate:0 6px}to{opacity:1;translate:0 0}}
   .detetive-art{animation:detetive-investiga 4s ease-in-out infinite}
+  .detetive-art.reagindo{animation:detetive-saudacao .85s ease-in-out 2}
+  .fala-detetive{animation:detetive-fala .25s ease-out both}
   .map button{transition:translate .18s ease,box-shadow .18s ease}
   .map button:hover{translate:0 -2px;box-shadow:0 8px 16px #17234924}
 }
@@ -61,6 +67,15 @@ button{border-radius:.85rem}
 <main><nav class="back" aria-label="Voltar ao laboratório"><a href="./index.html#/">← Todos os jogos</a></nav><div id="app"></div></main>
 <script>
 const app=document.getElementById('app');
+app.addEventListener('click',event=>{
+  const personagem=event.target.closest('.detetive-art');if(!personagem)return;
+  let fala=app.querySelector('.fala-detetive');
+  if(!fala){fala=document.createElement('p');fala.className='fala-detetive';fala.setAttribute('role','status');personagem.closest('.detetive-banner').insertAdjacentElement('afterend',fala)}
+  fala.textContent='A pista mora nos restos da divisão!';
+  personagem.classList.remove('reagindo');void personagem.offsetWidth;personagem.classList.add('reagindo');
+  clearTimeout(fala._tempo);fala._tempo=setTimeout(()=>{fala.remove();personagem.classList.remove('reagindo')},2700);
+});
+app.addEventListener('keydown',event=>{if((event.key==='Enter'||event.key===' ')&&event.target.matches('.detetive-art')){event.preventDefault();event.target.click()}});
 const M=[
  {n:'Multiplicando os pesos',ph:1,ask:'p',t:'Multiplique cada dígito pelo seu peso.'},
  {n:'Somando e dividindo',ph:1,ask:'sqrv',pre:1,t:'Os produtos já estão prontos. Some tudo e divida por 11.'},
@@ -78,7 +93,7 @@ const $$=s=>document.querySelectorAll(s);
 
 function home(){
   app.innerHTML=`<span class="badge">${rank()}<br>${total()} de 15 ⭐</span><h1>🕵️ Agência Detetive do CPF</h1>
-  <div class="detetive-banner"><span class="detetive-art" role="img" aria-label="Detetive chibi com lupa"></span><p>Agente, a agência recebeu sequências numéricas para investigar! Use os <b>dígitos verificadores</b> para encontrar erros de cálculo. Cumpra as missões e ganhe estrelas.</p></div>
+  <div class="detetive-banner"><span class="detetive-art" role="button" tabindex="0" aria-label="Conversar com o detetive chibi"></span><p>Agente, a agência recebeu sequências numéricas para investigar! Use os <b>dígitos verificadores</b> para encontrar erros de cálculo. Cumpra as missões e ganhe estrelas.</p></div>
   <details class="card"><summary>📒 Manual do detetive</summary><ol>
   <li>Multiplique cada dígito por um peso que diminui: de 10 a 2 para o 1º dígito verificador, de 11 a 2 para o 2º.</li>
   <li>Some todos os produtos.</li>

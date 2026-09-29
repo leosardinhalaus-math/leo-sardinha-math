@@ -17,6 +17,11 @@ main.inicio{max-width:1240px;padding-top:clamp(1rem,3vw,2rem);padding-bottom:3re
 .hero-personagens img{position:absolute;width:min(48%,260px);height:auto;max-height:94%;object-fit:contain;bottom:0;left:50%;transform:translateX(-50%);z-index:2;filter:drop-shadow(0 13px 16px #30284455)}
 .hero-personagens .sprite-chibi{position:absolute;width:37%;max-width:205px;bottom:1rem;filter:drop-shadow(0 12px 14px #3028444d)}
 .hero-personagens .sprite-detetive{left:0;z-index:1}.hero-personagens .sprite-fracsoma{right:0;z-index:1}
+.personagem-hero,.mascote-modulo{cursor:pointer}
+.personagem-hero:focus-visible,.mascote-modulo:focus-visible{outline:3px solid var(--destaque);outline-offset:4px;border-radius:1rem}
+.fala-personagem{position:absolute;top:.8rem;right:1rem;z-index:4;max-width:15rem;margin:0;padding:.65rem .85rem;border-radius:1rem 1rem .2rem 1rem;background:var(--papel);color:var(--texto);box-shadow:0 8px 22px #17333330;font-size:.87rem;font-weight:700;line-height:1.35;pointer-events:none}
+.fala-personagem:empty{display:none}
+.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 .secao-inicio{margin-top:clamp(2rem,4vw,3.5rem);padding:clamp(1rem,2.5vw,1.8rem);border:1px solid #ffffffa8;border-radius:1.5rem;background:color-mix(in srgb,var(--papel) 83%,transparent);box-shadow:0 14px 42px #2038371c;backdrop-filter:blur(12px)}
 .secao-cabecalho{display:flex;align-items:end;justify-content:space-between;gap:1.2rem;margin-bottom:1.25rem}
 .secao-cabecalho h2{margin:.35rem 0 0;font-family:Georgia,'Times New Roman',serif;font-weight:500;font-size:clamp(1.85rem,3vw,2.55rem);letter-spacing:-.035em}
@@ -43,10 +48,14 @@ main.inicio{max-width:1240px;padding-top:clamp(1rem,3vw,2rem);padding-bottom:3re
 .inicio-rodape{color:var(--texto);background:color-mix(in srgb,var(--papel) 82%,transparent);border-radius:.8rem;margin-top:2rem;padding:1rem 1.2rem;font-size:.85rem}
 main.modulo-com-personagem .mascote-modulo{float:right;width:clamp(90px,16vw,160px);margin:-.8rem 0 .6rem 1rem;filter:drop-shadow(0 10px 10px #143d4a33)}
 main.modulo-com-personagem .objetivo{clear:left}
+main.modulo-com-personagem .mascote-modulo{position:relative}
+main.modulo-com-personagem .mascote-modulo.falando::after{content:attr(data-fala);position:absolute;right:55%;bottom:90%;z-index:3;min-width:10rem;max-width:13rem;padding:.55rem .75rem;border-radius:1rem 1rem .2rem 1rem;background:var(--papel);border:1px solid var(--linha);box-shadow:0 8px 18px #1733332c;color:var(--texto);font-size:.82rem;font-weight:700;line-height:1.3;pointer-events:none}
 @media(prefers-reduced-motion:no-preference){
   @keyframes chibi-entrada{from{opacity:0;translate:0 18px}to{opacity:1;translate:0 0}}
   @keyframes chibi-flutuar{0%,100%{translate:0 0}50%{translate:0 -9px}}
   @keyframes chibi-brilho{0%,100%{opacity:.5;transform:scale(.94)}50%{opacity:.85;transform:scale(1.04)}}
+  @keyframes chibi-ola{0%,100%{translate:0 0;rotate:0deg}25%{translate:0 -16px;rotate:-7deg}55%{translate:0 -7px;rotate:7deg}80%{translate:0 -3px;rotate:-3deg}}
+  @keyframes chibi-fala{from{opacity:0;scale:.9;translate:0 6px}to{opacity:1;scale:1;translate:0 0}}
   .hero-texto{animation:chibi-entrada .7s ease-out both}
   .hero-personagens::before{content:"";position:absolute;inset:25% 7% 0;border-radius:50%;background:radial-gradient(ellipse at 50% 75%,#edc98588,transparent 65%);pointer-events:none;animation:chibi-brilho 5s ease-in-out infinite}
   .hero-personagens img{animation:chibi-flutuar 4s ease-in-out infinite}
@@ -54,8 +63,10 @@ main.modulo-com-personagem .objetivo{clear:left}
   .hero-personagens .sprite-fracsoma{animation:chibi-flutuar 4.2s ease-in-out -2.2s infinite}
   .cartao-inicio{animation:chibi-entrada .55s ease-out both;animation-delay:var(--delay,0ms)}
   .cartao-personagem,.grade-acervo .cartao-personagem{transition:scale .25s ease,translate .25s ease}
-  .cartao-inicio:hover .cartao-personagem,.cartao-inicio:focus-visible .cartao-personagem{scale:1.06;translate:0 -5px}
+  .cartao-inicio:hover .cartao-personagem,.cartao-inicio:focus-visible .cartao-personagem{scale:1.06;animation:chibi-ola .85s ease-in-out 1}
   main.modulo-com-personagem .mascote-modulo{animation:chibi-flutuar 4.5s ease-in-out infinite}
+  .hero-personagens .personagem-hero.reagindo,main.modulo-com-personagem .mascote-modulo.reagindo{animation:chibi-ola .85s ease-in-out 2}
+  .fala-personagem:not(:empty),main.modulo-com-personagem .mascote-modulo.falando::after{animation:chibi-fala .25s ease-out both}
 }
 :root[data-tema="escuro"] body.pagina-inicio{background-image:linear-gradient(#142229bd,#142229da),url('../images/laboratorio-chibi.webp')}
 :root[data-tema="escuro"] body.pagina-modulo{background-image:linear-gradient(#142229eb,#142229f0),url('../images/laboratorio-chibi.webp')}
@@ -63,6 +74,7 @@ main.modulo-com-personagem .objetivo{clear:left}
 @media(prefers-color-scheme:dark){:root:not([data-tema]) body.pagina-inicio{background-image:linear-gradient(#142229bd,#142229da),url('../images/laboratorio-chibi.webp')}:root:not([data-tema]) body.pagina-modulo{background-image:linear-gradient(#142229eb,#142229f0),url('../images/laboratorio-chibi.webp')}:root:not([data-tema]) .hero-inicio{background:linear-gradient(100deg,#1b3036f2,#233342c9,#42384c8e);border-color:#ffffff24}}
 @media(max-width:920px){.grade-destaques{grid-template-columns:repeat(2,minmax(0,1fr))}.grade-destaques .cartao-inicio:last-child{grid-column:span 2}.grade-acervo{grid-template-columns:repeat(2,minmax(0,1fr))}.hero-texto h1{font-size:clamp(2.5rem,5vw,3.6rem)}}
 @media(max-width:680px){.hero-inicio{display:flex;flex-direction:column-reverse}.hero-personagens{min-height:250px}.hero-personagens img{width:180px}.hero-personagens .sprite-chibi{width:135px}.hero-texto{padding:1.5rem}.hero-texto h1{font-size:clamp(2.45rem,9vw,3.5rem);max-width:14ch}.hero-texto p{font-size:1rem}.grade-destaques{grid-template-columns:1fr}.grade-destaques .cartao-inicio:last-child{grid-column:auto}.grade-destaques .cartao-inicio{min-height:270px}.secao-cabecalho{align-items:start;flex-direction:column;gap:.3rem}.secao-cabecalho p{font-size:.9rem}}
+@media(max-width:680px){.fala-personagem{top:.3rem;right:.5rem;max-width:12rem;font-size:.76rem}main.modulo-com-personagem .mascote-modulo.falando::after{right:25%;min-width:9rem}}
 @media(max-width:440px){.grade-acervo{grid-template-columns:1fr}.grade-destaques .cartao-inicio h3{max-width:54%}.grade-destaques .cartao-inicio p{max-width:50%}}
 @media(prefers-reduced-motion:reduce){.hero-acao,.cartao-inicio,.cartao-personagem{transition:none;animation:none}}
 @media print{body.pagina-inicio,body.pagina-modulo{background:#fff}.hero-personagens,.cartao-personagem,.mascote-modulo{display:none!important}.inicio .grade{display:block}.inicio .cartao-inicio{break-inside:avoid}.secao-inicio{box-shadow:none}}
