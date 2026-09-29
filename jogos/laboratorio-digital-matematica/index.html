@@ -4,7 +4,8 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#143d4a"><meta name="description" content="Atividades interativas de matemática para o Ensino Fundamental II, disponíveis offline.">
   <link rel="manifest" href="./manifest.webmanifest"><link rel="icon" href="./icons/icon-192.png">
-  <link rel="stylesheet" href="./css/tema.css"><link rel="stylesheet" href="./css/estilos.css"><link rel="stylesheet" href="./css/fracsoma.css"><link rel="stylesheet" href="./css/inicio.css">
+  <link rel="stylesheet" href="./css/tema.css"><link rel="stylesheet" href="./css/estilos.css"><link rel="stylesheet" href="./css/fracsoma.css"><link rel="stylesheet" href="./css/inicio.css"><link rel="stylesheet" href="./css/chibi-3d.css">
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.186.0/examples/jsm/"}}</script>
   <title>Laboratório Digital de Matemática</title>
 </head>
 <body>
@@ -15,5 +16,6 @@
   <nav class="rodape" aria-label="Navegação principal"><a href="#/">Atividades</a><a href="#/teoria">Quadro teórico</a><a href="#/avaliador">Avaliador</a><a href="#/espiral">Diário</a><a href="#/referencias">Referências</a></nav>
   <dialog id="dialogo"><form method="dialog"><h2 id="dialogo-titulo"></h2><div id="dialogo-corpo"></div><button autofocus>Fechar</button></form></dialog>
   <script type="module" src="./js/main.js?v=17"></script>
+  <script type="module" src="./js/animacao/ativar-chibis.js?v=18"></script>
 </body>
 </html>

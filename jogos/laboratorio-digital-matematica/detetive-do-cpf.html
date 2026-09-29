@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Agência Detetive do CPF · Laboratório Digital</title>
 <meta name="description" content="Aprenda dígitos verificadores, pesos e divisão com resto em missões matemáticas simuladas.">
+<link rel="stylesheet" href="./css/chibi-3d.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.186.0/examples/jsm/"}}</script>
 <style>
 :root{--bg:#f4f6fa;--grid:#dfe5f0;--card:#fff;--tx:#1a2238;--mut:#58627c;--pri:#2f4bd0;--ok:#1f7a3a;--bad:#c62828;--line:#c9d1e3;--gold:#b7791f;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141a2b;--grid:#1e2640;--card:#1c2338;--tx:#eaeefb;--mut:#a3adc9;--pri:#8ea2ff;--ok:#6fdc8c;--bad:#ff8a8a;--line:#34405f;--gold:#f6c453}}
@@ -45,6 +47,7 @@ button{border-radius:.85rem}
 .detetive-banner{display:flex;align-items:center;gap:1rem;background:var(--card);border:1px solid var(--line);border-radius:1.25rem;padding:1rem;box-shadow:0 12px 30px #1a22381c}
 .detetive-banner p{margin:0;flex:1}
 .detetive-art{display:block;flex:none;width:clamp(7rem,25vw,11rem);aspect-ratio:1;background:url('./images/chibi-detetive.webp') center bottom/contain no-repeat;filter:drop-shadow(0 8px 10px #1a223833)}
+.detetive-art.mini{float:right;width:clamp(5rem,17vw,7rem);margin:0 0 .4rem .6rem}
 .detetive-art{cursor:pointer}.detetive-art:focus-visible{outline:3px solid var(--pri);outline-offset:3px;border-radius:1rem}
 .fala-detetive{width:fit-content;max-width:95%;margin:.5rem 0;padding:.55rem .8rem;border:1px solid var(--line);border-radius:1rem 1rem .2rem 1rem;background:var(--card);font-weight:700;box-shadow:0 7px 16px #1723491c}
 @media(prefers-reduced-motion:no-preference){
@@ -67,6 +70,8 @@ button{border-radius:.85rem}
 <main><nav class="back" aria-label="Voltar ao laboratório"><a href="./index.html#/">← Todos os jogos</a></nav><div id="app"></div></main>
 <script>
 const app=document.getElementById('app');
+const agente=()=>'<span class="detetive-art mini" role="button" tabindex="0" aria-label="Conversar com o detetive chibi"></span>';
+const animar=tipo=>requestAnimationFrame(()=>document.dispatchEvent(new CustomEvent('chibi:evento',{detail:{id:'detetive',tipo}})));
 app.addEventListener('click',event=>{
   const personagem=event.target.closest('.detetive-art');if(!personagem)return;
   let fala=app.querySelector('.fala-detetive');
@@ -104,11 +109,11 @@ function home(){
   <p class="mut">As sequências são geradas ao acaso para o exercício. Passar na conta não comprova a existência nem a titularidade de um CPF. Não digite dados pessoais neste jogo.</p>`;
 }
 
-function mission(i){G={i,d:novo(),err:0,done:false};rc()}
+function mission(i){G={i,d:novo(),err:0,done:false};rc();animar('fase')}
 function rc(){
   const m=M[G.i],b=m.ph===1?G.d:G.d.concat(calc(G.d).dv),w=b.length+1,a=m.ask;
   const fl=(k,l)=>`<div class="f"><label for="${k}">${l}</label><input id="${k}" data-k="${k}" inputmode="numeric"></div>`;
-  app.innerHTML=`<span class="badge">${rank()}</span><h2>Missão ${G.i+1}: ${m.n}</h2><p class="mut">${m.t}</p><div class="cpf">${fmt(b)}</div>
+  app.innerHTML=`<span class="badge">${rank()}</span>${agente()}<h2>Missão ${G.i+1}: ${m.n}</h2><p class="mut">${m.t}</p><div class="cpf">${fmt(b)}</div>
   <div class="card"><p>${a.includes('p')?`Multiplique cada dígito pelo peso (${w} até 2):`:'Produtos (dígito × peso):'}</p><div class="row">
   ${b.map((d,i)=>`<div class="col"><span class="dg ${m.ph===2&&i===9?'dvx':''}">${d}</span><span class="mut">× ${w-i}</span>${a.includes('p')?`<input data-k="p${i}" inputmode="numeric" aria-label="${d} vezes ${w-i}">`:`<span class="pv">${d*(w-i)}</span>`}</div>`).join('')}</div>
   ${a.includes('s')?fl('s','Soma dos produtos'):''}${a.includes('q')?fl('q','Quociente: quantas vezes o 11 cabe na soma')+fl('r','Resto: soma − 11 × quociente'):''}${a.includes('v')?fl('v','Dígito verificador'):''}</div>
@@ -128,11 +133,13 @@ function check(){
     el.className='good';el.textContent=`Missão cumprida! ${star(s)}${m.ph===2?` CPF completo: ${fmt(b.concat(c.dv))}.`:''}`;
     document.getElementById('go').textContent=G.i<3?'Próxima missão':'Ir para o Caça-Fraudes';
     $$('#app input').forEach(i=>i.disabled=true);
+    animar('acerto');
   }else{
     G.err++;el.className='wrong';
     let t=bad.p?'Confira os produtos: cada dígito vezes o seu peso.':bad.s?'Confira a soma: some todos os produtos.':(bad.q||bad.r)?'Quantas vezes o 11 cabe na soma? O resto é o que sobra.':`Confira a regra: resto ${c.r<2?'0 ou 1 dá dígito 0':'maior que 1 dá 11 − resto'}.`;
     if(G.err>=3)t+=` Pista: o primeiro campo errado deveria ser ${first}.`;
     el.textContent=t;
+    animar('erro');
   }
 }
 
@@ -140,22 +147,24 @@ function fraud(){D={n:0,ok:0};nextQ()}
 function nextQ(){
   if(D.n===5){
     const s=D.ok===5?3:D.ok===4?2:D.ok>=3?1:0;st[4]=Math.max(st[4],s);
-    app.innerHTML=`<span class="badge">${rank()}</span><h2>Caso encerrado</h2><p>Você classificou ${D.ok} de 5 sequências corretamente. ${star(s)}</p><button onclick="fraud()">Jogar de novo</button><button class="sec" onclick="home()">Menu</button>`;return}
+    app.innerHTML=`<span class="badge">${rank()}</span>${agente()}<h2>Caso encerrado</h2><p>Você classificou ${D.ok} de 5 sequências corretamente. ${star(s)}</p><button onclick="fraud()">Jogar de novo</button><button class="sec" onclick="home()">Menu</button>`;animar(D.ok>=3?'vitoria':'derrota');return}
   const d=novo(),a=calc(d).dv,b=calc(d.concat(a)).dv,valido=Math.random()<.5;let x=a,y=b;
   if(!valido){const t=1+(Math.random()*9|0);Math.random()<.5?x=(a+t)%10:y=(b+t)%10}
   D.q={cpf:d.concat(x,y),valido,a,b};
-  app.innerHTML=`<span class="badge">${rank()}</span><h2>Caso ${D.n+1} de 5</h2><p>Os dígitos verificadores passam na conta? Faça o cálculo e decida.</p>
+  app.innerHTML=`<span class="badge">${rank()}</span>${agente()}<h2>Caso ${D.n+1} de 5</h2><p>Os dígitos verificadores passam na conta? Faça o cálculo e decida.</p>
   <div class="cpf">${fmt(D.q.cpf)}</div><div id="msg" role="status"></div>
   <div id="bt"><button onclick="ans(true)">Passa</button><button class="sec" onclick="ans(false)">Não passa</button></div>
-  <button class="sec" onclick="home()">Menu</button>`;
+  <button class="sec" onclick="home()">Menu</button>`;animar('fase');
 }
 function ans(v){
   const q=D.q,ok=v===q.valido;D.n++;if(ok)D.ok++;
   const m=document.getElementById('msg');m.className=ok?'good':'wrong';
   m.textContent=`${ok?'Boa, detetive!':'Tente conferir os dois dígitos.'} Para os 9 primeiros dígitos desta sequência, os verificadores calculados são ${q.a} e ${q.b}.`;
+  animar(ok?'acerto':'erro');
   document.getElementById('bt').innerHTML=`<button onclick="nextQ()">${D.n===5?'Ver resultado':'Próximo caso'}</button>`;
 }
 home();
 </script>
+<script type="module" src="./js/animacao/ativar-chibis.js?v=18"></script>
 </body>
 </html>

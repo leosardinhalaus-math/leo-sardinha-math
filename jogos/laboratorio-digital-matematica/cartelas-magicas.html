@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>O Grimório das Seis Runas · Laboratório Digital</title>
 <meta name="description" content="Cartelas mágicas, potências de 2 e base binária em quatro atividades interativas.">
+<link rel="stylesheet" href="./css/chibi-3d.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.186.0/examples/jsm/"}}</script>
 <style>
 :root{--bg:#f1eefb;--star:#d9d1f3;--card:#fff;--tx:#231a4a;--mut:#5d5488;--pri:#6a3fd6;--ok:#1f7a3a;--bad:#c62828;--line:#cfc6ee;--gold:#a8620a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#120d26;--star:#3a2f6b;--card:#1d1640;--tx:#efeaff;--mut:#b3a8dd;--pri:#b79cff;--ok:#79e29a;--bad:#ff8f8f;--line:#3d3270;--gold:#f4c95d}}
@@ -97,6 +99,7 @@ const tier=p=>p>=63?4:p>=48?3:p>=32?2:p>=16?1:0;
 const wizard=()=>`<img class="mago-chibi" src="./images/mago-chibi.webp" width="900" height="1080" alt="Mestre Arcano, mago chibi de chapéu roxo, barba branca e cajado luminoso" role="button" tabindex="0" aria-label="Conversar com o Mestre Arcano" data-fala="Uma runa de cada vez. A magia está na soma!">`;
 const heroT=(t,dim)=>`<span class="sprite-jogo heroi nivel-${t}" role="button" tabindex="0" aria-label="Conversar com o herói chibi de nível ${t+1}" data-fala="Escolha as runas e me dê poder!"${dim?' style="opacity:.35"':''}></span>`;
 const dragon=(n,dead)=>`<span class="sprite-jogo dragao cor-${n%5}${dead?' vencido':''}" role="button" tabindex="0" aria-label="Conversar com o dragão chibi" data-fala="${dead?'Você acertou meu número!':'Raa! Monte o dano exato para me vencer!'}"></span>`;
+const animar=(id,tipo)=>queueMicrotask(()=>document.dispatchEvent(new CustomEvent('chibi:evento',{detail:{id,tipo}})));
 app.addEventListener('click',event=>{
   const personagem=event.target.closest('.fig [data-fala]');
   if(!personagem||!app.contains(personagem))return;
@@ -110,7 +113,7 @@ app.addEventListener('click',event=>{
 app.addEventListener('keydown',event=>{
   if((event.key==='Enter'||event.key===' ')&&event.target.matches('.fig [data-fala]')){event.preventDefault();event.target.click()}
 });
-function nextD(){B.won=false;if(B.n<5)B.d=hpNew();draw()}
+function nextD(){B.won=false;if(B.n<5)B.d=hpNew();draw();animar('heroi',B.n===5?'vitoria':'fase')}
 document.getElementById('print').innerHTML=[0,1,2,3,4,5].map(cardHTML).join('');
 
 let tab='ritual',step=0,resp=[],started=false,pl=[0,0,0,0,0,0],B=null;
@@ -123,7 +126,7 @@ function draw(){
 }
 function ritual(){
   if(!started)return `<div class="card ritual-intro"><div class="fig">${wizard()}</div><p>Eu sou o Mestre Arcano e leio mentes. Imagine o <b>nível de poder</b> do seu herói, um número de <b>1 a 63</b>, e não conte a ninguém.</p><p class="mut">Vou mostrar seis pergaminhos, um para cada runa. Diga se o seu número está neles.</p><button onclick="started=true;draw()">Já pensei!</button></div>`;
-  if(step<6)return `<p class="mut">Pergaminho ${step+1} de 6</p>${cardHTML(step)}<h2>A Runa de ${R[step].n} brilha no seu número?</h2><button onclick="resp[${step}]=1;step++;draw()">Sim (1)</button><button class="sec" onclick="resp[${step}]=0;step++;draw()">Não (0)</button>${step?'<button class="sec" onclick="step--;resp.length=step;draw()">Voltar</button>':''}`;
+  if(step<6)return `<div class="fig fig-pequena">${wizard()}</div><p class="mut">Pergaminho ${step+1} de 6</p>${cardHTML(step)}<h2>A Runa de ${R[step].n} brilha no seu número?</h2><button onclick="resp[${step}]=1;step++;draw()">Sim (1)</button><button class="sec" onclick="resp[${step}]=0;step++;draw()">Não (0)</button>${step?'<button class="sec" onclick="step--;resp.length=step;draw()">Voltar</button>':''}`;
   const v=val(resp);
   return `<div class="card">${v?`<div class="fig">${heroT(tier(v))}</div><p style="text-align:center">Vejo tudo... O poder do seu herói é</p><div class="big">${v}</div><p class="tt">${titulo(v)}</p><p style="text-align:center"><b>${conta(resp)}</b></p><p class="mut">Cada runa acesa soma o seu valor. O truque: os valores 1, 2, 4, 8, 16 e 32 dobram a cada runa.</p>`:'<p>Nenhuma runa brilhou. Isso daria poder 0, mas o herói vai de 1 a 63. Tente de novo!</p>'}</div><button onclick="step=0;resp=[];started=false;draw()">Ler outra mente</button>`;
 }
@@ -137,7 +140,7 @@ function hpNew(){const [a,b]=RANGE[B.n];return a+(Math.random()*(b-a+1)|0)}
 function batalha(){
   if(!B){B={n:0,xp:0,hp:3,miss:0,sel:[0,0,0,0,0,0],msg:'',cls:''};B.d=hpNew()}
   if(B.won)return `<div class="card"><div class="fig">${heroT(Math.min(B.n,4))}${dragon(B.n-1,1)}</div><h2>Dragão derrotado! +${B.gain} XP</h2></div><button onclick="nextD()">${B.n===5?'Ver resultado':'Próximo dragão'}</button>`;
-  if(B.hp<=0)return `<div class="card"><div class="fig">${dragon(B.n)}</div><h2>O dragão venceu desta vez</h2><p>Você chegou ao dragão ${B.n+1} com ${B.xp} XP. Cuidado: se passar do dano, o dragão contra-ataca.</p></div><button onclick="B=null;draw()">Tentar de novo</button>`;
+  if(B.hp<=0)return `<div class="card"><div class="fig">${heroT(Math.min(B.n,4),true)}${dragon(B.n)}</div><h2>O dragão venceu desta vez</h2><p>Você chegou ao dragão ${B.n+1} com ${B.xp} XP. Cuidado: se passar do dano, o dragão contra-ataca.</p></div><button onclick="B=null;draw()">Tentar de novo</button>`;
   if(B.n===5)return `<div class="card"><div class="fig">${heroT(4)}</div><h2>Os cinco dragões caíram!</h2><p>XP total: <b>${B.xp}</b>. ${B.xp>=45?'Você é um Arquimago do Grimório!':B.xp>=30?'Você é um Mago de Elite!':'Você é um Aventureiro corajoso!'}</p></div><button onclick="B=null;draw()">Nova aventura</button>`;
   const dano=val(B.sel);
   return `<p class="mut">Dragão ${B.n+1} de 5 · XP ${B.xp} · ${'❤️'.repeat(B.hp)}${'🖤'.repeat(3-B.hp)}</p><div class="card"><div class="fig">${heroT(Math.min(B.n,4))}${dragon(B.n)}</div><p class="tt">🐉 Vida: ${B.d}</p><p style="text-align:center">Acenda as runas para causar <b>exatamente ${B.d}</b> de dano.</p>${runeBtns(B.sel,'bt')}<p class="tt">Dano do feitiço: ${dano}</p><p class="${B.cls}" role="status">${B.msg}</p></div><button onclick="cast()">Lançar feitiço</button>`;
@@ -145,12 +148,12 @@ function batalha(){
 function bt(i){B.sel[i]^=1;B.msg='';draw()}
 function cast(){
   const dano=val(B.sel);
-  if(!dano){B.msg='Acenda pelo menos uma runa.';B.cls='wrong';return draw()}
+  if(!dano){B.msg='Acenda pelo menos uma runa.';B.cls='wrong';draw();animar('heroi','erro');return}
   if(dano===B.d){
     B.gain=Math.max(10-2*B.miss,4);B.xp+=B.gain;B.n++;B.miss=0;B.sel=[0,0,0,0,0,0];B.msg='';B.won=true;
   }else if(dano<B.d){B.miss++;B.msg=`Faltaram ${B.d-dano} de dano. Falta uma runa?`;B.cls='wrong'}
   else{B.miss++;B.hp--;B.msg=`Passou ${dano-B.d} do dano! O dragão contra-ataca 💥`;B.cls='wrong'}
-  draw();
+  draw();animar('heroi',B.won?'acerto':B.hp<=0?'derrota':dano>B.d?'erro':'erro');
 }
 function segredo(){
   return `<div class="card"><div class="fig">${wizard()}</div><p>O segredo do Mestre Arcano: os valores das runas <b>dobram</b> a cada uma (1, 2, 4, 8, 16, 32) e todo número de 1 a 63 tem uma única receita feita com elas. Em Matemática, isso é escrever o número em <b>base 2</b>.</p><p>Cada resposta Sim ou Não corta os números possíveis pela metade. Depois de 6 respostas, sobra só um.</p></div>
@@ -165,5 +168,6 @@ function upd(){
 }
 draw();
 </script>
+<script type="module" src="./js/animacao/ativar-chibis.js?v=18"></script>
 </body>
 </html>

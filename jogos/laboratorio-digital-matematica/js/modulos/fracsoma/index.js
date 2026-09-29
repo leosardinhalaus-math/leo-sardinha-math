@@ -48,7 +48,8 @@ export function montar(container){
     const cor=d=>`hsl(${DENOMINADORES.indexOf(d)*43%360} 80% 62%)`;
     const expressao=()=>assinatura(desafios[nivel]);
     const soma=()=>valorPecas(pecas);
-    function iniciarNivel(){erros=0;concluido=false;visiveis=new Set(desafios[nivel].map(([,d])=>d));pecas=[];numerador=denominador=mensagem=classe='';desenhar()}
+    function animar(tipo){document.dispatchEvent(new CustomEvent('chibi:evento',{detail:{id:'fracsoma',tipo}}))}
+    function iniciarNivel(){erros=0;concluido=false;visiveis=new Set(desafios[nivel].map(([,d])=>d));pecas=[];numerador=denominador=mensagem=classe='';desenhar();queueMicrotask(()=>animar('fase'))}
     function linha(d){const usadas=pecas.filter(x=>x===d).length;const partes=Array.from({length:d},(_,i)=>`<span class="fs-parte ${i<usadas?'fs-usada':''}" style="--fs-cor:${cor(d)}"></span>`).join('');return `<div class="fs-linha"><strong>1/${d}</strong><button type="button" class="fs-trilho" data-pegar="${d}" aria-label="Adicionar peça um sobre ${d} à soma" ${concluido||usadas>=d?'disabled':''}>${partes}</button></div>`}
     function desenhar(){
       const total=soma();
@@ -63,19 +64,19 @@ export function montar(container){
         <div class="fs-cartao"><strong>Linhas visíveis</strong><div class="fs-linhas">${DENOMINADORES.map(d=>`<button type="button" data-linha="${d}" aria-pressed="${visiveis.has(d)}">1/${d}</button>`).join('')}</div></div>
         <div class="fs-cartao"><div class="fs-resposta"><strong>Resposta:</strong><label>Numerador <input id="fs-numerador" inputmode="numeric" pattern="[0-9]*" maxlength="6" value="${numerador}" ${concluido?'disabled':''}></label><span aria-hidden="true">/</span><label>Denominador <input id="fs-denominador" inputmode="numeric" pattern="[0-9]*" maxlength="6" value="${denominador}" ${concluido?'disabled':''}></label><button type="button" class="primario" data-acao="${concluido?'proximo':'conferir'}">${concluido?nivel===desafios.length-1?'Ver resultado':'Próximo desafio':'Conferir'}</button></div><p class="fs-mensagem ${classe}" role="status">${mensagem}</p></div></div>`;
     }
-    function avisar(texto,tipo=''){mensagem=texto;classe=tipo;const saida=el.querySelector('.fs-mensagem');saida.textContent=texto;saida.className=`fs-mensagem ${tipo}`}
+    function avisar(texto,tipo=''){mensagem=texto;classe=tipo;const saida=el.querySelector('.fs-mensagem');saida.textContent=texto;saida.className=`fs-mensagem ${tipo}`;if(tipo==='erro')animar('erro')}
     function conferir(){
       if(!/^\d{1,6}$/.test(numerador)||!/^[1-9]\d{0,5}$/.test(denominador)){avisar('Digite numerador e denominador inteiros. O denominador precisa ser maior que zero.','erro');return}
       const alvo=valorDesafio(desafios[nivel]);
       if(Number(numerador)*UNIDADE===alvo*Number(denominador)){
         concluido=true;pontos+=Math.max(10-2*erros,4);
-        const [n,d]=fracaoReduzida(alvo);mensagem=`Certo! ${expressao()} = ${n}/${d}. Você pode montar essa soma com as peças de vários modos.`;classe='acerto';desenhar();
+        const [n,d]=fracaoReduzida(alvo);mensagem=`Certo! ${expressao()} = ${n}/${d}. Você pode montar essa soma com as peças de vários modos.`;classe='acerto';desenhar();animar('acerto');
       }else{erros++;avisar('Ainda não. Monte a soma e procure uma linha em que o cursor roxo coincida com uma divisão.','erro')}
     }
     function proximo(){
       if(nivel<desafios.length-1){nivel++;iniciarNivel();return}
       concluir('fracsoma');const melhor=Math.max(pontos,recorde());salvar('fracsoma-recorde',melhor);
-      el.innerHTML=`<div class="fs fs-fim"><h2>Missão cumprida!</h2><p>Você completou os ${desafios.length} desafios com <strong>${pontos} pontos</strong>. Recorde neste aparelho: ${melhor}.</p><button type="button" class="primario" data-acao="reiniciar">Jogar de novo</button></div>`;
+      el.innerHTML=`<div class="fs fs-fim"><h2>Missão cumprida!</h2><p>Você completou os ${desafios.length} desafios com <strong>${pontos} pontos</strong>. Recorde neste aparelho: ${melhor}.</p><button type="button" class="primario" data-acao="reiniciar">Jogar de novo</button></div>`;animar('vitoria');
     }
     el.addEventListener('input',event=>{
       if(event.target.id==='fs-numerador')numerador=event.target.value.replace(/\D/g,'').slice(0,6);

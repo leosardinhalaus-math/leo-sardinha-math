@@ -1,0 +1,10 @@
+/* O canvas é transparente; os controles originais continuam recebendo cliques. */
+#chibi3d-canvas{position:fixed;inset:0;z-index:8;pointer-events:none;max-width:none;max-height:none}
+.chibi3d-pronto{opacity:0!important}
+body.chibi3d-ligado .fala-personagem,body.chibi3d-ligado .fala-modulo,
+body.chibi3d-ligado .fala-jogo,body.chibi3d-ligado .fala-detetive{display:none!important}
+.chibi3d-balao{position:fixed;z-index:12;transform:translate(-50%,-100%);width:max-content;max-width:min(16rem,70vw);padding:.55rem .85rem;border-radius:1rem 1rem 1rem .18rem;border:1px solid #dec591;background:#fffaf0;color:#322545;font:bold .86rem/1.4 system-ui,sans-serif;box-shadow:0 9px 22px #352a4a38;pointer-events:none;text-align:center}
+.chibi3d-balao[hidden]{display:none}
+#chibi3d-voz{position:fixed;right:1rem;bottom:1rem;z-index:14;border:1px solid #f0d79b;border-radius:2rem;padding:.5rem .8rem;background:#332747;color:#fff;font:700 .75rem system-ui,sans-serif;box-shadow:0 6px 18px #221b3644;cursor:pointer}
+.chibi3d-sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+@media print{#chibi3d-canvas,#chibi3d-voz,.chibi3d-balao{display:none!important}.chibi3d-pronto{opacity:1!important}}
