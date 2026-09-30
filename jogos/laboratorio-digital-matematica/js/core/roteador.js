@@ -1,5 +1,6 @@
 import {catalogo} from '../dados/textos.js';
 import {ler} from './estado.js';
+import {animar} from './ui.js';
 
 const caminhos={adivinhacao:'adivinhacao',fracsoma:'fracsoma',abelha:'abelha',poligonos:'poligonos',divisores:'divisores',cpf:'cpf',kente:'kente',estacao:'estacao',teoria:'teoria',avaliador:'avaliador',espiral:'espiral',referencias:'referencias'};
 const destacados=['grimorio','detetive','fracsoma'];
@@ -85,7 +86,7 @@ export async function navegar(){
   }
   if(!caminhos[slug]){main.innerHTML='<h1>Página não encontrada</h1><a href="#/">Voltar ao início</a>';return}
   try{
-    const revisao=slug==='fracsoma'?'?v=17':'';
+    const revisao=slug==='fracsoma'?'?v=21':'';
     const modulo=await import(`../modulos/${caminhos[slug]}/index.js${revisao}`);
     if(location.hash.replace(/^#\/?/,'').split('/')[0]!==slug)return;
     atual=modulo;modulo.montar(main);
@@ -102,6 +103,7 @@ export async function navegar(){
         figura.append(fala);
         figura.addEventListener('click',()=>reagir(figura,fala));
         ativarTeclado(figura);
+        animar(slug,'fase');
       }
     }
     main.focus();window.scrollTo(0,0);

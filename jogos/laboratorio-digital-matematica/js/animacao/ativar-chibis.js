@@ -142,11 +142,16 @@ function iniciar(){
     const dt=Math.min(.05,(agora-ultimo)/1000);ultimo=agora;
     if(document.hidden){requestAnimationFrame(quadro);return}
     tamanho();renderizador.clear();
+    for(const item of ativos.values())item.personagem.root.visible=false;
     for(const item of ativos.values()){
       const r=item.elemento.getBoundingClientRect();
       if(r.width<45||r.height<45||r.bottom<0||r.top>altura||r.right<0||r.left>largura){if(item.balao)item.balao.hidden=true;continue}
       item.personagem.atualizar(dt);
-      if(item.personagem.silencio>16&&!item.elemento.classList.contains('cartao-personagem')){
+      const conversaParado=item.elemento.classList.contains('mascote-modulo')||
+        item.elemento.classList.contains('detetive-art')||
+        item.elemento.classList.contains('heroi')||
+        item.id==='mago'&&item.elemento.classList.contains('personagem-hero');
+      if(item.personagem.silencio>16&&conversaParado){
         dizer(item,'parado');
       }
       if(item.balao&&!item.balao.hidden){
@@ -158,9 +163,10 @@ function iniciar(){
       if(w<=0||h<=0)continue;
       camera.left=-1.90*r.width/r.height;camera.right=1.90*r.width/r.height;
       camera.top=1.90;camera.bottom=-1.90;camera.updateProjectionMatrix();
-      for(const outro of ativos.values())outro.personagem.root.visible=outro===item;
+      item.personagem.root.visible=true;
       renderizador.setViewport(x,y,w,h);renderizador.setScissor(x,y,w,h);renderizador.setScissorTest(true);
       renderizador.render(cena,camera);
+      item.personagem.root.visible=false;
     }
     renderizador.setScissorTest(false);
     requestAnimationFrame(quadro);
@@ -173,6 +179,9 @@ function iniciar(){
     const item=candidatos.find(i=>i.elemento.classList.contains('mascote-modulo'))||
       candidatos.find(i=>i.elemento.classList.contains('heroi')||i.elemento.classList.contains('detetive-art'))||candidatos[0];
     if(!item)return;
+    const agora=performance.now();
+    if(item.ultimoTipo===tipo&&agora-item.ultimaFala<650)return;
+    item.ultimoTipo=tipo;item.ultimaFala=agora;
     const estado={acerto:'comemorar',erro:'errar',vitoria:'comemorar',derrota:'dano',fase:'pular'}[tipo]||'idle';
     item.personagem.estado(estado,tipo==='vitoria'?2:1.1);
     dizer(item,tipo);
