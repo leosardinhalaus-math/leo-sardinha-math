@@ -1,4 +1,4 @@
-import {modulo,esc,animar} from '../../core/ui.js';import {ler,salvar} from '../../core/estado.js';
+import {modulo,esc,animar} from '../../core/ui.js?v=22';import {ler,salvar} from '../../core/estado.js';
 const cores=['#e7ac34','#ac3b38','#22548b','#25825c','#111c28','#f1ead4'];const modelos=[[0,1,0,1],[2,2,3,3],[4,0,4,0],[1,3,1,3],[5,0,5,0],[3,4,3,4]];
  let pintura=false;
 function amostra(p){return `<span class="amostra" aria-hidden="true">${p.map(i=>`<i style="background:${cores[i]}"></i>`).join('')}</span>`}

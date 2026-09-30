@@ -1,4 +1,4 @@
-import {modulo} from '../../core/ui.js';
+import {modulo} from '../../core/ui.js?v=22';
 import {ler,salvar,concluir} from '../../core/estado.js';
 
 // Múltiplo de todos os denominadores: peças e alvos têm valor inteiro.
