@@ -13,6 +13,7 @@
     "prebuild": "npm run models",
     "predev": "npm run models",
     "test:combat": "node --experimental-strip-types scripts/test-combat.ts",
+    "test:save": "node --experimental-strip-types scripts/test-save-game.ts",
     "test:models": "node --experimental-strip-types scripts/test-generated-models.ts"
   },
   "dependencies": {

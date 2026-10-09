@@ -2,6 +2,7 @@ import { stepCombat, SPAWN_ZONES, zoneAvailable, type CombatUnit, type CombatEve
 import { getCardProfile, abilityDescription } from "@/game/cardProfiles";
 import { createChallengePicker, type Challenge } from "@/data/powerUpChallenges";
 import { WORLD_MAPS } from "@/data/worldMaps";
+import { readStorage, storageKeys, writeStorage } from "@/data/saveGame";
 import { getCardImage, getCardImageFallback } from "@/data/cardArt";
 import RoyaleCard from "./RoyaleCard";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -200,11 +201,6 @@ const survivalBadges: SurvivalBadge[] = [
   { id: "integral-wall", wave: 8, name: "Muralha Integral", icon: "∫", detail: "Alcance a onda 8", reward: 150 },
   { id: "infinite-scholar", wave: 12, name: "Sábio do Infinito", icon: "∞", detail: "Alcance a onda 12", reward: 250 },
 ];
-const storageKeys = { deck: "calculus-royale:main-deck", worlds: "calculus-royale:completed-worlds", levels: "calculus-royale:card-levels", essence: "calculus-royale:essence", wins: "calculus-royale:wins", coins: "calculus-royale:coins", worldIndex: "calculus-royale:world-index", chapter: "calculus-royale:chapter", survivalLeaderboard: "calculus-royale:survival-leaderboard", survivalBadges: "calculus-royale:survival-badges", volume: "calculus-royale:volume", muted: "calculus-royale:muted", inventory: "calculus-royale:inventory", playerName: "calculus-royale:player-name" };
-const readStorage = <T,>(key: string, fallback: T): T => {
-  if (typeof window === "undefined") return fallback;
-  try { const value = window.localStorage.getItem(key); return value ? JSON.parse(value) as T : fallback; } catch { return fallback; }
-};
 const initialDeck = () => {
   const fallback = getCumulativeCards(0).map((card) => card.id);
   const saved = readStorage<string[]>(storageKeys.deck, fallback);
@@ -376,20 +372,20 @@ export default function GameCanvas() {
     setToast(`Fase ${targetWorldIndex + 1} concluída! Celebração iniciada no mapa.`);
   };
 
-  useEffect(() => { window.localStorage.setItem(storageKeys.deck, JSON.stringify(mainDeckIds)); }, [mainDeckIds]);
-  useEffect(() => { window.localStorage.setItem(storageKeys.worlds, JSON.stringify(completedWorlds)); }, [completedWorlds]);
-  useEffect(() => { window.localStorage.setItem(storageKeys.levels, JSON.stringify(cardLevels)); }, [cardLevels]);
-  useEffect(() => { window.localStorage.setItem(storageKeys.essence, JSON.stringify(essence)); }, [essence]);
-  useEffect(() => { window.localStorage.setItem(storageKeys.wins, JSON.stringify(wins)); }, [wins]);
-  useEffect(() => { window.localStorage.setItem(storageKeys.coins, JSON.stringify(coins)); }, [coins]);
-  useEffect(() => { window.localStorage.setItem(storageKeys.worldIndex, JSON.stringify(worldIndex)); }, [worldIndex]);
-  useEffect(() => { window.localStorage.setItem(storageKeys.chapter, JSON.stringify(chapter)); }, [chapter]);
-  useEffect(() => { window.localStorage.setItem(storageKeys.volume, JSON.stringify(soundVolume)); }, [soundVolume]);
-  useEffect(() => { window.localStorage.setItem(storageKeys.muted, JSON.stringify(soundMuted)); }, [soundMuted]);
-  useEffect(() => { window.localStorage.setItem(storageKeys.inventory, JSON.stringify(rewardInventory)); }, [rewardInventory]);
+  useEffect(() => { writeStorage(storageKeys.deck, mainDeckIds); }, [mainDeckIds]);
+  useEffect(() => { writeStorage(storageKeys.worlds, completedWorlds); }, [completedWorlds]);
+  useEffect(() => { writeStorage(storageKeys.levels, cardLevels); }, [cardLevels]);
+  useEffect(() => { writeStorage(storageKeys.essence, essence); }, [essence]);
+  useEffect(() => { writeStorage(storageKeys.wins, wins); }, [wins]);
+  useEffect(() => { writeStorage(storageKeys.coins, coins); }, [coins]);
+  useEffect(() => { writeStorage(storageKeys.worldIndex, worldIndex); }, [worldIndex]);
+  useEffect(() => { writeStorage(storageKeys.chapter, chapter); }, [chapter]);
+  useEffect(() => { writeStorage(storageKeys.volume, soundVolume); }, [soundVolume]);
+  useEffect(() => { writeStorage(storageKeys.muted, soundMuted); }, [soundMuted]);
+  useEffect(() => { writeStorage(storageKeys.inventory, rewardInventory); }, [rewardInventory]);
   useEffect(() => { completedWorldsRef.current = completedWorlds; }, [completedWorlds]);
-  useEffect(() => { window.localStorage.setItem(storageKeys.survivalLeaderboard, JSON.stringify(survivalLeaderboard)); }, [survivalLeaderboard]);
-  useEffect(() => { window.localStorage.setItem(storageKeys.survivalBadges, JSON.stringify(survivalBadgeIds)); }, [survivalBadgeIds]);
+  useEffect(() => { writeStorage(storageKeys.survivalLeaderboard, survivalLeaderboard); }, [survivalLeaderboard]);
+  useEffect(() => { writeStorage(storageKeys.survivalBadges, survivalBadgeIds); }, [survivalBadgeIds]);
 
 
 
@@ -562,7 +558,7 @@ export default function GameCanvas() {
     const nextName = withName ? nameDraft.trim().slice(0, 24) : "";
     if (withName && !nextName) { setToast("Digite um nome ou escolha Jogar sem nome."); return; }
     setPlayerName(nextName);
-    window.localStorage.setItem(storageKeys.playerName, JSON.stringify(nextName));
+    writeStorage(storageKeys.playerName, nextName);
     setView("lobby");
   };
 

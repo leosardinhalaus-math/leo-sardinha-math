@@ -21,6 +21,7 @@ Abra o endereço mostrado pelo Vite. Para verificar e criar uma versão estátic
 npm run check
 npm run test:three
 npm run test:combat
+npm run test:save
 npm run build
 npm run test:models
 python -m http.server 8000 --directory dist/public
@@ -43,7 +44,9 @@ Abra http://localhost:8000. Não abra `index.html` por `file://`: módulos, mani
 | `scripts/generate-models.ts` | Exporta os 45 modelos GLB com animações completas |
 | `client/src/game/world.ts` | Cinco ilhas procedurais com torres, pontes e ornamentos |
 | `client/src/game/collisions.ts` | Conversão de coordenadas e colisões Box3 com subpassos e deslize |
+| `client/src/data/saveGame.ts` | Save versionado, migração dos dados antigos e compatibilidade com as chaves existentes |
 | `client/public/assets/models/manifest.json` | Configuração opcional dos personagens e mapas externos |
+| `client/public/manifest.webmanifest`, `sw.js` | Instalação como PWA e cache offline do aplicativo |
 | `client/src/world-arena.css` | Canvas responsivo e HUD da arena |
 | `client/src/data/` | Cartas, mapas, artes e desafios |
 | `art-source/`, `.packed/`, `scripts/` | Fontes e preparação das imagens incluídas no projeto |
@@ -59,6 +62,12 @@ A arena normal agora começa após a primeira invocação. Toque numa carta, esc
 A simulação pura em `combat.ts` roda em passos de 100 ms e independe de FPS/WebGL. O avanço vira X entre −9 e +9; a faixa vira Z = ±1,65. Tropas de faixas diferentes não colidem. A colisão com a torre, em 96% de avanço, aplica o poder da carta uma única vez e consome a unidade; os efeitos secundários são aplicados nos duelos entre tropas. Feitiços não causam mais dano remoto imediato ao serem lançados. Zoom agora acelera por 3 s, sem teletransportar através do rival. O antigo modal de choque foi substituído por partículas e um registro dos efeitos reais. Vitória/derrota aparecem antes de seguir ao fluxo de recompensas.
 
 A Sobrevivência recebe os novos modelos e animações, mas conserva seu sistema próprio de defesa por cartas e ondas; a escolha de spawn e os duelos com status pertencem à arena normal.
+
+## Progresso e funcionamento offline
+
+O progresso local usa um envelope de save com versão de esquema. Na primeira leitura, moedas, deck, inventário, nome, recordes e demais dados das chaves anteriores são migrados automaticamente para `calculus-royale:save-v2`, sem apagar nem renomear as chaves legadas. As gravações continuam atualizando os dois formatos para preservar compatibilidade com versões já publicadas. Dados ausentes, inválidos ou armazenamento indisponível não impedem a inicialização do jogo.
+
+O manifesto e o service worker tornam o jogo instalável como PWA. Depois da primeira visita com conexão, o shell da aplicação e os recursos usados são mantidos em cache para novas aberturas offline. Navegações procuram primeiro uma versão atualizada e usam o cache como recuperação. O service worker só é registrado no build de produção; durante o desenvolvimento, o Vite continua sem cache persistente.
 
 Box3 impede os avatares de entrar nos obstáculos estáticos, com pequenos subpassos para evitar atravessamento. As rotas e pontes ficam livres. Luz hemisférica e direcional, sombras, fundo e névoa compõem a cena. O pixel ratio é limitado a 1,5 e sombras a 1024²; câmera e canvas acompanham o tamanho do contêiner. Fora da arena a cena é descartada. Sem WebGL, o jogo continua no cenário ilustrado com os retratos se movimentando.
 
