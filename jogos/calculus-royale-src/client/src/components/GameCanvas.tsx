@@ -690,7 +690,23 @@ export default function GameCanvas() {
 
           {view === "battle" && <aside ref={handRef} className="battle-hand" aria-label="Mão de cartas">
             <div className="hand-toolbar"><strong>Mão de batalha <span>· {activeCards.length} cartas</span></strong><span className="hand-energy"><Zap size={18} /> {energy.toFixed(1)} / 10 <span>elixir</span></span><button onClick={() => setView("lobby")}><Layers3 size={17} /> Preparação</button></div>
-            {pendingCard && <section className="spawn-panel" aria-label="Posicionar personagem"><div className="spawn-heading"><img src={getCardImage(pendingCard.id)} alt=""/><div><strong>{pendingCard.name}</strong><small>Escolha a zona · batalha pausada</small></div><button onClick={()=>setPendingCard(null)} aria-label="Cancelar posicionamento">×</button></div><p>{abilityDescription(pendingCard.id)}</p><div className="spawn-zones" role="group" aria-label="Zonas de invocação">{SPAWN_ZONES.map(zone=><button key={zone.id} aria-pressed={spawnZone===zone.id} disabled={!zoneAvailable(zone.id,units)} onClick={()=>setSpawnZone(zone.id)}>{zone.id}<small>{zone.label}</small></button>)}</div><button className="spawn-confirm" onClick={confirmSpawn} disabled={!arenaAvailable || !zoneAvailable(spawnZone,units)}>{arenaAvailable ? `Invocar em ${spawnZone} · ${pendingCard.cost} elixir` : "Carregando prévia…"}</button></section>}
+            {pendingCard && <section className="spawn-panel" aria-label="Posicionar personagem">
+              <div className="spawn-heading"><img src={getCardImage(pendingCard.id)} alt=""/><div><strong>{pendingCard.name}</strong><small>POSICIONAMENTO TÁTICO · BATALHA PAUSADA</small></div><button onClick={()=>setPendingCard(null)} aria-label="Cancelar posicionamento">×</button></div>
+              <p>{abilityDescription(pendingCard.id)}</p>
+              <div className="spawn-direction" aria-label="Direção da arena"><span>↑ Avanço · Torre do Erro</span><strong>Retaguarda → Meio → Frente</strong><span>↓ Início · Sua torre</span></div>
+              <p className="spawn-map-hint">A e B são faixas paralelas. Toque uma zona destacada no mapa 3D ou escolha a posição abaixo.</p>
+              <div className="spawn-depth-guide" aria-hidden="true"><span>FAIXA</span><span>1 · RETAGUARDA</span><span>2 · MEIO</span><span>3 · FRENTE</span></div>
+              <div className="spawn-zones" role="group" aria-label="Zonas de invocação">
+                {(["A","B"] as const).map(lane=><div className="spawn-lane-row" key={lane}>
+                  <div className="spawn-lane-heading"><strong>{lane}</strong><small>Faixa</small></div>
+                  {SPAWN_ZONES.filter(zone=>zone.id[0]===lane).map(zone=>{
+                    const available=zoneAvailable(zone.id,units),selected=spawnZone===zone.id;
+                    return <button key={zone.id} className="spawn-zone" aria-label={`Zona ${zone.id}, ${zone.label}${selected?", selecionada":""}${available?", disponível":", ocupada"}`} aria-pressed={selected} disabled={!available} title={`${zone.id} · ${zone.label}${available?"":" · ocupada"}`} onClick={()=>setSpawnZone(zone.id)}><span className="spawn-zone-code">{zone.id}</span><span className="spawn-zone-copy"><strong>{zone.label}</strong><small>{selected?"Selecionada":available?"Livre":"Ocupada"}</small></span></button>;
+                  })}
+                </div>)}
+              </div>
+              <button className="spawn-confirm" onClick={confirmSpawn} disabled={!arenaAvailable || !zoneAvailable(spawnZone,units)}>{arenaAvailable ? `Invocar em ${spawnZone} · ${pendingCard.cost} elixir` : "Carregando prévia…"}</button>
+            </section>}
             {!pendingCard && <div className="powerups"><span className="section-label">ITENS DE EVOLUÇÃO</span><div className="powerup-row"><button onClick={() => requestPowerUp("limit")}><span className="power-icon coral"><ArrowUpRight size={17} /></span><span><strong>Limite</strong><small>+2 energia</small></span></button><button onClick={() => requestPowerUp("root")}><span className="power-icon cyan"><Shield size={17} /></span><span><strong>Raiz</strong><small>+8 HP torre</small></span></button><button onClick={() => requestPowerUp("zoom")}><span className="power-icon gold"><Flame size={17} /></span><span><strong>Zoom</strong><small>acelera tropas</small></span></button></div></div>}
             {!pendingCard && <div className="card-stack">{activeCards.map((card) => <RoyaleCard key={card.id} card={card} level={(cardLevels[card.id] ?? 0) + 1} disabled={energy < card.cost || battleResolvedRef.current || Boolean(challenge) || Boolean(pendingCard) || Boolean(battleOutcome)} variant="compact" onPlay={playCard} />)}</div>}
           </aside>}
