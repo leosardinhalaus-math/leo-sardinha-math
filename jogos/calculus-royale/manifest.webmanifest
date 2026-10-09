@@ -1,0 +1,14 @@
+{
+  "name": "Calculus Royale",
+  "short_name": "Calculus",
+  "description": "Arena educacional de cálculo com cartas, personagens e desafios matemáticos.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#071329",
+  "theme_color": "#071329",
+  "icons": [
+    {"src":"./assets/icons/calculus-mark.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}
