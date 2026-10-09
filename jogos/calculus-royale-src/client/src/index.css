@@ -55,6 +55,7 @@ button:focus-visible { outline: 2px solid #54e6ee; outline-offset: 2px; }
 .chapter strong { font-size: 10px; font-weight: 600; line-height: 1.2; }
 .chapter small { font-size: 8px; color: #628098; margin-top: 2px; }
 .chapter.current small { color: var(--glow); }
+.chapter:disabled{cursor:not-allowed;opacity:.42}.chapter.done{border-color:rgba(75,229,171,.18)}.chapter.done .check{color:#4be5ab}.chapter.locked:hover{background:transparent}
 .check { color: #4be5ab; font-size: 13px; }
 .xp-card { margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(145, 190, 214, .13); }
 .xp-card > div:first-child { display: flex; justify-content: space-between; color: #7794aa; font-family: 'DM Mono'; font-size: 9px; }

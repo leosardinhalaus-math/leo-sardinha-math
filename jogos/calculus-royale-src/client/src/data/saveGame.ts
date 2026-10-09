@@ -10,6 +10,7 @@ export const storageKeys = {
   coins: 'calculus-royale:coins',
   worldIndex: 'calculus-royale:world-index',
   chapter: 'calculus-royale:chapter',
+  stages: 'calculus-royale:stage-progress',
   survivalLeaderboard: 'calculus-royale:survival-leaderboard',
   survivalBadges: 'calculus-royale:survival-badges',
   volume: 'calculus-royale:volume',

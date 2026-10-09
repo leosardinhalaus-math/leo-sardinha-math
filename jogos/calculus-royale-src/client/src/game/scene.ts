@@ -12,7 +12,7 @@ export type ArenaState={allies:ArenaUnit[];enemies:ArenaUnit[];paused:boolean;ev
 type Manifest={useGenerated?:boolean;characters?:Record<string,ModelSpec>;worlds?:Record<string,{url:string}>};
 export type GameHandle={setState:(state:ArenaState)=>void;resetCamera:()=>void;viewIsland:()=>void;dispose:()=>void};
 
-export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(warnings:number)=>void,onError:()=>void,onSelectZone?:(id:string)=>void):GameHandle{
+export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(warnings:number)=>void,onError:()=>void,onSelectZone?:(id:string)=>void,stageIndex=0):GameHandle{
  const renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:false});
  renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
  renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;
@@ -20,7 +20,7 @@ export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(w
  scene.add(new T.HemisphereLight(0xc9efff,0x566635,1.65));
  const sun=new T.DirectionalLight(0xfff0ce,2.5);sun.position.set(-12,25,10);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-20,right:20,top:18,bottom:-18,near:.1,far:70});sun.shadow.bias=-.0004;sun.shadow.normalBias=.035;sun.shadow.radius=2;scene.add(sun);
  const rim=new T.DirectionalLight(0x65cfff,1.15);rim.position.set(14,10,-12);scene.add(rim);
- const world=createWorld(index);scene.background=new T.Color(world.sky);scene.fog=new T.FogExp2(world.fog,.008);rim.color.set(world.accent);scene.add(world.root);
+ const world=createWorld(index,stageIndex);scene.background=new T.Color(world.sky);scene.fog=new T.FogExp2(world.fog,.008);rim.color.set(world.accent);scene.add(world.root);
  const camera=new T.PerspectiveCamera(42,1,.1,120);const controls=new OrbitControls(camera,canvas);
  controls.enableDamping=true;controls.enableRotate=false;controls.enablePan=false;controls.enableZoom=true;controls.minDistance=12;controls.maxDistance=65;
  // Câmera fixa ao sul: aliados nascem embaixo e avançam para o norte da tela.

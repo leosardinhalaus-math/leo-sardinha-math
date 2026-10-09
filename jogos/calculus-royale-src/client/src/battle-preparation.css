@@ -28,6 +28,10 @@
 .preparation-island h3{font-size:32px;line-height:1.12;margin:10px 0}.preparation-island p{font-size:17px;color:#d1e4ea;margin:0 0 22px}
 .prepare-play{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;border:0;border-radius:12px;background:#70eee1;color:#042b34;font:700 19px 'Space Grotesk',sans-serif;min-height:56px;padding:12px 20px;cursor:pointer}
 .preparation-island small{font-size:14px;color:#c1d9e0;margin-top:12px}
+.preparation-stage-route{display:grid;grid-template-columns:repeat(6,minmax(42px,1fr));gap:7px;width:100%;margin:0 0 18px;padding:10px;border:1px solid #7fdce944;border-radius:13px;background:#031326cc;backdrop-filter:blur(6px)}
+.preparation-stage-route button{display:grid;place-items:center;gap:2px;min-height:52px;border:1px solid #66859a;border-radius:10px;background:#10283ddd;color:#d9eef3;cursor:pointer}
+.preparation-stage-route button span{font:800 16px 'DM Mono',monospace}.preparation-stage-route button small{margin:0;color:#9ab8c4;font:700 9px 'DM Mono',monospace}
+.preparation-stage-route button.active{border-color:#65eff2;background:#164f62;box-shadow:0 0 18px #39dce744}.preparation-stage-route button.done{border-color:#4be5ab;color:#6ff0bd;background:#0f3b38dd}.preparation-stage-route button:disabled{opacity:.42;cursor:not-allowed;filter:grayscale(.65)}
 .preparation-options{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .preparation-options>a,.preparation-options>button{display:flex;align-items:center;gap:12px;border:1px solid #34566e;border-radius:16px;padding:20px 16px;background:#10253deb;color:#edfbff;text-decoration:none;text-align:left;cursor:pointer}
 .preparation-options>button:hover,.preparation-options>a:hover{background:#193b55;border-color:#72dbdc}
@@ -139,6 +143,7 @@
 .battle-hand .powerup-row{gap:8px}.battle-hand .powerup-row button{min-height:48px;padding:7px 12px;display:flex;align-items:center;gap:10px}
 .battle-hand .powerup-row button>span:last-child{display:flex;align-items:baseline;gap:8px}.battle-hand .powerup-row strong{font-size:15px}.battle-hand .powerup-row small{font-size:13px}
 @media(max-width:600px){
+ .preparation-stage-route{grid-template-columns:repeat(6,1fr);gap:4px;padding:7px}.preparation-stage-route button{min-width:0;min-height:44px}.preparation-stage-route button span{font-size:13px}.preparation-stage-route button small{font-size:8px}
  .screen-battle .arena-frame{height:260px;min-height:260px}.screen-battle .battle-column{gap:10px}
  .battle-hand .powerup-row{gap:5px}.battle-hand .powerup-row button{padding:5px;gap:5px;min-height:48px}
  .battle-hand .powerup-row button>span:last-child{display:block}.battle-hand .powerup-row strong{font-size:14px}.battle-hand .powerup-row small{font-size:11px}
