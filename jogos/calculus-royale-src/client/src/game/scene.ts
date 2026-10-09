@@ -25,7 +25,7 @@ export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(w
  controls.enableDamping=true;controls.enableRotate=false;controls.enablePan=false;controls.enableZoom=true;controls.minDistance=12;controls.maxDistance=65;
  // Câmera fixa ao sul: aliados nascem embaixo e avançam para o norte da tela.
  function resetCamera(){const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight),distance=Math.max(24,11/(Math.tan(T.MathUtils.degToRad(21))*aspect));camera.position.set(-distance*.78,distance*.86,0);controls.target.set(0,.35,0);controls.update();}
- function viewIsland(){const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight),distance=Math.max(34,12/(Math.tan(T.MathUtils.degToRad(21))*aspect));camera.position.set(-distance*.78,distance*.9,0);controls.target.set(0,.2,0);controls.update();}
+ function viewIsland(){const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight),distance=Math.max(26,10/(Math.tan(T.MathUtils.degToRad(21))*aspect));camera.position.set(-distance*.78,distance*.9,0);controls.target.set(.6,.28,0);controls.update();}
  function focusSpawn(x:number){const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight),distance=Math.max(14,6.5/(Math.tan(T.MathUtils.degToRad(21))*aspect));controls.target.set(x,.65,0);camera.position.set(x-distance*.78,distance*.86,0);controls.update();}
  viewIsland();
  const observer=new ResizeObserver(()=>{const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();});observer.observe(canvas);

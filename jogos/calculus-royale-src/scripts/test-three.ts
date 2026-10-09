@@ -14,6 +14,7 @@ assert(pos.x<-.28,'Não deve atravessar uma parede em um passo longo');
 assert(Math.abs(pos.z-1)<.01,'Deve deslizar no eixo livre');
 for(let i=0;i<5;i++){
  const world=createWorld(i);
+ if(i===0){assert.equal(world.root.userData.landmarks?.length,8,'A Ilha dos Limites deve expor os oito marcos da referência');assert(world.root.getObjectByName('Simbolo_Infinito'),'A Ilha dos Limites deve possuir o símbolo do infinito');assert(world.root.getObjectByName('Guardiao_Aproximacao')&&world.root.getObjectByName('Guardiao_Infinito'),'Os dois guardiões monumentais devem enquadrar o castelo');}
  for(const enemy of [false,true]){const start=arenaPosition(5,enemy,enemy?-1.65:1.65);const end=arenaPosition(96,enemy,start.z);moveWithCollisions(start,end,world.obstacles);assert(start.distanceTo(end)<.01,`A rota da ilha ${i+1} deve ficar livre`);}
  disposeObject(world.root);
 }
