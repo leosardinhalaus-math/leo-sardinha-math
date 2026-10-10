@@ -149,3 +149,9 @@
  .battle-hand .powerup-row button>span:last-child{display:block}.battle-hand .powerup-row strong{font-size:14px}.battle-hand .powerup-row small{font-size:11px}
  .battle-hand .power-icon{display:none}
 }
+
+
+.deck-math-stats{display:grid;grid-template-columns:auto minmax(55px,1fr) auto;align-items:center;gap:10px;margin:9px 0;padding:9px 11px;border:1px solid #3b6073;border-radius:10px;background:linear-gradient(110deg,#10253a,#142b39);color:#c9e1e8}
+.deck-math-stats>span{display:grid;grid-template-columns:auto auto;align-items:center;column-gap:8px}.deck-math-stats>span small:first-child{grid-column:1/-1;color:#80dcd4;font:700 9px 'DM Mono',monospace;letter-spacing:.08em}.deck-math-stats>span strong{font:800 19px 'DM Mono',monospace;color:#ffe19a}.deck-math-stats>span small:last-child{font-size:10px;color:#9db9c1}
+.deck-math-stats>i{height:6px;overflow:hidden;border-radius:8px;background:#293e52}.deck-math-stats>i>b{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#55d9c3,#f4d077,#ff8c72);transition:width .2s ease}.deck-math-stats>em{font-size:10px;font-style:normal;color:#9db9c1}
+@media(max-width:600px){.deck-math-stats{grid-template-columns:auto 1fr;gap:7px;padding:8px}.deck-math-stats>em{grid-column:1/-1}.deck-math-stats>i{min-width:0}}

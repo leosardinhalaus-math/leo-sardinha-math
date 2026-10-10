@@ -1,4 +1,5 @@
 import { stepCombat, SPAWN_ZONES, zoneAvailable, type CombatUnit, type CombatEvent } from "@/game/combat";
+import { BATTLE_TICK_SECONDS, DECK_SIZE, ELIXIR_PER_TICK, OVERTIME_SECONDS, REGULATION_SECONDS, STARTING_ELIXIR, battleClockLabel, compareTowerHealth, elixirMultiplier, normalizeDeck, type MatchOutcome } from "@/game/battleRules";
 import { getCardProfile, abilityDescription } from "@/game/cardProfiles";
 import { isStageUnlocked, normalizeStageProgress, resolveStageVictory } from "@/game/progression";
 import { createChallengePicker, type Challenge } from "@/data/powerUpChallenges";
@@ -203,16 +204,14 @@ const survivalBadges: SurvivalBadge[] = [
   { id: "infinite-scholar", wave: 12, name: "Sábio do Infinito", icon: "∞", detail: "Alcance a onda 12", reward: 250 },
 ];
 const initialDeck = () => {
-  const fallback = getCumulativeCards(0).map((card) => card.id);
-  const saved = readStorage<string[]>(storageKeys.deck, fallback);
-  const known = new Set(getCumulativeCards(4).map((card) => card.id));
-  const valid = saved.filter((id) => known.has(id));
-  return valid.length ? valid : fallback;
+  const available = getCumulativeCards(4).map((card) => card.id);
+  const saved = readStorage<string[]>(storageKeys.deck, available.slice(0, DECK_SIZE));
+  return normalizeDeck(saved, available);
 };
 
 export default function GameCanvas() {
   const [worldIndex, setWorldIndex] = useState(() => Math.min(4, Math.max(0, readStorage(storageKeys.worldIndex, 0))));
-  const [energy, setEnergy] = useState(7);
+  const [energy, setEnergy] = useState(STARTING_ELIXIR);
   const [enemyTower, setEnemyTower] = useState(82);
   const [allyTower, setAllyTower] = useState(96);
   const [units, setUnits] = useState<Unit[]>([]);
@@ -242,9 +241,14 @@ export default function GameCanvas() {
   const [spawnZone, setSpawnZone] = useState('A1');
   const [arenaAvailable,setArenaAvailable]=useState(false);
   const [battleStarted, setBattleStarted] = useState(false);
-  const [battleOutcome, setBattleOutcome] = useState<'victory'|'defeat'|null>(null);
+  const [battleElapsed, setBattleElapsed] = useState(0);
+  const [battleOutcome, setBattleOutcome] = useState<MatchOutcome|null>(null);
   const [combatEvents, setCombatEvents] = useState<CombatEvent[]>([]);
   const combatTimeRef = useRef(0);
+  const battleElapsedRef = useRef(0);
+  const suddenDeathRef = useRef(false);
+  const enemyDeckRef = useRef<string[]>([]);
+  const enemyLaneRef = useRef(-1.65);
   const aiElapsedRef = useRef(0);
   const unitSequenceRef = useRef(Date.now());
   const battleSnapshot = useRef({units,enemyUnits,energy,enemyEnergy,allyTower,enemyTower});
@@ -340,14 +344,19 @@ export default function GameCanvas() {
     setAllyTower(96);
     setUnits([]);
     setEnemyUnits([]);
-    setEnergy(7);
-    setEnemyEnergy(5);
+    setEnergy(STARTING_ELIXIR);
+    setEnemyEnergy(STARTING_ELIXIR);
     setDeckQueue(nextDeck);
     setChallenge(null);
     setPendingCard(null);
     setBattleStarted(false);
     setBattleOutcome(null);
+    setBattleElapsed(0);
     setCombatEvents([]);
+    battleElapsedRef.current = 0;
+    suddenDeathRef.current = false;
+    enemyDeckRef.current = nextDeck.slice(0, DECK_SIZE);
+    enemyLaneRef.current = -1.65;
     combatTimeRef.current = 0;
     aiElapsedRef.current = 0;
   };
@@ -424,28 +433,52 @@ export default function GameCanvas() {
     const timer=window.setInterval(()=>{
       if(battleResolvedRef.current) return;
       const current=battleSnapshot.current;
-      combatTimeRef.current += .1;
-      const next=stepCombat(current.units,current.enemyUnits,.1,combatTimeRef.current,worldIndex);
+      const elapsed=battleElapsedRef.current+BATTLE_TICK_SECONDS;
+      const wasSuddenDeath=suddenDeathRef.current;
+      battleElapsedRef.current=elapsed;
+      if(Math.floor(elapsed)!==Math.floor(elapsed-BATTLE_TICK_SECONDS))setBattleElapsed(Math.floor(elapsed));
+      const multiplier=elixirMultiplier(elapsed);
+      combatTimeRef.current+=BATTLE_TICK_SECONDS;
+      const next=stepCombat(current.units,current.enemyUnits,BATTLE_TICK_SECONDS,combatTimeRef.current,worldIndex);
       setUnits(next.allies);setEnemyUnits(next.enemies);
-      setEnergy(value=>Math.min(10,Number((value+.045).toFixed(3))));
+      setEnergy(value=>Math.min(10,Number((value+ELIXIR_PER_TICK*multiplier).toFixed(3))));
+      setEnemyEnergy(value=>Math.min(10,Number((value+ELIXIR_PER_TICK*multiplier).toFixed(3))));
       const nextEnemy=Math.max(0,current.enemyTower-next.enemyDamage),nextAlly=Math.max(0,current.allyTower-next.allyDamage);
       setEnemyTower(nextEnemy);setAllyTower(nextAlly);
       if(next.events.length){setCombatEvents(previous=>[...previous,...next.events].slice(-12));setBattleLog(next.events[next.events.length-1].label);if(next.events.some(e=>e.type==='ability'))playSound('arcane');}
-      if(nextEnemy===0||nextAlly===0){setBattleOutcome(nextAlly===0?'defeat':'victory');if(nextAlly===0){battleResolvedRef.current=true;setToast('Sua torre caiu. Reinicie para tentar outra formação.');}}
-      if(battleResolvedRef.current || nextEnemy===0 || nextAlly===0)return;
-      aiElapsedRef.current += .1;
+      const outcome=compareTowerHealth(nextAlly,nextEnemy,96,getWorldEnemyHp(worldIndex));
+      if(nextEnemy===0||nextAlly===0){setBattleOutcome(outcome);if(outcome!=='victory')battleResolvedRef.current=true;setBattleLog(outcome==='victory'?'Torre rival derrubada!':outcome==='draw'?'As duas torres caíram juntas.':'Sua torre caiu.');if(outcome==='defeat')setToast('Sua torre caiu. Reinicie para tentar outra formação.');return;}
+      if(wasSuddenDeath&&(next.enemyDamage>0||next.allyDamage>0)){setBattleOutcome(outcome);if(outcome!=='victory')battleResolvedRef.current=true;setBattleLog(outcome==='victory'?'Morte súbita: primeiro golpe na torre — vitória!':outcome==='defeat'?'Morte súbita: o rival atingiu sua torre primeiro.':'Morte súbita: ataques simultâneos — empate.');return;}
+      if(!wasSuddenDeath&&elapsed>=REGULATION_SECONDS){
+        suddenDeathRef.current=true;
+        if(outcome!=='draw'){setBattleOutcome(outcome);if(outcome!=='victory')battleResolvedRef.current=true;setBattleLog(outcome==='victory'?'Tempo! Sua torre terminou com mais vida.':'Tempo! A torre rival terminou com mais vida.');return;}
+        setBattleLog('Empate matemático · morte súbita: o próximo dano à torre decide.');setToast('Elixir triplo · a próxima torre atingida decide a partida.');
+      }
+      if(elapsed>=REGULATION_SECONDS+OVERTIME_SECONDS){setBattleOutcome(outcome);if(outcome!=='victory')battleResolvedRef.current=true;setBattleLog(outcome==='draw'?'Fim da morte súbita · empate matemático.':outcome==='victory'?'Fim da morte súbita · sua torre preservou mais vida.':'Fim da morte súbita · o rival preservou mais vida.');return;}
+      if(battleResolvedRef.current)return;
+      aiElapsedRef.current+=BATTLE_TICK_SECONDS;
       if(aiElapsedRef.current<3.8)return;
+      const catalog=getCumulativeCards(4);
+      const queue=enemyDeckRef.current.length?enemyDeckRef.current:mainDeckIds.slice(0,DECK_SIZE);
+      const candidates=queue.map((id,index)=>({card:catalog.find(card=>card.id===id),index})).filter((entry):entry is {card:Card;index:number}=>entry.card!==undefined&&entry.card.cost<=current.enemyEnergy);
+      if(!candidates.length)return;
+      const threat=current.units.filter(unit=>unit.hp!>0).sort((a,b)=>b.progress-a.progress)[0];
+      const chosen=threat?candidates.reduce((best,entry)=>{
+        const score=(card:Card)=>card.power/card.cost+(card.kind==='estrutura'?.45:0)-Math.abs(card.cost-3)*.06;
+        return score(entry.card)>score(best.card)?entry:best;
+      }):candidates[0];
       aiElapsedRef.current=0;
-      const deck=getCumulativeCards(worldIndex);const aiCard=deck[Math.floor(Date.now()/3800)%deck.length];
-      const available=battleSnapshot.current.enemyEnergy;
-      if(available<aiCard.cost){setEnemyEnergy(Math.min(10,Number((available+1.5).toFixed(1))));return;}
+      const aiCard=chosen.card;
+      enemyDeckRef.current=[...queue.slice(0,chosen.index),...queue.slice(chosen.index+1),aiCard.id];
+      const lane=threat?.lane??enemyLaneRef.current;
+      if(!threat)enemyLaneRef.current=enemyLaneRef.current===-1.65?1.65:-1.65;
       const id=++unitSequenceRef.current;
-      setEnemyUnits(current=>[...current,{id,cardId:aiCard.id,icon:aiCard.icon,name:aiCard.name,kind:aiCard.kind,progress:5,power:Math.max(5,Math.round(aiCard.power*.55)),color:'#ff7d72',lane:id%2?-1.65:1.65}]);
-      setEnemyEnergy(Number((available-aiCard.cost).toFixed(1)));
+      setEnemyUnits(currentUnits=>[...currentUnits,{id,cardId:aiCard.id,icon:aiCard.icon,name:aiCard.name,kind:aiCard.kind,progress:5,power:Math.max(5,Math.round(aiCard.power*.55)),color:'#ff7d72',lane}]);
+      setEnemyEnergy(value=>Math.max(0,Number((value-aiCard.cost).toFixed(2))));
       setEnemyLastCard(`${aiCard.name} · ${getCardProfile(aiCard.id).ability}`);
     },100);
     return()=>{window.clearInterval(timer);};
-  },[worldIndex,view,battleStarted,battleOutcome,challenge,pendingCard,inventoryOpen,survivalOpen]);
+  },[worldIndex,view,battleStarted,battleOutcome,challenge,pendingCard,inventoryOpen,survivalOpen,mainDeckIds]);
 
   // Deixa as animações finais aparecerem antes do fluxo de recompensa existente.
   useEffect(()=>{if(battleOutcome!=='victory')return;const timer=window.setTimeout(()=>finishBattle(worldIndex),1800);return()=>window.clearTimeout(timer);},[battleOutcome,worldIndex]);
@@ -517,10 +550,17 @@ export default function GameCanvas() {
   const allCards = useMemo(() => getCumulativeCards(4), []);
   const cardsById = useMemo(() => new Map(allCards.map((card) => [card.id, card])), [allCards]);
   const activeCards = useMemo(() => { return deckQueue.map((id) => cardsById.get(id)).filter((card): card is Card => Boolean(card)).slice(0, 4); }, [cardsById, deckQueue]);
+  const nextCard = useMemo(() => cardsById.get(deckQueue[4] ?? "") ?? null, [cardsById, deckQueue]);
   const mainDeckCards = useMemo(() => mainDeckIds.map((id) => cardsById.get(id)).filter((card): card is Card => Boolean(card)), [cardsById, mainDeckIds]);
+  const averageElixirCost = useMemo(() => mainDeckCards.length ? (mainDeckCards.reduce((sum, card) => sum + card.cost, 0) / mainDeckCards.length).toFixed(1) : "0.0", [mainDeckCards]);
   const editMainDeck = (card: Card) => {
-    setMainDeckIds((ids) => ids.includes(card.id) ? ids.filter((id) => id !== card.id) : [...ids, card.id]);
-    setDeckQueue((ids) => ids.includes(card.id) ? ids.filter((id) => id !== card.id) : [...ids, card.id]);
+    if (!mainDeckIds.includes(card.id) && mainDeckIds.length >= DECK_SIZE) {
+      setToast(`Deck completo: remova uma carta antes de adicionar outra. (${DECK_SIZE} no máximo)`);
+      return;
+    }
+    const next = mainDeckIds.includes(card.id) ? mainDeckIds.filter((id) => id !== card.id) : [...mainDeckIds, card.id];
+    setMainDeckIds(next);
+    setDeckQueue(next);
   };
   const reorderDeck = (targetId: string) => {
     if (!draggedCardId || draggedCardId === targetId) return;
@@ -553,6 +593,7 @@ export default function GameCanvas() {
     const power=Math.round(card.power*(1+(cardLevels[card.id]??0)*.12));
     setEnergy(value=>Math.max(0,Number((value-card.cost).toFixed(2))));
     setUnits(value=>[...value,{id:++unitSequenceRef.current,cardId:card.id,icon:card.icon,name:card.name,kind:card.kind,progress:zone.progress,power,color:world.color,lane:zone.lane}]);
+    if (!enemyDeckRef.current.length) enemyDeckRef.current = mainDeckIds.slice(0, DECK_SIZE);
     setDeckQueue(queue=>{const position=queue.indexOf(card.id);return position<0?queue:[...queue.slice(0,position),...queue.slice(position+1),card.id];});
     setPendingCard(null);setBattleStarted(true);
     setBattleLog(`${card.name} em ${zone.id} · ${getCardProfile(card.id).ability}`);
@@ -608,7 +649,7 @@ export default function GameCanvas() {
   };
 
   const enterArena = () => {
-    if (!mainDeckIds.length) { setToast("Escolha pelo menos uma carta para entrar na arena."); setView("deck"); return; }
+    if (mainDeckIds.length !== DECK_SIZE) { setToast(`A arena exige um deck completo de ${DECK_SIZE} cartas.`); setView("deck"); return; }
     if (battleResolvedRef.current) resetBattleState();
     unlockAudio();
     setView("battle");
@@ -675,21 +716,21 @@ export default function GameCanvas() {
           </aside>
 
           <section className="battle-column">
-            <div className="battle-status"><div className="status-pill"><span className="live-dot" /> BATALHA AO VIVO</div><span className="arena-caption"><Swords size={14} /> {WORLD_MAPS[worldIndex].title}</span><span className="ai-chip"><span className="ai-pulse" /> IA · {enemyEnergy.toFixed(1)} elixir</span><button className="icon-button" onClick={resetBattle} title="Reiniciar batalha"><RotateCcw size={15} /></button></div>
+            <div className="battle-status"><div className="status-pill"><span className="live-dot" /> {battleOutcome?battleOutcome==='victory'?'FIM · VITÓRIA':battleOutcome==='draw'?'FIM · EMPATE':'FIM · DERROTA':'BATALHA AO VIVO'}</div><span className={`battle-clock ${battleElapsed>=REGULATION_SECONDS?"is-overtime":battleElapsed>=REGULATION_SECONDS-60?"is-double-elixir":""}`} aria-label={`Tempo ${battleClockLabel(battleElapsed)}`}><strong>{battleClockLabel(battleElapsed)}</strong><small>{battleElapsed>=REGULATION_SECONDS?"MORTE SÚBITA · ELIXIR 3×":battleElapsed>=REGULATION_SECONDS-60?"ELIXIR DUPLO · 2×":"ELIXIR · 1×"}</small></span><span className="arena-caption"><Swords size={14} /> {WORLD_MAPS[worldIndex].title}</span><span className="ai-chip"><span className="ai-pulse" /> IA · {enemyEnergy.toFixed(1)} elixir</span><button className="icon-button" onClick={resetBattle} title="Reiniciar batalha"><RotateCcw size={15} /></button></div>
             <div className="arena-frame" data-world={WORLD_MAPS[worldIndex].slug}>
-              <WorldArena onAvailabilityChange={setArenaAvailable} worldIndex={worldIndex} stageIndex={chapter} active={view === "battle" && !survivalOpen && !inventoryOpen} allies={units} enemies={enemyUnits} paused={Boolean(!battleStarted || challenge || pendingCard || inventoryOpen || survivalOpen || battleOutcome)} events={combatEvents} outcome={battleOutcome} placement={pendingCard ? {unit:{id:-1,cardId:pendingCard.id,name:pendingCard.name,kind:pendingCard.kind,progress:0,color:world.color},zoneId:spawnZone,blocked:SPAWN_ZONES.filter(zone=>!zoneAvailable(zone.id,units)).map(zone=>zone.id)} : undefined} onSelectZone={id=>{if(zoneAvailable(id,units))setSpawnZone(id);}} />
-              <div className="tower-label enemy-label"><span>TORRE DO ERRO</span><strong>{enemyTower} HP</strong></div><div className="health-bar enemy-health"><i style={{ width: `${enemyTower}%` }} /></div>
+              <WorldArena onAvailabilityChange={setArenaAvailable} worldIndex={worldIndex} stageIndex={chapter} active={view === "battle" && !survivalOpen && !inventoryOpen} allies={units} enemies={enemyUnits} paused={Boolean(!battleStarted || challenge || pendingCard || inventoryOpen || survivalOpen || battleOutcome)} events={combatEvents} outcome={battleOutcome==='draw'?null:battleOutcome} placement={pendingCard ? {unit:{id:-1,cardId:pendingCard.id,name:pendingCard.name,kind:pendingCard.kind,progress:0,color:world.color},zoneId:spawnZone,blocked:SPAWN_ZONES.filter(zone=>!zoneAvailable(zone.id,units)).map(zone=>zone.id)} : undefined} onSelectZone={id=>{if(zoneAvailable(id,units))setSpawnZone(id);}} />
+              <div className="tower-label enemy-label"><span>TORRE DO ERRO</span><strong>{enemyTower} HP</strong></div><div className="health-bar enemy-health"><i style={{ width: `${Math.max(0,Math.min(100,enemyTower/getWorldEnemyHp(worldIndex)*100))}%` }} /></div>
               <div className="battle-field">{!pendingCard && !battleOutcome && units.length === 0 && enemyUnits.length === 0 && <div className="battle-hint"><Sparkles size={18} /><span>jogue uma carta<br /><small>e veja a prova avançar em 3D</small></span></div>}</div>
-              <div className="tower-label ally-label"><span>SUA TORRE</span><strong>{allyTower} HP</strong></div><div className="health-bar ally-health"><i style={{ width: `${allyTower}%` }} /></div>
+              <div className="tower-label ally-label"><span>SUA TORRE</span><strong>{allyTower} HP</strong></div><div className="health-bar ally-health"><i style={{ width: `${Math.max(0,Math.min(100,allyTower/100*100))}%` }} /></div>
             </div>
-            {battleOutcome && <div className="battle-result" role="status">{battleOutcome==='victory'?'Vitória!':'Sua torre caiu'}<small>{battleOutcome==='victory'?'Preparando suas recompensas…':'Use Reiniciar batalha para tentar novamente.'}</small></div>}
+            {battleOutcome && <div className="battle-result" role="status">{battleOutcome==='victory'?'Vitória!':battleOutcome==='draw'?'Empate matemático':'Sua torre caiu'}<small>{battleOutcome==='victory'?'Preparando suas recompensas…':battleOutcome==='draw'?'Torres equilibradas. Reinicie para uma nova partida.':'Use Reiniciar batalha para tentar novamente.'}</small></div>}
             {combatEvents.length>0 && <div className="combat-feed" aria-label="Habilidades ativadas" aria-live="polite">{combatEvents.slice(-3).map(event=><p key={event.id} data-event-type={event.type}><span style={{color:getCardProfile(event.cardId).glow}}>{getCardProfile(event.cardId).symbol}</span>{event.label}</p>)}</div>}
             <div className="battle-log"><span className="log-icon"><Zap size={14} /></span><span>{battleLog}</span><small className="enemy-log">Rival: {enemyLastCard}</small></div>
 
           </section>
 
           {view === "battle" && <aside ref={handRef} className="battle-hand" aria-label="Mão de cartas">
-            <div className="hand-toolbar"><strong>Mão de batalha <span>· {activeCards.length} cartas</span></strong><span className="hand-energy"><Zap size={18} /> {energy.toFixed(1)} / 10 <span>elixir</span></span><button onClick={() => setView("lobby")}><Layers3 size={17} /> Preparação</button></div>
+            <div className="hand-toolbar"><strong>Mão de batalha <span>· {activeCards.length}/4</span></strong><span className="hand-energy"><Zap size={18} /> {energy.toFixed(1)} / 10 <span>elixir</span></span>{nextCard&&<div className="next-card-preview" aria-label={`Próxima carta: ${nextCard.name}, ${nextCard.cost} elixir`}><img src={getCardImage(nextCard.id)} alt=""/><span>PRÓXIMA<small>{nextCard.name}</small></span><b>{nextCard.cost}</b></div>}<button onClick={() => setView("lobby")}><Layers3 size={17} /> Preparação</button></div>
             {pendingCard && <section className="spawn-panel" aria-label="Posicionar personagem">
               <div className="spawn-heading"><img src={getCardImage(pendingCard.id)} alt=""/><div><strong>{pendingCard.name}</strong><small>POSICIONAMENTO TÁTICO · BATALHA PAUSADA</small></div><button onClick={()=>setPendingCard(null)} aria-label="Cancelar posicionamento">×</button></div>
               <p>{abilityDescription(pendingCard.id)}</p>
@@ -725,10 +766,10 @@ export default function GameCanvas() {
           <a href="./perfil/"><Star /><span><strong>Meu perfil</strong><small>Acesse seu perfil online</small></span><ArrowUpRight /></a>
           <a href="./ranking/"><Trophy /><span><strong>Ranking</strong><small>Confira a classificação</small></span><ArrowUpRight /></a>
         </div></div>
-        <div className="preparation-deck"><div><h3>Seu deck está pronto?</h3><p>As quatro primeiras cartas entram na sua mão.</p></div><div className="preparation-portraits">{mainDeckCards.slice(0, 4).map(card => <figure key={card.id}><img src={getCardImage(card.id)} alt="" /><figcaption>{card.name}</figcaption></figure>)}</div><button className="close-mode" onClick={() => setView("deck")}>Editar deck <ArrowUpRight size={18} /></button></div>
+        <div className="preparation-deck"><div><h3>Seu deck está pronto?</h3><p>Deck de {DECK_SIZE} cartas · as 4 primeiras entram na mão e a próxima aparece para planejar o rodízio.</p></div><div className="preparation-portraits">{mainDeckCards.slice(0, 4).map(card => <figure key={card.id}><img src={getCardImage(card.id)} alt="" /><figcaption>{card.name}</figcaption></figure>)}</div><button className="close-mode" onClick={() => setView("deck")}>Editar deck <ArrowUpRight size={18} /></button></div>
       </section>}
       {view === "map" && <div className="mode-screen map-screen"><div className="mode-screen-header"><div><span className="eyebrow">CALCULUS ROYALE · MAPA PRINCIPAL</span><h2>Trilha das Ilhas do Cálculo</h2><p>Vença todas as casas de uma ilha para revelar a próxima arena.</p></div><button className="close-mode" onClick={() => setView("lobby")}><X size={17} /> Preparação</button></div><div className="completion-banner">{completionNotice !== null ? <><CheckCircle2 size={20} /><span><strong>Ilha {completionNotice + 1} concluída!</strong><small>{worlds[completionNotice].title} dominado. {celebrationWorld !== null ? "A próxima ilha será desbloqueada ao fim da celebração." : "A próxima ilha está pronta para ser explorada."}</small></span></> : <><MapPinned size={20} /><span><strong>Sua jornada</strong><small>Cada ilha possui várias casas. A próxima ilha só abre após a última batalha.</small></span></>}</div>{phaseReward && <div className={`reward-card reward-${phaseReward.rarity}`}><div className="reward-chest"><img src={getChestArt(phaseReward.world)} alt={phaseReward.chest} /></div><div><span className="section-label">{phaseReward.rarity.toUpperCase()} · RECOMPENSA DESBLOQUEADA</span><strong>{phaseReward.chest}</strong><small><Coins size={12} /> +{phaseReward.coins} moedas · ✦ +{phaseReward.essence} essência</small><small><Gem size={12} /> {phaseReward.icon} {phaseReward.item}</small></div><span className="reward-sparkle">✦</span></div>}<div className="island-path">{worlds.map((item, index) => { const celebrating = celebrationWorld === index; const unlocked = index === 0 || completedWorlds[index - 1]; const done = completedWorlds[index]; const houses=stageProgress[index]??0; return <div key={item.id} className={`island-node ${unlocked ? "island-unlocked" : "island-locked"} ${done ? "island-done" : ""} ${celebrating ? "island-celebrating" : ""}`}><div className="path-line" /><button onClick={() => selectWorld(index)} disabled={!unlocked || celebrating} className="island-button" style={{ "--island-color": item.color } as React.CSSProperties}><img className="island-map-art" src={WORLD_MAPS[index]?.art ?? WORLD_MAPS[0].art} alt="" aria-hidden="true" /><span className="island-map-shade" /><span className="island-glow" /><span className="island-number">0{item.id}</span><strong>{WORLD_MAPS[index]?.title ?? item.title}</strong><small>{celebrating ? "ilha concluída · celebrando" : done ? `${houses}/${item.chapters.length} casas · concluída` : unlocked ? `${houses}/${item.chapters.length} casas vencidas` : "conclua todas as casas anteriores"}</small>{celebrating ? <span className="celebration-burst">✦</span> : done ? <CheckCircle2 className="island-check" size={17} /> : !unlocked ? <LockKeyhole className="island-lock" size={16} /> : <ArrowUpRight className="island-arrow" size={17} />}</button></div>; })}</div><button className="map-deck-cta" onClick={() => setView("deck")}><Layers3 size={17} /><span><strong>Editar deck principal</strong><small>Escolha quais cartas aparecem no rodízio da batalha</small></span><ArrowUpRight size={16} /></button></div>}
-      {view === "deck" && <div className="mode-screen deck-screen"><div className="mode-screen-header"><div><span className="eyebrow">OFICINA DE ESTRATÉGIA · {mainDeckIds.length} CARTAS SELECIONADAS</span><h2>Deck principal</h2><p>Monte a fila que aparece na sua mão durante as batalhas. As cartas jogadas giram para o fim do rodízio.</p></div><button className="close-mode" onClick={() => setView("lobby")}><MapPinned size={17} /> Preparação</button></div><div className="deck-editor-grid"><section className="deck-selected"><div className="section-label">DECK ATUAL · {mainDeckCards.length} CARTAS</div><div className="drag-hint"><ArrowUpRight size={13} /> Arraste uma carta sobre outra para reorganizar a ordem do rodízio</div><div className="selected-cards">{mainDeckCards.map((card, index) => <button key={card.id} draggable onDragStart={() => { dragGestureRef.current = true; setDraggedCardId(card.id); }} onDragOver={(event) => event.preventDefault()} onDrop={() => reorderDeck(card.id)} onDragEnd={() => setDraggedCardId(null)} onClick={() => { if (dragGestureRef.current) { dragGestureRef.current = false; return; } editMainDeck(card); }} className={`selected-card ${draggedCardId === card.id ? "is-dragging" : ""}`}><span className="drag-grip">⠿</span><span className="selected-order">{String(index + 1).padStart(2, "0")}</span><span className="selected-symbol"><img src={getCardArt(card)} alt="" /></span><span><strong>{card.name}</strong><small>{card.formula}</small></span><X size={14} /></button>)}</div><button className="start-deck-button" onClick={() => { setDeckQueue(mainDeckIds); setView("lobby"); setToast("Deck principal equipado · rodízio pronto"); }}><Swords size={16} /> Salvar deck e voltar</button></section><section className="deck-library"><div className="deck-upgrades"><h3>Evoluir cartas</h3><p>Você tem {essence} essências. Cada evolução custa 3.</p>{mainDeckCards.map((card) => <button key={card.id} disabled={essence < 3} onClick={() => evolveCard(card)}>{card.name} · Nv. {(cardLevels[card.id] ?? 0) + 1} <span>✦ Evoluir</span></button>)}</div><div className="section-label">BIBLIOTECA DE CARTAS DESBLOQUEADAS</div><div className="library-grid">{allCards.filter((card) => !mainDeckIds.includes(card.id)).map((card) => <button key={card.id} onClick={() => editMainDeck(card)} className="library-card"><span className="library-art"><img src={getCardArt(card)} alt="" /></span><span><strong>{card.name}</strong><small>{card.formula}</small></span><ArrowUpRight size={14} /></button>)}</div></section></div></div>}
+      {view === "deck" && <div className="mode-screen deck-screen"><div className="mode-screen-header"><div><span className="eyebrow">OFICINA DE ESTRATÉGIA · {mainDeckIds.length} CARTAS SELECIONADAS</span><h2>Deck principal</h2><p>Monte um deck de {DECK_SIZE} cartas. Você recebe 4 na mão; a quinta fica visível e cada carta jogada gira para o fim do rodízio.</p></div><button className="close-mode" onClick={() => setView("lobby")}><MapPinned size={17} /> Preparação</button></div><div className="deck-editor-grid"><section className="deck-selected"><div className="section-label">DECK ATUAL · {mainDeckCards.length}/{DECK_SIZE} CARTAS</div><div className="deck-math-stats"><span><small>MÉDIA DE ELIXIR</small><strong>{averageElixirCost}</strong><small>Σ custos ÷ {mainDeckCards.length||1}</small></span><i><b style={{width:`${Math.min(100,Number(averageElixirCost)*10)}%`}} /></i><em>Equilibre cartas leves e pesadas para manter o ciclo.</em></div><div className="drag-hint"><ArrowUpRight size={13} /> Arraste uma carta sobre outra para reorganizar a ordem do rodízio</div><div className="selected-cards">{mainDeckCards.map((card, index) => <button key={card.id} draggable onDragStart={() => { dragGestureRef.current = true; setDraggedCardId(card.id); }} onDragOver={(event) => event.preventDefault()} onDrop={() => reorderDeck(card.id)} onDragEnd={() => setDraggedCardId(null)} onClick={() => { if (dragGestureRef.current) { dragGestureRef.current = false; return; } editMainDeck(card); }} className={`selected-card ${draggedCardId === card.id ? "is-dragging" : ""}`}><span className="drag-grip">⠿</span><span className="selected-order">{String(index + 1).padStart(2, "0")}</span><span className="selected-symbol"><img src={getCardArt(card)} alt="" /></span><span><strong>{card.name}</strong><small>{card.formula}</small></span><X size={14} /></button>)}</div><button className="start-deck-button" onClick={() => { if(mainDeckIds.length!==DECK_SIZE){setToast(`Complete o deck com ${DECK_SIZE} cartas para batalhar.`);return;} setDeckQueue(mainDeckIds); setView("lobby"); setToast("Deck de 8 cartas equipado · rodízio pronto"); }}><Swords size={16} /> Salvar deck e voltar</button></section><section className="deck-library"><div className="deck-upgrades"><h3>Evoluir cartas</h3><p>Você tem {essence} essências. Cada evolução custa 3.</p>{mainDeckCards.map((card) => <button key={card.id} disabled={essence < 3} onClick={() => evolveCard(card)}>{card.name} · Nv. {(cardLevels[card.id] ?? 0) + 1} <span>✦ Evoluir</span></button>)}</div><div className="section-label">BIBLIOTECA DE CARTAS DESBLOQUEADAS</div><div className="library-grid">{allCards.filter((card) => !mainDeckIds.includes(card.id)).map((card) => <button key={card.id} onClick={() => editMainDeck(card)} className="library-card"><span className="library-art"><img src={getCardArt(card)} alt="" /></span><span><strong>{card.name}</strong><small>{card.formula}</small></span><ArrowUpRight size={14} /></button>)}</div></section></div></div>}
       {survivalOpen && <div className="survival-backdrop"><section className="survival-screen"><header className="survival-header"><div><span className="eyebrow">MODO INFINITO · TESTE DE DECK</span><h2>Torre de Sobrevivência</h2><p>Cada onda aumenta o dano. Use seu deck para resistir ao infinito.</p></div><button className="close-mode" onClick={closeSurvival}><X size={17} /> Sair</button></header><div className="survival-stats"><div><span>ONDA</span><strong>{survivalWave}</strong></div><div><span>PONTUAÇÃO</span><strong>{survivalScore}</strong></div><div><span>TORRE</span><strong>{survivalTower}%</strong></div></div><div className="survival-arena"><div className="survival-3d"><WorldArena worldIndex={worldIndex} active={survivalOpen} enemies={survivalEnemies} paused={!survivalRunning || Boolean(survivalChallenge)} /></div><div className="survival-deck"><div className="survival-deck-head"><span>DECK DE DEFESA</span><strong>{survivalElixir.toFixed(1)} / 10 elixir</strong></div><div className="survival-deck-cards">{activeCards.map((card) => <button key={card.id} onClick={() => playSurvivalCard(card)}><img className="survival-hand-art" src={getCardImage(card.id)} alt={card.name} /><small>{card.name}</small><b>{card.cost}</b></button>)}</div></div><div className="survival-tip"><Sparkles size={17} /><span>{survivalRunning ? "Aguente a próxima sequência de cartas avançadas." : survivalTower <= 0 ? "A torre caiu. Reinicie para tentar superar sua pontuação." : "Pronto para medir a resistência do deck."}</span></div></div>{survivalRewardNotice && <div className="survival-reward"><div className="badge-medallion">{survivalRewardNotice.icon}</div><div><span className="section-label">EMBLEMA CONQUISTADO</span><strong>{survivalRewardNotice.name}</strong><small>{survivalRewardNotice.detail} · +{survivalRewardNotice.reward} moedas</small></div><button onClick={() => setSurvivalRewardNotice(null)}><X size={14} /></button></div>}<div className="survival-bottom-grid"><div><div className="survival-section-label">EMBLEMAS DA TORRE</div><div className="survival-badges">{survivalBadges.map((badge) => <div key={badge.id} className={`survival-badge ${survivalBadgeIds.includes(badge.id) ? "earned" : "locked"}`} title={badge.detail}><span>{badge.icon}</span><small>{badge.name}</small></div>)}</div></div><div><div className="survival-section-label">MELHORES MARCAS</div><div className="leaderboard">{survivalLeaderboard.length ? survivalLeaderboard.slice(0, 5).map((entry, index) => <div key={`${entry.date}-${index}`}><b>0{index + 1}</b><span>Onda {entry.wave}<small>{entry.date}</small></span><strong>{entry.score}</strong></div>) : <p>Nenhuma marca registrada ainda.</p>}</div></div></div><div className="survival-actions">{survivalRunning && <button className="survival-challenge-button" onClick={requestSurvivalChallenge}>? Desafio da onda {survivalWave}</button>}{!survivalRunning && <button className="start-deck-button" onClick={startSurvival}><Flame size={16} /> {survivalTower <= 0 ? "Tentar novamente" : "Iniciar torre"}</button>}<button className="close-mode" onClick={closeSurvival}>Voltar ao jogo</button></div></section></div>}
       {inventoryOpen && <div className="inventory-backdrop" onClick={() => setInventoryOpen(false)}><aside className="inventory-drawer" onClick={(event) => event.stopPropagation()}><div className="inventory-header"><div><span className="eyebrow">CALCULUS ROYALE · COLEÇÃO</span><h2>Inventário tático</h2><p>Itens especiais, personagens vinculados e recompensas das ilhas.</p></div><button className="close-mode" onClick={() => setInventoryOpen(false)}><X size={17} /> Fechar</button></div><div className="inventory-totals"><div><Coins size={17} /><span><strong>{coins}</strong><small>moedas</small></span></div><div><Gem size={17} /><span><strong>{essence}</strong><small>essência</small></span></div><div><PackageOpen size={17} /><span><strong>{rewardInventory.length}</strong><small>baús abertos</small></span></div></div><div className="inventory-content-grid"><SpecialItemsBoard worldArt={currentWorldArt} worldTitle={WORLD_MAPS[worldIndex].title} featuredCards={mainDeckCards.slice(0,2).map(card=>({id:card.id,name:card.name,formula:card.formula}))}/><div className="inventory-list"><div className="section-label">RECOMPENSAS REGISTRADAS</div>{rewardInventory.length ? [...rewardInventory].reverse().map((reward, index) => <div key={`${reward.claimedAt}-${index}`} className={`inventory-item inventory-${reward.rarity}`}><div className="inventory-icon"><img src={getChestArt(reward.world)} alt={reward.chest} /></div><div><strong>{reward.chest}</strong><small>Fase {reward.world + 1} · {reward.rarity}</small><em><Coins size={12} /> +{reward.coins} · {reward.item}</em></div><Star size={14} /></div>) : <div className="inventory-empty"><ScrollText size={22} /><strong>Nenhum baú aberto ainda</strong><small>Conclua uma ilha para adicionar sua primeira recompensa.</small></div>}</div></div></aside></div>}
 
