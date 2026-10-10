@@ -64,7 +64,7 @@ export function createProceduralCharacter(cardId:string){
   if(robed)mesh(new T.CylinderGeometry(width*.78,.43,.68,24),cloth,0,.54,0);
   if(armored){mesh(new T.BoxGeometry(width*2.2,.12,.48),gold,0,1.32,0);for(const side of [-1,1])mesh(new T.SphereGeometry(.17,18,12),gold,side*(width+.08),1.34,0);}
   if(!['dancer','engineer'].includes(p.archetype)){const cape=mesh(new T.ConeGeometry(.5,1.05,24,3,true,0,Math.PI),cloth,0,.88,-.18);cape.rotation.x=.08;}
-  mesh(new T.SphereGeometry(.23,28,20),skin,0,1.68,0);addHair();addFace();
+  mesh(new T.SphereGeometry(.23,28,20),skin,0,1.68,0);addHair();addFace();addCardIdentity();
   const bones:T.Bone[]=[body];
   for(const side of [-1,1]){
    const leg=new T.Bone();leg.name=side<0?'legL':'legR';leg.position.set(side*.15,.72,0);body.add(leg);bones.push(leg);mesh(new T.CapsuleGeometry(.09,.36,8,14),armored?steel:dark,0,-.24,0,leg);mesh(new T.CapsuleGeometry(.105,.12,5,12),dark,0,-.51,.08,leg);
@@ -87,6 +87,34 @@ export function createProceduralCharacter(cardId:string){
  }
 
  function addFace(){for(const side of [-1,1]){mesh(new T.SphereGeometry(.026,7,5),dark,side*.078,1.69,.216);const brow=mesh(new T.BoxGeometry(.082,.018,.022),hair,side*.075,1.75,.208);brow.rotation.z=side*.12;}mesh(new T.BoxGeometry(.065,.018,.018),material(0x713b35),0,1.58,.223);}
+
+ function addCardIdentity(){
+  if(cardId==='slope'){
+   // A arqueira da carta tem rabo de cavalo alto, corpete vermelho, ombreiras e faixa assimétrica.
+   const tie=orb(.075,.18,1.83,-.17);tie.material=gold;
+   for(let i=0;i<4;i++){const lock=mesh(new T.CapsuleGeometry(.075-i*.009,.24,8,14),hair,.24+i*.09,1.74-i*.13,-.2);lock.rotation.z=-.55-i*.09;}
+   const chest=mesh(new T.CapsuleGeometry(.255,.22,8,20),cloth,0,1.16,.08);chest.scale.set(1.04,1,.72);
+   for(const side of [-1,1]){const strap=bar(new T.Vector3(side*.2,.92,.25),new T.Vector3(-side*.08,1.36,.25),.025,gold);strap.rotation.z=side*.04;mesh(new T.CylinderGeometry(.13,.15,.18,18),gold,side*.3,1.3,0);}
+   const sash=mesh(new T.ConeGeometry(.38,.72,24,2,true),cloth,.12,.58,.02);sash.rotation.z=-.16;
+  }else if(cardId==='limit'){
+   // Elmo fechado, crista, peitoral facetado e capa azul formam a leitura do guardião da carta.
+   const crest=mesh(new T.ConeGeometry(.085,.58,12),gold,0,2.08,-.04);crest.rotation.z=-.08;
+   const breast=mesh(new T.OctahedronGeometry(.34,1),steel,0,1.14,.17);breast.scale.set(1,.85,.45);
+   for(const side of [-1,1]){const trim=bar(new T.Vector3(side*.08,.88,.27),new T.Vector3(side*.27,1.35,.2),.028,gold);trim.rotation.z=side*.1;}
+   const capeClasp=orb(.075,0,1.37,.18);capeClasp.material=crystal;
+  }else if(cardId==='power'){
+   // O mago mantém o capuz rubro, barba branca longa, medalhão e espirais exponenciais douradas.
+   const medallion=torus(.105,.025,gold,0,1.27,.28);medallion.rotation.x=Math.PI/2;
+   for(const y of [.43,.72,.98]){const trim=torus(.34+(y-.43)*.1,.018,gold,0,y,.01);trim.rotation.x=Math.PI/2;}
+   for(let i=0;i<13;i++){const a=i*.82,r=.22+i*.012;orb(.028,Math.cos(a)*r,.52+i*.075,Math.sin(a)*r-.24);}
+  }else if(cardId==='sine'){
+   // Saia em camadas, coque, joias e fitas ondulantes reproduzem a bailarina verde e dourada.
+   mesh(new T.SphereGeometry(.12,20,14),hair,.1,1.96,-.08);
+   for(let i=0;i<3;i++){const skirt=mesh(new T.CylinderGeometry(.24+i*.06,.43+i*.08,.24,28,1,true),i===1?gold:cloth,0,.66-i*.16,0);skirt.scale.z=.88;}
+   for(const side of [-1,1]){const band=torus(.105,.018,gold,side*.29,1.28,0);band.rotation.x=Math.PI/2;}
+   for(const side of [-1,1]){const points=Array.from({length:16},(_,i)=>new T.Vector3(side*(.18+i*.045),1.3-i*.055,-.12+Math.sin(i*.72)*.18));const ribbon=mesh(new T.TubeGeometry(new T.CatmullRomCurve3(points),24,.027,7,false),side<0?glow:gold,0,0,0);ribbon.castShadow=false;}
+  }
+ }
 
  function addSignature(left:T.Object3D,right:T.Object3D){
   if(cardId==='slope'){

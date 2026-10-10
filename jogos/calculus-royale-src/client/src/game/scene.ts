@@ -22,11 +22,11 @@ export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(w
  const rim=new T.DirectionalLight(0x65cfff,1.15);rim.position.set(14,10,-12);scene.add(rim);
  const world=createWorld(index,stageIndex);scene.background=new T.Color(world.sky);scene.fog=new T.FogExp2(world.fog,.008);rim.color.set(world.accent);scene.add(world.root);
  const camera=new T.PerspectiveCamera(42,1,.1,120);const controls=new OrbitControls(camera,canvas);
- controls.enableDamping=true;controls.enableRotate=false;controls.enablePan=false;controls.enableZoom=true;controls.minDistance=12;controls.maxDistance=65;
+ controls.enableDamping=true;controls.enableRotate=false;controls.enablePan=false;controls.enableZoom=true;controls.minDistance=7;controls.maxDistance=65;
  // Câmera fixa ao sul: aliados nascem embaixo e avançam para o norte da tela.
- function resetCamera(){const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight),distance=Math.max(24,11/(Math.tan(T.MathUtils.degToRad(21))*aspect));camera.position.set(-distance*.78,distance*.86,0);controls.target.set(0,.35,0);controls.update();}
- function viewIsland(){const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight),distance=Math.max(26,10/(Math.tan(T.MathUtils.degToRad(21))*aspect));camera.position.set(-distance*.78,distance*.9,0);controls.target.set(.6,.28,0);controls.update();}
- function focusSpawn(x:number){const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight),distance=Math.max(14,6.5/(Math.tan(T.MathUtils.degToRad(21))*aspect));controls.target.set(x,.65,0);camera.position.set(x-distance*.78,distance*.86,0);controls.update();}
+ function resetCamera(){const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight),distance=Math.max(24,11/(Math.tan(T.MathUtils.degToRad(21))*aspect));camera.position.set(-distance*.78,distance*.86,0);controls.target.set(0,.35,0);controls.update();canvas.dataset.cameraMode='combat';}
+ function viewIsland(){const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight),distance=Math.max(26,10/(Math.tan(T.MathUtils.degToRad(21))*aspect));camera.position.set(-distance*.78,distance*.9,0);controls.target.set(.6,.28,0);controls.update();canvas.dataset.cameraMode='island';}
+ function focusSpawn(x:number){const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight),distance=Math.max(8.5,4/(Math.tan(T.MathUtils.degToRad(21))*aspect));controls.target.set(x,.72,0);camera.position.set(x-distance*.78,distance*.86,0);controls.update();canvas.dataset.cameraMode='spawn';}
  viewIsland();
  const observer=new ResizeObserver(()=>{const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();});observer.observe(canvas);
  let state:ArenaState={allies:[],enemies:[],paused:false},disposed=false,ready=false,warnings=0;
@@ -73,7 +73,7 @@ export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(w
   canvas.dataset.units=String(live.size);canvas.dataset.effects=String(effects.length);
   for(const mesh of zoneMeshes){mesh.visible=Boolean(state.placement);mesh.material.color.set(state.placement?.blocked.includes(mesh.userData.zoneId)?0xf1746d:state.placement?.zoneId===mesh.userData.zoneId?0xffd77c:0x5bffcc);mesh.material.opacity=state.placement?.zoneId===mesh.userData.zoneId ? .65 : .25;}
   const placement=state.placement;
-  if(placement&&focusedZone!==placement.zoneId){const zone=SPAWN_ZONES.find(z=>z.id===placement.zoneId);if(zone)focusSpawn(arenaPosition(zone.progress,false,zone.lane).x);focusedZone=placement.zoneId;}else if(!placement)focusedZone='';
+  if(placement&&focusedZone!==placement.zoneId){const zone=SPAWN_ZONES.find(z=>z.id===placement.zoneId);if(zone)focusSpawn(arenaPosition(zone.progress,false,zone.lane).x);focusedZone=placement.zoneId;}else if(!placement&&focusedZone){focusedZone='';resetCamera();}
   if(!placement||previewId!==placement.unit.cardId){if(preview){scene.remove(preview.group);preview.dispose();preview=undefined;}previewId='';}
   if(placement){if(!preview){const spec=manifest.characters?.[placement.unit.cardId]??manifest.characters?.default;preview=createCharacter('#ffe18c',placement.unit.kind,spec?assets.get(spec.url):undefined,spec,placement.unit.cardId);previewId=placement.unit.cardId;scene.add(preview.group);}const zone=SPAWN_ZONES.find(z=>z.id===placement.zoneId)!;preview.group.position.copy(arenaPosition(zone.progress,false,zone.lane));preview.group.rotation.y=Math.PI/2;preview.play('idle');}
   canvas.dataset.previewCard=previewId;canvas.dataset.previewZone=placement?.zoneId??'';

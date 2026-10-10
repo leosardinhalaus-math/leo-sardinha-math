@@ -3,7 +3,9 @@ import { Box3, Vector3, AnimationClip, NumberKeyframeTrack } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { arenaPosition, moveWithCollisions } from '../client/src/game/collisions.ts';
 import { createCharacter, disposeObject } from '../client/src/game/characters.ts';
+import { createAbilityEffect } from '../client/src/game/effects.ts';
 import { createWorld } from '../client/src/game/world.ts';
+import type { CombatEvent } from '../client/src/game/combat.ts';
 
 assert.equal(arenaPosition(0,false,1.65).x,-9);
 assert.equal(arenaPosition(100,false,1.65).x,9);
@@ -29,4 +31,13 @@ first.play('idle');second.play('idle');first.mixer.update(.25);
 assert.notEqual(first.group.getObjectByName('bone')!.rotation.x,second.group.getObjectByName('bone')!.rotation.x,'Clones não podem compartilhar pose');
 first.play('walk');first.mixer.update(.3);assert(first.group.getObjectByName('bone')!.rotation.x<0,'Crossfade deve alcançar Walk');
 first.dispose();second.dispose();disposeObject(gltf.scene);
-console.log('PASS: coordenadas, colisão sem atravessamento, cinco rotas, cinco animações, GLTFLoader, clones e crossfade.');
+// Cada herói inicial precisa criar um poder 3D próprio, animável e descartável.
+for(const [cardId,type] of [['slope','pierce'],['limit','shield'],['power','strike'],['sine','slow']] as const){
+ const event={id:`fx-${cardId}`,type,cardId,sourceId:1,enemy:false,x:0,z:0,value:1} as CombatEvent;
+ const effect=createAbilityEffect(event);
+ assert(effect.group.children.length>=4,`${cardId} deve possuir partículas e geometria de assinatura`);
+ assert(effect.update(.2),`${cardId} deve permanecer visível durante a animação`);
+ for(let i=0;i<6;i++)effect.update(.2);
+ effect.dispose();
+}
+console.log('PASS: coordenadas, colisão, rotas, animações, GLTFLoader, clones, crossfade e poderes 3D.');
