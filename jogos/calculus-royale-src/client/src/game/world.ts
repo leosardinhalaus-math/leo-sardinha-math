@@ -49,8 +49,8 @@ export function createWorld(index:number,activeStage=0){
  for(const z of [-1.65,1.65]){for(let x=-10.5;x<=10.5;x+=.72){const tile=box(.58,.055,1.05,path,x,.19,z);tile.rotation.y=(Math.sin(x*1.7)*.015);}bridge(0,z,2.55,1.2,true);}
  const river=box(1.55,.05,9.4,water,0,.17,0);river.castShadow=false;waterfall(0,4.55,1.4,5);waterfall(0,-4.55,1.4,5);
  // Torres funcionais ganham a linguagem de portais do mapa.
- for(const x of [-9.5,9.5])for(const z of [-1.65,1.65]){cylinder(.58,.78,.52,12,stone,x,.43,z,true);cylinder(.45,.55,.55,12,dark,x,.91,z);const crown=add(new T.ConeGeometry(.36,.65,8),gold,x,1.48,z);crown.castShadow=true;orb(.18,glow,x,1.82,z);}
- castle(8.5,0,theme.kind==='limits'?1.42:1.05);portal(-9.8,0,.9);observatory(-7.4,-3.7,theme.kind==='limits'?1.08:.9);armillary(7.5,3.3,theme.kind==='limits'?1.08:.9);
+
+ castle(11.5,-4.8,theme.kind==='limits'?1.42:1.05);portal(-9.8,0,.9);observatory(-7.4,-3.7,theme.kind==='limits'?1.08:.9);armillary(7.5,3.3,theme.kind==='limits'?1.08:.9);
  for(let i=0;i<8;i++){const x=-8+i*2.25,z=i%2?-3.35:3.35;marker(x,z,i);}
  for(const [x,z] of [[-10,-5.4],[-8,5.5],[-5,5.8],[-3,-5.6],[3,5.5],[5,-5.7],[8,5.5],[10,-5.3],[-7,-8.6],[7,-8.2]])crystalCluster(x,z,.8+random()*.5);
  for(let i=0;i<30;i++){const x=-11+random()*22,z=(random()>.5?1:-1)*(3.1+random()*2.9);if(Math.abs(x)<1.4)continue;tree(x,z,.75+random()*.65);}

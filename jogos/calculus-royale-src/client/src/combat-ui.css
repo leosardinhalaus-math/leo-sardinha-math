@@ -78,3 +78,8 @@
  .next-card-preview{gap:3px;padding:2px 4px}.next-card-preview img{width:22px;height:27px}.next-card-preview>span{font-size:7px}.next-card-preview small{max-width:58px;font-size:8px}.next-card-preview>b{width:18px;height:18px;font-size:9px}
 }
 @media(prefers-reduced-motion:reduce){.battle-clock.is-overtime{animation:none}}
+.tower-scoreboard{position:absolute;z-index:4;left:8px;right:8px;display:grid;grid-template-columns:64px repeat(3,minmax(0,1fr));gap:6px;padding:6px 8px;border-radius:8px;background:#071928ed;color:#e5f7ff;pointer-events:none;font-size:11px}
+.enemy-scoreboard{top:8px}.ally-scoreboard{bottom:42px}.tower-scoreboard>strong{align-self:center;font-size:12px}.tower-scoreboard>div{display:grid;gap:2px;min-width:0}.tower-scoreboard span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tower-scoreboard meter{width:100%;height:9px}.tower-scoreboard small{font-size:10px}
+.placement-controls{display:grid;grid-template-columns:1fr 1fr;gap:12px}.placement-controls label{display:grid;gap:4px;font-size:13px}.placement-controls input{width:100%;min-height:32px;accent-color:#f3c86a}.placement-controls input:focus-visible{outline:2px solid #f3c86a;outline-offset:3px}
+.inventory-item button,.reward-card button,.battle-result button{min-height:42px;margin-top:8px;padding:8px 16px;border:1px solid #f3c86a;border-radius:8px;background:#f3c86a;color:#102a4d;font-weight:700;cursor:pointer}
+@media(max-width:600px){.tower-scoreboard{grid-template-columns:45px repeat(3,minmax(0,1fr));gap:4px;padding:5px;left:4px;right:4px;font-size:10px}.tower-scoreboard>strong{font-size:10px}.tower-scoreboard small{font-size:9px}.placement-controls{gap:8px}.world-arena .arena-world-name{top:65px}}

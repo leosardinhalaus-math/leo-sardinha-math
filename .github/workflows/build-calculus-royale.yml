@@ -58,6 +58,13 @@ jobs:
         run: |
           npm run test:three
           npm run test:combat
+          npm run test:save
+          npm run test:progression
+          npm run test:battle-rules
+          npm run test:cave-encounters
+          npm run test:chests
+          npm run test:tactical
+          npm run test:campaign
 
       - name: Build game
         working-directory: jogos/calculus-royale-src
