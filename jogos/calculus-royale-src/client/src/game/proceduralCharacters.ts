@@ -7,10 +7,10 @@ type HeroLook={female?:boolean;hair?:HairStyle;beard?:boolean;skin?:number;armor
 // Descritores observados nas artes. Eles controlam a silhueta 3D; nenhuma imagem
 // da carta é aplicada como textura ou placa no personagem.
 const LOOKS:Record<string,HeroLook>={
- area:{female:true,hair:'long'},average:{hair:'short',beard:true},bernoulli:{hair:'curly',beard:true},cauchy:{hair:'short',beard:true,armor:true},
+ area:{female:true,hair:'long'},average:{hair:'long',beard:true},bernoulli:{hair:'long',beard:true},cauchy:{hair:'short',beard:true,armor:true},
  cavalieri:{hair:'curly',beard:true},'cavalieri-advanced':{hair:'curly',beard:true},chain:{hair:'hood',beard:true},compare:{female:true,hair:'long'},
  comparison:{hair:'short',beard:true,armor:true},continuity:{female:true,hair:'long',armor:true},ftc:{hair:'curly',beard:true},gabriel:{female:true,hair:'long',whiteGold:true},
- growth:{female:true,hair:'curly',armor:true},implicit:{hair:'robot',armor:true,skin:0x6f8395},improper:{hair:'helmet',armor:true,skin:0x5c4f66},inverse:{female:true,hair:'long'},
+ growth:{female:true,hair:'long',armor:true},implicit:{hair:'robot',armor:true,skin:0x6f8395},improper:{hair:'helmet',armor:true,skin:0x5c4f66},inverse:{female:true,hair:'long'},
  limit:{hair:'helmet',armor:true,skin:0x7a8998},ln:{female:true,hair:'hood'},mean:{hair:'short',beard:true,armor:true},miner:{female:true,hair:'curly',armor:true},
  newton:{hair:'long'},parts:{female:true,hair:'long',armor:true},parts2:{hair:'short',beard:true,armor:true},power:{hair:'hood',beard:true},
  quotient:{female:true,hair:'hood'},rate:{hair:'short',skin:0x8d5f45},root:{hair:'short',beard:true,armor:true},secant:{hair:'short',beard:true,armor:true},
@@ -34,6 +34,7 @@ export function createProceduralCharacter(cardId:string){
 
  const floating=OBJECTS.has(cardId);
  if(floating)createRelic();else createHero();
+ addCardIdentity();
 
  function createRelic(){
   if(cardId==='mirror'){
@@ -58,17 +59,18 @@ export function createProceduralCharacter(cardId:string){
  }
 
  function createHero(){
-  const armored=look.armor||['guardian','golem','titan'].includes(p.archetype),robed=['mage','priest','angel','dancer'].includes(p.archetype);
-  const width=p.archetype==='golem'||p.archetype==='titan'?.45:look.female?.27:.31;
+  const armored=look.armor||['guardian','golem'].includes(p.archetype)||(p.archetype==='titan'&&cardId==='ftc'),robed=['mage','priest','angel','dancer'].includes(p.archetype);
+  const width=p.archetype==='golem'?.45:p.archetype==='titan'?.36:look.female?.27:.31;
+  mesh(new T.CylinderGeometry(.085,.105,.16,16),skin,0,1.48,0);
   mesh(new T.CapsuleGeometry(width*.88,.35,8,18),armored?steel:cloth,0,1.05,0);mesh(new T.BoxGeometry(width*2.15,.1,.43),gold,0,.78,0);
-  if(robed)mesh(new T.CylinderGeometry(width*.78,.43,.68,24),cloth,0,.54,0);
+  if(robed){mesh(new T.CylinderGeometry(width*.78,.43,.68,24),cloth,0,.54,0);for(const side of [-1,0,1]){const fold=mesh(new T.CapsuleGeometry(.022,.42,5,10),side===0?gold:glow,side*.19,.5,.37);fold.scale.y=.85;}}
   if(armored){mesh(new T.BoxGeometry(width*2.2,.12,.48),gold,0,1.32,0);for(const side of [-1,1])mesh(new T.SphereGeometry(.17,18,12),gold,side*(width+.08),1.34,0);}
   if(!['dancer','engineer'].includes(p.archetype)){const cape=mesh(new T.ConeGeometry(.5,1.05,24,3,true,0,Math.PI),cloth,0,.88,-.18);cape.rotation.x=.08;}
-  mesh(new T.SphereGeometry(.23,28,20),skin,0,1.68,0);addHair();addFace();addCardIdentity();
+  mesh(new T.SphereGeometry(.23,28,20),skin,0,1.68,0);addHair();addFace();
   const bones:T.Bone[]=[body];
   for(const side of [-1,1]){
    const leg=new T.Bone();leg.name=side<0?'legL':'legR';leg.position.set(side*.15,.72,0);body.add(leg);bones.push(leg);mesh(new T.CapsuleGeometry(.09,.36,8,14),armored?steel:dark,0,-.24,0,leg);mesh(new T.CapsuleGeometry(.105,.12,5,12),dark,0,-.51,.08,leg);
-   const arm=new T.Bone();arm.name=side<0?'armL':'armR';arm.position.set(side*(width+.08),1.3,0);body.add(arm);bones.push(arm);mesh(new T.CapsuleGeometry(.092,.32,8,14),armored?steel:cloth,0,-.22,0,arm);mesh(new T.SphereGeometry(.095,18,12),skin,0,-.48,.04,arm);
+   const arm=new T.Bone();arm.name=side<0?'armL':'armR';arm.position.set(side*(width+.08),1.3,0);body.add(arm);bones.push(arm);mesh(new T.CapsuleGeometry(.092,.32,8,14),armored?steel:cloth,0,-.22,0,arm);const hand=mesh(new T.CapsuleGeometry(.07,.09,7,12),skin,0,-.48,.04,arm);hand.rotation.z=side*.08;mesh(new T.SphereGeometry(.035,12,8),skin,side*.07,-.47,.07,arm);
   }
   const rigGeometry=new T.CylinderGeometry(width*.78,width,.58,20,5);rigGeometry.translate(0,1.08,0);const count=rigGeometry.attributes.position.count,indices=new Uint16Array(count*4),weights=new Float32Array(count*4);for(let i=0;i<count;i++)weights[i*4]=1;rigGeometry.setAttribute('skinIndex',new T.Uint16BufferAttribute(indices,4));rigGeometry.setAttribute('skinWeight',new T.Float32BufferAttribute(weights,4));const torso=new T.SkinnedMesh(rigGeometry,armored?steel:cloth);torso.name='riggedTorso';torso.castShadow=true;root.add(torso);torso.bind(new T.Skeleton(bones));
   addSignature(body.getObjectByName('armL')!,body.getObjectByName('armR')!);
@@ -78,7 +80,7 @@ export function createProceduralCharacter(cardId:string){
   const style=look.hair??'short';
   if(style==='robot'){const helmet=mesh(new T.SphereGeometry(.25,22,16),steel,0,1.69,0);mesh(new T.BoxGeometry(.34,.09,.03),glow,0,1.69,.225);helmet.scale.y=1.05;return;}
   if(style==='helmet'){mesh(new T.SphereGeometry(.255,22,16),steel,0,1.69,0);mesh(new T.BoxGeometry(.035,.34,.27),gold,0,1.74,.08);mesh(new T.BoxGeometry(.3,.08,.06),dark,0,1.67,.225);return;}
-  if(style==='hood'){const hood=mesh(new T.SphereGeometry(.32,24,18),cloth,0,1.7,-.04);hood.scale.set(1,1.13,.82);mesh(new T.SphereGeometry(.235,24,18),skin,0,1.66,.08);}
+  if(style==='hood'){const back=mesh(new T.SphereGeometry(.29,24,18),cloth,0,1.7,-.2);back.scale.set(1,1.14,.72);const rim=mesh(new T.TorusGeometry(.245,.065,12,32),cloth,0,1.69,.015);rim.scale.y=1.12;}
   else if(style!=='bald')mesh(new T.SphereGeometry(.245,24,18,0,Math.PI*2,0,Math.PI*.55),hair,0,1.73,-.02);
   if(style==='long')for(const side of [-1,1]){const lock=mesh(new T.CapsuleGeometry(.075,.72,8,14),hair,side*.19,1.34,-.1);lock.rotation.z=side*.14;}
   if(style==='curly')for(let i=0;i<11;i++){const a=i/11*Math.PI*2;mesh(new T.SphereGeometry(.082,16,12),hair,Math.cos(a)*.22,1.64+Math.sin(a)*.17,-.1);}
@@ -86,33 +88,198 @@ export function createProceduralCharacter(cardId:string){
   if(look.female)for(const side of [-1,1]){const earring=orb(.035,side*.22,1.59,.08);earring.material=gold;}
  }
 
- function addFace(){for(const side of [-1,1]){mesh(new T.SphereGeometry(.026,7,5),dark,side*.078,1.69,.216);const brow=mesh(new T.BoxGeometry(.082,.018,.022),hair,side*.075,1.75,.208);brow.rotation.z=side*.12;}mesh(new T.BoxGeometry(.065,.018,.018),material(0x713b35),0,1.58,.223);}
+ function addFace(){
+  for(const side of [-1,1]){
+   mesh(new T.SphereGeometry(.041,12,8),material(0xf4f2e8,.45),side*.08,1.69,.216);
+   mesh(new T.SphereGeometry(.019,10,7),dark,side*.08,1.69,.249);
+   mesh(new T.SphereGeometry(.006,7,5),material(0xffffff,.2),side*.074,1.698,.266);
+   const brow=mesh(new T.CapsuleGeometry(.01,.07,5,8),hair,side*.075,1.755,.225);brow.rotation.z=side*.14;
+   const ear=mesh(new T.SphereGeometry(.043,12,8),skin,side*.226,1.67,0);ear.scale.x=.65;
+  }
+  const nose=mesh(new T.ConeGeometry(.032,.09,10),skin,0,1.64,.245);nose.rotation.x=Math.PI/2;
+  const mouth=mesh(new T.CapsuleGeometry(.008,.052,4,8),material(look.female?0x8e3e4c:0x713b35),0,1.58,.225);mouth.rotation.z=Math.PI/2;
+ }
 
  function addCardIdentity(){
+  const identity=new T.Group();identity.name=`identity-${cardId}`;body.add(identity);
+  const piece=(g:T.BufferGeometry,m:T.Material,x=0,y=0,z=0)=>mesh(g,m,x,y,z,identity);
+  const identityOrb=(radius:number,x:number,y:number,z:number,m:T.Material=crystal)=>{const value=piece(new T.IcosahedronGeometry(radius,1),m,x,y,z);return value;};
+  const identityBar=(from:T.Vector3,to:T.Vector3,radius:number,m:T.Material,sides=8)=>bar(from,to,radius,m,identity,sides);
+  const identityTorus=(radius:number,tube:number,m:T.Material,x:number,y:number,z:number)=>torus(radius,tube,m,x,y,z,identity);
+  const curve=(points:T.Vector3[],m:T.Material,radius=.025)=>piece(new T.TubeGeometry(new T.CatmullRomCurve3(points),Math.max(24,points.length*2),radius,7,false),m);
+  const blade=(x:number,y:number,z:number,m:T.Material=crystal,tilt=0)=>{const value=piece(new T.ConeGeometry(.075,.72,6),m,x,y,z);value.rotation.set(Math.PI/2,0,tilt);return value;};
+  const arc=(m:T.Material,x=0,y=1.15,z=.28,scale=1)=>{const points=Array.from({length:25},(_,i)=>{const u=i/24*2-1;return new T.Vector3(x+u*.5*scale,y+(1-u*u)*.34*scale,z);});return curve(points,m,.025);};
+  const book=(x:number,y:number,z:number,m:T.Material=gold)=>{const value=piece(new T.BoxGeometry(.42,.07,.3),m,x,y,z);value.rotation.z=.15;identityBar(new T.Vector3(x,y+.045,z-.14),new T.Vector3(x,y+.045,z+.14),.012,dark);return value;};
+  const goggles=()=>{for(const side of [-1,1]){const lens=identityTorus(.075,.018,gold,side*.085,1.73,.22);lens.rotation.x=Math.PI/2;}identityBar(new T.Vector3(-.02,1.73,.23),new T.Vector3(.02,1.73,.23),.012,gold);};
+  const shoulderMantle=(m:T.Material)=>{for(const side of [-1,1]){const pad=piece(new T.SphereGeometry(.16,18,12),m,side*.34,1.36,0);pad.scale.set(1.15,.72,1);}};
+  const shield=(x:number,m:T.Material=steel,r=.31)=>{const value=piece(new T.CylinderGeometry(r,r,.07,20),m,x,1.03,.28);value.rotation.x=Math.PI/2;const rim=identityTorus(r*.82,.025,glow,x,1.03,.33);rim.rotation.x=Math.PI/2;return value;};
   if(cardId==='slope'){
    // A arqueira da carta tem rabo de cavalo alto, corpete vermelho, ombreiras e faixa assimétrica.
-   const tie=orb(.075,.18,1.83,-.17);tie.material=gold;
-   for(let i=0;i<4;i++){const lock=mesh(new T.CapsuleGeometry(.075-i*.009,.24,8,14),hair,.24+i*.09,1.74-i*.13,-.2);lock.rotation.z=-.55-i*.09;}
-   const chest=mesh(new T.CapsuleGeometry(.255,.22,8,20),cloth,0,1.16,.08);chest.scale.set(1.04,1,.72);
-   for(const side of [-1,1]){const strap=bar(new T.Vector3(side*.2,.92,.25),new T.Vector3(-side*.08,1.36,.25),.025,gold);strap.rotation.z=side*.04;mesh(new T.CylinderGeometry(.13,.15,.18,18),gold,side*.3,1.3,0);}
-   const sash=mesh(new T.ConeGeometry(.38,.72,24,2,true),cloth,.12,.58,.02);sash.rotation.z=-.16;
+   identityOrb(.075,.18,1.83,-.17,gold);
+   for(let i=0;i<4;i++){const lock=piece(new T.CapsuleGeometry(.075-i*.009,.24,8,14),hair,.24+i*.09,1.74-i*.13,-.2);lock.rotation.z=-.55-i*.09;}
+   const chest=piece(new T.CapsuleGeometry(.255,.22,8,20),cloth,0,1.16,.08);chest.scale.set(1.04,1,.72);
+   for(const side of [-1,1]){const strap=identityBar(new T.Vector3(side*.2,.92,.25),new T.Vector3(-side*.08,1.36,.25),.025,gold);strap.rotation.z=side*.04;piece(new T.CylinderGeometry(.13,.15,.18,18),gold,side*.3,1.3,0);}
+   const sash=piece(new T.ConeGeometry(.38,.72,24,2,true),cloth,.12,.58,.02);sash.rotation.z=-.16;
   }else if(cardId==='limit'){
    // Elmo fechado, crista, peitoral facetado e capa azul formam a leitura do guardião da carta.
-   const crest=mesh(new T.ConeGeometry(.085,.58,12),gold,0,2.08,-.04);crest.rotation.z=-.08;
-   const breast=mesh(new T.OctahedronGeometry(.34,1),steel,0,1.14,.17);breast.scale.set(1,.85,.45);
-   for(const side of [-1,1]){const trim=bar(new T.Vector3(side*.08,.88,.27),new T.Vector3(side*.27,1.35,.2),.028,gold);trim.rotation.z=side*.1;}
-   const capeClasp=orb(.075,0,1.37,.18);capeClasp.material=crystal;
+   const crest=piece(new T.ConeGeometry(.085,.58,12),gold,0,2.08,-.04);crest.rotation.z=-.08;
+   const breast=piece(new T.OctahedronGeometry(.34,1),steel,0,1.14,.17);breast.scale.set(1,.85,.45);
+   for(const side of [-1,1]){const trim=identityBar(new T.Vector3(side*.08,.88,.27),new T.Vector3(side*.27,1.35,.2),.028,gold);trim.rotation.z=side*.1;}
+   identityOrb(.075,0,1.37,.18);
   }else if(cardId==='power'){
    // O mago mantém o capuz rubro, barba branca longa, medalhão e espirais exponenciais douradas.
-   const medallion=torus(.105,.025,gold,0,1.27,.28);medallion.rotation.x=Math.PI/2;
-   for(const y of [.43,.72,.98]){const trim=torus(.34+(y-.43)*.1,.018,gold,0,y,.01);trim.rotation.x=Math.PI/2;}
-   for(let i=0;i<13;i++){const a=i*.82,r=.22+i*.012;orb(.028,Math.cos(a)*r,.52+i*.075,Math.sin(a)*r-.24);}
+   const medallion=identityTorus(.105,.025,gold,0,1.27,.28);medallion.rotation.x=Math.PI/2;
+   for(const y of [.43,.72,.98]){const trim=identityTorus(.34+(y-.43)*.1,.018,gold,0,y,.01);trim.rotation.x=Math.PI/2;}
+   for(let i=0;i<13;i++){const a=i*.82,r=.22+i*.012;identityOrb(.028,Math.cos(a)*r,.52+i*.075,Math.sin(a)*r-.24);}
   }else if(cardId==='sine'){
    // Saia em camadas, coque, joias e fitas ondulantes reproduzem a bailarina verde e dourada.
-   mesh(new T.SphereGeometry(.12,20,14),hair,.1,1.96,-.08);
-   for(let i=0;i<3;i++){const skirt=mesh(new T.CylinderGeometry(.24+i*.06,.43+i*.08,.24,28,1,true),i===1?gold:cloth,0,.66-i*.16,0);skirt.scale.z=.88;}
-   for(const side of [-1,1]){const band=torus(.105,.018,gold,side*.29,1.28,0);band.rotation.x=Math.PI/2;}
-   for(const side of [-1,1]){const points=Array.from({length:16},(_,i)=>new T.Vector3(side*(.18+i*.045),1.3-i*.055,-.12+Math.sin(i*.72)*.18));const ribbon=mesh(new T.TubeGeometry(new T.CatmullRomCurve3(points),24,.027,7,false),side<0?glow:gold,0,0,0);ribbon.castShadow=false;}
+   piece(new T.SphereGeometry(.12,20,14),hair,.1,1.96,-.08);
+   for(let i=0;i<3;i++){const skirt=piece(new T.CylinderGeometry(.24+i*.06,.43+i*.08,.24,28,1,true),i===1?gold:cloth,0,.66-i*.16,0);skirt.scale.z=.88;}
+   for(const side of [-1,1]){const band=identityTorus(.105,.018,gold,side*.29,1.28,0);band.rotation.x=Math.PI/2;}
+   for(const side of [-1,1]){const points=Array.from({length:16},(_,i)=>new T.Vector3(side*(.18+i*.045),1.3-i*.055,-.12+Math.sin(i*.72)*.18));const ribbon=curve(points,side<0?glow:gold,.027);ribbon.castShadow=false;}
+  }else if(cardId==='area'){
+   // Sacerdotisa verde: diadema, manto branco e cajado curvo da integral.
+   const hood=piece(new T.TorusGeometry(.27,.045,10,32,Math.PI),gold,0,1.72,.02);hood.rotation.z=Math.PI/2;
+   const mantle=piece(new T.ConeGeometry(.47,1.08,28,2,true),material(0xe8eadc,.7),0,.88,-.12);mantle.rotation.x=.06;
+   identityBar(new T.Vector3(.43,.42,.12),new T.Vector3(.43,1.55,.12),.035,gold);
+   const crook=curve(Array.from({length:16},(_,i)=>{const a=i/15*Math.PI*1.45;return new T.Vector3(.43+Math.cos(a)*.22,1.55+Math.sin(a)*.22,.12);}),glow,.035);crook.name='integral-staff';
+  }else if(cardId==='average'){
+   // Monge do valor médio: túnica azul-petróleo e duas colunas luminosas equilibradas.
+   shoulderMantle(gold);for(const side of [-1,1]){const column=piece(new T.BoxGeometry(.17,.62,.17),glow,side*.48,1.12,.24);column.name=`mean-column-${side}`;for(let i=-1;i<=1;i++)identityTorus(.12,.012,gold,side*.48,1.12+i*.2,.24).rotation.x=Math.PI/2;}
+   piece(new T.BoxGeometry(.38,.08,.48),gold,0,.78,.03);
+  }else if(cardId==='bernoulli'){
+   // Ancião azul e dourado, com espiral exponencial sustentada entre as mãos.
+   shoulderMantle(gold);book(-.34,.83,.2,dark);
+   const points=Array.from({length:30},(_,i)=>{const a=i*.72,r=.05+i*.012;return new T.Vector3(Math.cos(a)*r,1.1+i*.022,Math.sin(a)*r+.3);});curve(points,glow,.035).name='bernoulli-spiral';
+   for(const side of [-1,1])identityOrb(.085,side*.4,1.08,.28,side<0?gold:glow);
+  }else if(cardId==='cauchy'){
+   // Cavaleiro azul de armadura pesada e dois escudos simétricos.
+   shoulderMantle(gold);shield(-.43,steel,.32);shield(.43,steel,.32);
+   const crest=piece(new T.ConeGeometry(.07,.45,10),gold,0,2.02,-.03);crest.rotation.z=-.12;
+  }else if(cardId==='cavalieri'){
+   // Mestre arquiteto: sólido em lâminas e esfera seccionada, como na carta.
+   shoulderMantle(gold);for(let i=0;i<5;i++){const plate=piece(new T.BoxGeometry(.42-i*.025,.035,.3-i*.018),i%2?glow:gold,-.42,.82+i*.13,.25);plate.rotation.y=i*.18;}
+   for(let i=0;i<4;i++){const ring=identityTorus(.11+i*.045,.015,i%2?gold:glow,.43,1.08,.28);ring.rotation.x=Math.PI/2;ring.scale.y=.72;}
+  }else if(cardId==='cavalieri-advanced'){
+   // Arquiteto azul: cilindro e tronco de cone com seções equivalentes.
+   shoulderMantle(gold);for(const side of [-1,1])for(let i=0;i<5;i++){const radius=side<0?.19:.11+i*.025;const ring=identityTorus(radius,.014,i%2?gold:glow,side*.43,.82+i*.14,.27);ring.rotation.x=Math.PI/2;}
+  }else if(cardId==='chain'){
+   // Mago encapuzado, medalhão e corrente de elos violeta atravessando o peito.
+   const medallion=identityOrb(.105,0,1.28,.3,gold);medallion.name='chain-medallion';
+   for(let i=0;i<6;i++){const link=identityTorus(.105,.022,i%2?gold:glow,(i-2.5)*.16,1.12+(i%2)*.1,.25);link.rotation.set(i%2?Math.PI/2:0,0,.45);}
+  }else if(cardId==='compare'){
+   // Oráculo feminina com duas curvas ordenadas, uma dourada e outra violeta.
+   shoulderMantle(gold);for(const side of [-1,1])curve(Array.from({length:18},(_,i)=>{const u=i/17;return new T.Vector3(side*(.2+u*.55),.72+u*.85+Math.sin(u*Math.PI)*.16,.22);}),side<0?gold:glow,.03);
+   identityTorus(.1,.018,gold,0,1.87,.02).rotation.x=Math.PI/2;
+  }else if(cardId==='comparison'){
+   // Guardião da comparação: armadura azul e par de escudos-curva ordenados.
+   shoulderMantle(gold);shield(-.42,steel,.3);shield(.42,steel,.3);for(const side of [-1,1])arc(side<0?gold:glow,side*.42,.98,.36,.55);
+  }else if(cardId==='continuity'){
+   // Sentinela violeta: coroa fina e domo contínuo sem interrupções.
+   identityTorus(.23,.025,gold,0,1.84,.02).rotation.x=Math.PI/2;shoulderMantle(gold);
+   const dome=arc(glow,0,1.15,.18,1.65);dome.name='continuous-dome';
+  }else if(cardId==='euler'){
+   // Orbe mecânico dourado com núcleo exponencial e gaiola giroscópica.
+   for(let i=0;i<5;i++){const ring=identityTorus(.32+i*.055,.022,i%2?gold:glow,0,1.08,0);ring.rotation.set(i*.62,i*.83,.25+i*.31);}identityOrb(.22,0,1.08,0,crystal);
+  }else if(cardId==='expchain'){
+   // Quatro elos tridimensionais em ascensão e um núcleo violeta.
+   for(let i=0;i<5;i++){const link=identityTorus(.2,.04,i%2?gold:glow,(i-2)*.22,.82+(i%2)*.2,.08);link.rotation.set(i%2?Math.PI/2:0,i*.42,i*.3);}identityOrb(.13,0,1.17,.15);
+  }else if(cardId==='fractal'){
+   // Semente verde abrindo ramificações auto-semelhantes.
+   identityOrb(.2,0,.55,0);for(let level=0;level<3;level++)for(let i=0;i<2**(level+1);i++){const a=i/(2**(level+1)-1)*1.8-.9,r=.24+level*.22,y=.82+level*.27;identityBar(new T.Vector3(0,y-.25,0),new T.Vector3(Math.sin(a)*r,y+.16,Math.cos(a)*r),.04-level*.009,gold);identityOrb(.075,Math.sin(a)*r,y+.16,Math.cos(a)*r);}
+  }else if(cardId==='ftc'){
+   // Colosso branco e dourado: livro do teorema e raio que emerge da mão.
+   shoulderMantle(gold);book(-.36,.94,.25,material(0x392719,.65));
+   const bolt=[new T.Vector3(.28,1.55,.25),new T.Vector3(.5,1.32,.28),new T.Vector3(.36,1.11,.3),new T.Vector3(.63,.78,.32)];curve(bolt,glow,.045).name='fundamental-bolt';
+  }else if(cardId==='gabriel'){
+   // A silhueta angelical é completada por halo e filigranas da túnica.
+   const halo=identityTorus(.26,.025,gold,0,2.02,-.06);halo.rotation.x=Math.PI/2;for(let i=0;i<3;i++){const trim=identityTorus(.28+i*.06,.013,i%2?gold:steel,0,.72+i*.2,.04);trim.rotation.x=Math.PI/2;}
+  }else if(cardId==='growth'){
+   // Batedora ruiva com armadura negra, folhas verdes e fluxo crescente.
+   shoulderMantle(dark);for(let i=0;i<5;i++){const leaf=piece(new T.OctahedronGeometry(.07),glow,-.48+i*.24,.72+i*.18,.22);leaf.scale.set(.65,1.8,.5);}
+   curve(Array.from({length:20},(_,i)=>new T.Vector3(-.62+i*.065,.58+i*.045+Math.sin(i*.55)*.08,.28)),glow,.03);
+  }else if(cardId==='implicit'){
+   // Golem de pedra: placas rochosas, núcleo ciano e rachaduras emissivas.
+   for(const [x,y,s] of [[-.3,1.22,.25],[.3,1.22,.25],[-.24,.83,.2],[.24,.83,.2]] as const){const rock=piece(new T.DodecahedronGeometry(s,0),steel,x,y,0);rock.rotation.set(x,y,s);}
+   const core=identityOrb(.16,0,1.13,.29);core.name='implicit-core';for(const side of [-1,1])identityBar(new T.Vector3(0,1.13,.3),new T.Vector3(side*.28,.86,.25),.022,glow);
+  }else if(cardId==='improper'){
+   // Sentinela violeta fechada, com bastão e halo infinito.
+   shoulderMantle(gold);identityBar(new T.Vector3(.42,.38,.08),new T.Vector3(.42,1.7,.08),.04,gold);identityOrb(.11,.42,1.78,.08);
+   for(const side of [-1,1]){const loop=identityTorus(.2,.026,glow,side*.17,1.86,-.08);loop.scale.x=1.35;loop.rotation.z=side*.34;}
+  }else if(cardId==='inverse'){
+   // Bruxa da inversa: diadema, orbe roxo e trajetórias que retornam.
+   identityTorus(.2,.022,gold,0,1.86,.02).rotation.x=Math.PI/2;identityOrb(.15,.42,1.16,.3);
+   for(const side of [-1,1])curve(Array.from({length:18},(_,i)=>{const a=i/17*Math.PI*1.6;return new T.Vector3(Math.cos(a)*(.28+i*.012),.92+Math.sin(a)*.34,.22+side*.08);}),side<0?gold:glow,.025);
+  }else if(cardId==='ln'){
+   // Ladina encapuzada escura, máscara e lâmina logarítmica azul.
+   const mask=piece(new T.BoxGeometry(.3,.1,.04),dark,0,1.64,.235);mask.rotation.z=-.05;
+   const points=Array.from({length:20},(_,i)=>{const u=i/19;return new T.Vector3(-.45+u*.9,.65+Math.log1p(u*4)*.38,.32);});curve(points,glow,.045).name='log-blade';
+  }else if(cardId==='mean'){
+   // Juiz barbado com balança de dois pratos e corrente central.
+   shoulderMantle(gold);identityBar(new T.Vector3(0,.74,.28),new T.Vector3(0,1.48,.28),.025,gold);identityBar(new T.Vector3(-.42,1.34,.28),new T.Vector3(.42,1.34,.28),.025,gold);
+   for(const side of [-1,1]){identityBar(new T.Vector3(side*.34,1.34,.28),new T.Vector3(side*.34,1.02,.28),.012,gold);const plate=piece(new T.CylinderGeometry(.15,.2,.025,16),glow,side*.34,1,.28);plate.rotation.x=Math.PI/2;}
+  }else if(cardId==='miner'){
+   // Mineradora ruiva: óculos, ombreiras de couro, picareta e cristais verdes.
+   goggles();shoulderMantle(material(0x6d4129,.72));identityBar(new T.Vector3(.42,.42,.1),new T.Vector3(.42,1.42,.12),.035,gold);const pick=piece(new T.BoxGeometry(.55,.12,.14),steel,.42,1.46,.12);pick.rotation.z=-.08;
+   for(let i=0;i<4;i++){const shard=piece(new T.OctahedronGeometry(.09),crystal,-.5+i*.22,.45+(i%2)*.13,.12);shard.scale.y=1.8;}
+  }else if(cardId==='mirror'){
+   // Espelho implícito: moldura azul-dourada, reflexo interno e pedestais.
+   const glass=new T.MeshPhysicalMaterial({color:0xa8dcff,metalness:.72,roughness:.08,transmission:.32,transparent:true,opacity:.72,side:T.DoubleSide});const face=piece(new T.CircleGeometry(.42,40),glass,0,1.12,.05);face.scale.y=1.35;const frame=identityTorus(.48,.045,gold,0,1.12,.08);frame.scale.y=1.35;for(const side of [-1,1])identityOrb(.07,side*.49,1.12,.08);
+  }else if(cardId==='newton'){
+   // Newton jovem de casaco azul: gola branca, lapelas e sequência de aproximação.
+   piece(new T.BoxGeometry(.46,.14,.38),material(0xe8e5d9,.72),0,1.34,.02);for(const side of [-1,1]){const lapel=piece(new T.BoxGeometry(.12,.55,.05),gold,side*.13,1.12,.24);lapel.rotation.z=side*.3;}
+   const steps=Array.from({length:5},(_,i)=>new T.Vector3(-.55+i*.27,.48+i*.17,.26));curve(steps,glow,.035);for(const point of steps)identityOrb(.055,point.x,point.y,point.z);
+  }else if(cardId==='opt'){
+   // Bússola Ótima com anéis orbitais e ponteiro azul central.
+   for(let i=0;i<4;i++){const ring=identityTorus(.28+i*.07,.022,i%2?gold:glow,0,1.08,0);ring.rotation.set(i*.5,i*.72,.3+i*.2);}const needle=piece(new T.ConeGeometry(.09,.72,5),crystal,0,1.08,.2);needle.rotation.z=-Math.PI/2;
+  }else if(cardId==='parts'){
+   // Duelista de lenço vermelho com lâminas complementares azul e laranja.
+   const scarf=identityTorus(.25,.055,cloth,0,1.48,-.02);scarf.rotation.x=Math.PI/2;blade(-.34,.92,.28,glow,-.28);blade(.34,.92,.28,gold,.28);
+  }else if(cardId==='parts2'){
+   // Mestre veterano: manto rubro, placas douradas e duas energias trocadas.
+   shoulderMantle(gold);blade(-.38,.98,.3,glow,-.32);blade(.38,.98,.3,gold,.32);for(const side of [-1,1])identityOrb(.09,side*.3,1.38,.3,side<0?gold:glow);
+  }else if(cardId==='quotient'){
+   // Ladina verde encapuzada com duas lâminas curvas cruzando numerador e denominador.
+   const mask=piece(new T.BoxGeometry(.3,.1,.04),dark,0,1.64,.235);blade(-.34,.96,.3,glow,-.55);blade(.34,.96,.3,gold,.55);identityBar(new T.Vector3(-.43,1.08,.34),new T.Vector3(.43,1.08,.34),.018,glow);
+  }else if(cardId==='rate'){
+   // Engenheiro das taxas: óculos, relógio de bolso e engrenagens de cobre.
+   goggles();const clock=identityTorus(.26,.035,gold,-.38,1.04,.3);clock.rotation.x=Math.PI/2;identityBar(new T.Vector3(-.38,1.04,.32),new T.Vector3(-.28,1.2,.32),.016,glow);for(let i=0;i<3;i++){const gear=identityTorus(.11+i*.035,.025,i%2?steel:gold,.28+i*.08,.72+i*.18,.18);gear.rotation.x=Math.PI/2;}
+  }else if(cardId==='root'){
+   // Mestre verde com braçadeira de raízes e punho cristalino rompendo a defesa.
+   shoulderMantle(gold);for(let i=0;i<5;i++){const shard=piece(new T.ConeGeometry(.06,.32,6),crystal,.28+i*.075,1.05+(i%2)*.14,.24);shard.rotation.z=-.7+i*.15;}curve(Array.from({length:16},(_,i)=>new T.Vector3(-.48+i*.065,.66+Math.sqrt(i/15)*.54,.22)),glow,.03);
+  }else if(cardId==='secant'){
+   // Cavaleiro verde e dourado com lança luminosa atravessando dois pontos.
+   shoulderMantle(gold);identityBar(new T.Vector3(-.55,.62,.28),new T.Vector3(.62,1.5,.28),.035,glow);for(const point of [new T.Vector3(-.28,.82,.28),new T.Vector3(.35,1.3,.28)])identityOrb(.07,point.x,point.y,point.z,gold);
+  }else if(cardId==='series'){
+   // A carta mostra dois feiticeiros: cria uma segunda silhueta ao lado do mago principal.
+   const twin=piece(new T.CapsuleGeometry(.2,.42,8,16),cloth,.5,1.02,-.08);twin.scale.set(.9,1,.8);piece(new T.SphereGeometry(.19,22,16),skin,.5,1.58,-.08);piece(new T.SphereGeometry(.2,22,16,0,Math.PI*2,0,Math.PI*.55),hair,.5,1.65,-.1);for(const side of [-1,1])identityOrb(.08,side*.5,1.15,.28,side<0?gold:glow);arc(glow,0,.78,.24,1.25);
+  }else if(cardId==='simpson'){
+   // Mecânica ruiva com óculos e arco parabólico apoiado em três pontos.
+   goggles();shoulderMantle(material(0x6b4328,.72));const parabola=arc(gold,0,.78,.3,1.35);parabola.name='simpson-parabola';for(const x of [-.5,0,.5])identityOrb(.06,x,.78+(1-(x/.5)**2)*.34,.3,glow);
+  }else if(cardId==='simpson-advanced'){
+   // Oráculo ancião violeta e dourado com parábolas sucessivas.
+   shoulderMantle(gold);for(let i=0;i<3;i++)arc(i%2?glow:gold,0,.68+i*.14,.22-i*.03,1.45-i*.22);identityOrb(.09,0,1.35,.3);
+  }else if(cardId==='sub'){
+   // Alquimista u: casaco escuro e dois frascos ligados por fluxo dourado-azul.
+   shoulderMantle(gold);for(const side of [-1,1]){const vial=piece(new T.SphereGeometry(.12,18,14),side<0?glow:gold,side*.38,.9,.28);piece(new T.CylinderGeometry(.04,.055,.16,10),steel,side*.38,1.05,.28);}curve(Array.from({length:20},(_,i)=>new T.Vector3(-.38+i*.04,.94+Math.sin(i/19*Math.PI)*.3,.3)),glow,.025);
+  }else if(cardId==='surface'){
+   // Navegadora azul-dourada com folha de superfície e astrolábio.
+   shoulderMantle(gold);const grid=new T.Group();grid.name='surface-grid';identity.add(grid);for(let row=-2;row<=2;row++)curve(Array.from({length:14},(_,i)=>{const u=i/13*2-1;return new T.Vector3(u*.55,.72+row*.08+Math.sin(u*Math.PI)*.16,.28+row*.025);}),row%2?gold:glow,.014);for(let i=0;i<3;i++){const ring=identityTorus(.17+i*.055,.014,i%2?gold:glow,.44,1.3,.12);ring.rotation.set(i*.55,i*.72,.25);}
+  }else if(cardId==='surface-flux'){
+   // Tecelã violeta-azul com esfera fechada e linhas vetoriais atravessando-a.
+   const shell=piece(new T.SphereGeometry(.35,20,14),new T.MeshBasicMaterial({color:p.glow,wireframe:true,transparent:true,opacity:.55}),.3,1.12,.08);shell.scale.y=.82;for(let i=-2;i<=2;i++)identityBar(new T.Vector3(-.35,i*.13+1.12,.22),new T.Vector3(.72,i*.13+1.12,.22),.014,i%2?gold:glow);
+  }else if(cardId==='taylor'){
+   // Oráculo de óculos, livro aberto e páginas douradas em série.
+   goggles();book(.12,.93,.3,material(0x4b2d24,.7));for(let i=0;i<5;i++){const page=piece(new T.BoxGeometry(.22,.018,.15),i%2?gold:glow,-.48+i*.22,1.25+i*.1,.18);page.rotation.set(.15,i*.3,-.25+i*.12);}
+  }else if(cardId==='taylor2'){
+   // Escriba masculino com pergaminho curvo, pena e aproximações em camadas.
+   shoulderMantle(gold);const scroll=arc(material(0xe4d6ae,.78),0,.88,.26,1.05);scroll.scale.z=1.8;identityBar(new T.Vector3(.42,.62,.26),new T.Vector3(.58,1.38,.26),.022,gold);for(let i=0;i<4;i++)curve(Array.from({length:10},(_,j)=>new T.Vector3(-.42+j*.09,.72+i*.12+Math.sin(j*.45)*.035,.3)),i%2?gold:glow,.012);
+  }else if(cardId==='trap'){
+   // Engenheira steampunk com óculos e placas trapezoidais empilhadas.
+   goggles();shoulderMantle(material(0x70462d,.72));for(let i=0;i<5;i++){const shape=new T.Shape();const top=.12+i*.02,bottom=.22+i*.035;shape.moveTo(-bottom,0);shape.lineTo(bottom,0);shape.lineTo(top,.2);shape.lineTo(-top,.2);shape.closePath();const plate=piece(new T.ShapeGeometry(shape),i%2?gold:glow,0,.46+i*.18,.3);plate.rotation.y=i*.08;}
+  }else if(cardId==='volume'){
+   // Tecelã azul criando um sólido por camadas elípticas.
+   shoulderMantle(gold);for(let i=0;i<7;i++){const radius=.12+Math.sin((i+1)/8*Math.PI)*.28;const ring=identityTorus(radius,.018,i%2?gold:glow,.34,.62+i*.14,.18);ring.rotation.x=Math.PI/2;ring.scale.z=.65;}identityBar(new T.Vector3(.34,.55,.18),new T.Vector3(.34,1.58,.18),.014,glow);
   }
  }
 

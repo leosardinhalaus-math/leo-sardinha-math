@@ -8,7 +8,7 @@ import { createAbilityEffect } from './effects';
 import { SPAWN_ZONES, type CombatEvent } from './combat';
 
 export type ArenaUnit={id:number;cardId:string;name:string;kind:string;progress:number;color:string;lane?:number;hp?:number;maxHp?:number;lastAttack?:number};
-export type ArenaState={allies:ArenaUnit[];enemies:ArenaUnit[];paused:boolean;events?:CombatEvent[];placement?:{unit:ArenaUnit;zoneId:string;blocked:string[]};outcome?:'victory'|'defeat'|null};
+export type ArenaState={allies:ArenaUnit[];enemies:ArenaUnit[];paused:boolean;events?:CombatEvent[];placement?:{unit:ArenaUnit;zoneId:string;blocked:string[]};outcome?:'victory'|'defeat'|null;modelIds?:string[]};
 type Manifest={useGenerated?:boolean;characters?:Record<string,ModelSpec>;worlds?:Record<string,{url:string}>};
 export type GameHandle={setState:(state:ArenaState)=>void;resetCamera:()=>void;viewIsland:()=>void;dispose:()=>void};
 
@@ -47,7 +47,9 @@ export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(w
  async function prepare(){
   try{const response=await fetch(`${import.meta.env.BASE_URL}assets/models/manifest.json`,{signal:abort.signal});if(!response.ok)throw new Error('Manifesto indisponível');manifest=await response.json();}catch(e){if(disposed)return;console.warn('Usando personagens provisórios.',e);warnings++;}
   if(manifest.useGenerated){try{const response=await fetch(`${import.meta.env.BASE_URL}assets/models/generated/manifest.json`,{signal:abort.signal});if(!response.ok)throw new Error('Modelos não gerados');const generated:Manifest=await response.json();manifest.characters={...generated.characters,...manifest.characters};}catch(e){if(disposed)return;warnings++;console.warn('Usando geometria procedural direta.',e);}}
-  const specs=Object.values(manifest.characters??{});const map=manifest.worlds?.[String(index+1)];
+  // Carrega apenas o deck ativo. Os demais continuam disponíveis pela versão
+  // procedural idêntica, evitando baixar os 45 GLBs de uma vez no celular.
+  const specs=[...new Set(state.modelIds??[])].map(id=>manifest.characters?.[id]).filter((spec):spec is ModelSpec=>Boolean(spec));const map=manifest.worlds?.[String(index+1)];
   const urls=[...new Set([...specs.map(s=>s.url),...(map?[map.url]:[])])];
   await Promise.all(urls.map(async url=>{try{const model=await loader.loadAsync(new URL(url,document.baseURI).href);if(disposed){disposeObject(model.scene);return;}assets.set(url,model);}catch(e){warnings++;console.warn(`Modelo indisponível: ${url}`,e);}}));
   if(disposed)return;

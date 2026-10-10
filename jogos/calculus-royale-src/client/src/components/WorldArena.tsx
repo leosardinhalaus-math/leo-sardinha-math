@@ -4,17 +4,17 @@ import { getWorldMap } from '@/data/worldMaps';
 import { SPAWN_ZONES } from '@/game/combat';
 import { getCardImage } from '@/data/cardArt';
 
-export default function WorldArena({worldIndex,stageIndex=0,active,allies=[],enemies=[],paused=false,events=[],placement,outcome,onSelectZone,onAvailabilityChange}:{onAvailabilityChange?:(ready:boolean)=>void;events?:ArenaState['events'];placement?:ArenaState['placement'];outcome?:ArenaState['outcome'];onSelectZone?:(id:string)=>void;worldIndex:number;stageIndex?:number;active:boolean;allies?:ArenaUnit[];enemies?:ArenaUnit[];paused?:boolean}){
+export default function WorldArena({worldIndex,stageIndex=0,active,allies=[],enemies=[],paused=false,events=[],placement,outcome,modelIds=[],onSelectZone,onAvailabilityChange}:{onAvailabilityChange?:(ready:boolean)=>void;events?:ArenaState['events'];placement?:ArenaState['placement'];outcome?:ArenaState['outcome'];modelIds?:string[];onSelectZone?:(id:string)=>void;worldIndex:number;stageIndex?:number;active:boolean;allies?:ArenaUnit[];enemies?:ArenaUnit[];paused?:boolean}){
  const canvasRef=useRef<HTMLCanvasElement>(null);const handle=useRef<GameHandle|undefined>(undefined);
  const [status,setStatus]=useState('loading');const [warnings,setWarnings]=useState(0);const world=getWorldMap(worldIndex);
- const latest=useRef({allies,enemies,paused,events,placement,outcome});latest.current={allies,enemies,paused,events,placement,outcome};
+ const latest=useRef({allies,enemies,paused,events,placement,outcome,modelIds});latest.current={allies,enemies,paused,events,placement,outcome,modelIds};
  const selectRef=useRef(onSelectZone);selectRef.current=onSelectZone;
  useEffect(()=>{onAvailabilityChange?.(active&&status!=='loading');},[active,status,onAvailabilityChange]);
  useEffect(()=>{if(!active||!canvasRef.current)return;setStatus('loading');setWarnings(0);
   try{handle.current=createGameScene(canvasRef.current,worldIndex,count=>{setWarnings(count);setStatus('ready');},()=>setStatus('fallback'),id=>selectRef.current?.(id),stageIndex);handle.current.setState(latest.current);}catch(error){console.warn('Arena 3D indisponível.',error);setStatus('fallback');}
   return()=>{handle.current?.dispose();handle.current=undefined;};
  },[worldIndex,stageIndex,active]);
- useEffect(()=>{handle.current?.setState({allies,enemies,paused,events,placement,outcome});},[allies,enemies,paused,events,placement,outcome]);
+ useEffect(()=>{handle.current?.setState({allies,enemies,paused,events,placement,outcome,modelIds});},[allies,enemies,paused,events,placement,outcome,modelIds]);
  return <div className="world-arena" data-arena-theme={world.slug} data-scene-status={status}>
   <img className="arena-backdrop" src={world.art} alt=""/>
   <canvas ref={canvasRef} className="world-arena-canvas" tabIndex={0} aria-label={`Arena 3D da ${world.title}. Visão fixa do sul para o norte; use pinça ou roda para zoom e R para centralizar.`}/>
