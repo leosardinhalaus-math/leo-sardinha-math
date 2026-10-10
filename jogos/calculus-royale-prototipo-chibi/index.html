@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Calculus Royale — Ilha dos Limites: protótipo Chibi</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#07152d;color:#fff;font:15px system-ui,sans-serif;overflow:hidden}canvas{display:block}
+#hud{position:fixed;top:12px;left:12px;max-width:min(90vw,370px);padding:14px 16px;border:1px solid #caad70;border-radius:13px;background:#07152dcc;backdrop-filter:blur(8px)}
+h1{font-size:19px;color:#f6d08c;margin:0 0 6px}p{margin:4px 0;line-height:1.4}#status{font-size:12px;color:#b9e3ff}#hint{font-size:13px;margin-top:8px;color:#ffe6b1}
+#help{position:fixed;bottom:12px;left:12px;padding:8px 12px;border-radius:10px;background:#07152dba;font-size:12px;max-width:calc(100vw - 130px)}
+#action{position:fixed;bottom:18px;right:18px;width:80px;height:80px;background:#eec777;color:#162341;border:2px solid white;border-radius:50%;font-weight:900;display:none;cursor:pointer}
+#pad{display:none;position:fixed;bottom:17px;left:18px;grid-template-columns:repeat(3,43px);grid-template-rows:repeat(2,43px);gap:3px}#pad button{background:#ffffff50;color:white;border:1px solid white;border-radius:9px;font-size:22px;touch-action:none}#pad .up{grid-column:2}#pad .left{grid-column:1;grid-row:2}#pad .down{grid-column:2;grid-row:2}#pad .right{grid-column:3;grid-row:2}
+#modal{position:fixed;inset:0;background:#020b1bd9;display:none;align-items:center;justify-content:center;padding:18px}
+#dialog{background:#10294e;border:2px solid #dcbb77;border-radius:18px;padding:24px;max-width:460px;width:100%;box-shadow:0 18px 90px #0008}
+#dialog h2{margin:0 0 13px;color:#f5d493}#dialog button{margin:8px 5px 0 0;padding:10px 14px;border:1px solid #d8bc7e;border-radius:9px;background:#23508e;color:white;font-weight:bold;cursor:pointer}
+#dialog button:hover{background:#326fbd}#error{position:fixed;inset:0;display:none;background:#061326;color:white;padding:25px;z-index:40}
+@media(pointer:coarse){#pad{display:grid}#help{bottom:121px;max-width:calc(100vw - 25px)}#action{bottom:20px}}
+</style></head><body>
+<div id="hud"><h1>✦ Calculus Royale — Ilha dos Limites</h1><p id="location">Carregando território...</p><p id="status">Protótipo de exploração • Casa 1.3 jogável</p><p id="hint"></p></div>
+<div id="help">WASD/setas: mover · Espaço: pular · E: interagir · R: voltar ao mapa · Arraste: girar câmera</div>
+<div id="pad"><button class="up" data-k="ArrowUp">▲</button><button class="left" data-k="ArrowLeft">◀</button><button class="down" data-k="ArrowDown">▼</button><button class="right" data-k="ArrowRight">▶</button></div>
+<button id="action">AÇÃO</button>
+<div id="modal"><div id="dialog"><h2 id="mtitle"></h2><p id="mtext"></p><div id="mchoices"></div></div></div>
+<div id="error"></div>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js';
+const $=id=>document.getElementById(id), scene=new THREE.Scene();scene.background=new THREE.Color('#07152d');scene.fog=new THREE.FogExp2('#0b2b53',.017);
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;document.body.prepend(renderer.domElement);
+const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,500);
+scene.add(new THREE.HemisphereLight(0xb0d8ff,0x112033,2.3));const sun=new THREE.DirectionalLight(0xffe2a8,2.3);sun.position.set(-12,25,7);scene.add(sun);
+const solid=[], parts=[], interactables=[];const mat=(c,e=0)=>new THREE.MeshStandardMaterial({color:c,roughness:.7,emissive:c,emissiveIntensity:e});
+const rock=mat('#3b4c67'),grass=mat('#406a59'),stone=mat('#8e9a9e'),gold=mat('#eac278',.28),blue=mat('#20aaff',.9),purple=mat('#745ab3'),wood=mat('#6c4c39');
+function box(parent,w,h,d,m,x=0,y=0,z=0){const a=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);a.position.set(x,y,z);parent.add(a);return a}
+function ball(parent,r,m,x=0,y=0,z=0){const a=new THREE.Mesh(new THREE.SphereGeometry(r,14,10),m);a.position.set(x,y,z);parent.add(a);return a}
+function crystal(parent,x,y,z,s=1){const a=new THREE.Mesh(new THREE.OctahedronGeometry(s),blue);a.position.set(x,y,z);parent.add(a);parts.push(a);return a}
+function ground(x,z,w,d,y=0,m=grass){box(scene,w,1,d,m,x,y-.5,z);const b=box(scene,w-1,3,d-1,rock,x,y-2.5,z);b.rotation.z=.03;solid.push({x,z,w,d,y})}
+function tower(x,z,height=5){box(scene,2,height,2,stone,x,height/2,z);const roof=new THREE.Mesh(new THREE.ConeGeometry(1.7,2.3,4),purple);roof.position.set(x,height+1.1,z);roof.rotation.y=Math.PI/4;scene.add(roof);crystal(scene,x,height+2.5,z,.5)}
+const player=new THREE.Group();scene.add(player);
+box(player,.8,1.1,.5,mat('#284e93'),0,1.03,0);ball(player,.55,mat('#f2c5a2'),0,1.93,0);ball(player,.62,mat('#3d2a39'),0,2.2,-.08);
+for(const xx of [-.52,.52]){ball(player,.22,mat('#284e93'),xx,1.31,0);box(player,.26,.64,.3,mat('#24335d'),xx*.5,.33,0)}
+for(const xx of [-.2,.2]){ball(player,.075,mat('#18243d'),xx,1.98,.48);ball(player,.025,mat('#fff'),xx-.015,2,.54)}
+const cape=box(player,.95,.9,.12,mat('#274d9e'),0,1.05,-.35);cape.rotation.x=-.2;
+let mode='map', position=new THREE.Vector3(0,0,11),yaw=0,vy=0,onGround=true,solved=localStorage.getItem('calculus_chibi_13')==='yes';
+const keys=new Set();let canInteract=null,modal=false,entered=false;let camAngle=0;
+function constructMap(){scene.background.set('#07152d');scene.fog.color.set('#0b2b53');scene.fog.density=.017;
+ground(0,8,15,15);ground(-11,-2,9,9);ground(-18,-13,10,12);ground(-8,-19,11,9);ground(5,-20,12,10);ground(17,-17,10,10);ground(25,-8,10,10);ground(20,4,12,12);
+const bridges=[[ -5,3,9,3],[-15,-7,3,9],[-13,-16,7,3],[-2,-20,5,3],[11,-19,5,3],[21,-12,3,5],[23,-1,3,6]];
+bridges.forEach(([x,z,w,d])=>ground(x,z,w,d,.06,stone));tower(0,4,8);tower(-11,-2,5);tower(-8,-19,4);tower(5,-20,5);tower(17,-17,5);tower(25,-8,5);tower(20,4,6);
+for(let i=0;i<22;i++)crystal(scene,Math.sin(i*2.41)*13, .5,Math.cos(i*1.7)*10-5,.45);
+const cave=new THREE.Group();cave.position.set(-18,0,-13);scene.add(cave);box(cave,7,3,2,rock,0,1.6,-4);box(cave,1.6,4,2,rock,-3,1.5,-4);box(cave,1.6,4,2,rock,3,1.5,-4);crystal(cave,0,4,-4,1);
+interactables.push({x:-18,z:-16.2,r:3,type:'cave'});
+}
+function clearScene(){for(const obj of [...scene.children])if(obj!==player && !obj.isLight)scene.remove(obj);solid.length=0;parts.length=0;interactables.length=0}
+function constructCave(){scene.background.set('#061327');scene.fog.color.set('#08182f');scene.fog.density=.03;
+ground(0,7,12,13,0,rock);ground(0,-9,12,15,0,rock);ground(-4,0,3,5,0,stone);ground(4,0,3,5,0,stone);
+for(let i=0;i<14;i++){const x=i%2?-6:6,z=-14+i*2.3;box(scene,2,6,2,rock,x,2.1,z);crystal(scene,x,5,z,1.1)}
+for(let i=0;i<3;i++){const x=(i-1)*3.2;crystal(scene,x,1.3,-11,1);interactables.push({x,z:-11,r:1.8,type:'puzzle'})}
+if(solved)ground(0,0,5,6,.1,gold);
+else {box(scene,5,.3,1.5,blue,0,-1.6,0)}
+}
+function enterCave(){mode='cave';clearScene();constructCave();position.set(0,0,10);vy=0;$('location').textContent='1.3 — Caverna da Aproximação';$('status').textContent=solved?'Ponte conquistada ✓':'Resolva o limite para restaurar a ponte';}
+function exitCave(){mode='map';clearScene();constructMap();position.set(-18,0,-13);vy=0;$('location').textContent='Ilha dos Limites — mapa explorável';$('status').textContent=solved?'Casa 1.3 concluída ✓':'Encontre a entrada da casa 1.3';}
+function showQuestion(){modal=true;$('modal').style.display='flex';$('mtitle').textContent='Cristais da Aproximação';$('mtext').innerHTML='Se <b>f(x) = (x² − 4)/(x − 2)</b>, para qual valor f(x) se aproxima quando x → 2?';const choices=$('mchoices');choices.innerHTML='';
+for(const value of ['0','2','4','Não existe']){const b=document.createElement('button');b.textContent=value;b.onclick=()=>{if(value==='4'){solved=true;localStorage.setItem('calculus_chibi_13','yes');closeModal();clearScene();constructCave();$('status').textContent='Ponte restaurada! Casa 1.3 concluída ✓';$('hint').textContent='Conquista salva localmente. Pressione R para voltar à ilha.'}else{$('mtext').textContent='Ainda não. Dica: fatorize x² − 4 = (x − 2)(x + 2) e analise x ≠ 2.'}};choices.append(b)}
+const c=document.createElement('button');c.textContent='Voltar';c.onclick=closeModal;choices.append(c)}
+function closeModal(){modal=false;$('modal').style.display='none'}
+function action(){if(modal)return;if(canInteract?.type==='cave')enterCave();else if(canInteract?.type==='puzzle'&&!solved)showQuestion();else if(mode==='cave'&&solved)exitCave()}
+function mapStatus(){if(mode==='map'){$('location').textContent='Ilha dos Limites — mapa explorável';$('status').textContent=solved?'Casa 1.3 concluída ✓':'Protótipo: explore e encontre a caverna 1.3'}}
+constructMap();mapStatus();
+const clock=new THREE.Clock();let orbit=false,lastX=0;
+renderer.domElement.addEventListener('pointerdown',e=>{orbit=true;lastX=e.clientX});window.addEventListener('pointerup',()=>orbit=false);window.addEventListener('pointermove',e=>{if(orbit){camAngle+=(e.clientX-lastX)*.006;lastX=e.clientX}});
+window.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();keys.add(e.code);if(e.code==='KeyE')action();if(e.code==='KeyR'&&mode==='cave'){closeModal();exitCave()}});window.addEventListener('keyup',e=>keys.delete(e.code));
+document.querySelectorAll('#pad button').forEach(b=>{const k=b.dataset.k;const down=e=>{e.preventDefault();keys.add(k)};const up=e=>{e.preventDefault();keys.delete(k)};b.addEventListener('pointerdown',down);b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);b.addEventListener('pointerleave',up)});
+$('action').onclick=()=>{if(canInteract)action();else if(onGround)vy=8};
+function loop(){requestAnimationFrame(loop);const dt=Math.min(clock.getDelta(),.04);
+if(!modal){const dx=Number(keys.has('KeyD')||keys.has('ArrowRight'))-Number(keys.has('KeyA')||keys.has('ArrowLeft')),dz=Number(keys.has('KeyS')||keys.has('ArrowDown'))-Number(keys.has('KeyW')||keys.has('ArrowUp'));const d=Math.hypot(dx,dz)||1;const a=camAngle;const sx=(dx*Math.cos(a)-dz*Math.sin(a))/d,sz=(dx*Math.sin(a)+dz*Math.cos(a))/d;const old=position.clone();position.x+=sx*6*dt;position.z+=sz*6*dt;
+const floor=solid.find(v=>Math.abs(position.x-v.x)<v.w/2-.35&&Math.abs(position.z-v.z)<v.d/2-.35);if(!floor && onGround){position.x=old.x;position.z=old.z}
+if(floor&&position.y<=floor.y+.05&&vy<=0){position.y=floor.y;vy=0;onGround=true}else{onGround=false;vy-=19*dt;position.y+=vy*dt;if(position.y< -12){position.copy(mode==='map'?new THREE.Vector3(0,0,11):new THREE.Vector3(0,0,10));vy=0}}
+if((keys.has('Space')||keys.has('KeyJ'))&&onGround){vy=8;onGround=false}
+if(Math.abs(sx)+Math.abs(sz)>.1){yaw=Math.atan2(sx,sz);player.rotation.y=yaw}
+}
+player.position.copy(position);const target=new THREE.Vector3(position.x+Math.sin(camAngle)*12,position.y+11,position.z+Math.cos(camAngle)*16);camera.position.lerp(target,.09);camera.lookAt(position.x,position.y+1.2,position.z);
+canInteract=null;for(const item of interactables)if(Math.hypot(item.x-position.x,item.z-position.z)<item.r){canInteract=item;break}
+$('hint').textContent=canInteract?(canInteract.type==='cave'?'Pressione E/AÇÃO para entrar na Caverna 1.3':solved?'Cristais ativados ✓ — R retorna ao mapa':'Pressione E/AÇÃO para investigar os cristais'):(mode==='cave'?'Explore os cristais • R retorna ao mapa':'Use pontes para circular entre as regiões; casa 1.3 é jogável');
+$('action').style.display=(canInteract||matchMedia('(pointer:coarse)').matches)?'block':'none';$('action').textContent=canInteract?'AÇÃO':'PULAR';
+parts.forEach((p,i)=>{p.rotation.y+=dt*.7;p.position.y+=Math.sin(clock.elapsedTime*2+i)*.001});
+renderer.render(scene,camera)}
+loop();window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+</script></body></html>
