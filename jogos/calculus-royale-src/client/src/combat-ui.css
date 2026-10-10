@@ -31,3 +31,50 @@
  .screen-battle .variant-compact .royale-card-footer{padding:5px 8px;font-size:10px}
 }
 @media(max-height:700px) and (max-width:600px){.screen-battle .arena-frame{height:350px;min-height:350px}}
+
+
+/* Mapa tático de invocação: direção, faixas e profundidade ficam legíveis num relance. */
+.spawn-panel{gap:8px;padding:8px 0 4px}
+.spawn-heading{gap:12px}.spawn-heading img{width:48px;height:54px;border-radius:10px;border-color:#69e4e8;box-shadow:0 0 18px #54dce333}.spawn-heading small{font-size:10px;letter-spacing:.08em;color:#81e6dc}
+.spawn-panel>p{font-size:13px;color:#d6e9ef}
+.spawn-direction{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 10px;border:1px solid #3d6876;border-radius:9px;background:linear-gradient(90deg,#0d2738,#132f3e 50%,#0d2738);color:#c7e3e9;font-size:11px;text-align:center}
+.spawn-direction>span:first-child{color:#ffb49d}.spawn-direction>span:last-child{color:#8cf0db}.spawn-direction strong{font-size:11px;color:#ffe0a1;white-space:nowrap}
+.spawn-panel>.spawn-map-hint{margin:0;color:#a8cbd4;font-size:12px;line-height:1.35}
+.spawn-depth-guide,.spawn-lane-row{display:grid;grid-template-columns:54px repeat(3,minmax(0,1fr));gap:6px;align-items:stretch}
+.spawn-depth-guide{padding:0 2px;color:#82a8b6;font:700 9px/1.2 'DM Mono',monospace;text-align:center;letter-spacing:.04em}
+.spawn-depth-guide>span{display:grid;align-content:end;min-height:24px}
+.spawn-depth-guide>span:first-child{color:#69ded6}
+.spawn-zones{display:grid;gap:6px}
+.spawn-lane-row{gap:6px}
+.spawn-lane-heading{display:grid;place-content:center;justify-items:center;min-height:46px;border:1px solid #447181;border-radius:9px;background:#10283a;color:#80e4dc}
+.spawn-lane-heading strong{font:800 15px 'DM Mono',monospace}.spawn-lane-heading small{font-size:9px;color:#9bbbc4}
+.spawn-zones .spawn-zone{display:flex;align-items:center;gap:7px;min-width:0;min-height:46px;padding:5px 7px;border:1px solid #446c7d;border-radius:9px;background:linear-gradient(145deg,#15334a,#0d2236);color:#e1f5f6;text-align:left;transition:transform .16s ease,border-color .16s ease,background .16s ease,box-shadow .16s ease}
+.spawn-zones .spawn-zone:not(:disabled):hover{transform:translateY(-1px);border-color:#83f1e4;background:#19465a}
+.spawn-zone-code{display:grid;place-items:center;flex:0 0 30px;height:30px;border:1px solid #60b8bf;border-radius:8px;background:#0b2639;color:#8ff5e8;font:800 12px 'DM Mono',monospace}
+.spawn-zone-copy{display:grid;gap:2px;min-width:0}.spawn-zone-copy strong{font-size:11px;line-height:1.15;color:#f0fbff}.spawn-zone-copy small{margin:0;font-size:9px;line-height:1.15;color:#99bdc8}
+.spawn-zones .spawn-zone[aria-pressed=true]{border-color:#ffd77b;background:linear-gradient(145deg,#4c482e,#173e46);box-shadow:0 0 0 1px #ffd77b55,0 0 16px #f3ce6640;color:#fff5cb}
+.spawn-zones .spawn-zone[aria-pressed=true] .spawn-zone-code{border-color:#ffe08f;background:#80652d;color:#fff4ca}
+.spawn-zones .spawn-zone[disabled]{opacity:.42;filter:saturate(.55);cursor:not-allowed}
+.spawn-zones .spawn-zone:focus-visible,.spawn-confirm:focus-visible{outline:3px solid #7ceee2;outline-offset:2px}
+.spawn-confirm{min-height:46px;box-shadow:0 4px 18px #f1ca7d26;transition:filter .15s ease,transform .15s ease}.spawn-confirm:not(:disabled):hover{filter:brightness(1.08);transform:translateY(-1px)}
+@media(max-width:600px){
+ .spawn-panel{gap:7px}.spawn-heading img{width:42px;height:48px}.spawn-heading small{font-size:9px}
+ .spawn-direction{gap:4px;padding:7px 5px;font-size:9px}.spawn-direction strong{font-size:9px}.spawn-panel>.spawn-map-hint{font-size:11px}
+ .spawn-depth-guide,.spawn-lane-row{grid-template-columns:38px repeat(3,minmax(0,1fr));gap:4px}.spawn-depth-guide{font-size:8px;letter-spacing:0}.spawn-lane-heading{min-height:43px}.spawn-lane-heading strong{font-size:13px}
+ .spawn-zones .spawn-zone{min-height:43px;gap:4px;padding:4px}.spawn-zone-code{flex-basis:25px;height:26px;font-size:10px}.spawn-zone-copy strong{font-size:10px}.spawn-zone-copy small{font-size:8px}
+}
+@media(prefers-reduced-motion:reduce){.spawn-zones .spawn-zone,.spawn-confirm{transition:none}}
+
+
+/* Ritmo de partida e previsão do ciclo de oito cartas. */
+.battle-clock{display:flex;align-items:center;gap:8px;padding:4px 10px;border:1px solid #3d697a;border-radius:8px;background:#0b2236;color:#e4f7fb;white-space:nowrap}
+.battle-clock>strong{font:800 17px 'DM Mono',monospace;letter-spacing:.05em}.battle-clock>small{font-size:9px;font-weight:800;letter-spacing:.06em;color:#9bcbd0}
+.battle-clock.is-double-elixir{border-color:#ffd36e;background:#392f1b;color:#ffe29b}.battle-clock.is-double-elixir>small{color:#ffe29b}
+.battle-clock.is-overtime{border-color:#ff8b78;background:#3a1d2a;color:#ffd5c8;box-shadow:0 0 14px #ff6b572b}.battle-clock.is-overtime>small{color:#ffb9a5}
+.next-card-preview{display:flex;align-items:center;gap:7px;min-width:0;padding:3px 8px;border:1px solid #586b85;border-radius:8px;background:linear-gradient(145deg,#121d34,#0c2638);color:#c8e6ef}
+.next-card-preview img{width:28px;height:34px;object-fit:cover;border-radius:5px}.next-card-preview>span{display:grid;gap:2px;font-size:8px;letter-spacing:.08em;color:#86d9dc}.next-card-preview small{max-width:110px;overflow:hidden;color:#e7f1f4;font-size:10px;letter-spacing:0;text-overflow:ellipsis;white-space:nowrap}.next-card-preview>b{display:grid;place-items:center;width:21px;height:21px;border-radius:50%;background:#8658c2;color:#fff;font:800 11px 'DM Mono',monospace}
+@media(max-width:600px){
+ .screen-battle .battle-status{flex-wrap:wrap;gap:4px}.battle-clock{gap:4px;padding:3px 6px}.battle-clock>strong{font-size:14px}.battle-clock>small{font-size:7px;letter-spacing:0}
+ .next-card-preview{gap:3px;padding:2px 4px}.next-card-preview img{width:22px;height:27px}.next-card-preview>span{font-size:7px}.next-card-preview small{max-width:58px;font-size:8px}.next-card-preview>b{width:18px;height:18px;font-size:9px}
+}
+@media(prefers-reduced-motion:reduce){.battle-clock.is-overtime{animation:none}}

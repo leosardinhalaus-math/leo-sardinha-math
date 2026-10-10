@@ -22,7 +22,7 @@ export default function WorldArena({worldIndex,stageIndex=0,active,allies=[],ene
   {status==='fallback'&&<><span className="arena-fallback-note">Modo ilustrado · 3D indisponível</span>{[...allies.map(u=>({u,enemy:false})),...enemies.map(u=>({u,enemy:true}))].map(({u,enemy})=><img key={`${enemy}${u.id}`} className="arena-fallback-unit" src={getCardImage(u.cardId)} alt={u.name} style={{left:(u.lane??(enemy?-1.65:1.65))<0?'56%':'44%',top:`${enemy?18+u.progress*.64:82-u.progress*.64}%`}}/>)}</>}
   {status==='fallback'&&placement&&<img className="arena-fallback-unit" src={getCardImage(placement.unit.cardId)} alt={`Prévia de ${placement.unit.name}`} style={{left:(SPAWN_ZONES.find(z=>z.id===placement.zoneId)?.lane??0)<0?'56%':'44%',top:`${82-(SPAWN_ZONES.find(z=>z.id===placement.zoneId)?.progress??5)*.64}%`,outline:'3px solid #ffe18c'}}/>}
   {warnings>0&&status==='ready'&&<span className="arena-fallback-note">Alguns modelos usam a versão provisória</span>}
-  <div className="arena-world-name"><span>ILHA {String(world.id).padStart(2,'0')} · CASA {world.id}.{stageIndex+1}</span><strong>{world.title}</strong></div>
+  <div className="arena-world-name"><span>ILHA {String(world.id).padStart(2,'0')} · {worldIndex===0?'CAVERNA':'CASA'} {world.id}.{stageIndex+1}</span><strong>{world.title}</strong></div>
   <div className="arena-camera-help"><span>SUL ↑ NORTE · pinça para zoom</span><div className="arena-view-buttons"><button onClick={()=>handle.current?.viewIsland()} aria-label="Ver ilha inteira">Ilha inteira</button><button onClick={()=>handle.current?.resetCamera()} aria-label="Centralizar câmera">Combate</button></div></div>
  </div>;
 }
