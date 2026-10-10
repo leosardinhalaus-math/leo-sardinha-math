@@ -1,5 +1,6 @@
 import { stepCombat, SPAWN_ZONES, zoneAvailable, type CombatUnit, type CombatEvent } from "@/game/combat";
 import { BATTLE_TICK_SECONDS, DECK_SIZE, ELIXIR_PER_TICK, OVERTIME_SECONDS, REGULATION_SECONDS, STARTING_ELIXIR, battleClockLabel, compareTowerHealth, elixirMultiplier, normalizeDeck, type MatchOutcome } from "@/game/battleRules";
+import { getCaveEncounter } from "@/game/caveEncounters";
 import { getCardProfile, abilityDescription } from "@/game/cardProfiles";
 import { isStageUnlocked, normalizeStageProgress, resolveStageVictory } from "@/game/progression";
 import { createChallengePicker, type Challenge } from "@/data/powerUpChallenges";
@@ -169,7 +170,7 @@ const worldArt = [
   `${assetBase}assets/maps/world-3.webp`,
   `${assetBase}assets/maps/world-5.webp`,
 ];
-const getWorldEnemyHp = (worldIndex: number) => 82 - worldIndex * 4;
+const getWorldEnemyHp = (worldIndex: number, stageIndex = 0) => getCaveEncounter(worldIndex, stageIndex).enemyTowerHp;
 
 const rarityClass: Record<Card["rarity"], string> = { comum: "common", rara: "rare", épica: "epic", lendária: "legendary" };
 
@@ -212,7 +213,7 @@ const initialDeck = () => {
 export default function GameCanvas() {
   const [worldIndex, setWorldIndex] = useState(() => Math.min(4, Math.max(0, readStorage(storageKeys.worldIndex, 0))));
   const [energy, setEnergy] = useState(STARTING_ELIXIR);
-  const [enemyTower, setEnemyTower] = useState(82);
+  const [enemyTower, setEnemyTower] = useState(() => getWorldEnemyHp(worldIndex, 0));
   const [allyTower, setAllyTower] = useState(96);
   const [units, setUnits] = useState<Unit[]>([]);
   const [enemyUnits, setEnemyUnits] = useState<Unit[]>([]);
@@ -301,6 +302,7 @@ export default function GameCanvas() {
   const stageProgressRef = useRef(stageProgress);
   const world = worlds[worldIndex];
   const currentWorldArt = worldArt[worldIndex];
+  const caveEncounter = getCaveEncounter(worldIndex, chapter);
 
   const unlockAudio = () => {
     if (typeof window === "undefined" || !window.AudioContext) return null;
@@ -338,9 +340,9 @@ export default function GameCanvas() {
     });
   };
 
-  const resetBattleState = (targetWorldIndex = worldIndex, nextDeck = mainDeckIds) => {
+  const resetBattleState = (targetWorldIndex = worldIndex, nextDeck = mainDeckIds, targetChapter = chapter) => {
     battleResolvedRef.current = false;
-    setEnemyTower(getWorldEnemyHp(targetWorldIndex));
+    setEnemyTower(getWorldEnemyHp(targetWorldIndex, targetChapter));
     setAllyTower(96);
     setUnits([]);
     setEnemyUnits([]);
@@ -446,7 +448,7 @@ export default function GameCanvas() {
       const nextEnemy=Math.max(0,current.enemyTower-next.enemyDamage),nextAlly=Math.max(0,current.allyTower-next.allyDamage);
       setEnemyTower(nextEnemy);setAllyTower(nextAlly);
       if(next.events.length){setCombatEvents(previous=>[...previous,...next.events].slice(-12));setBattleLog(next.events[next.events.length-1].label);if(next.events.some(e=>e.type==='ability'))playSound('arcane');}
-      const outcome=compareTowerHealth(nextAlly,nextEnemy,96,getWorldEnemyHp(worldIndex));
+      const outcome=compareTowerHealth(nextAlly,nextEnemy,96,getWorldEnemyHp(worldIndex,chapter));
       if(nextEnemy===0||nextAlly===0){setBattleOutcome(outcome);if(outcome!=='victory')battleResolvedRef.current=true;setBattleLog(outcome==='victory'?'Torre rival derrubada!':outcome==='draw'?'As duas torres caíram juntas.':'Sua torre caiu.');if(outcome==='defeat')setToast('Sua torre caiu. Reinicie para tentar outra formação.');return;}
       if(wasSuddenDeath&&(next.enemyDamage>0||next.allyDamage>0)){setBattleOutcome(outcome);if(outcome!=='victory')battleResolvedRef.current=true;setBattleLog(outcome==='victory'?'Morte súbita: primeiro golpe na torre — vitória!':outcome==='defeat'?'Morte súbita: o rival atingiu sua torre primeiro.':'Morte súbita: ataques simultâneos — empate.');return;}
       if(!wasSuddenDeath&&elapsed>=REGULATION_SECONDS){
@@ -457,7 +459,7 @@ export default function GameCanvas() {
       if(elapsed>=REGULATION_SECONDS+OVERTIME_SECONDS){setBattleOutcome(outcome);if(outcome!=='victory')battleResolvedRef.current=true;setBattleLog(outcome==='draw'?'Fim da morte súbita · empate matemático.':outcome==='victory'?'Fim da morte súbita · sua torre preservou mais vida.':'Fim da morte súbita · o rival preservou mais vida.');return;}
       if(battleResolvedRef.current)return;
       aiElapsedRef.current+=BATTLE_TICK_SECONDS;
-      if(aiElapsedRef.current<3.8)return;
+      if(aiElapsedRef.current<caveEncounter.aiPlayInterval)return;
       const catalog=getCumulativeCards(4);
       const queue=enemyDeckRef.current.length?enemyDeckRef.current:mainDeckIds.slice(0,DECK_SIZE);
       const candidates=queue.map((id,index)=>({card:catalog.find(card=>card.id===id),index})).filter((entry):entry is {card:Card;index:number}=>entry.card!==undefined&&entry.card.cost<=current.enemyEnergy);
@@ -473,12 +475,12 @@ export default function GameCanvas() {
       const lane=threat?.lane??enemyLaneRef.current;
       if(!threat)enemyLaneRef.current=enemyLaneRef.current===-1.65?1.65:-1.65;
       const id=++unitSequenceRef.current;
-      setEnemyUnits(currentUnits=>[...currentUnits,{id,cardId:aiCard.id,icon:aiCard.icon,name:aiCard.name,kind:aiCard.kind,progress:5,power:Math.max(5,Math.round(aiCard.power*.55)),color:'#ff7d72',lane}]);
+      setEnemyUnits(currentUnits=>[...currentUnits,{id,cardId:aiCard.id,icon:aiCard.icon,name:aiCard.name,kind:aiCard.kind,progress:5,power:Math.max(4,Math.round(aiCard.power*caveEncounter.enemyPowerMultiplier)),color:'#ff7d72',lane}]);
       setEnemyEnergy(value=>Math.max(0,Number((value-aiCard.cost).toFixed(2))));
       setEnemyLastCard(`${aiCard.name} · ${getCardProfile(aiCard.id).ability}`);
     },100);
     return()=>{window.clearInterval(timer);};
-  },[worldIndex,view,battleStarted,battleOutcome,challenge,pendingCard,inventoryOpen,survivalOpen,mainDeckIds]);
+  },[worldIndex,chapter,view,battleStarted,battleOutcome,challenge,pendingCard,inventoryOpen,survivalOpen,mainDeckIds]);
 
   // Deixa as animações finais aparecerem antes do fluxo de recompensa existente.
   useEffect(()=>{if(battleOutcome!=='victory')return;const timer=window.setTimeout(()=>finishBattle(worldIndex),1800);return()=>window.clearTimeout(timer);},[battleOutcome,worldIndex]);
@@ -639,8 +641,9 @@ export default function GameCanvas() {
     const nextIds = mainDeckIds.length ? mainDeckIds : getCumulativeCards(index).map((card) => card.id);
     setMainDeckIds(nextIds);
     setWorldIndex(index);
-    setChapter(Math.min(worlds[index].chapters.length-1,stageProgress[index]??0));
-    resetBattleState(index, nextIds);
+    const nextChapter=Math.min(worlds[index].chapters.length-1,stageProgress[index]??0);
+    setChapter(nextChapter);
+    resetBattleState(index, nextIds, nextChapter);
     setView("lobby");
     setCompletionNotice(null);
     setPhaseReward(null);
@@ -650,13 +653,13 @@ export default function GameCanvas() {
 
   const enterArena = () => {
     if (mainDeckIds.length !== DECK_SIZE) { setToast(`A arena exige um deck completo de ${DECK_SIZE} cartas.`); setView("deck"); return; }
-    if (battleResolvedRef.current) resetBattleState();
+    if (battleResolvedRef.current || !battleStarted) resetBattleState(worldIndex,mainDeckIds,chapter);
     unlockAudio();
     setView("battle");
   };
 
   const resetBattle = () => {
-    resetBattleState(worldIndex, mainDeckIds);
+    resetBattleState(worldIndex, mainDeckIds, chapter);
     setView("battle");
     setCompletionNotice(null);
     setPhaseReward(null);
@@ -719,7 +722,7 @@ export default function GameCanvas() {
             <div className="battle-status"><div className="status-pill"><span className="live-dot" /> {battleOutcome?battleOutcome==='victory'?'FIM · VITÓRIA':battleOutcome==='draw'?'FIM · EMPATE':'FIM · DERROTA':'BATALHA AO VIVO'}</div><span className={`battle-clock ${battleElapsed>=REGULATION_SECONDS?"is-overtime":battleElapsed>=REGULATION_SECONDS-60?"is-double-elixir":""}`} aria-label={`Tempo ${battleClockLabel(battleElapsed)}`}><strong>{battleClockLabel(battleElapsed)}</strong><small>{battleElapsed>=REGULATION_SECONDS?"MORTE SÚBITA · ELIXIR 3×":battleElapsed>=REGULATION_SECONDS-60?"ELIXIR DUPLO · 2×":"ELIXIR · 1×"}</small></span><span className="arena-caption"><Swords size={14} /> {WORLD_MAPS[worldIndex].title}</span><span className="ai-chip"><span className="ai-pulse" /> IA · {enemyEnergy.toFixed(1)} elixir</span><button className="icon-button" onClick={resetBattle} title="Reiniciar batalha"><RotateCcw size={15} /></button></div>
             <div className="arena-frame" data-world={WORLD_MAPS[worldIndex].slug}>
               <WorldArena onAvailabilityChange={setArenaAvailable} worldIndex={worldIndex} stageIndex={chapter} active={view === "battle" && !survivalOpen && !inventoryOpen} allies={units} enemies={enemyUnits} paused={Boolean(!battleStarted || challenge || pendingCard || inventoryOpen || survivalOpen || battleOutcome)} events={combatEvents} outcome={battleOutcome==='draw'?null:battleOutcome} placement={pendingCard ? {unit:{id:-1,cardId:pendingCard.id,name:pendingCard.name,kind:pendingCard.kind,progress:0,color:world.color},zoneId:spawnZone,blocked:SPAWN_ZONES.filter(zone=>!zoneAvailable(zone.id,units)).map(zone=>zone.id)} : undefined} onSelectZone={id=>{if(zoneAvailable(id,units))setSpawnZone(id);}} />
-              <div className="tower-label enemy-label"><span>TORRE DO ERRO</span><strong>{enemyTower} HP</strong></div><div className="health-bar enemy-health"><i style={{ width: `${Math.max(0,Math.min(100,enemyTower/getWorldEnemyHp(worldIndex)*100))}%` }} /></div>
+              <div className="tower-label enemy-label"><span>TORRE DO ERRO</span><strong>{enemyTower} HP</strong></div><div className="health-bar enemy-health"><i style={{ width: `${Math.max(0,Math.min(100,enemyTower/getWorldEnemyHp(worldIndex,chapter)*100))}%` }} /></div>
               <div className="battle-field">{!pendingCard && !battleOutcome && units.length === 0 && enemyUnits.length === 0 && <div className="battle-hint"><Sparkles size={18} /><span>jogue uma carta<br /><small>e veja a prova avançar em 3D</small></span></div>}</div>
               <div className="tower-label ally-label"><span>SUA TORRE</span><strong>{allyTower} HP</strong></div><div className="health-bar ally-health"><i style={{ width: `${Math.max(0,Math.min(100,allyTower/100*100))}%` }} /></div>
             </div>
@@ -757,7 +760,7 @@ export default function GameCanvas() {
       </section>
       {view === "lobby" && <section className="preparation-screen" aria-labelledby="preparation-title">
         <div className="preparation-heading"><span className="eyebrow">SEU PRÓXIMO DESAFIO</span><h2 id="preparation-title">Prepare sua estratégia</h2><p>{playerName ? `${playerName}, escolha` : "Escolha"} suas cartas e a ilha antes de entrar na batalha.</p></div>
-        <div className="preparation-grid"><div className="preparation-island"><img src={WORLD_MAPS[worldIndex].art} alt={WORLD_MAPS[worldIndex].title} /><div><span className="eyebrow">ILHA {worldIndex + 1} · CASA {worldIndex+1}.{chapter+1}</span><h3>{WORLD_MAPS[worldIndex].title}</h3><p>{world.chapters[chapter].replace(/^\d+\.\d+\s*/,"")}</p><div className="preparation-stage-route" aria-label={`Casas da ${WORLD_MAPS[worldIndex].title}`}>{world.chapters.map((item,index)=>{const unlocked=isStageUnlocked(index,stageProgress[worldIndex]??0),done=index<(stageProgress[worldIndex]??0);return <button key={item} disabled={!unlocked} className={`${chapter===index?'active':''} ${done?'done':''}`} onClick={()=>setChapter(index)} title={item}><span>{done?'✓':!unlocked?<LockKeyhole size={14}/>:index+1}</span><small>{worldIndex+1}.{index+1}</small></button>;})}</div><button className="prepare-play" onClick={enterArena}><Swords size={22} /> Batalhar na Casa {worldIndex+1}.{chapter+1}</button><small>Vença esta casa para avançar pela ilha. A próxima ilha só abre após a última casa.</small></div></div>
+        <div className="preparation-grid"><div className="preparation-island"><img src={WORLD_MAPS[worldIndex].art} alt={WORLD_MAPS[worldIndex].title} /><div><span className="eyebrow">ILHA {worldIndex + 1} · {worldIndex===0?"CAVERNA":"CASA"} {worldIndex+1}.{chapter+1}</span><h3>{WORLD_MAPS[worldIndex].title}</h3><p>{world.chapters[chapter].replace(/^\d+\.\d+\s*/,"")}</p>{worldIndex===0&&<div className="cave-mission"><div><strong>CAVERNA {worldIndex+1}.{chapter+1} · {caveEncounter.difficulty}</strong><span>{caveEncounter.objective}</span></div><small>TORRE RIVAL · {caveEncounter.enemyTowerHp} HP<br/>IA · {Math.round(caveEncounter.enemyPowerMultiplier*100)}% FORÇA<br/>INTERVALO · {caveEncounter.aiPlayInterval.toFixed(1)} S</small></div>}<div className="preparation-stage-route" aria-label={`${worldIndex===0?"Cavernas":"Casas"} da ${WORLD_MAPS[worldIndex].title}`}>{world.chapters.map((item,index)=>{const unlocked=isStageUnlocked(index,stageProgress[worldIndex]??0),done=index<(stageProgress[worldIndex]??0);return <button key={item} disabled={!unlocked} className={`${chapter===index?'active':''} ${done?'done':''}`} onClick={()=>{if(index!==chapter)resetBattleState(worldIndex,mainDeckIds,index);setChapter(index);}} title={item}><span>{done?'✓':!unlocked?<LockKeyhole size={14}/>:index+1}</span><small>{worldIndex+1}.{index+1}</small></button>;})}</div><button className="prepare-play" onClick={enterArena}><Swords size={22} /> Batalhar na {worldIndex===0?"Caverna":"Casa"} {worldIndex+1}.{chapter+1}</button><small>Vença esta {worldIndex===0?"caverna":"casa"} para avançar pela ilha. A próxima ilha só abre após a última etapa.</small></div></div>
         <div className="preparation-options">
           <button onClick={() => setView("deck")}><Layers3 /><span><strong>Meu deck</strong><small>{mainDeckIds.length} cartas · montar e evoluir</small></span><ArrowUpRight /></button>
           <button onClick={() => setView("map")}><MapPinned /><span><strong>Escolher ilha</strong><small>Explore as 5 arenas do cálculo</small></span><ArrowUpRight /></button>

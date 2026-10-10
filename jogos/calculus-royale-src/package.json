@@ -16,6 +16,7 @@
     "test:save": "node --experimental-strip-types scripts/test-save-game.ts",
     "test:progression": "node --experimental-strip-types scripts/test-progression.ts",
     "test:battle-rules": "node --experimental-strip-types scripts/test-battle-rules.ts",
+    "test:cave-encounters": "node --experimental-strip-types scripts/test-cave-encounters.ts",
     "test:models": "node --experimental-strip-types scripts/test-generated-models.ts"
   },
   "dependencies": {
