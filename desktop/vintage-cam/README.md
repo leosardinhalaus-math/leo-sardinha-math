@@ -28,7 +28,13 @@ cmake --build build-vs --config Release
 ctest --test-dir build-vs -C Release --output-on-failure
 ```
 
-A pasta `.github/workflows` contém uma compilação opcional para um repositório seu. Ela compila no Windows, executa os testes e publica um artefato com o EXE. Nenhum repositório foi criado nem nenhuma execução remota foi acionada nesta entrega. Isso é uma ferramenta de desenvolvimento; o aplicativo não usa GitHub nem rede em execução.
+A pasta `.github/workflows` contém uma compilação opcional para um repositório seu. Ela compila no Windows, executa os testes e publica um artefato com o EXE. A versão Windows é validada na branch `build/vintage-cam-windows`, separada do site. Isso é uma ferramenta de desenvolvimento; o aplicativo não usa GitHub nem rede em execução.
+
+## Ícones · versão 1.2
+
+Os controles usam vetores próprios em GDI+, com suavização e escala conforme o DPI do Windows. Importação, rolo, flash, troca de câmera, compartilhamento, salvamento, exclusão e configurações mantêm rótulos e estados desativados. Cada filme tem um desenho e uma cor definidos nos dados (`glyph` e `iconTint` em `src/VCFilm.h`), independentes do processamento da imagem.
+
+O ícone do aplicativo é uma câmera vintage própria, embutida no EXE em sete tamanhos (16 a 256 pixels), usada na janela, no Explorer e na barra de tarefas. `assets/make_icon.py` permite regenerar esse recurso com Pillow; isso é apenas uma ferramenta de autoria, sem dependência adicional para compilar ou executar o app. `src/VCIcons.h` contém os vetores dos controles. O teste de abertura verifica os recursos carregados e registra capturas da interface para inspeção visual.
 
 ## Correção de câmera · versão 1.1
 

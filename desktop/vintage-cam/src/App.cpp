@@ -1,6 +1,8 @@
 #include "VCGpu.h"
 #include "VCCamera.h"
 #include "VCShare.h"
+#include "VCIcons.h"
+#include "../assets/resource.h"
 #include <windowsx.h>
 #include <shobjidl.h>
 #include <shellapi.h>
@@ -117,7 +119,13 @@ class App {
   auto brush=CreateSolidBrush(fill);auto pen=CreatePen(PS_SOLID,std::max(1,int(scale)),stroke);auto ob=SelectObject(dc,brush);auto op=SelectObject(dc,pen);
   auto r=logicalRect(x,y,w,h);RoundRect(dc,r.left,r.top,r.right,r.bottom,int(radius*scale),int(radius*scale));SelectObject(dc,ob);SelectObject(dc,op);DeleteObject(brush);DeleteObject(pen);
  }
- void button(HDC dc,std::wstring_view name,int x,int y,int w,bool enabled=true){rounded(dc,x,y,w,38,RGB(31,33,32),RGB(57,58,54));text(dc,name,x,y,w,38,12,enabled?Cream:RGB(90,90,86),DT_CENTER|DT_VCENTER|DT_SINGLELINE);}
+ void icon(HDC dc,Icon glyph,int x,int y,int size,COLORREF ink,COLORREF accent){icons::draw(dc,glyph,x*scale,y*scale,size*scale,ink,accent);}
+ void button(HDC dc,std::wstring_view name,int x,int y,int w,bool enabled=true,Icon glyph=Icon::None){
+  rounded(dc,x,y,w,38,RGB(31,33,32),RGB(57,58,54));auto ink=enabled?Cream:RGB(90,90,86);auto accent=enabled?Amber:RGB(90,90,86);
+  if(glyph==Icon::None)text(dc,name,x,y,w,38,12,ink,DT_CENTER|DT_VCENTER|DT_SINGLELINE);
+  else if(name.empty())icon(dc,glyph,x+(w-20)/2,y+9,20,ink,accent);
+  else {icon(dc,glyph,x+10,y+10,18,ink,accent);text(dc,name,x+35,y,w-42,38,w<110?10:11,ink,DT_LEFT|DT_VCENTER|DT_SINGLELINE);}
+ }
  void drawThumb(HDC dc,Image const& im,int x,int y,int w,int h){
   double r=std::min(double(w)/im.width,double(h)/im.height);int iw=int(im.width*r),ih=int(im.height*r);
   BITMAPINFO info{};info.bmiHeader.biSize=sizeof(BITMAPINFOHEADER);info.bmiHeader.biWidth=LONG(im.width);info.bmiHeader.biHeight=-LONG(im.height);info.bmiHeader.biPlanes=1;info.bmiHeader.biBitCount=32;info.bmiHeader.biCompression=BI_RGB;
@@ -128,10 +136,11 @@ class App {
   PAINTSTRUCT ps;auto screen=BeginPaint(window,&ps);RECT client;GetClientRect(window,&client);
   auto dc=CreateCompatibleDC(screen);auto bitmap=CreateCompatibleBitmap(screen,client.right,client.bottom);auto old=SelectObject(dc,bitmap);
   auto background=CreateSolidBrush(Background);FillRect(dc,&client,background);DeleteObject(background);
+  icon(dc,Icon::Slr,412,15,40,Cream,Amber);
   text(dc,L"VINTAGE CAM",24,10,300,30,21,Cream,DT_LEFT|DT_VCENTER|DT_SINGLELINE,true);
   text(dc,L"NOVE FILMES. SUAS MEMÓRIAS.",24,41,420,20,10,Muted);
   if(page==Page::Roll) {
-   button(dc,L"‹ VOLTAR",24,73,100);text(dc,L"ROLO DE FILME",142,73,250,38,17,Cream,DT_LEFT|DT_VCENTER|DT_SINGLELINE,true);
+   button(dc,L"VOLTAR",24,73,100,true,Icon::Back);text(dc,L"ROLO DE FILME",142,73,250,38,17,Cream,DT_LEFT|DT_VCENTER|DT_SINGLELINE,true);
    if(photos.empty()){text(dc,L"Seu primeiro filme começa aqui.",24,280,432,40,19,Cream,DT_CENTER|DT_SINGLELINE);text(dc,L"Fotografe ou importe uma imagem.",24,325,432,30,13,Muted,DT_CENTER|DT_SINGLELINE);}
    for(size_t cell=0;cell<12;cell++) {
     size_t n=rollPage*12+cell;if(n>=photos.size())break;int x=24+int(cell%3)*146,y=130+int(cell/3)*132;
@@ -140,46 +149,46 @@ class App {
     catch(...){text(dc,L"Arquivo ilegível",x,y,138,100,10,Muted,DT_CENTER|DT_SINGLELINE);}
     text(dc,std::to_wstring(n+1),x,y+104,138,15,10,Muted,DT_CENTER|DT_SINGLELINE);
    }
-   button(dc,L"‹",24,664,52);button(dc,L"›",404,664,52);
+   button(dc,L"",24,664,52,true,Icon::Back);button(dc,L"",404,664,52,true,Icon::Next);
    text(dc,std::to_wstring(photos.size())+L" fotos · página "+std::to_wstring(rollPage+1),84,664,312,38,12,Muted,DT_CENTER|DT_SINGLELINE);
-   button(dc,L"COMPARTILHAR",24,718,140,rollSelection>=0);button(dc,L"SALVAR EM IMAGENS",170,718,174,rollSelection>=0);button(dc,L"EXCLUIR",350,718,106,rollSelection>=0);
+   button(dc,L"COMPARTILHAR",24,718,140,rollSelection>=0,Icon::Share);button(dc,L"SALVAR EM IMAGENS",170,718,174,rollSelection>=0,Icon::Save);button(dc,L"EXCLUIR",350,718,106,rollSelection>=0,Icon::Delete);
    text(dc,notice,24,775,432,42,12,Amber,DT_LEFT|DT_WORDBREAK);
   }else if(page==Page::Photo) {
-   button(dc,L"‹ ROLO",24,73,110);button(dc,L"COMPARTILHAR",300,73,156);
+   button(dc,L"ROLO",24,73,110,true,Icon::Back);button(dc,L"COMPARTILHAR",300,73,156,true,Icon::Share);
    text(dc,viewedPhoto.filename().wstring(),24,710,432,50,12,Muted,DT_LEFT|DT_WORDBREAK);
   }else {
-   if(page==Page::Develop)button(dc,L"‹ CÂMERA",24,73,135,!busy);
-   else button(dc,cameraStatus.flashSupported?(flash?L"FLASH LIGADO":L"FLASH DESLIG."):L"FLASH N/D",24,73,135,cameraStatus.flashSupported&&!busy);
-   button(dc,cameraStatus.count>1?L"TROCAR CÂMERA":L"ABRIR CÂMERA",291,73,165,page==Page::Camera&&!busy);
+   if(page==Page::Develop)button(dc,L"CÂMERA",24,73,135,!busy,Icon::Back);
+   else button(dc,cameraStatus.flashSupported?(flash?L"FLASH LIGADO":L"FLASH DESLIG."):L"FLASH N/D",24,73,135,cameraStatus.flashSupported&&!busy,flash?Icon::Flash:Icon::FlashOff);
+   button(dc,cameraStatus.count>1?L"TROCAR CÂMERA":L"ABRIR CÂMERA",291,73,165,page==Page::Camera&&!busy,cameraStatus.count>1?Icon::Flip:Icon::Camera);
    if(page==Page::Camera&&!cameraStatus.ready){
     rounded(dc,24,126,432,398,RGB(26,28,27),RGB(51,53,48));
     text(dc,L"AGUARDANDO A CÂMERA",48,237,384,42,19,Cream,DT_CENTER|DT_SINGLELINE|DT_VCENTER,true);
     text(dc,cameraStatus.text.empty()?L"Inicializando…":cameraStatus.text,48,285,384,60,13,Muted,DT_CENTER|DT_WORDBREAK);
-    button(dc,L"ABRIR CÂMERA",150,362,180,!busy);
+    button(dc,L"ABRIR CÂMERA",150,362,180,!busy,Icon::Camera);
     text(dc,L"A importação de fotos continua disponível.",48,425,384,35,12,Muted,DT_CENTER|DT_WORDBREAK);
    }
    auto status=page==Page::Develop?L"IMPORTADA · PRONTA PARA REVELAR":cameraStatus.text;
    text(dc,status,24,536,432,37,11,Muted,DT_LEFT|DT_WORDBREAK);
    if(page==Page::Camera){std::wostringstream s;s<<std::fixed<<std::setprecision(0)<<fps<<L" FPS · "<<(mirror?L"ESPELHADA":L"ORIGINAL");text(dc,s.str(),24,575,210,22,10,Muted);}
    else text(dc,L"Escolha um filme abaixo para visualizar.",24,575,432,22,11,Muted);
-   if(page==Page::Camera){button(dc,L"COMPATÍVEL",264,566,100,!busy&&!cameraStatus.compatible);button(dc,L"VER ERRO",370,566,86);}
+   if(page==Page::Camera){button(dc,L"COMPATÍVEL",264,566,100,!busy&&!cameraStatus.compatible,Icon::Retry);button(dc,L"VER ERRO",370,566,86,true,Icon::Error);}
    // Carousel cards follow pointer while dragging and ease to the selected center.
    for(unsigned n=0;n<Films.size();n++) {
     int x=int(240+(double(n)-carousel)*128-59);if(x+118<0||x>480)continue;
     bool active=n==selected;auto const& f=Films[n];
     rounded(dc,x,606,118,76,active?RGB(56,50,39):RGB(28,30,29),active?Amber:RGB(53,54,49));
-    rounded(dc,x+47,616,24,15,active?Amber:RGB(103,103,90),active?Amber:RGB(103,103,90),4);
-    text(dc,f.name,x+4,640,110,25,10,active?Cream:Muted,DT_CENTER|DT_SINGLELINE|DT_VCENTER,true);
+    icons::film(dc,f,(x+43)*scale,611*scale,32*scale,active?Cream:Muted);
+    text(dc,f.name,x+4,645,110,25,10,active?Cream:Muted,DT_CENTER|DT_SINGLELINE|DT_VCENTER,true);
    }
    text(dc,Films[selected].description,24,689,432,24,12,Muted,DT_CENTER|DT_SINGLELINE|DT_VCENTER);
-   button(dc,L"IMPORTAR",24,739,125,!busy);button(dc,L"ROLO",331,739,125,!busy);
+   button(dc,L"IMPORTAR",24,739,125,!busy,Icon::Import);button(dc,L"ROLO",331,739,125,!busy,Icon::Roll);
    int shrink=(shutterHeld||GetTickCount64()<animationUntil)?5:0;
    auto r=logicalRect(202+shrink,721+shrink,76-shrink*2,76-shrink*2);
    auto brush=CreateSolidBrush(busy?RGB(100,96,83):Cream);auto pen=CreatePen(PS_SOLID,std::max(1,int(3*scale)),Amber);
    auto ob=SelectObject(dc,brush);auto op=SelectObject(dc,pen);Ellipse(dc,r.left,r.top,r.right,r.bottom);SelectObject(dc,ob);SelectObject(dc,op);DeleteObject(brush);DeleteObject(pen);
    text(dc,busy?L"REVELANDO…":page==Page::Develop?L"REVELAR":L"FOTOGRAFAR",149,798,182,20,10,Muted,DT_CENTER|DT_SINGLELINE);
    text(dc,notice,24,822,370,33,11,Amber,DT_LEFT|DT_WORDBREAK);
-   text(dc,L"⚙",420,815,36,36,19,Muted,DT_CENTER|DT_SINGLELINE);
+   rounded(dc,420,815,36,36,RGB(31,33,32),RGB(57,58,54));icon(dc,Icon::Settings,428,823,20,Cream,Amber);
   }
   BitBlt(screen,0,0,client.right,client.bottom,dc,0,0,SRCCOPY);SelectObject(dc,old);DeleteObject(bitmap);DeleteDC(dc);EndPaint(window,&ps);
  }
@@ -291,11 +300,11 @@ class App {
  public:
  int run(HINSTANCE instance){
   SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
-  WNDCLASSEXW wc{sizeof(wc)};wc.style=CS_DBLCLKS;wc.lpfnWndProc=procedure;wc.hInstance=instance;wc.hCursor=LoadCursorW(nullptr,IDC_ARROW);wc.hIcon=LoadIconW(nullptr,IDI_APPLICATION);wc.lpszClassName=L"VintageCam.Native";RegisterClassExW(&wc);
+  WNDCLASSEXW wc{sizeof(wc)};wc.style=CS_DBLCLKS;wc.lpfnWndProc=procedure;wc.hInstance=instance;wc.hCursor=LoadCursorW(nullptr,IDC_ARROW);wc.hIcon=static_cast<HICON>(LoadImageW(instance,MAKEINTRESOURCEW(IDI_VINTAGECAM),IMAGE_ICON,GetSystemMetrics(SM_CXICON),GetSystemMetrics(SM_CYICON),0));wc.hIconSm=static_cast<HICON>(LoadImageW(instance,MAKEINTRESOURCEW(IDI_VINTAGECAM),IMAGE_ICON,GetSystemMetrics(SM_CXSMICON),GetSystemMetrics(SM_CYSMICON),0));wc.lpszClassName=L"VintageCam.Native";RegisterClassExW(&wc);
   RECT work;SystemParametersInfoW(SPI_GETWORKAREA,0,&work,0);UINT dpi=GetDpiForSystem();
   double r=std::min(double(dpi)/96.0,double(work.bottom-work.top-72)/864.0);int width=int(480*r),height=int(864*r);
   DWORD style=WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU|WS_MINIMIZEBOX|WS_CLIPCHILDREN;RECT rect{0,0,width,height};AdjustWindowRectExForDpi(&rect,style,FALSE,0,dpi);
-  auto hwnd=CreateWindowExW(0,wc.lpszClassName,L"Vintage Cam 1.1 — câmera de filme",style,CW_USEDEFAULT,CW_USEDEFAULT,rect.right-rect.left,rect.bottom-rect.top,nullptr,nullptr,instance,this);
+  auto hwnd=CreateWindowExW(0,wc.lpszClassName,L"Vintage Cam 1.2 — câmera de filme",style,CW_USEDEFAULT,CW_USEDEFAULT,rect.right-rect.left,rect.bottom-rect.top,nullptr,nullptr,instance,this);
   if(!hwnd)return 1;ShowWindow(hwnd,SW_SHOW);UpdateWindow(hwnd);
   MSG msg;while(GetMessageW(&msg,nullptr,0,0)>0){TranslateMessage(&msg);DispatchMessageW(&msg);}return int(msg.wParam);
  }
@@ -303,7 +312,9 @@ class App {
 int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
  HANDLE instanceGuard=CreateMutexW(nullptr,FALSE,L"Local\\LeoSardinha.VintageCam");
  if(instanceGuard&&GetLastError()==ERROR_ALREADY_EXISTS){auto existing=FindWindowW(L"VintageCam.Native",nullptr);if(existing){ShowWindow(existing,SW_RESTORE);SetForegroundWindow(existing);}CloseHandle(instanceGuard);return 0;}
+ Gdiplus::GdiplusStartupInput graphicsInput;ULONG_PTR graphicsToken=0;
+ if(Gdiplus::GdiplusStartup(&graphicsToken,&graphicsInput,nullptr)!=Gdiplus::Ok){if(instanceGuard)CloseHandle(instanceGuard);return 1;}
  winrt::init_apartment(winrt::apartment_type::single_threaded);
  int result=1;try {App app;result=app.run(instance);}catch(...){auto text=exceptionText();MessageBoxW(nullptr,text.c_str(),L"Vintage Cam",MB_OK|MB_ICONERROR);}
- winrt::uninit_apartment();if(instanceGuard)CloseHandle(instanceGuard);return result;
+ winrt::uninit_apartment();Gdiplus::GdiplusShutdown(graphicsToken);if(instanceGuard)CloseHandle(instanceGuard);return result;
 }

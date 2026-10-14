@@ -57,5 +57,6 @@ jobs:
             desktop/vintage-cam/build-log.txt
             desktop/vintage-cam/compiler-log.txt
             desktop/vintage-cam/smoke-output/smoke-result.txt
+            desktop/vintage-cam/smoke-output/screenshots/*.png
           if-no-files-found: warn
           retention-days: 7
