@@ -40,12 +40,12 @@ try {
 
         & cl.exe @flags "$PSScriptRoot\tests\GpuTests.cpp" "$PSScriptRoot\src\Gpu.cpp" "$PSScriptRoot\src\ImageIO.cpp" "/Fe:$out\GpuTests.exe" /link @libs 2>&1 | Tee-Object -FilePath $compilerLog -Append
         if ($LASTEXITCODE -ne 0) { throw 'Falha ao compilar GpuTests.' }
-        Write-Host '3/3 Compilando VintageCam.exe...'
+        Write-Host '3/3 Compilando CameraDaGraci.exe...'
         & rc.exe /nologo "/I$PSScriptRoot\assets" "/fo$obj\VintageCam.res" "$PSScriptRoot\assets\VintageCam.rc" 2>&1 | Tee-Object -FilePath $compilerLog -Append
         if ($LASTEXITCODE -ne 0) { throw 'Falha ao compilar o icone do aplicativo.' }
         $sources = @('App.cpp','Camera.cpp','CompatCamera.cpp','Gpu.cpp','ImageIO.cpp','Share.cpp') | ForEach-Object { Join-Path "$PSScriptRoot\src" $_ }
-        & cl.exe @flags @sources "$obj\VintageCam.res" "/Fe:$out\VintageCam.exe" /link @libs /SUBSYSTEM:WINDOWS /MANIFEST:EMBED "/MANIFESTINPUT:$PSScriptRoot\app.manifest" 2>&1 | Tee-Object -FilePath $compilerLog -Append
-        if ($LASTEXITCODE -ne 0) { throw 'Falha ao compilar VintageCam.' }
+        & cl.exe @flags @sources "$obj\VintageCam.res" "/Fe:$out\CameraDaGraci.exe" /link @libs /SUBSYSTEM:WINDOWS /MANIFEST:EMBED "/MANIFESTINPUT:$PSScriptRoot\app.manifest" 2>&1 | Tee-Object -FilePath $compilerLog -Append
+        if ($LASTEXITCODE -ne 0) { throw 'Falha ao compilar Camera da Graci.' }
     } finally { Pop-Location }
     if (-not $SkipTests) {
         & "$out\CoreTests.exe"
@@ -57,8 +57,8 @@ try {
         & "$out\GpuTests.exe"
         if ($LASTEXITCODE -ne 0) { throw 'GpuTests falhou. O executavel nao foi validado.' }
     }
-    Write-Host "Pronto: $out\VintageCam.exe" -ForegroundColor Green
-    if ($Run) { Start-Process "$out\VintageCam.exe" }
+    Write-Host "Pronto: $out\CameraDaGraci.exe" -ForegroundColor Green
+    if ($Run) { Start-Process "$out\CameraDaGraci.exe" }
 } catch {
     Write-Host $_.Exception.Message -ForegroundColor Red
     Write-Host "Diagnostico em: $log"

@@ -1,5 +1,5 @@
 [CmdletBinding()]
-param([string]$Exe = "$PSScriptRoot\..\dist\VintageCam.exe", [string]$OutputDir = "$PSScriptRoot\..\smoke-output")
+param([string]$Exe = "$PSScriptRoot\..\dist\CameraDaGraci.exe", [string]$OutputDir = "$PSScriptRoot\..\smoke-output")
 $ErrorActionPreference = 'Stop'
 New-Item -ItemType Directory -Force -Path $OutputDir | Out-Null
 $process = Start-Process -FilePath (Resolve-Path $Exe) -PassThru
@@ -10,9 +10,9 @@ try {
         Start-Sleep -Milliseconds 200
         $process.Refresh()
         if ($process.HasExited) { throw "Application exited during startup with code $($process.ExitCode)." }
-        if ($process.MainWindowHandle -ne 0 -and $process.MainWindowTitle.StartsWith('Vintage Cam') -and $process.Responding) { $ready = $true; break }
+        if ($process.MainWindowHandle -ne 0 -and $process.MainWindowTitle.StartsWith('Camera da Graci 1.3') -and $process.Responding) { $ready = $true; break }
     }
-    if (-not $ready) { throw 'Application did not create a responding Vintage Cam window.' }
+    if (-not $ready) { throw 'Application did not create a responding Camera da Graci window.' }
     Start-Sleep -Seconds 2
     $process.Refresh()
     if ($process.HasExited -or -not $process.Responding) { throw 'Application failed after opening.' }
@@ -22,7 +22,7 @@ try {
 using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
-public static class VintageCamUi {
+public static class CameraDaGraciUi {
     [StructLayout(LayoutKind.Sequential)] public struct Rect { public int Left, Top, Right, Bottom; }
     [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr hwnd, out Rect rect);
     [DllImport("user32.dll")] public static extern bool PrintWindow(IntPtr hwnd, IntPtr dc, uint flags);
@@ -43,20 +43,20 @@ public static class VintageCamUi {
     }
 }
 '@
-    if ([VintageCamUi]::GetClassLongPtr($process.MainWindowHandle, -14) -eq [IntPtr]::Zero -or
-        [VintageCamUi]::GetClassLongPtr($process.MainWindowHandle, -34) -eq [IntPtr]::Zero) { throw 'Application icons were not loaded from the executable.' }
+    if ([CameraDaGraciUi]::GetClassLongPtr($process.MainWindowHandle, -14) -eq [IntPtr]::Zero -or
+        [CameraDaGraciUi]::GetClassLongPtr($process.MainWindowHandle, -34) -eq [IntPtr]::Zero) { throw 'Application icons were not loaded from the executable.' }
     $screenDir = Join-Path $OutputDir 'screenshots'
     New-Item -ItemType Directory -Force -Path $screenDir | Out-Null
-    [VintageCamUi]::Capture($process.MainWindowHandle, (Join-Path $screenDir 'camera.png'))
-    for ($i=0; $i -lt 8; $i++) { [void][VintageCamUi]::SendMessage($process.MainWindowHandle, 0x100, [IntPtr]37, [IntPtr]::Zero) }
+    [CameraDaGraciUi]::Capture($process.MainWindowHandle, (Join-Path $screenDir 'camera.png'))
+    for ($i=0; $i -lt 8; $i++) { [void][CameraDaGraciUi]::SendMessage($process.MainWindowHandle, 0x100, [IntPtr]37, [IntPtr]::Zero) }
     for ($i=0; $i -lt 9; $i++) {
         Start-Sleep -Milliseconds 500
-        [VintageCamUi]::Capture($process.MainWindowHandle, (Join-Path $screenDir "film-$i.png"))
-        [void][VintageCamUi]::SendMessage($process.MainWindowHandle, 0x100, [IntPtr]39, [IntPtr]::Zero)
+        [CameraDaGraciUi]::Capture($process.MainWindowHandle, (Join-Path $screenDir "film-$i.png"))
+        [void][CameraDaGraciUi]::SendMessage($process.MainWindowHandle, 0x100, [IntPtr]39, [IntPtr]::Zero)
     }
-    [void][VintageCamUi]::SendMessage($process.MainWindowHandle, 0x100, [IntPtr]82, [IntPtr]::Zero)
+    [void][CameraDaGraciUi]::SendMessage($process.MainWindowHandle, 0x100, [IntPtr]82, [IntPtr]::Zero)
     Start-Sleep -Milliseconds 500
-    [VintageCamUi]::Capture($process.MainWindowHandle, (Join-Path $screenDir 'roll.png'))
+    [CameraDaGraciUi]::Capture($process.MainWindowHandle, (Join-Path $screenDir 'roll.png'))
     if (-not $process.CloseMainWindow()) { throw 'Could not request clean shutdown.' }
     if (-not $process.WaitForExit(15000)) { throw 'Application did not close cleanly.' }
     if ($process.ExitCode -ne 0) { throw "Application shutdown code: $($process.ExitCode)." }

@@ -1,4 +1,4 @@
-# Vintage Cam · Windows
+# Camera da Graci · Windows
 
 Câmera de fotografia com nove filmes, interface própria em português e processamento local. Projeto nativo C++20/Win32 para Windows 10 2004+ e Windows 11 x64. Não é uma cópia da identidade, dos recursos ou do código do Dazz Cam.
 
@@ -11,7 +11,7 @@ Compilação validada: [execução Windows de 14/10/2026](https://github.com/leo
 1. Extraia o ZIP inteiro.
 2. Instale **Visual Studio 2022 Community** ou **Build Tools 2022**, selecionando **Desenvolvimento para desktop com C++**, **MSVC v143 x64/x86** e **Windows SDK 10.0.22621 ou superior**, com cabeçalhos C++/WinRT. Não são necessários NuGet, npm, Qt, Electron ou outras bibliotecas. O compilador é um requisito de desenvolvimento; ocupa vários GB.
 3. Execute **COMPILAR_E_ABRIR.cmd**. O script localiza o compilador da Microsoft, compila o núcleo, o teste gráfico e o aplicativo, executa ambos os testes e só então abre o aplicativo. Não faz downloads nem instala programas.
-4. O resultado fica em **dist/VintageCam.exe**. Nas próximas vezes, abra **ABRIR.cmd** ou o EXE. O executável usa o runtime C++ estático; o computador de destino não precisa instalar o Visual Studio.
+4. O resultado fica em **dist/CameraDaGraci.exe**. Nas próximas vezes, abra **ABRIR.cmd** ou o EXE. O executável usa o runtime C++ estático; o computador de destino não precisa instalar o Visual Studio.
 5. Se houver falha, leia **build-log.txt**. Ele contém os comandos de compilação e o resultado dos testes. O arquivo fica na pasta extraída, não dentro do ZIP.
 
 Em PowerShell:
@@ -20,7 +20,7 @@ Em PowerShell:
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -Run
 ```
 
-Também é possível abrir esta pasta no Visual Studio, com o componente CMake instalado. O `CMakeLists.txt` define os alvos `VintageCam`, `CoreTests` e `GpuTests`:
+Também é possível abrir esta pasta no Visual Studio, com o componente CMake instalado. O `CMakeLists.txt` define os alvos `CameraDaGraci`, `CoreTests` e `GpuTests`:
 
 ```powershell
 cmake -S . -B build-vs -G "Visual Studio 17 2022" -A x64
@@ -29,6 +29,10 @@ ctest --test-dir build-vs -C Release --output-on-failure
 ```
 
 A pasta `.github/workflows` contém uma compilação opcional para um repositório seu. Ela compila no Windows, executa os testes e publica um artefato com o EXE. A versão Windows é validada na branch `build/vintage-cam-windows`, separada do site. Isso é uma ferramenta de desenvolvimento; o aplicativo não usa GitHub nem rede em execução.
+
+## Nome · versão 1.3
+
+O nome do aplicativo é **Camera da Graci**: cabeçalho, título da janela, mensagens, compartilhamento, manifesto e executável `CameraDaGraci.exe`. As novas cópias salvas ficam em `Imagens/Camera da Graci`. O rolo, os diagnósticos e a identificação de instância continuam usando os caminhos internos antigos para manter o acesso às fotos existentes e evitar duas versões abertas ao mesmo tempo. Não é necessário migrar o rolo.
 
 ## Ícones · versão 1.2
 
@@ -55,7 +59,7 @@ Os testes adicionados cobrem padding, stride negativo, limites do buffer, alpha,
 - **Importar:** escolha uma foto pelo seletor nativo. Ela é mostrada com o filme ativo. Percorra os nove filmes e clique **Revelar** para criar uma versão; pode revelar outras sem reimportar. O original não é alterado. Clique **Câmera** para voltar.
 - **Rolo:** grade de fotografias com seleção, paginação e ações **Compartilhar**, **Salvar em Imagens** e **Excluir**. Duplo clique numa miniatura abre uma visualização ampliada no aplicativo.
 - **Compartilhar:** abre o painel de compartilhamento do Windows. O destino é escolhido por você. O aplicativo não envia arquivos automaticamente.
-- **Salvar em Imagens:** copia o PNG para `Imagens/VintageCam`. O Windows Fotos pode visualizar os arquivos dessa pasta. A cópia permanece caso você exclua a versão do rolo.
+- **Salvar em Imagens:** copia o PNG para `Imagens/Camera da Graci`. O Windows Fotos pode visualizar os arquivos dessa pasta. A cópia permanece caso você exclua a versão do rolo.
 - **Atalhos:** Espaço fotografa/revela; setas mudam filme; I importa; R abre o rolo; Esc volta.
 - A câmera pausa quando o aplicativo é minimizado e durante o desenvolvimento de uma foto importada ou a navegação do rolo. O encerramento aguarda a liberação da câmera sem bloquear a thread de interface.
 

@@ -60,6 +60,6 @@ std::filesystem::path uniquePhotoPath(std::filesystem::path const& dir,std::wstr
  for(unsigned n=1;;n++) {auto p=dir/(s.str()+L"_"+std::to_wstring(n)+L".png");if(!std::filesystem::exists(p))return p;}
 }
 void saveToPictures(std::filesystem::path const& source) {
- auto dir=known(FOLDERID_Pictures)/L"VintageCam";std::filesystem::create_directories(dir);
+ auto dir=known(FOLDERID_Pictures)/L"Camera da Graci";std::filesystem::create_directories(dir);
  auto target=uniquePhotoPath(dir,L"foto");std::filesystem::copy_file(source,target);
 }

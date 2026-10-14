@@ -1,0 +1,20 @@
+name: Windows native build
+on: [push, workflow_dispatch]
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile application and run CPU and actual shader tests
+        shell: powershell
+        run: ./build.ps1
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: CameraDaGraci-Windows-x64
+          path: dist/CameraDaGraci.exe
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: build-log
+          path: build-log.txt

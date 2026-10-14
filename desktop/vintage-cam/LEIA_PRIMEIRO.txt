@@ -1,9 +1,9 @@
-VINTAGE CAM PARA WINDOWS — LEIA ANTES DE ABRIR
+CAMERA DA GRACI PARA WINDOWS — LEIA ANTES DE ABRIR
 
 Este pacote contém o PROJETO-FONTE. Não contém um .exe já compilado.
 A compilação Windows e o teste gráfico ainda precisam ser executados no Windows.
 
-1. Extraia TODO o ZIP para uma pasta, por exemplo Documentos\VintageCam.
+1. Extraia TODO o ZIP para uma pasta, por exemplo Documentos\CameraDaGraci.
    Não execute os arquivos dentro da janela do ZIP.
 
 2. Para gerar o aplicativo, é necessário o Visual Studio 2022 ou Build Tools
@@ -13,10 +13,10 @@ A compilação Windows e o teste gráfico ainda precisam ser executados no Windo
 
 3. Dê dois cliques em COMPILAR_E_ABRIR.cmd.
    O script compila o projeto, executa os testes de dados e do shader real
-   e abre dist\VintageCam.exe somente se todos passarem.
+   e abre dist\CameraDaGraci.exe somente se todos passarem.
    Os detalhes ficam em build-log.txt.
 
-4. Depois de compilado, use ABRIR.cmd ou dist\VintageCam.exe.
+4. Depois de compilado, use ABRIR.cmd ou dist\CameraDaGraci.exe.
    O EXE é portátil e não precisa do Visual Studio no computador de destino.
 
 5. Câmera bloqueada? Clique na engrenagem do aplicativo ou abra:

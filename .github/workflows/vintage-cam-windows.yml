@@ -1,4 +1,4 @@
-name: Vintage Cam Windows executable
+name: Camera da Graci Windows executable
 on:
   pull_request:
     types: [opened, synchronize, reopened]
@@ -33,11 +33,11 @@ jobs:
         shell: powershell
         run: |
           New-Item -ItemType Directory -Force -Path executable-package | Out-Null
-          Copy-Item desktop/vintage-cam/dist/VintageCam.exe executable-package/
+          Copy-Item desktop/vintage-cam/dist/CameraDaGraci.exe executable-package/
           Copy-Item desktop/vintage-cam/LICENSE executable-package/
           @'
-          VINTAGE CAM PARA WINDOWS
-          Abra VintageCam.exe. Nao e necessario instalar Visual Studio.
+          CAMERA DA GRACI 1.3 PARA WINDOWS
+          Abra CameraDaGraci.exe. Nao e necessario instalar Visual Studio.
           Permita a camera em Configuracoes > Privacidade > Camera.
           A compilacao e o teste de imagem fixa foram executados no Windows.
           A compatibilidade com a webcam do seu notebook ainda depende de teste no dispositivo.
@@ -45,14 +45,14 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: VintageCam-Windows-x64-executable
+          name: CameraDaGraci-Windows-x64-executable
           path: executable-package/*
           if-no-files-found: error
           retention-days: 7
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: VintageCam-build-log
+          name: CameraDaGraci-build-log
           path: |
             desktop/vintage-cam/build-log.txt
             desktop/vintage-cam/compiler-log.txt

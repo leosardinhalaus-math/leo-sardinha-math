@@ -108,7 +108,7 @@ class App {
   if(rollSelection<0||size_t(rollSelection)>=photos.size()) {notice=L"Selecione uma fotografia.";invalidate();return;}
   auto path=photos[size_t(rollSelection)];
   if(action==0)share.show(window,path);
-  if(action==1){saveToPictures(path);notice=L"Salva em Imagens / VintageCam.";invalidate();}
+  if(action==1){saveToPictures(path);notice=L"Salva em Imagens / Camera da Graci.";invalidate();}
   if(action==2&&MessageBoxW(window,L"Excluir esta foto do rolo? As cópias em Imagens serão mantidas.",L"Excluir fotografia",MB_YESNO|MB_ICONQUESTION)==IDYES){std::filesystem::remove(path);notice=L"Foto excluída do rolo.";refreshRoll();}
  }
  void text(HDC dc,std::wstring_view value,int x,int y,int w,int h,int size,COLORREF color,UINT flags=DT_LEFT|DT_VCENTER|DT_SINGLELINE,bool bold=false){
@@ -137,7 +137,7 @@ class App {
   auto dc=CreateCompatibleDC(screen);auto bitmap=CreateCompatibleBitmap(screen,client.right,client.bottom);auto old=SelectObject(dc,bitmap);
   auto background=CreateSolidBrush(Background);FillRect(dc,&client,background);DeleteObject(background);
   icon(dc,Icon::Slr,412,15,40,Cream,Amber);
-  text(dc,L"VINTAGE CAM",24,10,300,30,21,Cream,DT_LEFT|DT_VCENTER|DT_SINGLELINE,true);
+  text(dc,L"CAMERA DA GRACI",24,10,300,30,21,Cream,DT_LEFT|DT_VCENTER|DT_SINGLELINE,true);
   text(dc,L"NOVE FILMES. SUAS MEMÓRIAS.",24,41,420,20,10,Muted);
   if(page==Page::Roll) {
    button(dc,L"VOLTAR",24,73,100,true,Icon::Back);text(dc,L"ROLO DE FILME",142,73,250,38,17,Cream,DT_LEFT|DT_VCENTER|DT_SINGLELINE,true);
@@ -249,7 +249,7 @@ class App {
   if(result->kind==JobResult::Kind::Imported){importFull=result->full;importPreview=result->preview;currentFrame=importPreview;page=Page::Develop;busy=false;dirty=true;notice=L"O original será preservado. Revele quantas versões quiser.";}
   if(result->kind==JobResult::Kind::Shot){exportImage(result->full);}
   if(result->kind==JobResult::Kind::Saved){busy=false;notice=result->text;}
-  if(result->kind==JobResult::Kind::Error){busy=false;notice=result->text;if(page==Page::Camera){lastFrameTick=GetTickCount64();camera->resume();}MessageBoxW(window,notice.c_str(),L"Vintage Cam",MB_OK|MB_ICONWARNING);}
+  if(result->kind==JobResult::Kind::Error){busy=false;notice=result->text;if(page==Page::Camera){lastFrameTick=GetTickCount64();camera->resume();}MessageBoxW(window,notice.c_str(),L"Camera da Graci",MB_OK|MB_ICONWARNING);}
   invalidate();
  }
  LRESULT message(UINT msg,WPARAM wp,LPARAM lp){
@@ -288,7 +288,7 @@ class App {
      {MSG m;while(PeekMessageW(&m,window,JobMessage,StatusMessage,PM_REMOVE)){if(m.message==JobMessage)delete reinterpret_cast<JobResult*>(m.lParam);else delete reinterpret_cast<CameraStatus*>(m.lParam);}}
      PostQuitMessage(0);return 0;
    }
-  }catch(...){notice=exceptionText();busy=false;invalidate();if(msg==WM_CREATE){MessageBoxW(window,notice.c_str(),L"Não foi possível iniciar",MB_OK|MB_ICONERROR);return -1;}MessageBoxW(window,notice.c_str(),L"Vintage Cam",MB_OK|MB_ICONWARNING);}
+  }catch(...){notice=exceptionText();busy=false;invalidate();if(msg==WM_CREATE){MessageBoxW(window,notice.c_str(),L"Não foi possível iniciar",MB_OK|MB_ICONERROR);return -1;}MessageBoxW(window,notice.c_str(),L"Camera da Graci",MB_OK|MB_ICONWARNING);}
   return DefWindowProcW(window,msg,wp,lp);
  }
  void layout(unsigned w,unsigned h){if(!w||!h)return;scale=std::min(w/480.f,h/864.f);if(view){auto r=logicalRect(24,126,432,398);MoveWindow(view,r.left,r.top,r.right-r.left,r.bottom-r.top,TRUE);gpu.resize(r.right-r.left,r.bottom-r.top);}dirty=true;invalidate();}
@@ -304,7 +304,7 @@ class App {
   RECT work;SystemParametersInfoW(SPI_GETWORKAREA,0,&work,0);UINT dpi=GetDpiForSystem();
   double r=std::min(double(dpi)/96.0,double(work.bottom-work.top-72)/864.0);int width=int(480*r),height=int(864*r);
   DWORD style=WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU|WS_MINIMIZEBOX|WS_CLIPCHILDREN;RECT rect{0,0,width,height};AdjustWindowRectExForDpi(&rect,style,FALSE,0,dpi);
-  auto hwnd=CreateWindowExW(0,wc.lpszClassName,L"Vintage Cam 1.2 — câmera de filme",style,CW_USEDEFAULT,CW_USEDEFAULT,rect.right-rect.left,rect.bottom-rect.top,nullptr,nullptr,instance,this);
+  auto hwnd=CreateWindowExW(0,wc.lpszClassName,L"Camera da Graci 1.3 — câmera de filme",style,CW_USEDEFAULT,CW_USEDEFAULT,rect.right-rect.left,rect.bottom-rect.top,nullptr,nullptr,instance,this);
   if(!hwnd)return 1;ShowWindow(hwnd,SW_SHOW);UpdateWindow(hwnd);
   MSG msg;while(GetMessageW(&msg,nullptr,0,0)>0){TranslateMessage(&msg);DispatchMessageW(&msg);}return int(msg.wParam);
  }
@@ -315,6 +315,6 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int){
  Gdiplus::GdiplusStartupInput graphicsInput;ULONG_PTR graphicsToken=0;
  if(Gdiplus::GdiplusStartup(&graphicsToken,&graphicsInput,nullptr)!=Gdiplus::Ok){if(instanceGuard)CloseHandle(instanceGuard);return 1;}
  winrt::init_apartment(winrt::apartment_type::single_threaded);
- int result=1;try {App app;result=app.run(instance);}catch(...){auto text=exceptionText();MessageBoxW(nullptr,text.c_str(),L"Vintage Cam",MB_OK|MB_ICONERROR);}
+ int result=1;try {App app;result=app.run(instance);}catch(...){auto text=exceptionText();MessageBoxW(nullptr,text.c_str(),L"Camera da Graci",MB_OK|MB_ICONERROR);}
  winrt::uninit_apartment();Gdiplus::GdiplusShutdown(graphicsToken);if(instanceGuard)CloseHandle(instanceGuard);return result;
 }

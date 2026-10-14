@@ -9,7 +9,7 @@ static fire_and_forget provide(DataRequestedEventArgs args,std::filesystem::path
  try {
   auto file=co_await winrt::Windows::Storage::StorageFile::GetFileFromPathAsync(path.wstring());
   auto items=single_threaded_vector<winrt::Windows::Storage::IStorageItem>();items.Append(file);
-  request.Data().Properties().Title(L"Foto · Vintage Cam");request.Data().Properties().Description(L"Revelada no dispositivo.");request.Data().SetStorageItems(items);
+  request.Data().Properties().Title(L"Foto · Camera da Graci");request.Data().Properties().Description(L"Revelada no dispositivo.");request.Data().SetStorageItems(items);
  }catch(...){request.FailWithDisplayText(L"Não foi possível compartilhar a foto. Verifique se o arquivo ainda existe.");}
  deferral.Complete();
 }

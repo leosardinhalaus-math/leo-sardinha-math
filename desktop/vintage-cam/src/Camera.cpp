@@ -49,7 +49,7 @@ static winrt::Windows::Foundation::IAsyncAction initializeOnUi(MediaCapture capt
  co_await ui;if(cancellation())throw hresult_canceled();co_await capture.InitializeAsync(settings);
 }
 void Camera::run() {
- init_apartment(apartment_type::multi_threaded);cameraLog(L"=== Vintage Cam 1.1: abertura de câmera ===");
+ init_apartment(apartment_type::multi_threaded);cameraLog(L"=== Camera da Graci 1.3: abertura de câmera ===");
  MediaCapture capture{nullptr};MediaFrameReader reader{nullptr};event_token token{},failToken{};
  bool subscribed=false,started=false,failedSubscribed=false;std::unique_ptr<CompatCamera> compatible;
  CameraStatus state;std::wstring deviceId,stage;bool paused=false;
