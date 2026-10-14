@@ -6,5 +6,6 @@ decltype(auto) waitCameraOperation(Operation const& operation,std::wstring_view 
  if(operation.wait_for(std::chrono::milliseconds(milliseconds))==winrt::Windows::Foundation::AsyncStatus::Started){
   operation.Cancel();throw winrt::hresult_error(HRESULT_FROM_WIN32(ERROR_TIMEOUT),winrt::hstring(L"A câmera não respondeu: "+std::wstring(stage)));
  }
- return operation.get();
+ // wait_for installs the completion delegate once. GetResults must not wait a second time.
+ return operation.GetResults();
 }

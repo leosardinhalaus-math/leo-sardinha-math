@@ -11,6 +11,8 @@
 #include <sstream>
 using namespace Microsoft::WRL;
 namespace {
+constexpr DWORD VideoStream=static_cast<DWORD>(MF_SOURCE_READER_FIRST_VIDEO_STREAM);
+constexpr DWORD AllStreams=static_cast<DWORD>(MF_SOURCE_READER_ALL_STREAMS);
 struct AsyncState {
  std::mutex mutex;std::condition_variable cv;ComPtr<IMFSample> sample;
  HRESULT status=S_OK;DWORD flags=0;bool delivered=false,flushed=false,active=true;
@@ -43,23 +45,23 @@ struct CompatCamera::Impl {
  void flush() {
   if(!reader)return;
   {std::lock_guard<std::mutex> lock(state->mutex);state->flushed=false;}
-  check(reader->Flush(MF_SOURCE_READER_FIRST_VIDEO_STREAM));
+  check(reader->Flush(VideoStream));
   std::unique_lock<std::mutex> lock(state->mutex);
   if(!state->cv.wait_for(lock,std::chrono::seconds(3),[&]{return state->flushed;}))throw std::runtime_error("O driver não respondeu à troca de resolução.");
   state->sample.Reset();state->delivered=false;state->status=S_OK;pending=false;
  }
  void dimensions() {
-  ComPtr<IMFMediaType> type;check(reader->GetCurrentMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM,&type));
+  ComPtr<IMFMediaType> type;check(reader->GetCurrentMediaType(VideoStream,&type));
   check(MFGetAttributeSize(type.Get(),MF_MT_FRAME_SIZE,&w,&h));UINT32 raw=0;
   if(SUCCEEDED(type->GetUINT32(MF_MT_DEFAULT_STRIDE,&raw)))stride=static_cast<LONG>(raw);
   else check(MFGetStrideForBitmapInfoHeader(MFVideoFormat_RGB32.Data1,w,&stride));
  }
  void configure(unsigned index,bool first=false) {
   if(!first)flush();
-  ComPtr<IMFMediaType> native;check(reader->GetNativeMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM,index,&native));
-  check(reader->SetCurrentMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM,nullptr,native.Get()));
+  ComPtr<IMFMediaType> native;check(reader->GetNativeMediaType(VideoStream,index,&native));
+  check(reader->SetCurrentMediaType(VideoStream,nullptr,native.Get()));
   ComPtr<IMFMediaType> rgb;check(MFCreateMediaType(&rgb));check(rgb->SetGUID(MF_MT_MAJOR_TYPE,MFMediaType_Video));check(rgb->SetGUID(MF_MT_SUBTYPE,MFVideoFormat_RGB32));
-  check(reader->SetCurrentMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM,nullptr,rgb.Get()));dimensions();waitingSince=GetTickCount64();
+  check(reader->SetCurrentMediaType(VideoStream,nullptr,rgb.Get()));dimensions();waitingSince=GetTickCount64();
  }
  Image pixels(IMFSample* sample) {
   ComPtr<IMFMediaBuffer> buffer;check(sample->ConvertToContiguousBuffer(&buffer));
@@ -82,7 +84,7 @@ CompatCamera::~CompatCamera(){close();}
 void CompatCamera::close()noexcept {
  auto& p=*impl;
  if(p.state){std::lock_guard<std::mutex> lock(p.state->mutex);p.state->active=false;}
- if(p.reader)p.reader->Flush(MF_SOURCE_READER_ALL_STREAMS);
+ if(p.reader)p.reader->Flush(AllStreams);
  if(p.source)p.source->Shutdown();
  p.reader.Reset();p.source.Reset();p.sink.Reset();p.state.reset();p.pending=false;p.photo=false;p.paused=false;p.modes.clear();p.count=0;
  if(p.startup){MFShutdown();p.startup=false;}
@@ -100,9 +102,9 @@ void CompatCamera::open(std::wstring const& deviceId,unsigned index) {
  ComPtr<IMFAttributes> options;check(MFCreateAttributes(&options,3));check(options->SetUnknown(MF_SOURCE_READER_ASYNC_CALLBACK,p.sink.Get()));
  check(options->SetUINT32(MF_SOURCE_READER_ENABLE_VIDEO_PROCESSING,TRUE));
  check(MFCreateSourceReaderFromMediaSource(p.source.Get(),options.Get(),&p.reader));
- check(p.reader->SetStreamSelection(MF_SOURCE_READER_ALL_STREAMS,FALSE));check(p.reader->SetStreamSelection(MF_SOURCE_READER_FIRST_VIDEO_STREAM,TRUE));
+ check(p.reader->SetStreamSelection(AllStreams,FALSE));check(p.reader->SetStreamSelection(VideoStream,TRUE));
  for(unsigned n=0;;n++) {
-  ComPtr<IMFMediaType> type;HRESULT hr=p.reader->GetNativeMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM,n,&type);
+  ComPtr<IMFMediaType> type;HRESULT hr=p.reader->GetNativeMediaType(VideoStream,n,&type);
   if(hr==MF_E_NO_MORE_TYPES)break;check(hr);UINT32 w=0,h=0,num=0,den=1;
   if(FAILED(MFGetAttributeSize(type.Get(),MF_MT_FRAME_SIZE,&w,&h))||!w||!h)continue;
   MFGetAttributeRatio(type.Get(),MF_MT_FRAME_RATE,&num,&den);p.modes.push_back({n,w,h,den?double(num)/den:0});
@@ -126,7 +128,7 @@ void CompatCamera::requestPhoto() {
 }
 std::shared_ptr<Image> CompatCamera::poll(bool& isPhoto) {
  auto& p=*impl;isPhoto=false;if(!p.reader||p.paused)return {};
- if(!p.pending){check(p.reader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM,0,nullptr,nullptr,nullptr,nullptr));p.pending=true;}
+ if(!p.pending){check(p.reader->ReadSample(VideoStream,0,nullptr,nullptr,nullptr,nullptr));p.pending=true;}
  ComPtr<IMFSample> sample;HRESULT status;DWORD flags;
  {std::unique_lock<std::mutex> lock(p.state->mutex);
   if(!p.state->cv.wait_for(lock,std::chrono::milliseconds(20),[&]{return p.state->delivered;})) {
