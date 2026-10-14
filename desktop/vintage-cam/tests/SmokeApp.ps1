@@ -18,7 +18,7 @@ try {
     if ($process.HasExited -or -not $process.Responding) { throw 'Application failed after opening.' }
     # Inspect the actual compiled native UI; no webcam or personal image is used.
     Add-Type -AssemblyName System.Drawing
-    Add-Type @'
+    Add-Type -ReferencedAssemblies 'System.Drawing','System' -TypeDefinition @'
 using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
