@@ -19,20 +19,22 @@ try {
     if (-not (Test-Path (Join-Path $cppwinrt 'winrt\Windows.Media.Capture.h'))) { throw 'Instale Windows SDK 10.0.22621 ou superior, incluindo os cabecalhos C++/WinRT.' }
     $out = Join-Path $PSScriptRoot 'dist'
     $obj = Join-Path $PSScriptRoot 'build'
+    $compilerLog = Join-Path $PSScriptRoot 'compiler-log.txt'
+    '' | Set-Content -Path $compilerLog
     New-Item -ItemType Directory -Force -Path $out,$obj | Out-Null
     $flags = @('/nologo','/std:c++20','/EHsc','/O2','/MP','/MT','/W4','/permissive-','/Zc:__cplusplus','/utf-8','/DUNICODE','/D_UNICODE','/DWINVER=0x0A00','/D_WIN32_WINNT=0x0A00',"/I$PSScriptRoot\src","/I$cppwinrt")
     $libs = @('windowsapp.lib','runtimeobject.lib','d3d11.lib','dxgi.lib','d3dcompiler.lib','windowscodecs.lib','shlwapi.lib','shell32.lib','ole32.lib','oleaut32.lib','user32.lib','gdi32.lib','advapi32.lib')
     Push-Location $obj
     try {
         Write-Host '1/3 Compilando o nucleo e o teste de dados...'
-        & cl.exe @flags "$PSScriptRoot\tests\CoreTests.cpp" "$PSScriptRoot\src\Film.cpp" "/Fe:$out\CoreTests.exe"
+        & cl.exe @flags "$PSScriptRoot\tests\CoreTests.cpp" "$PSScriptRoot\src\Film.cpp" "/Fe:$out\CoreTests.exe" 2>&1 | Tee-Object -FilePath $compilerLog -Append
         if ($LASTEXITCODE -ne 0) { throw 'Falha ao compilar CoreTests.' }
         Write-Host '2/3 Compilando o teste do shader real...'
-        & cl.exe @flags "$PSScriptRoot\tests\GpuTests.cpp" "$PSScriptRoot\src\Gpu.cpp" "$PSScriptRoot\src\ImageIO.cpp" "/Fe:$out\GpuTests.exe" /link @libs
+        & cl.exe @flags "$PSScriptRoot\tests\GpuTests.cpp" "$PSScriptRoot\src\Gpu.cpp" "$PSScriptRoot\src\ImageIO.cpp" "/Fe:$out\GpuTests.exe" /link @libs 2>&1 | Tee-Object -FilePath $compilerLog -Append
         if ($LASTEXITCODE -ne 0) { throw 'Falha ao compilar GpuTests.' }
         Write-Host '3/3 Compilando VintageCam.exe...'
         $sources = @('App.cpp','Camera.cpp','Gpu.cpp','ImageIO.cpp','Share.cpp') | ForEach-Object { Join-Path "$PSScriptRoot\src" $_ }
-        & cl.exe @flags @sources "/Fe:$out\VintageCam.exe" /link @libs /SUBSYSTEM:WINDOWS /MANIFEST:EMBED "/MANIFESTINPUT:$PSScriptRoot\app.manifest"
+        & cl.exe @flags @sources "/Fe:$out\VintageCam.exe" /link @libs /SUBSYSTEM:WINDOWS /MANIFEST:EMBED "/MANIFESTINPUT:$PSScriptRoot\app.manifest" 2>&1 | Tee-Object -FilePath $compilerLog -Append
         if ($LASTEXITCODE -ne 0) { throw 'Falha ao compilar VintageCam.' }
     } finally { Pop-Location }
     if (-not $SkipTests) {

@@ -55,6 +55,7 @@ jobs:
           name: VintageCam-build-log
           path: |
             desktop/vintage-cam/build-log.txt
+            desktop/vintage-cam/compiler-log.txt
             desktop/vintage-cam/smoke-output/smoke-result.txt
           if-no-files-found: warn
           retention-days: 7

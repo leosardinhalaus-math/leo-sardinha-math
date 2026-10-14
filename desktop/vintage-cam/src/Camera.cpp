@@ -10,12 +10,12 @@
 #include <cstring>
 #include <algorithm>
 using namespace winrt;
-using namespace Windows::Devices::Enumeration;
-using namespace Windows::Media::Capture;
-using namespace Windows::Media::Capture::Frames;
-using namespace Windows::Media::MediaProperties;
-using namespace Windows::Graphics::Imaging;
-using namespace Windows::Storage::Streams;
+using namespace winrt::Windows::Devices::Enumeration;
+using namespace winrt::Windows::Media::Capture;
+using namespace winrt::Windows::Media::Capture::Frames;
+using namespace winrt::Windows::Media::MediaProperties;
+using namespace winrt::Windows::Graphics::Imaging;
+using namespace winrt::Windows::Storage::Streams;
 struct __declspec(uuid("5B0D3235-4DBA-4D44-865E-8F1D0E4FD04D")) MemoryAccess : IUnknown {
  virtual HRESULT __stdcall GetBuffer(BYTE** value,UINT32* capacity)=0;
 };
@@ -38,7 +38,7 @@ Camera::Camera(std::function<void(std::shared_ptr<Image>)> f,std::function<void(
 void Camera::requestStop() {{std::lock_guard<std::mutex> lock(mutex);ending=true;commands.clear();}cv.notify_one();}
 Camera::~Camera() {requestStop();if(worker.joinable())worker.join();}
 void Camera::enqueue(Command c) {{std::lock_guard<std::mutex> lock(mutex);if(ending)return;commands.push_back(c);}cv.notify_one();}
-static Windows::Foundation::IAsyncAction initializeOnUi(MediaCapture capture,MediaCaptureInitializationSettings settings,apartment_context ui) {
+static winrt::Windows::Foundation::IAsyncAction initializeOnUi(MediaCapture capture,MediaCaptureInitializationSettings settings,apartment_context ui) {
  co_await ui;co_await capture.InitializeAsync(settings);
 }
 void Camera::run() {
