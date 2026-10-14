@@ -42,7 +42,7 @@ inline void draw(HDC dc,Icon icon,float x,float y,float size,COLORREF ink,COLORR
  case Icon::Delete:path({{6,7},{7,21},{17,21},{18,7}});line(3,6,21,6);path({{9,6},{9,3},{15,3},{15,6}});line(10,10,10,17);line(14,10,14,17);break;
  case Icon::Settings:{GraphicsPath gear;for(int i=0;i<32;i++){float angle=float(i)*3.14159265f/16.f;float radius=(i%4==1||i%4==2)?10.f:8.f;PointF point(12+std::cos(angle)*radius,12+std::sin(angle)*radius);if(i==0)gear.StartFigure();else {float prev=float(i-1)*3.14159265f/16.f;float pr=((i-1)%4==1||(i-1)%4==2)?10.f:8.f;gear.AddLine(PointF(12+std::cos(prev)*pr,12+std::sin(prev)*pr),point);}}gear.CloseFigure();g.DrawPath(&p,&gear);circle(12,12,3.2f,&a);break;}
  case Icon::Retry:g.DrawArc(&p,3.f,3.f,18.f,18.f,40.f,290.f);path({{15,2},{20,3},{19,8}},&a);break;
- case Icon::Error:box(5,2,14,20,2);line(9,7,15,7);line(12,10,12,15,&a);g.FillEllipse(&solid,11.2f,17,1.6f,1.6f);break;
+ case Icon::Error:box(5,2,14,20,2);line(9,7,15,7);line(12,10,12,15,&a);g.FillEllipse(&solid,11.2f,17.f,1.6f,1.6f);break;
  default:break;
  }
 }
