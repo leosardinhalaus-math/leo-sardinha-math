@@ -51,3 +51,11 @@ O usuário relatou que a câmera não abriu na versão 1.0. Não foi fornecido o
 Passaram os testes Windows de buffers de câmera com padding/stride negativo, bounds/alpha e seleção de 29,97 FPS; conclusão de operações assíncronas, timeout e propagação de cancelamento; shader dos nove filmes e abertura/fechamento sem webcam. O teste de timeout detectou a tentativa inválida de atribuir um segundo delegate de conclusão; a correção usa GetResults após wait_for e passou na nova execução.
 
 Ainda é necessário abrir a câmera real no notebook. VER ERRO permite obter o diagnóstico do dispositivo caso a falha persista. Não se afirma que a causa específica do usuário foi reproduzida ou confirmada.
+
+## Ícones 1.2
+
+Compilação MSVC x64 e todos os testes existentes aprovados na execução https://github.com/leosardinhalaus-math/leo-sardinha-math/actions/runs/38609653213 (código `9aba73bc4d52620fa2bf94eb1947e246a9421c43`). SHA-256 do EXE: `79699f641a6777ab9e2454158552a16a3667c3e3e3d65b6bb79e1baf6071a4c8`.
+
+O teste de janela carregou os ícones grande e pequeno dos recursos embutidos no EXE, percorreu os nove filmes, abriu o rolo e encerrou com código zero. Foram inspecionadas as capturas reais `camera.png`, `film-0.png` a `film-8.png` e `roll.png`: os vetores, as cores e os rótulos cabem nos controles. A conferência inclui uma janela reduzida para a área de trabalho do runner; não substitui testar todos os fatores de escala em monitores físicos.
+
+O ícone `.ico` inclui 16, 24, 32, 48, 64, 128 e 256 pixels. Os vetores da interface usam GDI+ do Windows, sem fonte de símbolos ou pacote de terceiros. O processamento de filme continua passando os testes do shader de produção.
