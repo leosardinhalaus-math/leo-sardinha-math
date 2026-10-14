@@ -4,7 +4,7 @@ Câmera de fotografia com nove filmes, interface própria em português e proces
 
 **Estado da entrega:** aplicativo compilado com MSVC no Windows Server 2022. Os testes do shader real, dos nove filmes e de abrir/fechar a janela passaram. A captura com webcam física e o FPS sustentado ainda precisam ser medidos no dispositivo. O pacote executável portátil é separado do projeto-fonte; não exige Visual Studio para rodar.
 
-Compilação validada: [execução Windows de 14/10/2026](https://github.com/leosardinhalaus-math/leo-sardinha-math/actions/runs/38578295419), código `194026bfa4da0b9344c3b271c65cecc237b922fa`.
+Compilação validada: [execução Windows de 14/10/2026](https://github.com/leosardinhalaus-math/leo-sardinha-math/actions/runs/38604122601), código `01d4f1884106ae446252943e6ec6d653cce90aed`.
 
 ## Como compilar e abrir
 
@@ -29,6 +29,16 @@ ctest --test-dir build-vs -C Release --output-on-failure
 ```
 
 A pasta `.github/workflows` contém uma compilação opcional para um repositório seu. Ela compila no Windows, executa os testes e publica um artefato com o EXE. Nenhum repositório foi criado nem nenhuma execução remota foi acionada nesta entrega. Isso é uma ferramenta de desenvolvimento; o aplicativo não usa GitHub nem rede em execução.
+
+## Correção de câmera · versão 1.1
+
+A abertura agora reenumera os dispositivos em cada tentativa e seleciona o grupo RGB quando o driver o informa. A verificação de permissão é feita pela API de captura do Windows; uma consulta prévia destinada a outro modelo de aplicativo não interrompe mais a abertura. Flash, resolução fotográfica e formatos opcionais recusados são registrados, sem impedir o visor.
+
+Quando MediaCapture falha ou não entrega imagens, há um backend alternativo local baseado em Media Foundation. Use **ABRIR CÂMERA**, **TROCAR CÂMERA** ou **COMPATÍVEL**. A captura nesse backend muda temporariamente para o maior formato de vídeo nativo aceito pelo driver e volta à resolução de preview depois de adquirir a foto. Isso preserva os pixels disponíveis nesse formato; não garante a resolução de um fluxo Photo independente que o driver não expõe. Flash físico só é anunciado quando o backend utilizado suporta esse controle.
+
+As operações assíncronas de abertura têm tempo máximo de espera e cancelamento. **VER ERRO** abre `%LOCALAPPDATA%/VintageCam/camera-log.txt`, com etapas, códigos de erro, dispositivos encontrados e recebimento do primeiro quadro. O registro é local e não inclui imagens. Se não abrir, compartilhe voluntariamente o texto desse registro para diagnóstico. Feche a versão anterior antes de abrir o novo EXE, pois só uma instância do aplicativo pode usar a câmera.
+
+Os testes adicionados cobrem padding, stride negativo, limites do buffer, alpha, priorização de 29,97 FPS e espera assíncrona com timeout/cancelamento. Esses testes não substituem uma webcam física.
 
 ## Usar
 
@@ -74,7 +84,7 @@ Se o dispositivo gráfico falhar na criação, há fallback Direct3D WARP por so
 
 ### Captura original
 
-A captura utiliza `CapturePhotoToStreamAsync`, e não uma cópia do último quadro do visor. Os formatos nativos do fluxo Photo são ordenados por área, e o maior aceito em conjunto com o preview é selecionado. O JPEG da câmera é decodificado, passa pelo mesmo shader na sua resolução original e é gravado em PNG, sem a redução usada no visor. A captura e a exportação usam o filme, o espelhamento e a data congelados no momento do clique.
+No backend MediaCapture, a captura utiliza `CapturePhotoToStreamAsync`, e não uma cópia do último quadro do visor. Os formatos nativos do fluxo Photo são ordenados por área, e o maior aceito em conjunto com o preview é selecionado. O JPEG da câmera é decodificado, passa pelo mesmo shader na sua resolução original e é gravado em PNG, sem a redução usada no visor. A captura e a exportação usam o filme, o espelhamento e a data congelados no momento do clique.
 
 "Resolução do sensor" depende do que o driver oferece. Uma webcam pode expor somente 1920×1080, mesmo se o sensor tiver mais pixels; câmeras sem fluxo Photo independente podem usar a resolução fotográfica padrão do driver. O programa não inventa resolução por ampliação. Os formatos efetivamente anunciados aparecem na linha de status; as dimensões reais da foto aparecem após revelar. Fotos importadas preservam as dimensões depois da orientação EXIF. Imagens acima de 16384 pixels em qualquer eixo são rejeitadas, em conformidade com o limite de textura adotado.
 

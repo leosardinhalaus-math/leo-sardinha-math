@@ -23,11 +23,11 @@ A primeira entrega foi criada em Linux. Após autorização, o projeto foi compi
 
 `tests/GpuTests.cpp` executou o **shader de produção**: imagem fixa por nove filmes, oito repetições idênticas para cada filme, grão, data VHS, espelhamento, resolução, retrato e PNG. `tests/SmokeApp.ps1` confirmou que o EXE abre uma janela responsiva e fecha com código zero sem câmera conectada.
 
-Execução: https://github.com/leosardinhalaus-math/leo-sardinha-math/actions/runs/38578295419
+Execução: https://github.com/leosardinhalaus-math/leo-sardinha-math/actions/runs/38604122601
 
-Código compilado: `194026bfa4da0b9344c3b271c65cecc237b922fa`.
+Código compilado: `01d4f1884106ae446252943e6ec6d653cce90aed`.
 
-SHA-256 do EXE: `efab5a236cf541efbb40433cf33cc081dcd1be37589dad9f039d8160f96b4415`.
+SHA-256 do EXE: `8ea12c5a918046c3751e40375880c6f86bb854ef495b15de94780ff65a990f9c`.
 
 ## Validação necessária no Windows
 
@@ -43,3 +43,11 @@ SHA-256 do EXE: `efab5a236cf541efbb40433cf33cc081dcd1be37589dad9f039d8160f96b441
 10. Testar em escalas de tela de 100%, 125%, 150% e em um notebook de 1366×768. A janela deve permanecer em retrato, com os controles acessíveis.
 
 Esses são procedimentos de aceitação a executar; não são resultados já observados.
+
+## Correção 1.1 de abertura da câmera
+
+O usuário relatou que a câmera não abriu na versão 1.0. Não foi fornecido o erro do notebook, e não houve reprodução com uma webcam física. A versão 1.1 remove a checagem prévia de permissão inadequada ao fluxo desktop, torna controles opcionais não fatais, seleciona grupos RGB e tenta formatos alternativos. Ela acrescenta Media Foundation como caminho compatível, reenumeração, limite de espera e registro dos erros de inicialização e quadros.
+
+Passaram os testes Windows de buffers de câmera com padding/stride negativo, bounds/alpha e seleção de 29,97 FPS; conclusão de operações assíncronas, timeout e propagação de cancelamento; shader dos nove filmes e abertura/fechamento sem webcam. O teste de timeout detectou a tentativa inválida de atribuir um segundo delegate de conclusão; a correção usa GetResults após wait_for e passou na nova execução.
+
+Ainda é necessário abrir a câmera real no notebook. VER ERRO permite obter o diagnóstico do dispositivo caso a falha persista. Não se afirma que a causa específica do usuário foi reproduzida ou confirmada.
