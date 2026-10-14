@@ -1,4 +1,4 @@
-#include "Share.h"
+#include "VCShare.h"
 #include <shobjidl.h>
 #include <winrt/Windows.Storage.h>
 #include <winrt/Windows.Foundation.Collections.h>

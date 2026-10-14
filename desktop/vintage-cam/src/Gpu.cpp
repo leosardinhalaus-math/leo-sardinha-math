@@ -1,5 +1,5 @@
-#include "Gpu.h"
-#include "Shader.h"
+#include "VCGpu.h"
+#include "VCShader.h"
 #include <d3dcompiler.h>
 #include <cstring>
 #include <string>

@@ -1,4 +1,4 @@
-#include "Gpu.h"
+#include "VCGpu.h"
 #include <iostream>
 #include <algorithm>
 #include <cmath>

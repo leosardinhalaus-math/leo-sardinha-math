@@ -1,5 +1,5 @@
 #pragma once
-#include "Platform.h"
+#include "VCPlatform.h"
 #include <d3d11.h>
 #include <dxgi.h>
 class Gpu {

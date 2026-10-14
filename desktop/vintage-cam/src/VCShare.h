@@ -1,5 +1,5 @@
 #pragma once
-#include "Platform.h"
+#include "VCPlatform.h"
 #include <winrt/Windows.ApplicationModel.DataTransfer.h>
 class Share {
  winrt::Windows::ApplicationModel::DataTransfer::DataTransferManager manager{nullptr};

@@ -1,4 +1,4 @@
-#include "Platform.h"
+#include "VCPlatform.h"
 #include <wincodec.h>
 #include <shlobj.h>
 #include <shlwapi.h>

@@ -20,7 +20,7 @@ try {
     $out = Join-Path $PSScriptRoot 'dist'
     $obj = Join-Path $PSScriptRoot 'build'
     New-Item -ItemType Directory -Force -Path $out,$obj | Out-Null
-    $flags = @('/nologo','/std:c++20','/EHsc','/O2','/MT','/W4','/permissive-','/Zc:__cplusplus','/utf-8','/DUNICODE','/D_UNICODE','/DWINVER=0x0A00','/D_WIN32_WINNT=0x0A00',"/I$PSScriptRoot\src","/I$cppwinrt")
+    $flags = @('/nologo','/std:c++20','/EHsc','/O2','/MP','/MT','/W4','/permissive-','/Zc:__cplusplus','/utf-8','/DUNICODE','/D_UNICODE','/DWINVER=0x0A00','/D_WIN32_WINNT=0x0A00',"/I$PSScriptRoot\src","/I$cppwinrt")
     $libs = @('windowsapp.lib','runtimeobject.lib','d3d11.lib','dxgi.lib','d3dcompiler.lib','windowscodecs.lib','shlwapi.lib','shell32.lib','ole32.lib','oleaut32.lib','user32.lib','gdi32.lib','advapi32.lib')
     Push-Location $obj
     try {

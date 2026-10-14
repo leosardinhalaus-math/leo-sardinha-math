@@ -1,5 +1,5 @@
 #pragma once
-#include "Platform.h"
+#include "VCPlatform.h"
 #include <functional>
 #include <mutex>
 #include <condition_variable>

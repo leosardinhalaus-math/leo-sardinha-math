@@ -24,6 +24,10 @@ jobs:
         shell: powershell
         working-directory: desktop/vintage-cam
         run: ./build.ps1
+      - name: Open and close native application
+        shell: powershell
+        working-directory: desktop/vintage-cam
+        run: ./tests/SmokeApp.ps1
       - name: Package executable for download
         if: success()
         shell: powershell
@@ -49,6 +53,8 @@ jobs:
         if: always()
         with:
           name: VintageCam-build-log
-          path: desktop/vintage-cam/build-log.txt
+          path: |
+            desktop/vintage-cam/build-log.txt
+            desktop/vintage-cam/smoke-output/smoke-result.txt
           if-no-files-found: warn
           retention-days: 7

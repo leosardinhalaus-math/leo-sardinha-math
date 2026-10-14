@@ -90,7 +90,7 @@ A captura utiliza `CapturePhotoToStreamAsync`, e não uma cópia do último quad
 
 ## Adicionar um filme
 
-Edite `src/Film.h`. Cada entrada é uma `Film`:
+Edite `src/VCFilm.h`. Cada entrada é uma `Film`:
 
 ```cpp
 {L"meu_filme", L"MEU FILME", L"Descrição curta",
@@ -121,8 +121,8 @@ Em Linux/macOS, `sh tests/run_portable.sh` compila e executa apenas o teste port
 |---|---|
 | `src/App.cpp` | Interface Win32/GDI, estado, carrossel, importação e rolo |
 | `src/Camera.cpp` | MediaCapture, negociação, frames e fotografia |
-| `src/Film.h` | Definição de dados e os nove filmes |
-| `src/Shader.h` | Pipeline HLSL único de visor e foto |
+| `src/VCFilm.h` | Definição de dados e os nove filmes |
+| `src/VCShader.h` | Pipeline HLSL único de visor e foto |
 | `src/Gpu.cpp` | Direct3D, renderização e readback em resolução original |
 | `src/ImageIO.cpp` | WIC, orientação EXIF, PNG e pastas locais |
 | `src/Share.cpp` | Painel de compartilhamento do Windows |

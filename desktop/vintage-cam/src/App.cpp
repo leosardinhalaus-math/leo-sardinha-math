@@ -1,6 +1,6 @@
-#include "Gpu.h"
-#include "Camera.h"
-#include "Share.h"
+#include "VCGpu.h"
+#include "VCCamera.h"
+#include "VCShare.h"
 #include <windowsx.h>
 #include <shobjidl.h>
 #include <shellapi.h>

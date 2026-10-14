@@ -1,4 +1,4 @@
-#include "Camera.h"
+#include "VCCamera.h"
 #include <winrt/Windows.Devices.Enumeration.h>
 #include <winrt/Windows.Media.Capture.h>
 #include <winrt/Windows.Media.Capture.Frames.h>

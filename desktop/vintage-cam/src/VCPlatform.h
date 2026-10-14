@@ -7,7 +7,7 @@
 #include <winrt/base.h>
 #include <winrt/Windows.Foundation.h>
 #include <winrt/Windows.Foundation.Collections.h>
-#include "Film.h"
+#include "VCFilm.h"
 #include <filesystem>
 #include <memory>
 using Microsoft::WRL::ComPtr;
