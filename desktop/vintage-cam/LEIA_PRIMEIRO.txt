@@ -25,8 +25,8 @@ A compilação Windows e o teste gráfico ainda precisam ser executados no Windo
 
 Sem webcam? A função IMPORTAR continua disponível.
 
-IMPORTANTE
-O ambiente em que este pacote foi criado é Linux e não tem o SDK Windows.
-Os testes portáveis passaram; a compilação MSVC, o teste Direct3D e o teste
-com webcam física NÃO foram executados. Não trate esta entrega como um
-executável validado. O README e docs/VALIDACAO.md detalham o estado.
+VALIDAÇÃO
+O projeto foi compilado em Windows Server 2022. Os testes portáteis, os testes
+do shader real e o teste de abrir/fechar a janela passaram. A captura física
+com webcam e o desempenho precisam de teste no seu computador.
+O pacote executável portátil é separado deste projeto-fonte.

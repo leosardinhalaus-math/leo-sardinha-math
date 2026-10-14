@@ -13,15 +13,21 @@ Data: 14/10/2026.
 | Repetibilidade da referência CPU para os nove filmes | Aprovada: vinte repetições por filme |
 | Rejeição de buffer com dimensões incompatíveis | Aprovada |
 | AddressSanitizer e UndefinedBehaviorSanitizer na suíte portátil | Aprovada, com detecção de vazamentos desativada devido à restrição de `/proc` deste ambiente |
-| Compilação do aplicativo usando MSVC e Windows SDK | **Não executada** |
-| Compilação e execução do HLSL de produção no Direct3D | **Não executada** |
+| Compilação do aplicativo usando MSVC e Windows SDK | Aprovada no Windows Server 2022 |
+| Compilação e execução do HLSL de produção no Direct3D | Aprovada em WARP e no backend padrão com fallback |
 | Teste de câmera e captura nativa em resolução máxima | **Não executado** |
 | FPS sustentado e inspeção visual em webcam | **Não medidos** |
 | Painel de compartilhamento e permissões do Windows | **Não exercitados** |
 
-O ambiente disponível é Linux, sem MSVC, Windows SDK, Direct3D ou webcam Windows. O teste portátil não pode provar que as APIs de câmera, a interface ou o shader compilam e funcionam no Windows. Não há binário Windows validado nesta entrega.
+A primeira entrega foi criada em Linux. Após autorização, o projeto foi compilado pelo GitHub Actions em Windows Server 2022. O teste portátil, o teste do shader de produção e o teste de abertura e encerramento da janela passaram. A máquina de compilação não tem webcam; a captura física não foi testada.
 
-`tests/GpuTests.cpp` contém os testes de determinismo do **pipeline de produção**. Eles serão compilados e executados automaticamente por `build.ps1` no Windows. O resultado acima não antecipa a aprovação deles.
+`tests/GpuTests.cpp` executou o **shader de produção**: imagem fixa por nove filmes, oito repetições idênticas para cada filme, grão, data VHS, espelhamento, resolução, retrato e PNG. `tests/SmokeApp.ps1` confirmou que o EXE abre uma janela responsiva e fecha com código zero sem câmera conectada.
+
+Execução: https://github.com/leosardinhalaus-math/leo-sardinha-math/actions/runs/38578295419
+
+Código compilado: `194026bfa4da0b9344c3b271c65cecc237b922fa`.
+
+SHA-256 do EXE: `efab5a236cf541efbb40433cf33cc081dcd1be37589dad9f039d8160f96b4415`.
 
 ## Validação necessária no Windows
 

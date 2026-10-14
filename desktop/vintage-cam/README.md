@@ -2,7 +2,9 @@
 
 Câmera de fotografia com nove filmes, interface própria em português e processamento local. Projeto nativo C++20/Win32 para Windows 10 2004+ e Windows 11 x64. Não é uma cópia da identidade, dos recursos ou do código do Dazz Cam.
 
-**Estado da entrega:** código-fonte implementado; testes portáveis executados e aprovados. A compilação MSVC, os testes do shader Direct3D e os testes com câmera física **ainda não foram executados**, porque o ambiente de criação é Linux sem Windows SDK. Este pacote não inclui um EXE pré-compilado. Não há garantia de 30 FPS em hardware ainda não medido.
+**Estado da entrega:** aplicativo compilado com MSVC no Windows Server 2022. Os testes do shader real, dos nove filmes e de abrir/fechar a janela passaram. A captura com webcam física e o FPS sustentado ainda precisam ser medidos no dispositivo. O pacote executável portátil é separado do projeto-fonte; não exige Visual Studio para rodar.
+
+Compilação validada: [execução Windows de 14/10/2026](https://github.com/leosardinhalaus-math/leo-sardinha-math/actions/runs/38578295419), código `194026bfa4da0b9344c3b271c65cecc237b922fa`.
 
 ## Como compilar e abrir
 
