@@ -59,3 +59,9 @@ Compilação MSVC x64 e todos os testes existentes aprovados na execução https
 O teste de janela carregou os ícones grande e pequeno dos recursos embutidos no EXE, percorreu os nove filmes, abriu o rolo e encerrou com código zero. Foram inspecionadas as capturas reais `camera.png`, `film-0.png` a `film-8.png` e `roll.png`: os vetores, as cores e os rótulos cabem nos controles. A conferência inclui uma janela reduzida para a área de trabalho do runner; não substitui testar todos os fatores de escala em monitores físicos.
 
 O ícone `.ico` inclui 16, 24, 32, 48, 64, 128 e 256 pixels. Os vetores da interface usam GDI+ do Windows, sem fonte de símbolos ou pacote de terceiros. O processamento de filme continua passando os testes do shader de produção.
+
+## Nome Camera da Graci · versão 1.3
+
+Compilação MSVC x64 e todas as suítes Windows aprovadas na execução https://github.com/leosardinhalaus-math/leo-sardinha-math/actions/runs/38613826283 (código `5723a61337ee8a791ec80363520eb4fce9f29d0e`). SHA-256 de `CameraDaGraci.exe`: `037ab0305e6af24b7a0c0ae0651c8063d90452f9bebd0c5ed6f61b6406ccddd7`.
+
+O teste de abertura exigiu uma janela cujo título começa com `Camera da Graci 1.3`, verificou os ícones, percorreu os nove filmes e encerrou com código zero. A captura real `camera.png` confirmou o novo cabeçalho e título sem comprometer os controles. O rolo privado e os diagnósticos mantêm os caminhos internos anteriores; novas cópias em Imagens usam `Camera da Graci`. A captura física segue dependendo de teste com webcam.

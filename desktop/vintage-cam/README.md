@@ -4,7 +4,7 @@ Câmera de fotografia com nove filmes, interface própria em português e proces
 
 **Estado da entrega:** aplicativo compilado com MSVC no Windows Server 2022. Os testes do shader real, dos nove filmes e de abrir/fechar a janela passaram. A captura com webcam física e o FPS sustentado ainda precisam ser medidos no dispositivo. O pacote executável portátil é separado do projeto-fonte; não exige Visual Studio para rodar.
 
-Compilação validada: [execução Windows de 14/10/2026](https://github.com/leosardinhalaus-math/leo-sardinha-math/actions/runs/38609653213), código `9aba73bc4d52620fa2bf94eb1947e246a9421c43`.
+Compilação validada: [execução Windows de 14/10/2026](https://github.com/leosardinhalaus-math/leo-sardinha-math/actions/runs/38613826283), código `5723a61337ee8a791ec80363520eb4fce9f29d0e`.
 
 ## Como compilar e abrir
 
