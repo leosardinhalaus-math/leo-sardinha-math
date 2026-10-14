@@ -38,7 +38,7 @@ class App {
  enum class Page {Camera,Develop,Roll,Photo};Page page=Page::Camera;
  unsigned selected=3,pendingFilm=3,pendingDate=0;
  bool flash=false,mirror=false,pendingMirror=false,busy=false,dirty=true,dragging=false,shutterHeld=false,minimized=false;
- bool rendering=true;
+ bool rendering=true,fallbackAttempted=false;
  double carousel=3,dragStartCarousel=3;int dragStartX=0;
  uint64_t lastFrameTick=0,animationUntil=0,lastFpsTick=0;unsigned fpsCounter=0;double fps=0;
  float scale=1;std::wstring notice=L"Tudo fica neste dispositivo.";
@@ -50,6 +50,12 @@ class App {
  void stopIo(){if(ioWorker.joinable())ioWorker.join();}
  void startIo(std::function<void()> f){stopIo();ioDone=false;ioWorker=std::thread([this,f=std::move(f)]{winrt::init_apartment(winrt::apartment_type::multi_threaded);f();winrt::uninit_apartment();ioDone=true;});}
  void setFilm(unsigned n){n=std::min(n,unsigned(Films.size()-1));if(selected!=n){selected=n;dirty=true;haptic();}invalidate();}
+ void showCameraError(){auto log=cameraLogPath();cameraLog(L"Diagnóstico aberto pelo usuário.");ShellExecuteW(window,L"open",log.c_str(),nullptr,nullptr,SW_SHOWNORMAL);}
+ void reopenCamera(bool compatibility,unsigned index){
+  if(busy||closing)return;currentFrame.reset();gpu.clear();{std::lock_guard<std::mutex> lock(frameMutex);latestFrame.reset();}
+  lastFrameTick=GetTickCount64();fallbackAttempted=compatibility;cameraStatus.ready=false;ShowWindow(view,SW_HIDE);notice=L"Tentando abrir a câmera…";
+  if(compatibility)camera->useCompatible(index);else camera->switchDevice(index);invalidate();
+ }
  void settings(){ShellExecuteW(window,L"open",L"ms-settings:privacy-webcam",nullptr,nullptr,SW_SHOWNORMAL);}
  void refreshRoll(){
   photos.clear();thumbnails.clear();rollSelection=-1;
@@ -60,7 +66,7 @@ class App {
  void showRoll(){if(busy)return;camera->pause();page=Page::Roll;ShowWindow(view,SW_HIDE);refreshRoll();}
  void leaveRoll(){
   page=importFull?Page::Develop:Page::Camera;ShowWindow(view,SW_SHOW);dirty=true;
-  if(page==Page::Camera){currentFrame.reset();{std::lock_guard<std::mutex> lock(frameMutex);latestFrame.reset();}gpu.clear();camera->resume();}else {currentFrame=importPreview;}
+  if(page==Page::Camera){currentFrame.reset();{std::lock_guard<std::mutex> lock(frameMutex);latestFrame.reset();}gpu.clear();lastFrameTick=GetTickCount64();camera->resume();}else {currentFrame=importPreview;}
   invalidate();
  }
  void openImport(){
@@ -95,7 +101,7 @@ class App {
   notice=L"Revelando em resolução original…";animationUntil=GetTickCount64()+180;haptic();invalidate();
   if(page==Page::Develop)exportImage(importFull);else camera->photo(flash&&cameraStatus.flashSupported);
  }
- void backToCamera(){if(busy)return;importFull.reset();importPreview.reset();currentFrame.reset();{std::lock_guard<std::mutex> lock(frameMutex);latestFrame.reset();}gpu.clear();page=Page::Camera;camera->resume();dirty=true;notice=L"Tudo fica neste dispositivo.";invalidate();}
+ void backToCamera(){if(busy)return;importFull.reset();importPreview.reset();currentFrame.reset();{std::lock_guard<std::mutex> lock(frameMutex);latestFrame.reset();}gpu.clear();page=Page::Camera;lastFrameTick=GetTickCount64();camera->resume();dirty=true;notice=L"Tudo fica neste dispositivo.";invalidate();}
  void rollAction(int action){
   if(rollSelection<0||size_t(rollSelection)>=photos.size()) {notice=L"Selecione uma fotografia.";invalidate();return;}
   auto path=photos[size_t(rollSelection)];
@@ -144,11 +150,19 @@ class App {
   }else {
    if(page==Page::Develop)button(dc,L"‹ CÂMERA",24,73,135,!busy);
    else button(dc,cameraStatus.flashSupported?(flash?L"FLASH LIGADO":L"FLASH DESLIG."):L"FLASH N/D",24,73,135,cameraStatus.flashSupported&&!busy);
-   button(dc,L"TROCAR CÂMERA",291,73,165,page==Page::Camera&&cameraStatus.count>1&&!busy);
+   button(dc,cameraStatus.count>1?L"TROCAR CÂMERA":L"ABRIR CÂMERA",291,73,165,page==Page::Camera&&!busy);
+   if(page==Page::Camera&&!cameraStatus.ready){
+    rounded(dc,24,126,432,398,RGB(26,28,27),RGB(51,53,48));
+    text(dc,L"AGUARDANDO A CÂMERA",48,237,384,42,19,Cream,DT_CENTER|DT_SINGLELINE|DT_VCENTER,true);
+    text(dc,cameraStatus.text.empty()?L"Inicializando…":cameraStatus.text,48,285,384,60,13,Muted,DT_CENTER|DT_WORDBREAK);
+    button(dc,L"ABRIR CÂMERA",150,362,180,!busy);
+    text(dc,L"A importação de fotos continua disponível.",48,425,384,35,12,Muted,DT_CENTER|DT_WORDBREAK);
+   }
    auto status=page==Page::Develop?L"IMPORTADA · PRONTA PARA REVELAR":cameraStatus.text;
    text(dc,status,24,536,432,37,11,Muted,DT_LEFT|DT_WORDBREAK);
    if(page==Page::Camera){std::wostringstream s;s<<std::fixed<<std::setprecision(0)<<fps<<L" FPS · "<<(mirror?L"ESPELHADA":L"ORIGINAL");text(dc,s.str(),24,575,210,22,10,Muted);}
    else text(dc,L"Escolha um filme abaixo para visualizar.",24,575,432,22,11,Muted);
+   if(page==Page::Camera){button(dc,L"COMPATÍVEL",264,566,100,!busy&&!cameraStatus.compatible);button(dc,L"VER ERRO",370,566,86);}
    // Carousel cards follow pointer while dragging and ease to the selected center.
    for(unsigned n=0;n<Films.size();n++) {
     int x=int(240+(double(n)-carousel)*128-59);if(x+118<0||x>480)continue;
@@ -175,13 +189,15 @@ class App {
   else if(!dragging&&carousel!=selected){carousel=selected;invalidate();}
   if(animationUntil&&now>=animationUntil){animationUntil=0;invalidate();}
   bool newFrame=false;
-  if(page==Page::Camera){std::lock_guard<std::mutex> lock(frameMutex);if(latestFrame){currentFrame=std::move(latestFrame);newFrame=true;lastFrameTick=now;}}
+  if(page==Page::Camera){std::lock_guard<std::mutex> lock(frameMutex);if(latestFrame){if(cameraStatus.ready){currentFrame=std::move(latestFrame);newFrame=true;lastFrameTick=now;}else latestFrame.reset();}}
   if((page==Page::Camera||page==Page::Develop||page==Page::Photo)&&currentFrame&&(newFrame||dirty)) {
    try {gpu.preview(*currentFrame,page==Page::Photo?Films[0]:Films[selected],1979,today(),page==Page::Camera&&mirror);dirty=false;if(newFrame)fpsCounter++;}
    catch(...){rendering=false;notice=L"Renderização interrompida: "+exceptionText()+L" Reabra o aplicativo.";invalidate();}
   }
   if(now-lastFpsTick>=1000){fps=double(fpsCounter)*1000/(now-lastFpsTick);fpsCounter=0;lastFpsTick=now;
-   if(page==Page::Camera&&cameraStatus.ready&&lastFrameTick&&now-lastFrameTick>5000)notice=L"Sem quadros. Feche outros apps e tente Trocar câmera.";
+   if(page==Page::Camera&&cameraStatus.ready&&lastFrameTick&&now-lastFrameTick>4000&&!busy&&!cameraStatus.compatible&&!fallbackAttempted){
+    cameraLog(L"Visor MediaCapture sem quadros: ativando modo compatível.");reopenCamera(true,cameraStatus.index);
+   }
    invalidate();}
  }
  void down(int x,int y){
@@ -208,12 +224,13 @@ class App {
    if(inside(x,y,350,718,106,38))rollAction(2);return;
   }
   if(page==Page::Photo){if(inside(x,y,24,73,110,38)){page=Page::Roll;ShowWindow(view,SW_HIDE);invalidate();}if(inside(x,y,300,73,156,38))share.show(window,viewedPhoto);return;}
-  if(inside(x,y,420,815,36,36)){settings();return;}if(busy)return;
+  if(inside(x,y,420,815,36,36)){settings();return;}if(busy){if(page==Page::Camera&&inside(x,y,370,566,86,38))showCameraError();return;}
   if(inside(x,y,24,73,135,38)){if(page==Page::Develop)backToCamera();else if(cameraStatus.flashSupported){flash=!flash;invalidate();}}
-  if(inside(x,y,291,73,165,38)&&page==Page::Camera){
-   currentFrame.reset();gpu.clear();{std::lock_guard<std::mutex> lock(frameMutex);latestFrame.reset();}lastFrameTick=0;cameraStatus.ready=false;
-   if(cameraStatus.count>1){camera->switchDevice((cameraStatus.index+1)%cameraStatus.count);}
-   else camera->switchDevice(cameraStatus.index);invalidate();
+  if(page==Page::Camera){
+   if(inside(x,y,291,73,165,38)){auto next=cameraStatus.count>1?(cameraStatus.index+1)%cameraStatus.count:cameraStatus.index;reopenCamera(false,next);return;}
+   if(!cameraStatus.ready&&inside(x,y,150,362,180,38)){reopenCamera(false,cameraStatus.index);return;}
+   if(inside(x,y,264,566,100,38)){reopenCamera(true,cameraStatus.index);return;}
+   if(inside(x,y,370,566,86,38)){showCameraError();return;}
   }
   if(inside(x,y,24,739,125,38))openImport();
   if(inside(x,y,331,739,125,38))showRoll();
@@ -223,7 +240,7 @@ class App {
   if(result->kind==JobResult::Kind::Imported){importFull=result->full;importPreview=result->preview;currentFrame=importPreview;page=Page::Develop;busy=false;dirty=true;notice=L"O original será preservado. Revele quantas versões quiser.";}
   if(result->kind==JobResult::Kind::Shot){exportImage(result->full);}
   if(result->kind==JobResult::Kind::Saved){busy=false;notice=result->text;}
-  if(result->kind==JobResult::Kind::Error){busy=false;notice=result->text;if(page==Page::Camera)camera->resume();MessageBoxW(window,notice.c_str(),L"Vintage Cam",MB_OK|MB_ICONWARNING);}
+  if(result->kind==JobResult::Kind::Error){busy=false;notice=result->text;if(page==Page::Camera){lastFrameTick=GetTickCount64();camera->resume();}MessageBoxW(window,notice.c_str(),L"Vintage Cam",MB_OK|MB_ICONWARNING);}
   invalidate();
  }
  LRESULT message(UINT msg,WPARAM wp,LPARAM lp){
@@ -237,7 +254,7 @@ class App {
       [this](CameraStatus s){deliver(window,StatusMessage,new CameraStatus(std::move(s)));});
      lastFpsTick=GetTickCount64();SetTimer(window,1,16,nullptr);return 0;
     }
-    case WM_SIZE:minimized=wp==SIZE_MINIMIZED;if(camera){if(minimized)camera->pause();else if(page==Page::Camera)camera->resume();}if(!minimized)layout(LOWORD(lp),HIWORD(lp));return 0;
+    case WM_SIZE:minimized=wp==SIZE_MINIMIZED;if(camera){if(minimized)camera->pause();else if(page==Page::Camera){lastFrameTick=GetTickCount64();camera->resume();}}if(!minimized)layout(LOWORD(lp),HIWORD(lp));return 0;
     case WM_DPICHANGED:{auto r=reinterpret_cast<RECT*>(lp);SetWindowPos(window,nullptr,r->left,r->top,r->right-r->left,r->bottom-r->top,SWP_NOZORDER|SWP_NOACTIVATE);return 0;}
     case WM_ERASEBKGND:return 1;
     case WM_PAINT:paint();return 0;
@@ -255,7 +272,7 @@ class App {
      if(wp==VK_SPACE)shutter();if(wp==VK_LEFT&&!busy&&(page==Page::Camera||page==Page::Develop))setFilm(selected?selected-1:0);if(wp==VK_RIGHT&&!busy&&(page==Page::Camera||page==Page::Develop))setFilm(std::min(selected+1,unsigned(Films.size()-1)));
      if(wp=='I')openImport();if(wp=='R')showRoll();if(wp==VK_ESCAPE&&!busy){if(page==Page::Roll)leaveRoll();else if(page==Page::Develop)backToCamera();else if(page==Page::Photo){page=Page::Roll;ShowWindow(view,SW_HIDE);invalidate();}}return 0;
     case JobMessage:processJob(reinterpret_cast<JobResult*>(lp));return 0;
-    case StatusMessage:{std::unique_ptr<CameraStatus> s(reinterpret_cast<CameraStatus*>(lp));cameraStatus=*s;mirror=s->front;if(s->ready&&!lastFrameTick)lastFrameTick=GetTickCount64();if(s->captureError){busy=false;notice=s->text;}invalidate();return 0;}
+    case StatusMessage:{std::unique_ptr<CameraStatus> s(reinterpret_cast<CameraStatus*>(lp));cameraStatus=*s;mirror=s->front;if(s->ready&&!lastFrameTick)lastFrameTick=GetTickCount64();if(s->captureError){busy=false;notice=s->text;}if(page==Page::Camera){ShowWindow(view,s->ready?SW_SHOW:SW_HIDE);if(!s->ready){currentFrame.reset();gpu.clear();}}invalidate();return 0;}
     case WM_CLOSE:if(!closing){closing=true;notice=L"Encerrando câmera…";busy=true;KillTimer(window,1);if(camera)camera->requestStop();SetTimer(window,2,50,nullptr);invalidate();}return 0;
     case WM_DESTROY:KillTimer(window,1);KillTimer(window,2);camera.reset();stopIo();
      // Drain heap-owned worker messages after all producers have joined.
@@ -278,7 +295,7 @@ class App {
   RECT work;SystemParametersInfoW(SPI_GETWORKAREA,0,&work,0);UINT dpi=GetDpiForSystem();
   double r=std::min(double(dpi)/96.0,double(work.bottom-work.top-72)/864.0);int width=int(480*r),height=int(864*r);
   DWORD style=WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU|WS_MINIMIZEBOX|WS_CLIPCHILDREN;RECT rect{0,0,width,height};AdjustWindowRectExForDpi(&rect,style,FALSE,0,dpi);
-  auto hwnd=CreateWindowExW(0,wc.lpszClassName,L"Vintage Cam — câmera de filme",style,CW_USEDEFAULT,CW_USEDEFAULT,rect.right-rect.left,rect.bottom-rect.top,nullptr,nullptr,instance,this);
+  auto hwnd=CreateWindowExW(0,wc.lpszClassName,L"Vintage Cam 1.1 — câmera de filme",style,CW_USEDEFAULT,CW_USEDEFAULT,rect.right-rect.left,rect.bottom-rect.top,nullptr,nullptr,instance,this);
   if(!hwnd)return 1;ShowWindow(hwnd,SW_SHOW);UpdateWindow(hwnd);
   MSG msg;while(GetMessageW(&msg,nullptr,0,0)>0){TranslateMessage(&msg);DispatchMessageW(&msg);}return int(msg.wParam);
  }
