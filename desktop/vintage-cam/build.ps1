@@ -32,7 +32,11 @@ try {
         Write-Host 'Compilando os testes de compatibilidade da camera...'
         & cl.exe @flags "$PSScriptRoot\tests\CameraTests.cpp" "/Fe:$out\CameraTests.exe" 2>&1 | Tee-Object -FilePath $compilerLog -Append
         if ($LASTEXITCODE -ne 0) { throw 'Falha ao compilar CameraTests.' }
+        Write-Host 'Compilando o teste de timeout da camera...'
+        & cl.exe @flags "$PSScriptRoot\tests\AsyncTests.cpp" "/Fe:$out\AsyncTests.exe" /link @libs 2>&1 | Tee-Object -FilePath $compilerLog -Append
+        if ($LASTEXITCODE -ne 0) { throw 'Falha ao compilar AsyncTests.' }
         Write-Host '2/3 Compilando o teste do shader real...'
+
 
         & cl.exe @flags "$PSScriptRoot\tests\GpuTests.cpp" "$PSScriptRoot\src\Gpu.cpp" "$PSScriptRoot\src\ImageIO.cpp" "/Fe:$out\GpuTests.exe" /link @libs 2>&1 | Tee-Object -FilePath $compilerLog -Append
         if ($LASTEXITCODE -ne 0) { throw 'Falha ao compilar GpuTests.' }
@@ -46,6 +50,8 @@ try {
         if ($LASTEXITCODE -ne 0) { throw 'CoreTests falhou.' }
         & "$out\CameraTests.exe"
         if ($LASTEXITCODE -ne 0) { throw 'CameraTests falhou.' }
+        & "$out\AsyncTests.exe"
+        if ($LASTEXITCODE -ne 0) { throw 'AsyncTests falhou.' }
         & "$out\GpuTests.exe"
         if ($LASTEXITCODE -ne 0) { throw 'GpuTests falhou. O executavel nao foi validado.' }
     }

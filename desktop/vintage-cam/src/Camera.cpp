@@ -1,6 +1,7 @@
 #include "VCCamera.h"
 #include "VCCompatCamera.h"
 #include "VCCameraPixels.h"
+#include "VCAsync.h"
 #include <winrt/Windows.Devices.Enumeration.h>
 #include <winrt/Windows.Media.Capture.h>
 #include <winrt/Windows.Media.Capture.Frames.h>
@@ -44,7 +45,8 @@ void Camera::requestStop() {{std::lock_guard<std::mutex> lock(mutex);ending=true
 Camera::~Camera() {requestStop();if(worker.joinable())worker.join();}
 void Camera::enqueue(Command c) {{std::lock_guard<std::mutex> lock(mutex);if(ending)return;commands.push_back(c);}cv.notify_one();}
 static winrt::Windows::Foundation::IAsyncAction initializeOnUi(MediaCapture capture,MediaCaptureInitializationSettings settings,apartment_context ui) {
- co_await ui;co_await capture.InitializeAsync(settings);
+ auto cancellation=co_await get_cancellation_token();cancellation.enable_propagation();
+ co_await ui;if(cancellation())throw hresult_canceled();co_await capture.InitializeAsync(settings);
 }
 void Camera::run() {
  init_apartment(apartment_type::multi_threaded);cameraLog(L"=== Vintage Cam 1.1: abertura de câmera ===");
@@ -54,7 +56,7 @@ void Camera::run() {
  auto publish=[&]{onStatus(state);};
  auto close=[&]{
   if(capture&&failedSubscribed){capture.Failed(failToken);failedSubscribed=false;}
-  if(reader){if(started){try{reader.StopAsync().get();}catch(...){cameraLog(L"Parada do leitor: "+failureText());}started=false;}if(subscribed){reader.FrameArrived(token);subscribed=false;}reader.Close();reader=nullptr;}
+  if(reader){if(started){try{waitCameraOperation(reader.StopAsync(),L"parar visor",3000);}catch(...){cameraLog(L"Parada do leitor: "+failureText());}started=false;}if(subscribed){reader.FrameArrived(token);subscribed=false;}reader.Close();reader=nullptr;}
   if(capture){capture.Close();capture=nullptr;}compatible.reset();state.ready=false;state.compatible=false;
  };
  auto reportFailure=[&](std::wstring const& detail,bool shot=false){
@@ -85,7 +87,7 @@ void Camera::run() {
     state.captureError=false;
     if(c.kind==Kind::Switch||c.kind==Kind::Compatible){
      close();paused=false;state.text=L"Abrindo câmera…";publish();stage=L"Enumerar câmeras";
-     auto devices=DeviceInformation::FindAllAsync(DeviceClass::VideoCapture).get();state.count=devices.Size();state.index=state.count?c.index%state.count:c.index;deviceId.clear();
+     auto devices=waitCameraOperation(DeviceInformation::FindAllAsync(DeviceClass::VideoCapture),L"listar câmeras");state.count=devices.Size();state.index=state.count?c.index%state.count:c.index;deviceId.clear();
      cameraLog(L"Dispositivos encontrados: "+std::to_wstring(state.count));
      for(auto const& dev:devices)cameraLog(L"Câmera: "+std::wstring(dev.Name()));
      if(state.count){auto dev=devices.GetAt(state.index);deviceId=dev.Id();auto location=dev.EnclosureLocation();state.front=location&&location.Panel()==Panel::Front;cameraLog(L"Selecionada: "+std::wstring(dev.Name()));}
@@ -94,13 +96,13 @@ void Camera::run() {
       stage=L"MediaCapture: inicialização";capture=MediaCapture();MediaCaptureInitializationSettings settings;
       settings.VideoDeviceId(deviceId);settings.StreamingCaptureMode(StreamingCaptureMode::Video);settings.MemoryPreference(MediaCaptureMemoryPreference::Cpu);settings.SharingMode(MediaCaptureSharingMode::ExclusiveControl);
       // The operating system checks desktop camera permission at initialization. No UWP pre-check.
-      try{auto groups=MediaFrameSourceGroup::FindAllAsync().get();bool matched=false;
+      try{auto groups=waitCameraOperation(MediaFrameSourceGroup::FindAllAsync(),L"grupos RGB");bool matched=false;
        for(auto const& group:groups){for(auto const& info:group.SourceInfos()){
         auto dev=info.DeviceInformation();if(dev&&info.SourceKind()==MediaFrameSourceKind::Color&&_wcsicmp(dev.Id().c_str(),deviceId.c_str())==0){settings.SourceGroup(group);matched=true;break;}
        }if(matched)break;}
        cameraLog(matched?L"Grupo de câmera RGB selecionado.":L"Grupo RGB não informado pelo driver; usando ID do dispositivo.");
       }catch(...){cameraLog(L"Grupo de câmera opcional: "+failureText());}
-      initializeOnUi(capture,settings,uiContext).get();auto controller=capture.VideoDeviceController();stage=L"MediaCapture: fluxo RGB";
+      waitCameraOperation(initializeOnUi(capture,settings,uiContext),L"inicialização do dispositivo");auto controller=capture.VideoDeviceController();stage=L"MediaCapture: fluxo RGB";
       MediaFrameSource source{nullptr};
       for(auto const& item:capture.FrameSources()){
        auto s=item.Value();if(s.Info().SourceKind()!=MediaFrameSourceKind::Color)continue;
@@ -110,14 +112,14 @@ void Camera::run() {
       std::vector<MediaFrameFormat> formats;for(auto const& fmt:source.SupportedFormats())if(fmt.VideoFormat())formats.push_back(fmt);
       auto score=[](MediaFrameFormat const& fmt){auto v=fmt.VideoFormat();auto r=fmt.FrameRate();return previewScore({0,v.Width(),v.Height(),r.Denominator()?double(r.Numerator())/r.Denominator():0});};
       std::sort(formats.begin(),formats.end(),[&](auto const& a,auto const& b){return score(a)>score(b);});
-      for(auto const& fmt:formats){try{source.SetFormatAsync(fmt).get();break;}catch(...){cameraLog(L"Formato de visor recusado: "+failureText());}}
+      for(auto const& fmt:formats){try{waitCameraOperation(source.SetFormatAsync(fmt),L"formato do visor",5000);break;}catch(...){cameraLog(L"Formato de visor recusado: "+failureText());}}
       auto current=source.CurrentFormat().VideoFormat();if(!current||!current.Width()||!current.Height())throw std::runtime_error("Dimensões do visor não disponíveis.");
       double ratio=std::min(1.0,1280.0/std::max(current.Width(),current.Height()));BitmapSize size{std::max(1u,unsigned(current.Width()*ratio)),std::max(1u,unsigned(current.Height()*ratio))};
       stage=L"MediaCapture: leitor de quadros";
-      try{reader=capture.CreateFrameReaderAsync(source,MediaEncodingSubtypes::Bgra8(),size).get();}
+      try{reader=waitCameraOperation(capture.CreateFrameReaderAsync(source,MediaEncodingSubtypes::Bgra8(),size),L"leitor RGB reduzido");}
       catch(...){cameraLog(L"Leitor com redução recusado: "+failureText());
-       try{reader=capture.CreateFrameReaderAsync(source,MediaEncodingSubtypes::Bgra8()).get();}
-       catch(...){cameraLog(L"Conversão BGRA recusada: "+failureText());reader=capture.CreateFrameReaderAsync(source).get();}
+       try{reader=waitCameraOperation(capture.CreateFrameReaderAsync(source,MediaEncodingSubtypes::Bgra8()),L"leitor BGRA");}
+       catch(...){cameraLog(L"Conversão BGRA recusada: "+failureText());reader=waitCameraOperation(capture.CreateFrameReaderAsync(source),L"leitor nativo");}
       }
       reader.AcquisitionMode(MediaFrameReaderAcquisitionMode::Realtime);
       auto logged=std::make_shared<std::atomic<bool>>(false),first=std::make_shared<std::atomic<bool>>(false);
@@ -128,7 +130,7 @@ void Camera::run() {
         if(!first->exchange(true))cameraLog(L"Primeiro quadro RGB recebido: "+std::to_wstring(im->width)+L"×"+std::to_wstring(im->height));sink(im);
        }catch(...){if(!logged->exchange(true))cameraLog(L"Falha no primeiro quadro MediaCapture: "+failureText());}
       });subscribed=true;stage=L"MediaCapture: iniciar visor";
-      if(reader.StartAsync().get()!=MediaFrameReaderStartStatus::Success)throw std::runtime_error("O driver recusou iniciar o visor.");started=true;
+      if(waitCameraOperation(reader.StartAsync(),L"iniciar visor")!=MediaFrameReaderStartStatus::Success)throw std::runtime_error("O driver recusou iniciar o visor.");started=true;
       state.ready=true;state.compatible=false;state.flashSupported=false;
       try{state.flashSupported=controller.FlashControl().Supported();}catch(...){cameraLog(L"Flash opcional indisponível: "+failureText());}
       state.text=std::wstring(devices.GetAt(state.index).Name())+L" · "+std::to_wstring(current.Width())+L"×"+std::to_wstring(current.Height());
@@ -138,23 +140,23 @@ void Camera::run() {
      stage=L"Captura da fotografia";
      if(compatible){compatible->requestPhoto();continue;}
      if(!capture||!state.ready)throw std::runtime_error("Abra a câmera antes de fotografar.");
-     bool restart=started;if(started){reader.StopAsync().get();started=false;}
+     bool restart=started;if(started){waitCameraOperation(reader.StopAsync(),L"parar visor",3000);started=false;}
      try{
       auto controller=capture.VideoDeviceController();
       try{std::vector<ImageEncodingProperties> photos;for(auto const& prop:controller.GetAvailableMediaStreamProperties(MediaStreamType::Photo)){auto ip=prop.try_as<ImageEncodingProperties>();if(ip&&ip.Width()&&ip.Height())photos.push_back(ip);}
        std::sort(photos.begin(),photos.end(),[](auto const& a,auto const& b){return uint64_t(a.Width())*a.Height()>uint64_t(b.Width())*b.Height();});
-       for(auto const& f:photos){try{controller.SetMediaStreamPropertiesAsync(MediaStreamType::Photo,f).get();break;}catch(...){cameraLog(L"Resolução fotográfica recusada: "+failureText());}}
+       for(auto const& f:photos){try{waitCameraOperation(controller.SetMediaStreamPropertiesAsync(MediaStreamType::Photo,f),L"resolução fotográfica",5000);break;}catch(...){cameraLog(L"Resolução fotográfica recusada: "+failureText());}}
       }catch(...){cameraLog(L"Configuração fotográfica opcional: "+failureText());}
       if(state.flashSupported){auto f=controller.FlashControl();f.Auto(false);f.Enabled(c.flag);}
-      InMemoryRandomAccessStream stream;capture.CapturePhotoToStreamAsync(ImageEncodingProperties::CreateJpeg(),stream).get();
+      InMemoryRandomAccessStream stream;waitCameraOperation(capture.CapturePhotoToStreamAsync(ImageEncodingProperties::CreateJpeg(),stream),L"capturar foto",20000);
       if(state.flashSupported)controller.FlashControl().Enabled(false);
       if(stream.Size()>512ull*1024*1024)throw std::runtime_error("Foto muito grande.");
-      DataReader data(stream.GetInputStreamAt(0));data.LoadAsync(uint32_t(stream.Size())).get();std::vector<uint8_t> bytes(size_t(stream.Size()));data.ReadBytes(bytes);
+      DataReader data(stream.GetInputStreamAt(0));waitCameraOperation(data.LoadAsync(uint32_t(stream.Size())),L"ler foto");std::vector<uint8_t> bytes(size_t(stream.Size()));data.ReadBytes(bytes);
       auto image=std::make_shared<Image>(decodeBytes(bytes));data.Close();stream.Close();
-      if(restart){if(reader.StartAsync().get()!=MediaFrameReaderStartStatus::Success)throw std::runtime_error("Não foi possível retomar o visor após fotografar.");started=true;}onPhoto(image);
-     }catch(...){if(restart&&!started){try{started=reader.StartAsync().get()==MediaFrameReaderStartStatus::Success;}catch(...){}}throw;}
-    }else if(c.kind==Kind::Pause){paused=true;if(compatible)compatible->pause();else if(reader&&started){reader.StopAsync().get();started=false;}}
-    else if(c.kind==Kind::Resume){paused=false;if(compatible)compatible->resume();else if(reader&&!started){if(reader.StartAsync().get()!=MediaFrameReaderStartStatus::Success)throw std::runtime_error("Não foi possível retomar o visor.");started=true;}}
+      if(restart){if(waitCameraOperation(reader.StartAsync(),L"iniciar visor")!=MediaFrameReaderStartStatus::Success)throw std::runtime_error("Não foi possível retomar o visor após fotografar.");started=true;}onPhoto(image);
+     }catch(...){if(restart&&!started){try{started=waitCameraOperation(reader.StartAsync(),L"iniciar visor")==MediaFrameReaderStartStatus::Success;}catch(...){}}throw;}
+    }else if(c.kind==Kind::Pause){paused=true;if(compatible)compatible->pause();else if(reader&&started){waitCameraOperation(reader.StopAsync(),L"parar visor",3000);started=false;}}
+    else if(c.kind==Kind::Resume){paused=false;if(compatible)compatible->resume();else if(reader&&!started){if(waitCameraOperation(reader.StartAsync(),L"iniciar visor")!=MediaFrameReaderStartStatus::Success)throw std::runtime_error("Não foi possível retomar o visor.");started=true;}}
    }catch(...){auto detail=failureText();if(c.kind==Kind::Switch||c.kind==Kind::Compatible){try{close();}catch(...){}}reportFailure(detail,c.kind==Kind::Photo);}
   }
  }catch(...){reportFailure(failureText(),true);}

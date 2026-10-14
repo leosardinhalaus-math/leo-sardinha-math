@@ -189,7 +189,7 @@ class App {
   else if(!dragging&&carousel!=selected){carousel=selected;invalidate();}
   if(animationUntil&&now>=animationUntil){animationUntil=0;invalidate();}
   bool newFrame=false;
-  if(page==Page::Camera){std::lock_guard<std::mutex> lock(frameMutex);if(latestFrame){if(cameraStatus.ready){currentFrame=std::move(latestFrame);newFrame=true;lastFrameTick=now;}else latestFrame.reset();}}
+  if(page==Page::Camera){std::lock_guard<std::mutex> lock(frameMutex);if(latestFrame){if(cameraStatus.ready){currentFrame=std::move(latestFrame);newFrame=true;lastFrameTick=now;if(notice==L"Tentando abrir a câmera…")notice=L"Imagem da câmera recebida.";}else latestFrame.reset();}}
   if((page==Page::Camera||page==Page::Develop||page==Page::Photo)&&currentFrame&&(newFrame||dirty)) {
    try {gpu.preview(*currentFrame,page==Page::Photo?Films[0]:Films[selected],1979,today(),page==Page::Camera&&mirror);dirty=false;if(newFrame)fpsCounter++;}
    catch(...){rendering=false;notice=L"Renderização interrompida: "+exceptionText()+L" Reabra o aplicativo.";invalidate();}
@@ -272,7 +272,7 @@ class App {
      if(wp==VK_SPACE)shutter();if(wp==VK_LEFT&&!busy&&(page==Page::Camera||page==Page::Develop))setFilm(selected?selected-1:0);if(wp==VK_RIGHT&&!busy&&(page==Page::Camera||page==Page::Develop))setFilm(std::min(selected+1,unsigned(Films.size()-1)));
      if(wp=='I')openImport();if(wp=='R')showRoll();if(wp==VK_ESCAPE&&!busy){if(page==Page::Roll)leaveRoll();else if(page==Page::Develop)backToCamera();else if(page==Page::Photo){page=Page::Roll;ShowWindow(view,SW_HIDE);invalidate();}}return 0;
     case JobMessage:processJob(reinterpret_cast<JobResult*>(lp));return 0;
-    case StatusMessage:{std::unique_ptr<CameraStatus> s(reinterpret_cast<CameraStatus*>(lp));cameraStatus=*s;mirror=s->front;if(s->ready&&!lastFrameTick)lastFrameTick=GetTickCount64();if(s->captureError){busy=false;notice=s->text;}if(page==Page::Camera){ShowWindow(view,s->ready?SW_SHOW:SW_HIDE);if(!s->ready){currentFrame.reset();gpu.clear();}}invalidate();return 0;}
+    case StatusMessage:{std::unique_ptr<CameraStatus> s(reinterpret_cast<CameraStatus*>(lp));cameraStatus=*s;mirror=s->front;if(s->ready&&!lastFrameTick)lastFrameTick=GetTickCount64();if(s->captureError){busy=false;notice=s->text;}else if(!s->ready&&(s->text.find(L"indisponível")!=std::wstring::npos||s->text.find(L"bloqueada")!=std::wstring::npos))notice=s->text;if(page==Page::Camera){ShowWindow(view,s->ready?SW_SHOW:SW_HIDE);if(!s->ready){currentFrame.reset();gpu.clear();}}invalidate();return 0;}
     case WM_CLOSE:if(!closing){closing=true;notice=L"Encerrando câmera…";busy=true;KillTimer(window,1);if(camera)camera->requestStop();SetTimer(window,2,50,nullptr);invalidate();}return 0;
     case WM_DESTROY:KillTimer(window,1);KillTimer(window,2);camera.reset();stopIo();
      // Drain heap-owned worker messages after all producers have joined.
