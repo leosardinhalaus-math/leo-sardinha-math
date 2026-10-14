@@ -1,0 +1,39 @@
+# Validação desta entrega
+
+Data: 14/10/2026.
+
+## Resultado disponível
+
+| Verificação | Resultado |
+|---|---|
+| Compilação C++20 dos dados e da referência CPU com GCC | Aprovada, sem avisos com `-Wall -Wextra -Werror -pedantic` |
+| Nove entradas, identificadores exclusivos e curva monotônica | Aprovada |
+| Filme neutro sobre a imagem fixa | Aprovada |
+| Semente de granulação com vetor conhecido | Aprovada |
+| Repetibilidade da referência CPU para os nove filmes | Aprovada: vinte repetições por filme |
+| Rejeição de buffer com dimensões incompatíveis | Aprovada |
+| AddressSanitizer e UndefinedBehaviorSanitizer na suíte portátil | Aprovada, com detecção de vazamentos desativada devido à restrição de `/proc` deste ambiente |
+| Compilação do aplicativo usando MSVC e Windows SDK | **Não executada** |
+| Compilação e execução do HLSL de produção no Direct3D | **Não executada** |
+| Teste de câmera e captura nativa em resolução máxima | **Não executado** |
+| FPS sustentado e inspeção visual em webcam | **Não medidos** |
+| Painel de compartilhamento e permissões do Windows | **Não exercitados** |
+
+O ambiente disponível é Linux, sem MSVC, Windows SDK, Direct3D ou webcam Windows. O teste portátil não pode provar que as APIs de câmera, a interface ou o shader compilam e funcionam no Windows. Não há binário Windows validado nesta entrega.
+
+`tests/GpuTests.cpp` contém os testes de determinismo do **pipeline de produção**. Eles serão compilados e executados automaticamente por `build.ps1` no Windows. O resultado acima não antecipa a aprovação deles.
+
+## Validação necessária no Windows
+
+1. Executar `COMPILAR_E_ABRIR.cmd`. Confirmar `CoreTests` e `GpuTests` aprovados. Guardar `build-log.txt` em caso de erro. O script não abre o aplicativo quando a compilação ou um teste falha.
+2. Abrir com webcam, boa iluminação e sem outros aplicativos de câmera. Aguardar estabilizar e observar o contador durante 30 segundos. Verificar pelo menos 30 FPS onde o dispositivo realmente suporta essa taxa; testar os nove filmes. Não confundir FPS de captura com taxa de atualização do monitor.
+3. Comparar o visor e as fotografias de cada filme. Conferir que o neutro preserva a cor, o P&B é monocromático e o VHS mostra a mesma data no visor e no PNG.
+4. Conferir as dimensões da captura no status e nas propriedades do PNG; elas não devem ser limitadas aos 1280 pixels da cópia do visor. Se o driver só oferece uma resolução, esse é o limite disponível.
+5. Testar troca entre duas webcams ou frontal/traseira, quando presentes, e conferir a convenção de espelhamento. Em hardware com flash, confirmar os dois estados. Em hardware háptico, confirmar o feedback do carrossel.
+6. Negar o acesso em Configurações, abrir o aplicativo e usar a engrenagem para liberar a câmera; clicar em Trocar câmera para tentar novamente. Testar também câmera ocupada e desconexão USB durante o visor.
+7. Importar JPEG deitado, JPEG com orientação EXIF de retrato e PNG. Visualizar os nove filmes e revelar duas versões do mesmo original. Conferir que o original não mudou e que cada versão preservou as dimensões orientadas.
+8. Abrir o rolo, selecionar foto, ampliar, compartilhar pelo painel Windows, salvar em Imagens e excluir apenas a versão do rolo. Confirmar que a cópia em Imagens permanece. Verificar paginação com mais de doze fotografias.
+9. Minimizar e restaurar. Fechar durante a abertura da câmera e durante uma exportação. O fechamento deve aguardar as operações e liberar os dispositivos; o PNG só deve aparecer após a gravação completa.
+10. Testar em escalas de tela de 100%, 125%, 150% e em um notebook de 1366×768. A janela deve permanecer em retrato, com os controles acessíveis.
+
+Esses são procedimentos de aceitação a executar; não são resultados já observados.

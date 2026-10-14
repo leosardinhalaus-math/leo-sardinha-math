@@ -1,0 +1,54 @@
+name: Vintage Cam Windows executable
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'desktop/vintage-cam/**'
+      - '.github/workflows/vintage-cam-windows.yml'
+  push:
+    branches:
+      - 'build/vintage-cam-windows'
+    paths:
+      - 'desktop/vintage-cam/**'
+      - '.github/workflows/vintage-cam-windows.yml'
+permissions:
+  contents: read
+jobs:
+  build-and-test:
+    if: startsWith(github.head_ref || github.ref_name, 'build/vintage-cam-windows')
+    runs-on: windows-2022
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile and run fixed-image tests
+        shell: powershell
+        working-directory: desktop/vintage-cam
+        run: ./build.ps1
+      - name: Package executable for download
+        if: success()
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force -Path executable-package | Out-Null
+          Copy-Item desktop/vintage-cam/dist/VintageCam.exe executable-package/
+          Copy-Item desktop/vintage-cam/LICENSE executable-package/
+          @'
+          VINTAGE CAM PARA WINDOWS
+          Abra VintageCam.exe. Nao e necessario instalar Visual Studio.
+          Permita a camera em Configuracoes > Privacidade > Camera.
+          A compilacao e o teste de imagem fixa foram executados no Windows.
+          A compatibilidade com a webcam do seu notebook ainda depende de teste no dispositivo.
+          '@ | Set-Content executable-package/LEIA_PRIMEIRO.txt -Encoding UTF8
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: VintageCam-Windows-x64-executable
+          path: executable-package/*
+          if-no-files-found: error
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: VintageCam-build-log
+          path: desktop/vintage-cam/build-log.txt
+          if-no-files-found: warn
+          retention-days: 7

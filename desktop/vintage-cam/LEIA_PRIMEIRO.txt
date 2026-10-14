@@ -1,0 +1,32 @@
+VINTAGE CAM PARA WINDOWS — LEIA ANTES DE ABRIR
+
+Este pacote contém o PROJETO-FONTE. Não contém um .exe já compilado.
+A compilação Windows e o teste gráfico ainda precisam ser executados no Windows.
+
+1. Extraia TODO o ZIP para uma pasta, por exemplo Documentos\VintageCam.
+   Não execute os arquivos dentro da janela do ZIP.
+
+2. Para gerar o aplicativo, é necessário o Visual Studio 2022 ou Build Tools
+   2022 com "Desenvolvimento para desktop com C++", MSVC x64 e Windows SDK
+   10.0.22621 ou superior. São ferramentas gratuitas da Microsoft.
+   O ambiente de desenvolvimento ocupa vários GB. Não é instalado pelo app.
+
+3. Dê dois cliques em COMPILAR_E_ABRIR.cmd.
+   O script compila o projeto, executa os testes de dados e do shader real
+   e abre dist\VintageCam.exe somente se todos passarem.
+   Os detalhes ficam em build-log.txt.
+
+4. Depois de compilado, use ABRIR.cmd ou dist\VintageCam.exe.
+   O EXE é portátil e não precisa do Visual Studio no computador de destino.
+
+5. Câmera bloqueada? Clique na engrenagem do aplicativo ou abra:
+   Configurações > Privacidade e segurança > Câmera.
+   Permita acesso à câmera para aplicativos da área de trabalho.
+
+Sem webcam? A função IMPORTAR continua disponível.
+
+IMPORTANTE
+O ambiente em que este pacote foi criado é Linux e não tem o SDK Windows.
+Os testes portáveis passaram; a compilação MSVC, o teste Direct3D e o teste
+com webcam física NÃO foram executados. Não trate esta entrega como um
+executável validado. O README e docs/VALIDACAO.md detalham o estado.

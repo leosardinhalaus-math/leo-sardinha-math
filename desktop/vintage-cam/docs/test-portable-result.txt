@@ -1,0 +1,2 @@
+PASS: 9 data definitions, neutral identity, grain golden vector, fixed-image reference determinism and input validation.
+NOTE: This portable reference does not implement bloom, chroma, scanlines or timestamp. Run GpuTests on Windows to validate the actual production pipeline.
