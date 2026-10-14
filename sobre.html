@@ -7,42 +7,11 @@
   <meta name="description" content="Conheça a trajetória de Leonardo Sardinha: música, educação, matemática e gratidão em permanente construção.">
   <title>Sobre mim · Leo Sardinha.Math</title>
   <link rel="stylesheet" href="assets/site.css">
-  <style>
-    .about-hero{margin:42px 0 36px;padding:clamp(30px,6vw,68px);border-radius:30px;background:linear-gradient(135deg,#082f49,#145474);color:#fff;box-shadow:var(--shadow);position:relative;overflow:hidden}
-    .about-hero:after{content:"∂";position:absolute;right:3%;bottom:-20%;font-family:Georgia,serif;font-size:clamp(12rem,30vw,26rem);line-height:1;color:rgba(255,255,255,.05);pointer-events:none}
-    .about-hero .eyebrow{color:#f4cf72}.about-hero h1{position:relative;z-index:1;font-family:Georgia,"Times New Roman",serif;font-size:clamp(2.25rem,6vw,4.5rem);line-height:1.12;letter-spacing:-.04em;max-width:800px;margin:0 0 18px}
-    .about-hero .intro{position:relative;z-index:1;color:#e0f2fe;font-size:clamp(1.05rem,2vw,1.3rem);line-height:1.6;margin:0}
-    .about-hero .topics{position:relative;z-index:1;color:#f4cf72;font-weight:700;margin:24px 0 0;letter-spacing:.03em}
-    .about-story{max-width:820px;margin:0 auto;padding:4px 0 42px}
-    .about-story h2{font-size:clamp(1.6rem,3vw,2.2rem);color:var(--navy);margin:0 0 22px}
-    .about-story p{font-size:1.1rem;line-height:1.85;margin:0 0 24px;color:var(--ink)}
-    .about-story p:first-of-type:first-letter{float:left;font-family:Georgia,serif;font-size:3.7rem;line-height:.9;padding-right:9px;color:var(--blue)}
-    .about-quote{max-width:920px;margin:10px auto 55px;padding:clamp(28px,5vw,55px);border-left:6px solid #c49b47;border-radius:0 25px 25px 0;background:#fff;box-shadow:var(--shadow)}
-    .about-quote blockquote{font-family:Georgia,"Times New Roman",serif;font-size:clamp(1.4rem,3.5vw,2.3rem);font-style:italic;line-height:1.5;color:var(--navy);margin:0 0 16px}
-    .about-quote cite{font-style:normal;font-weight:700;color:var(--muted)}
-    .about-areas{padding:0 0 80px}.about-areas h2{color:var(--navy);margin:0 0 22px}
-    .about-areas .content-grid{padding:0}.about-areas .card:last-child{grid-column:1/-1}
-    @media(max-width:800px){.about-hero{margin:24px 0 30px}.about-story p{font-size:1.04rem}.about-areas .card:last-child{grid-column:auto}}
-
-    .music-feature{max-width:1050px;margin:0 auto 65px;padding:clamp(24px,5vw,46px);border-radius:28px;background:#082f49;color:#f5fbff;box-shadow:var(--shadow)}
-    .music-feature h2{font-family:Georgia,serif;font-size:clamp(1.9rem,4vw,2.8rem);margin:0 0 15px;color:#fff}
-    .music-feature p{color:#e0f2fe;line-height:1.75}
-    .music-feature .eyebrow{color:#f4cf72}
-    .music-intro{max-width:780px;margin-bottom:30px}
-    .music-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin-top:28px}
-    .music-card{min-width:0;border:1px solid rgba(255,255,255,.22);border-radius:22px;background:rgba(255,255,255,.07);padding:clamp(16px,3vw,24px)}
-    .music-card h3{color:#fff;font-size:1.35rem;margin:18px 0 6px}
-    .music-card p{margin:0;font-size:1rem}
-    .music-player{aspect-ratio:9/16;width:min(100%,290px);margin:0 auto;overflow:hidden;border-radius:16px;background:#071f31;display:grid;place-items:center;border:2px solid rgba(255,255,255,.19)}
-    .music-player video{display:none;width:100%;height:100%;object-fit:contain;background:#000}
-    .music-placeholder{text-align:center;padding:22px}
-    .music-placeholder span{display:block;font-size:3rem;margin-bottom:10px;color:#f4cf72}
-    .music-placeholder p{font-size:1rem;color:#fff;line-height:1.5}
-    .music-footer{margin:26px 0 0}.music-feature .button{background:#f4cf72;color:#082f49;box-shadow:none}
-    @media(max-width:700px){.music-gallery{grid-template-columns:1fr}.music-feature .button{width:100%}}
-  </style>
+  <link rel="stylesheet" href="assets/sobre.css">
+  <script src="assets/sobre.js" defer></script>
 </head>
-<body>
+<body class="about-page">
+  <a class="skip-link" href="#trajetoria">Ir para minha história</a>
   <header class="site-header">
     <nav class="nav" aria-label="Navegação principal">
       <a class="brand" href="index.html">Leo Sardinha<span>.Math</span></a>
@@ -57,14 +26,24 @@
   </header>
   <main class="wrap">
     <header class="about-hero">
-      <p class="eyebrow">Leonardo Sardinha · Sobre mim</p>
-      <h1>Entre notas, números e possibilidades</h1>
-      <p class="intro">Uma trajetória em permanente construção.</p>
-      <p class="topics">Música &nbsp;·&nbsp; Matemática &nbsp;·&nbsp; Educação</p>
+      <figure class="about-landscape" id="about-landscape" data-motion="off">
+        <img src="assets/sobre-cerejeira.png" width="860" height="365" fetchpriority="high" alt="Um panda sentado sob uma cerejeira florida, em um mirante cercado por montanhas e um céu azul.">
+        <div class="about-petals" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+      </figure>
+      <div class="about-introduction">
+        <p class="eyebrow">Leonardo Sardinha · Sobre mim</p>
+        <h1>Entre notas, números e possibilidades</h1>
+        <p class="intro">Uma trajetória em permanente construção.</p>
+        <p class="topics">Música &nbsp;·&nbsp; Matemática &nbsp;·&nbsp; Educação</p>
+        <div class="about-actions">
+          <a class="button" href="#trajetoria">Conheça minha história <span aria-hidden="true">&nbsp;↓</span></a>
+          <button class="petals-toggle" id="petals-toggle" type="button" aria-controls="about-landscape" aria-label="Animação de pétalas" aria-pressed="false" hidden>Animar pétalas</button>
+        </div>
+      </div>
     </header>
 
     <article class="about-story" aria-labelledby="trajetoria">
-      <h2 id="trajetoria">Uma história que continua sendo escrita</h2>
+      <h2 id="trajetoria" tabindex="-1">Uma história que continua sendo escrita</h2>
       <p>A vida, em sua essência, não é linear. Cada pessoa carrega suas peculiaridades, percorre caminhos próprios e encontra, ao longo da existência, diferentes maneiras de compreender o mundo e a si mesma.</p>
       <p>Talvez estejamos eternamente em busca do nosso lugar, do nosso <em>vir a ser</em>. Uma inquietação que me aproxima das reflexões de Viktor Frankl sobre a busca humana por sentido.</p>
       <p>Minha trajetória é feita de caminhos que, à primeira vista, poderiam parecer distantes, mas que se encontram naquilo que me move: a vontade de aprender, compartilhar e transformar.</p>
@@ -117,23 +96,12 @@
         <a class="button" href="https://www.tiktok.com/@leonardosardinha0" target="_blank" rel="noopener noreferrer">Acompanhe meu TikTok ↗</a>
       </div>
     </section>
-    <script>
-      // Só mostra os players quando os respectivos arquivos tiverem sido publicados.
-      document.querySelectorAll('.music-player').forEach(function(player){
-        const video=player.querySelector('video');
-        const placeholder=player.querySelector('.music-placeholder');
-        video.addEventListener('loadedmetadata',function(){
-          video.style.display='block';
-          placeholder.style.display='none';
-        });
-      });
-    </script>
     <section class="about-areas" aria-labelledby="areas">
       <h2 id="areas">Caminhos que se encontram</h2>
       <div class="content-grid">
-        <article class="card"><div class="icon" aria-hidden="true">🎓</div><h3>Educação e matemática</h3><p>Experiências na UFF e propostas para tornar a aprendizagem mais criativa, participativa e próxima da realidade dos estudantes.</p></article>
-        <article class="card"><div class="icon" aria-hidden="true">🎮</div><h3>Jogos e tecnologia</h3><p>Recursos digitais que conectam conceitos matemáticos a desafios, investigação e novas formas de aprender.</p></article>
-        <article class="card"><div class="icon" aria-hidden="true">♫</div><h3>Música e comunidade</h3><p>Mais de 30 anos de música voluntária na Igreja Católica, em uma trajetória marcada por convivência, serviço e partilha.</p></article>
+        <article class="card"><div class="icon" aria-hidden="true">🎓</div><h3>Educação e matemática</h3><p>Experiências na UFF e propostas para tornar a aprendizagem mais criativa, participativa e próxima da realidade dos estudantes.</p><a class="about-card-link" href="educacao.html">Explore as atividades <span aria-hidden="true">↗</span></a></article>
+        <article class="card"><div class="icon" aria-hidden="true">🎮</div><h3>Jogos e tecnologia</h3><p>Recursos digitais que conectam conceitos matemáticos a desafios, investigação e novas formas de aprender.</p><a class="about-card-link" href="jogos/calculus-royale/">Conheça um dos jogos <span aria-hidden="true">↗</span></a></article>
+        <article class="card"><div class="icon" aria-hidden="true">♫</div><h3>Música e comunidade</h3><p>Mais de 30 anos de música voluntária na Igreja Católica, em uma trajetória marcada por convivência, serviço e partilha.</p><a class="about-card-link" href="#musica-fe">Veja os registros musicais <span aria-hidden="true">↗</span></a></article>
       </div>
     </section>
   </main>
