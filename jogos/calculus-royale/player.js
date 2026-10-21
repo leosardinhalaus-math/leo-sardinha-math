@@ -1,3 +1,5 @@
+(() => {
+"use strict";
 const SUPABASE_URL = "https://vmblubjbgwhaplsptymj.supabase.co";
 const SUPABASE_KEY = "sb_publishable_FxmodDcyhUhSyqre8fTCCw_DwI4iiE8";
 const SESSION_KEY = "calculus-royale:cloud-session";
@@ -171,3 +173,4 @@ function logout() {
 }
 
 window.CalculusCloud = { $, $$, safe, api, session, signIn, signUp, getProfile, ensureProfile, syncProgress, getMyStats, publicProfile, leaderboard, logout, localProgress };
+})();

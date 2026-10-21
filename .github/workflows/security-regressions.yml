@@ -1,0 +1,32 @@
+name: Security regressions
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'jogos/calculus-royale/**'
+      - 'jogos/calculus-royale-src/client/public/**'
+      - 'jogos/laboratorio-digital-matematica/**'
+      - 'tests/**'
+      - '.github/workflows/security-regressions.yml'
+  pull_request:
+    paths:
+      - 'jogos/calculus-royale/**'
+      - 'jogos/calculus-royale-src/client/public/**'
+      - 'jogos/laboratorio-digital-matematica/**'
+      - 'tests/**'
+      - '.github/workflows/security-regressions.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Test cache isolation, safe records and player pages
+        run: node --test tests/*security.test.cjs

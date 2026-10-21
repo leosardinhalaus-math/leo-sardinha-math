@@ -44,7 +44,10 @@ export function montar(container){
     let desafios=gerarDesafios(ler('fracsoma-ultimo-inicio',''));
     salvar('fracsoma-ultimo-inicio',assinatura(desafios[0]));
     let nivel=0,pontos=0,erros=0,concluido=false,visiveis=new Set(),pecas=[],numerador='',denominador='',mensagem='',classe='';
-    const recorde=()=>ler('fracsoma-recorde',0);
+    const recorde=()=>{
+      const valor=ler('fracsoma-recorde',0);
+      return Number.isSafeInteger(valor)&&valor>=0&&valor<=FASES.length*10?valor:0;
+    };
     const cor=d=>`hsl(${DENOMINADORES.indexOf(d)*43%360} 80% 62%)`;
     const expressao=()=>assinatura(desafios[nivel]);
     const soma=()=>valorPecas(pecas);
@@ -57,12 +60,13 @@ export function montar(container){
       const leitura=total===0?'Toque numa linha para levar uma peça até a soma.':equivalencias.length?`O cursor roxo coincide com: ${equivalencias.join(', ')}.`:'O cursor ainda não coincide com uma divisão das linhas visíveis. Mostre outra linha.';
       const faixa=pecas.map(d=>`<span class="fs-bloco" style="width:${100/d}%;background:${cor(d)}" aria-hidden="true"></span>`).join('');
       const retiradas=pecas.map((d,i)=>`<button type="button" class="fs-retirar" data-retirar="${i}" ${concluido?'disabled':''} aria-label="Retirar a peça ${i+1}, um sobre ${d}">− 1/${d}</button>`).join('');
-      el.innerHTML=`<div class="fs"><div class="fs-topo"><p>As frações mudam a cada visita. Toque numa linha para levar uma peça até a soma; use os botões abaixo para devolver peças.</p><strong>Pontos: ${pontos} · Recorde: ${recorde()}</strong></div>
+      el.innerHTML=`<div class="fs"><div class="fs-topo"><p>As frações mudam a cada visita. Toque numa linha para levar uma peça até a soma; use os botões abaixo para devolver peças.</p><strong>Pontos: ${pontos} · Recorde: <span data-fs-recorde></span></strong></div>
         <div class="fs-cartao"><strong>Desafio ${nivel+1} de ${desafios.length}:</strong> ${expressao()} = ?</div>
         <div class="fs-quadro"><div class="fs-parede">${DENOMINADORES.filter(d=>visiveis.has(d)).map(linha).join('')||'<p>Escolha uma linha abaixo.</p>'}<div class="fs-linha fs-total"><strong>Soma</strong><div class="fs-trilho fs-soma" role="img" aria-label="Soma montada com ${pecas.length} peças">${faixa}</div></div>${total?`<div class="fs-cursor-faixa" aria-hidden="true"><div class="fs-cursor" style="left:${100*total/UNIDADE}%"></div></div>`:''}</div></div>
         <p class="fs-leitura" role="status">${leitura}</p><div class="fs-retiradas" aria-label="Peças na soma">${retiradas||'<span>Nenhuma peça na soma.</span>'}</div>
         <div class="fs-cartao"><strong>Linhas visíveis</strong><div class="fs-linhas">${DENOMINADORES.map(d=>`<button type="button" data-linha="${d}" aria-pressed="${visiveis.has(d)}">1/${d}</button>`).join('')}</div></div>
         <div class="fs-cartao"><div class="fs-resposta"><strong>Resposta:</strong><label>Numerador <input id="fs-numerador" inputmode="numeric" pattern="[0-9]*" maxlength="6" value="${numerador}" ${concluido?'disabled':''}></label><span aria-hidden="true">/</span><label>Denominador <input id="fs-denominador" inputmode="numeric" pattern="[0-9]*" maxlength="6" value="${denominador}" ${concluido?'disabled':''}></label><button type="button" class="primario" data-acao="${concluido?'proximo':'conferir'}">${concluido?nivel===desafios.length-1?'Ver resultado':'Próximo desafio':'Conferir'}</button></div><p class="fs-mensagem ${classe}" role="status">${mensagem}</p></div></div>`;
+      el.querySelector('[data-fs-recorde]').textContent=String(recorde());
     }
     function avisar(texto,tipo=''){mensagem=texto;classe=tipo;const saida=el.querySelector('.fs-mensagem');saida.textContent=texto;saida.className=`fs-mensagem ${tipo}`;if(tipo==='erro')animar('erro')}
     function conferir(){
@@ -76,7 +80,8 @@ export function montar(container){
     function proximo(){
       if(nivel<desafios.length-1){nivel++;iniciarNivel();return}
       concluir('fracsoma');const melhor=Math.max(pontos,recorde());salvar('fracsoma-recorde',melhor);
-      el.innerHTML=`<div class="fs fs-fim"><h2>Missão cumprida!</h2><p>Você completou os ${desafios.length} desafios com <strong>${pontos} pontos</strong>. Recorde neste aparelho: ${melhor}.</p><button type="button" class="primario" data-acao="reiniciar">Jogar de novo</button></div>`;animar('vitoria');
+      el.innerHTML=`<div class="fs fs-fim"><h2>Missão cumprida!</h2><p>Você completou os ${desafios.length} desafios com <strong>${pontos} pontos</strong>. Recorde neste aparelho: <span data-fs-recorde></span>.</p><button type="button" class="primario" data-acao="reiniciar">Jogar de novo</button></div>`;
+      el.querySelector('[data-fs-recorde]').textContent=String(melhor);animar('vitoria');
     }
     el.addEventListener('input',event=>{
       if(event.target.id==='fs-numerador')numerador=event.target.value.replace(/\D/g,'').slice(0,6);
