@@ -72,6 +72,7 @@ jobs:
           mkdir -p build/web
           godot --headless --export-release Web build/web/index.html
           python tools/verify_godot_export.py --engine godot --pack build/web/index.pck
+          python tools/version_web_export.py --dir build/web
       - name: Render screens with software OpenGL
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'

@@ -44,7 +44,7 @@ func build(world_index: int, stage_index: int) -> void:
 	var water = Geo.material(Color(theme.water),true)
 	Geo.part(self,"FloatingFoundation","box",Vector3(0,-0.66,0),Vector3(14.2,1.2,20.3),stone)
 	Geo.part(self,"BattleFloor","box",Vector3(0,-0.08,0),Vector3(13.2,0.14,19.3),floor_mat)
-	Geo.part(self,"River","box",Vector3(0,0.0,0),Vector3(13.1,0.055,1.65),water)
+	Geo.part(self,"River","box",Vector3(0,-0.09,0),Vector3(13.1,0.055,1.65),water)
 	# Thin inlaid tiles replace the old white road strips.
 	for lane_x in [-3.0,3.0]:
 		for index in range(18):
@@ -72,14 +72,15 @@ func build(world_index: int, stage_index: int) -> void:
 		Geo.part(self,"RearRune","box",Vector3(0,0.018,side*8.85),Vector3(0.05,0.02,0.35),accent)
 
 func _bridge(x: float, stone: Material, trim: Material, accent: Material) -> void:
-	Geo.part(self,"BridgeArch","box",Vector3(x,0.08,0),Vector3(1.9,0.20,2.1),stone)
+	var bridge = Geo.pivot(self,"StoneBridge",Vector3(0,-0.21,0))
+	Geo.part(bridge,"BridgeArch","box",Vector3(x,0.08,0),Vector3(1.9,0.20,2.1),stone)
 	for step in range(5):
-		Geo.part(self,"BridgePaving","box",Vector3(x,0.195,-0.85+step*0.42),Vector3(1.6,0.035,0.38),trim)
+		Geo.part(bridge,"BridgePaving","box",Vector3(x,0.195,-0.85+step*0.42),Vector3(1.6,0.035,0.38),trim)
 	for side in [-1.0,1.0]:
 		for end in [-1.0,1.0]:
-			Geo.part(self,"BridgePost","box",Vector3(x+side*0.85,0.48,end*0.85),Vector3(0.15,0.65,0.15),stone)
-			Geo.part(self,"BridgeCrystal","sphere",Vector3(x+side*0.85,0.85,end*0.85),Vector3(0.08,0.12,0.08),accent)
-		Geo.part(self,"BridgeRail","box",Vector3(x+side*0.85,0.60,0),Vector3(0.07,0.075,1.8),trim)
+			Geo.part(bridge,"BridgePost","box",Vector3(x+side*0.85,0.48,end*0.85),Vector3(0.15,0.65,0.15),stone)
+			Geo.part(bridge,"BridgeCrystal","sphere",Vector3(x+side*0.85,0.85,end*0.85),Vector3(0.08,0.12,0.08),accent)
+		Geo.part(bridge,"BridgeRail","box",Vector3(x+side*0.85,0.60,0),Vector3(0.07,0.075,1.8),trim)
 
 func _pillar(point: Vector3, stone: Material, trim: Material, accent: Material) -> void:
 	Geo.part(self,"Buttress","box",point+Vector3(0,0.47,0),Vector3(0.51,0.95,0.51),stone)

@@ -80,7 +80,9 @@ python tools/verify_godot_export.py --engine godot --pack build/web/index.pck
 
 Sirva `build/web` por HTTP local para testar. A versão Web usa WebGL 2,
 sem threads e sem exigir os cabeçalhos de SharedArrayBuffer.
-É necessário um navegador com aceleração gráfica compatível.
+É necessário um navegador com aceleração gráfica compatível. O workflow
+usa um nome com hash para cada pacote Web, evitando misturar versões em cache
+sem apagar os dados de progresso do navegador.
 
 O workflow **Godot Web and Android** executa os testes, gera os arquivos Web
 e um APK Android de teste para ARMv7/ARM64. Os downloads ficam nos artifacts
