@@ -40,6 +40,28 @@ func run() -> void:
 	battle.frozen = false
 	battle.elixir = 10
 	battle._request_card(0)
-	await capture("05-math")
-	print("Five rendered screenshots captured.")
+	battle._preview_screen(battle.camera.unproject_position(Vector3(-4.5,0,8.7)))
+	await capture("05-placement")
+	battle._pick_screen(battle.camera.unproject_position(Vector3(-4.5,0,8.7)))
+	await capture("06-math")
+	battle._cancel_placement()
+	battle.queue_free()
+	await process_frame
+	var gallery = load("res://scenes/CharacterGallery.tscn").instantiate()
+	root.add_child(gallery)
+	for index in [0,1,2,4,7,10,16,28,32,36]:
+		gallery.show_card(index)
+		await capture("native-%02d" % (index+1))
+	gallery.queue_free()
+	await process_frame
+	for world in range(1,5):
+		game.active_stage = world*6
+		var themed = load("res://scenes/BattleArena3D.tscn").instantiate()
+		root.add_child(themed)
+		await process_frame
+		themed.frozen = true
+		await capture("arena-world-%d" % (world+1))
+		themed.queue_free()
+		await process_frame
+	print("Native characters, touch placement, five arenas and gallery captured.")
 	quit(0)

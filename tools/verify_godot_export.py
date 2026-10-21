@@ -14,7 +14,7 @@ engine = shutil.which(args.engine) or str(Path(args.engine).resolve())
 pack = str(Path(args.pack).resolve())
 with tempfile.TemporaryDirectory(prefix='calculus-export-') as isolated:
     env = dict(os.environ, XDG_DATA_HOME=isolated)
-    for scene in ['MainMenu', 'IslandOverworld', 'BattleArena3D']:
+    for scene in ['MainMenu', 'IslandOverworld', 'BattleArena3D', 'CharacterGallery']:
         result = subprocess.run(
             [engine, '--headless', '--main-pack', pack,
              f'res://scenes/{scene}.tscn', '--quit-after', '12'],

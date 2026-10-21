@@ -10,12 +10,38 @@ Abra `project.godot` no Godot 4.7.2 e pressione F6 na cena MainMenu, ou F5.
 Escolha um nome, monte um deck de oito cartas e entre em **Explorar as ilhas**.
 Cada vitória libera a próxima caverna; seis cavernas formam uma ilha.
 
-Na arena, escolha a ponte esquerda ou direita e toque em uma carta.
+Na arena, toque em uma carta e marque no cenário o ponto onde ela deve nascer.
+Você pode escolher todo o seu campo ao sul do rio, incluindo as laterais e
+atrás da torre central. No celular, arraste o marcador e solte para confirmar;
+no computador, clique. O marcador fica vermelho em pontos inválidos.
+Rio, pontes, terreno inimigo e pontos ocupados não aceitam invocações.
+A batalha pausa durante a escolha. **Cancelar escolha** ou Esc retoma o jogo
+sem gastar elixir. Unidades fora das rotas buscam rotas livres até as pontes.
 O jogo pausa os dois exércitos durante a pergunta. Uma resposta correta
 permite invocar a unidade; o erro custa um ponto de elixir. A carta usada
 volta para a fila do deck. Destrua a torre central adversária antes de
 180 segundos; no limite de tempo, vence a maior proporção de vida da torre.
-As unidades usam modelos GLB com animações de movimento e combate.
+Os 45 personagens são construídos nativamente no Godot, em
+`NativeCharacter.tscn` / `NativeCharacter.gd`, com peças 3D articuladas,
+AnimationPlayer e dez animações. `data/native_visuals.json` registra roupas,
+cabelos, armas e acessórios observados em cada carta. São interpretações 3D
+estilizadas das ilustrações. Os GLBs anteriores são mantidos como assets de
+referência e ficam fora dos exports; o combate usa os novos modelos nativos.
+
+No editor, abra `scenes/NativeCharacter.tscn` e altere **Preview Key**
+no Inspector para visualizar as 45 variantes. A cena `scenes/NativeArena.tscn`
+permite alternar **Preview World** entre 0 e 4. As duas cenas usam `@tool`
+para mostrar a geometria diretamente na área 3D do editor.
+
+O menu **Galeria 3D · 45 personagens** mostra a carta ao lado do personagem.
+Arraste para girá-lo e escolha uma animação. Os modelos têm rosto, mãos,
+botas e equipamentos próprios: arco, cajado, escudos, adagas, livro, picareta,
+espelho, orbe, balança, trombeta e outros elementos da carta.
+
+`NativeArena.gd` constrói cinco arenas com pisos de pedra, muralhas,
+bandeiras, pontes, torres e motivos próprios de cada ilha. O campo é mais
+profundo para permitir o nascimento atrás das torres. A câmera permanece
+fixa no sentido sul → norte e as cartas ficam na lateral.
 
 Vitórias inéditas concedem moedas e novas cartas. O treino não altera
 a campanha. Nome, deck e progresso são salvos localmente em

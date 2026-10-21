@@ -23,7 +23,20 @@ func run() -> void:
 		check(entry.chapters.size() == 6, "Every island has six missions")
 	for card in cards.entries:
 		check(ResourceLoader.exists(card.image), "Card texture exists: " + str(card.id))
-		check(ResourceLoader.exists(card.model), "Animated model exists: " + str(card.key))
+		check(ResourceLoader.exists("res://scenes/NativeCharacter.tscn"), "Native scene exists for: " + str(card.key))
+	var native_scene = load("res://scenes/NativeCharacter.tscn")
+	for card in cards.entries:
+		check(not card.visual.is_empty(), "Every card has an observed visual profile")
+		var native = native_scene.instantiate()
+		root.add_child(native)
+		native.configure(card)
+		check(native.get_meta("card_key") == card.key, "Native avatar retains the correct card identity")
+		for state in ["idle","walk","run","jump","summon","attack","power","hurt","victory","defeat"]:
+			check(native.animation.has_animation(state), "Native animation exists: " + state)
+			native.animation.play(state)
+			native.animation.advance(0.2)
+		native.queue_free()
+		await process_frame
 	var rng = RandomNumberGenerator.new()
 	rng.seed = 20261021
 	for world in range(5):
@@ -68,17 +81,55 @@ func run() -> void:
 			check(cave.get_global_rect().end.y <= root.get_visible_rect().size.y, "Every cave stays within the visible map")
 	overworld.queue_free()
 	await process_frame
+	var gallery = load("res://scenes/CharacterGallery.tscn").instantiate()
+	root.add_child(gallery)
+	await process_frame
+	for index in range(45):
+		gallery.show_card(index)
+		check(gallery.character.get_meta("card_key") == cards.entries[index].key, "Gallery shows the matching native model")
+		await process_frame
+	gallery.queue_free()
+	await process_frame
+	var terrain_scene = load("res://scripts/NativeArena.gd")
+	for world in range(5):
+		var terrain = terrain_scene.new()
+		root.add_child(terrain)
+		terrain.build(world,0)
+		check(terrain.get_meta("theme_name") == terrain_scene.THEMES[world].name, "Each island uses its own native arena")
+		terrain.queue_free()
+		await process_frame
 	var battle = load("res://scenes/BattleArena3D.tscn").instantiate()
 	root.add_child(battle)
 	await process_frame
 	check(battle.units().size() == 6, "Battle starts with three towers per side")
 	await process_frame
 	var king_position = battle.camera.unproject_position(battle.player_king.position + Vector3(0, 1.7, 0))
-	check(king_position.y < battle.hand_row.get_global_rect().position.y, "Player king is visible above the card hand")
+	check(not battle.hand_row.get_global_rect().has_point(king_position), "Player king is visible outside the card HUD")
 	battle.elixir = 10.0
 	var original_id = battle.hand[0]
 	battle._request_card(0)
-	check(battle.frozen, "Math question pauses both armies")
+	check(battle.frozen and battle.placing, "Choosing a point pauses both armies")
+	check(battle.quiz.is_empty(), "No question opens before choosing a point")
+	var before_cost = battle.elixir
+	battle._summon_selected()
+	check(battle.units().size() == 6 and battle.elixir == before_cost, "Cannot summon before choosing a point and answering")
+	var requested = Vector3(-4.0,0,8.8)
+	check(battle.spawn_error(requested).is_empty(), "Can deploy behind the king tower")
+	check(battle.spawn_error(Vector3(5.5,0,5.0)).is_empty(), "Can deploy beside towers and away from lanes")
+	check(not battle.spawn_error(Vector3(0,0,-5)).is_empty(), "Cannot deploy in enemy territory")
+	check(not battle.spawn_error(Vector3(0,0,0)).is_empty(), "Cannot deploy into the river")
+	check(not battle.spawn_error(Vector3(3,0,0)).is_empty(), "Cannot deploy onto a bridge")
+	check(not battle.spawn_error(Vector3(7,0,5)).is_empty(), "Cannot deploy outside the arena")
+	check(not battle.spawn_error(Vector3(5.6,0,7.5)).is_empty(), "Cannot deploy onto scenery")
+	check(not battle.spawn_error(battle.player_king.position).is_empty(), "Cannot deploy inside a tower")
+	var click = InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.pressed = true
+	click.position = battle.camera.unproject_position(requested)
+	root.push_input(click,true)
+	await process_frame
+	check(not battle.placing and not battle.quiz.is_empty(), "A real viewport click selects the world point and opens the question")
+	check(battle.selected_spawn.distance_to(requested) < 0.001, "Screen picking preserves the selected 3D point")
 	battle._answer(int(battle.quiz.answer))
 	battle._answer(int(battle.quiz.answer))
 	check(battle.answers == 1, "An answer cannot be submitted twice")
@@ -87,7 +138,44 @@ func run() -> void:
 	check(battle.hand[0] != original_id and battle.draw_queue.has(original_id), "Used card cycles through the deck")
 	check(battle.units().size() == 7, "Correct answer spawns one model")
 	var unit = battle.units().back()
-	check(unit.animation != null, "Imported model includes an AnimationPlayer")
+	check(unit.animation != null, "Native character includes an AnimationPlayer")
+	check(unit.position.distance_to(requested) < 0.001, "The character is born at the touched point")
+	check(unit.visual.get_child(0).get_meta("native_godot_model",false), "Unit uses the native Godot character")
+	var after_cost = battle.elixir
+	battle._summon_selected()
+	check(battle.units().size() == 7 and battle.elixir == after_cost, "Repeated summon cannot spend or create a second unit")
+	battle._request_card(1)
+	var touch = InputEventScreenTouch.new()
+	touch.index = 1
+	touch.pressed = true
+	touch.position = battle.camera.unproject_position(Vector3(5,0,8.5))
+	battle._unhandled_input(touch)
+	check(battle.placing, "A second finger cannot confirm a deployment")
+	touch.index = 0
+	battle._unhandled_input(touch)
+	var drag = InputEventScreenDrag.new()
+	drag.index = 0
+	drag.position = battle.camera.unproject_position(Vector3(4.5,0,8.5))
+	battle._unhandled_input(drag)
+	touch.position = drag.position
+	touch.pressed = false
+	battle._unhandled_input(touch)
+	check(not battle.placing and battle.selected_spawn.distance_to(Vector3(4.5,0,8.5)) < 0.001, "Native touch drag confirms only when released")
+	battle._cancel_placement()
+	check(not battle.frozen and battle.selected_card == -1 and battle.elixir == after_cost, "Cancel resumes without spending elixir")
+	var previous_position = unit.position
+	for side in [-1.0,1.0]:
+		unit.position = Vector3(side*5.5,0,8.5)
+		unit.lane = 0 if side<0 else 1
+		unit.path_clock = 0
+		for tick in range(700):
+			var waypoint = battle.walk_target(unit,battle.enemy_king)
+			var direction = waypoint-unit.position
+			unit.position = battle.constrain_walk(unit.position + direction.normalized()*minf(direction.length(),0.05),unit.position)
+			if absf(unit.position.z) < 0.9:
+				check(absf(absf(unit.position.x)-3.0) < 0.64, "Free deployment crosses only through a bridge")
+		check(unit.position.z < -3.0, "Both free deployment routes reach enemy territory")
+	unit.position = previous_position
 	var enemy = battle._spawn(cards.card(2), 1, 0, Vector3(-3,0,1))
 	unit.attack(enemy)
 	check(enemy.hp < enemy.max_hp, "Units deal combat damage")

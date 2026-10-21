@@ -1,6 +1,8 @@
 extends CharacterBody3D
 class_name RoyaleUnit
 
+const CHARACTER_SCENE = preload("res://scenes/NativeCharacter.tscn")
+
 signal defeated(unit: RoyaleUnit)
 
 var arena
@@ -27,6 +29,12 @@ var animation: AnimationPlayer
 var visual: Node3D
 var hp_fill: MeshInstance3D
 var animation_state = ""
+var animation_paused = false
+var walk_path: Array[Vector3] = []
+var path_step = 0
+var path_revision = -1
+var path_target_id = 0
+var path_clock = 0.0
 
 func configure(card: Dictionary, side: int, selected_lane: int, battle: Node3D, multiplier: float = 1.0) -> void:
 	stats = card.duplicate(true)
@@ -47,50 +55,19 @@ func configure(card: Dictionary, side: int, selected_lane: int, battle: Node3D, 
 func _build_visual() -> void:
 	visual = Node3D.new()
 	add_child(visual)
-	var color = Color(stats.get("color", "#63d6cd"))
 	if is_tower:
-		var tower = MeshInstance3D.new()
-		var cylinder = CylinderMesh.new()
-		cylinder.top_radius = 0.48 if is_king else 0.35
-		cylinder.bottom_radius = 0.65 if is_king else 0.48
-		cylinder.height = 1.7 if is_king else 1.2
-		tower.mesh = cylinder
-		tower.position.y = cylinder.height / 2.0
-		visual.add_child(tower)
-		tower.material_override = material(Color("43d5d0") if team == 0 else Color("e66b72"))
-		var crown = MeshInstance3D.new()
-		var ring = TorusMesh.new()
-		ring.inner_radius = 0.3
-		ring.outer_radius = 0.47
-		crown.mesh = ring
-		crown.position.y = cylinder.height
-		crown.material_override = material(Color("ebc774"))
-		visual.add_child(crown)
+		visual.add_child(arena.native_world.tower(team, is_king))
 	else:
-		var model_path = str(stats.get("model", ""))
-		if ResourceLoader.exists(model_path):
-			var packed = load(model_path) as PackedScene
-			if packed:
-				var model = packed.instantiate() as Node3D
-				visual.add_child(model)
-				model.rotation.y = PI
-				var players = model.find_children("*", "AnimationPlayer", true, false)
-				if not players.is_empty():
-					animation = players[0] as AnimationPlayer
-		if visual.get_child_count() == 0:
-			var fallback = MeshInstance3D.new()
-			var capsule = CapsuleMesh.new()
-			capsule.radius = 0.3
-			capsule.height = 1.2
-			fallback.mesh = capsule
-			fallback.position.y = 0.6
-			fallback.material_override = material(color)
-			visual.add_child(fallback)
+		var character = CHARACTER_SCENE.instantiate()
+		visual.add_child(character)
+		character.configure(stats)
+		animation = character.animation
 	var base = MeshInstance3D.new()
-	var marker = CylinderMesh.new()
-	marker.top_radius = 0.45
-	marker.bottom_radius = 0.45
-	marker.height = 0.045
+	var marker = TorusMesh.new()
+	marker.inner_radius = 0.34
+	marker.outer_radius = 0.43
+	marker.rings = 16
+	marker.ring_segments = 6
 	base.mesh = marker
 	base.position.y = 0.025
 	base.material_override = material(Color("46c9d4") if team == 0 else Color("ec6d88"))
@@ -99,7 +76,7 @@ func _build_visual() -> void:
 	var bar = BoxMesh.new()
 	bar.size = Vector3(0.8, 0.06, 0.08)
 	hp_fill.mesh = bar
-	hp_fill.position = Vector3(0, 2.0 if is_tower else 1.9, 0)
+	hp_fill.position = Vector3(0, 2.55 if is_king else (1.95 if is_tower else 2.4), 0)
 	hp_fill.material_override = material(Color("70efad"))
 	add_child(hp_fill)
 
@@ -110,11 +87,20 @@ static func material(color: Color) -> StandardMaterial3D:
 	return result
 
 func _physics_process(delta: float) -> void:
-	if dead or arena == null or arena.frozen:
+	if dead or arena == null:
 		return
+	if arena.frozen:
+		if animation and animation.is_playing():
+			animation.pause()
+			animation_paused = true
+		return
+	if animation_paused:
+		animation.play()
+		animation_paused = false
 	slow_timer = maxf(0.0, slow_timer - delta)
 	haste_timer = maxf(0.0, haste_timer - delta)
 	reflect_timer = maxf(0.0, reflect_timer - delta)
+	path_clock -= delta
 	attack_clock -= delta
 	if burn_timer > 0.0:
 		burn_timer -= delta
@@ -135,7 +121,11 @@ func _physics_process(delta: float) -> void:
 			var multiplier = 0.55 if slow_timer > 0 else 1.0
 			if haste_timer > 0:
 				multiplier *= 1.5
-			position += direction.normalized() * speed * multiplier * delta
+			var waypoint: Vector3 = arena.walk_target(self, target)
+			var travel = waypoint - position
+			travel.y = 0
+			var next_position = position + travel.normalized() * minf(travel.length(), speed * multiplier * delta)
+			position = arena.constrain_walk(next_position, position)
 			if direction.length_squared() > 0.001:
 				look_at(position + direction, Vector3.UP)
 			play_animation("walk")
@@ -155,7 +145,7 @@ func attack(target: RoyaleUnit) -> void:
 		return
 	play_animation("attack", true)
 	target.take_damage(damage, self, stats.get("ability_kind") == "pierce")
-	arena.effect(position + Vector3.UP, target.position + Vector3.UP, Color(stats.get("glow", "#eee5b8")))
+	arena.attack_effect(self,target)
 	special_hits += 1
 	if not is_tower and special_hits % 3 == 0 and not target.dead:
 		play_animation("power", true)

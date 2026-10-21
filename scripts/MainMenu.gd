@@ -37,6 +37,7 @@ func _ready() -> void:
 	panel.custom_minimum_size.x = 410
 	layout.add_child(panel)
 	var menu = VBoxContainer.new()
+	menu.add_theme_constant_override("separation",10)
 	panel.add_child(menu)
 	menu.add_child(RoyaleUI.label("Prepare seu calculante", 28, RoyaleUI.GOLD))
 	name_input = LineEdit.new()
@@ -54,13 +55,14 @@ func _ready() -> void:
 	menu.add_child(RoyaleUI.label("Identificação do perfil. A classe não altera os atributos das cartas.", 15, Color("b4c8d4")))
 	menu.add_child(RoyaleUI.button("EXPLORAR AS ILHAS  →", start_adventure))
 	menu.add_child(RoyaleUI.button("MINHAS CARTAS / DECK", show_deck))
+	menu.add_child(RoyaleUI.button("GALERIA 3D · 45 PERSONAGENS", func(): get_tree().change_scene_to_file("res://scenes/CharacterGallery.tscn")))
 	menu.add_child(RoyaleUI.button("BATALHA DE TREINO", func(): _save_identity(); Game.select_stage(0, true)))
 	menu.add_child(RoyaleUI.button("TELA CHEIA", func(): DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN else DisplayServer.WINDOW_MODE_FULLSCREEN)))
 	menu.add_child(RoyaleUI.label("%d / 30 missões  ·  %d moedas  ·  %d / 45 cartas" % [Game.completed.size(), Game.coins, Game.unlocked.size()], 18, RoyaleUI.MINT))
 	var preview = HBoxContainer.new()
 	menu.add_child(preview)
 	for id in [1, 6, 14]:
-		preview.add_child(RoyaleUI.card_button(id, show_deck, 104))
+		preview.add_child(RoyaleUI.card_button(id, show_deck, 80))
 	_build_deck_overlay()
 
 func _save_identity() -> void:
