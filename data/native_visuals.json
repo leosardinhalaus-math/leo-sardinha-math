@@ -106,9 +106,9 @@
     "detail": "cracks",
     "notes": "Corpo de pedra e aço, ombreiras largas e fissuras luminosas azuis.",
     "color": "#4c5267",
-    "glow": "#a08eff",
+    "glow": "#63dfff",
     "skin": "#e4b98f",
-    "trim": "#d4ac59",
+    "trim": "#809ba9",
     "height": 1.85
   },
   "rate": {
@@ -147,7 +147,7 @@
     "weapon": "book",
     "detail": "glasses",
     "notes": "Cabelos castanhos, óculos redondos e livro de páginas douradas.",
-    "color": "#97663a",
+    "color": "#4f345c",
     "glow": "#ffe08d",
     "skin": "#e4b98f",
     "trim": "#d4ac59",
@@ -402,7 +402,7 @@
     "color": "#6691b1",
     "glow": "#a5edff",
     "skin": "#e4b98f",
-    "trim": "#d4ac59",
+    "trim": "#a6bdcb",
     "height": 1.85
   },
   "mean": {
@@ -511,7 +511,7 @@
     "weapon": "trumpet",
     "detail": "wings",
     "notes": "Arauto loiro em túnica branca/dourada com trombeta e asas.",
-    "color": "#f0deac",
+    "color": "#f4eee1",
     "glow": "#ffec98",
     "skin": "#e4b98f",
     "trim": "#d4ac59",

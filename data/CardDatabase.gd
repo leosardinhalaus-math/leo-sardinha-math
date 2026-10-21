@@ -10,6 +10,8 @@ func _ready() -> void:
 		entries = parsed
 		for card in entries:
 			card["visual"] = visual_profiles.get(str(card.key), {}) if visual_profiles is Dictionary else {}
+			for field in ["color","glow"]:
+				if card.visual.has(field): card[field] = card.visual[field]
 			lookup[int(card.id)] = card
 
 func card(id: int) -> Dictionary:
