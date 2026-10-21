@@ -62,12 +62,19 @@ func run() -> void:
 	for world in range(5):
 		overworld.select_world(world)
 		check(overworld.cave_layer.get_child_count() == 6, "Six cave buttons on every island")
+		await process_frame
+		await process_frame
+		for cave in overworld.cave_layer.get_children():
+			check(cave.get_global_rect().end.y <= root.get_visible_rect().size.y, "Every cave stays within the visible map")
 	overworld.queue_free()
 	await process_frame
 	var battle = load("res://scenes/BattleArena3D.tscn").instantiate()
 	root.add_child(battle)
 	await process_frame
 	check(battle.units().size() == 6, "Battle starts with three towers per side")
+	await process_frame
+	var king_position = battle.camera.unproject_position(battle.player_king.position + Vector3(0, 1.7, 0))
+	check(king_position.y < battle.hand_row.get_global_rect().position.y, "Player king is visible above the card hand")
 	battle.elixir = 10.0
 	var original_id = battle.hand[0]
 	battle._request_card(0)

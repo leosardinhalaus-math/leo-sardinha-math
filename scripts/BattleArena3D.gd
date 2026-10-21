@@ -60,7 +60,8 @@ func _build_world() -> void:
 	camera = Camera3D.new()
 	camera.position = Vector3(0, 16.5, 12.5)
 	camera.projection = Camera3D.PROJECTION_ORTHOGONAL
-	camera.size = 21.0
+	camera.size = 24.5
+	camera.v_offset = -2.0
 	add_child(camera)
 	camera.look_at(Vector3(0, 0, 0))
 	camera.current = true
@@ -127,9 +128,12 @@ func _build_interface() -> void:
 	var pause = RoyaleUI.button("PAUSAR", _pause, Vector2(140, 48))
 	header.add_child(pause)
 	top_status = RoyaleUI.label("", 22, RoyaleUI.GOLD)
+	top_status.autowrap_mode = TextServer.AUTOWRAP_OFF
 	top_status.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(top_status)
-	header.add_child(RoyaleUI.label("SUL → NORTE", 17, RoyaleUI.MINT))
+	var direction_label = RoyaleUI.label("SUL → NORTE", 17, RoyaleUI.MINT)
+	direction_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	header.add_child(direction_label)
 	column.add_child(RoyaleUI.label(Islands.title_for(Game.active_stage), 18))
 	var center = Control.new()
 	center.size_flags_vertical = Control.SIZE_EXPAND_FILL

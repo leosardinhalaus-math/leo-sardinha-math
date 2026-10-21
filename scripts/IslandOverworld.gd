@@ -20,7 +20,9 @@ func _ready() -> void:
 	var name_label = RoyaleUI.label("A JORNADA DE %s" % Game.player_name.to_upper(), 22, RoyaleUI.GOLD)
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(name_label)
-	header.add_child(RoyaleUI.label("%d / 30  ·  %d moedas" % [Game.completed.size(), Game.coins], 18, RoyaleUI.MINT))
+	var progress_label = RoyaleUI.label("%d / 30  ·  %d moedas" % [Game.completed.size(), Game.coins], 18, RoyaleUI.MINT)
+	progress_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	header.add_child(progress_label)
 	var islands_row = HBoxContainer.new()
 	content.add_child(islands_row)
 	for index in range(5):
