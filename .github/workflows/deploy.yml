@@ -72,6 +72,16 @@ jobs:
           mkdir -p build/web
           godot --headless --export-release Web build/web/index.html
           python tools/verify_godot_export.py --engine godot --pack build/web/index.pck
+      - name: Render screens with software OpenGL
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+          XDG_DATA_HOME: ${{ runner.temp }}/godot-visual-test
+        run: timeout 90s xvfb-run -a godot --rendering-method gl_compatibility --audio-driver Dummy --script tests/godot/capture_screens.gd
+      - uses: actions/upload-artifact@v4
+        with:
+          name: calculus-royale-screens
+          path: build/screens/*.png
+          retention-days: 30
       - name: Configure Android SDK and debug signing
         run: |
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-35" "build-tools;35.0.1"
