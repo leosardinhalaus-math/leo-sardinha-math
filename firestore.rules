@@ -1,0 +1,44 @@
+rules_version = '2';
+service cloud.firestore {
+ match /databases/{database}/documents {
+  function owner(id) { return request.auth != null && request.auth.uid == id; }
+  function boundedList() { return request.query.limit != null && request.query.limit <= 100; }
+  function profile(id) {
+   let d = request.resource.data;
+   return d.keys().hasAll(['user_id','username','public_slug','avatar_seed','created_at'])
+    && d.keys().hasOnly(['user_id','username','public_slug','avatar_seed','created_at'])
+    && d.user_id == id && d.public_slug == 'jogador-' + id
+    && d.username is string && d.username.size() >= 3 && d.username.size() <= 24
+    && d.avatar_seed is string && d.avatar_seed.size() >= 1 && d.avatar_seed.size() <= 2
+    && d.created_at is timestamp;
+  }
+  match /players/{id} {
+   allow get: if true;
+   allow list: if boundedList();
+   allow create: if owner(id) && profile(id) && request.resource.data.created_at == request.time;
+   allow update: if owner(id) && profile(id) && request.resource.data.created_at == resource.data.created_at;
+   allow delete: if owner(id);
+  }
+  match /progress/{id} {
+   allow read, delete: if owner(id);
+   allow create, update: if owner(id)
+    && request.resource.data.keys().hasAll(['user_id','schema_version','payload_json','summary','updated_at'])
+    && request.resource.data.keys().hasOnly(['user_id','schema_version','payload_json','summary','updated_at'])
+    && request.resource.data.user_id == id
+    && request.resource.data.schema_version == 1
+    && request.resource.data.payload_json is string
+    && request.resource.data.payload_json.size() > 0 && request.resource.data.payload_json.size() <= 200000
+    && request.resource.data.summary is map
+    && request.resource.data.summary.keys().hasOnly(['level','xp','trophies','wins','losses','completed_worlds','best_tower_wave','current_streak','best_streak','chests_opened','coins','essence'])
+    && request.resource.data.updated_at == request.time;
+  }
+  // Only a trusted server using Admin SDK/IAM may publish verified scores.
+  // Private device saves are never promoted automatically into public scores.
+  match /leaderboard/{id} {
+   allow get: if true;
+   allow list: if boundedList();
+   allow write: if false;
+  }
+  match /{document=**} { allow read, write: if false; }
+ }
+}

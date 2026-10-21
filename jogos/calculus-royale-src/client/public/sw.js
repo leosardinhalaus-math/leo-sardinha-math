@@ -1,5 +1,5 @@
-const CACHE='calculus-royale-v4';
-const CORE=['./','./index.html','./manifest.webmanifest','./assets/icons/calculus-mark.svg'];
+const CACHE='calculus-royale-v5';
+const CORE=['./','./index.html','./manifest.webmanifest','./assets/icons/calculus-mark.svg','./player.js','./cloud-config.js','./firebase-cloud.js','./firebase-runtime.js'];
 async function matchOwn(request){
  try{return await (await caches.open(CACHE)).match(request);}
  catch(error){console.warn('Cache indisponível:',error);return undefined;}
@@ -11,7 +11,7 @@ async function remember(request,response){
  }
  return response;
 }
-self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting())));
+self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE.map(path=>new Request(path,{cache:'reload'})))).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('calculus-royale-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',event=>{
  const request=event.request;if(request.method!=='GET')return;

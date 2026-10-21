@@ -16,7 +16,9 @@ async function api(path, options={}, token="") {
     ...(options.headers || {}),
   };
   if (token) headers.Authorization = `Bearer ${token}`;
-  const res = await fetch(SUPABASE_URL + path, { ...options, headers });
+  let res;
+  try { res = await fetch(SUPABASE_URL + path, { ...options, headers }); }
+  catch { throw new Error('O serviço online está indisponível. Seu progresso continua salvo neste aparelho.'); }
   const text = await res.text();
   let data = null;
   try { data = text ? JSON.parse(text) : null; } catch { data = text; }
@@ -172,5 +174,26 @@ function logout() {
   location.reload();
 }
 
-window.CalculusCloud = { $, $$, safe, api, session, signIn, signUp, getProfile, ensureProfile, syncProgress, getMyStats, publicProfile, leaderboard, logout, localProgress };
+const legacy = { $, $$, safe, api, session, signIn, signUp, getProfile, ensureProfile, syncProgress, getMyStats, publicProfile, leaderboard, logout, localProgress, provider: 'supabase' };
+if (window.CalculusCloudConfig?.provider === 'firebase') {
+  const config = window.CalculusCloudConfig.firebase;
+  const configured = ['apiKey','projectId','appId','authDomain'].every(key => typeof config?.[key] === 'string' && config[key].trim());
+  let service;
+  async function firebase() {
+    if (!configured) throw new Error('O salvamento online ainda não está disponível. Você pode continuar jogando neste aparelho.');
+    if (!service) service = import('./firebase-runtime.js')
+      .then(module => module.openFirebase(config, localProgress, localStorage))
+      .catch(() => { service = undefined; throw new Error('Não foi possível conectar ao serviço online agora. Seu progresso neste aparelho foi preservado.'); });
+    return service;
+  }
+  const cloud = { $, $$, safe, localProgress, provider: 'firebase', configured };
+  for (const method of ['signIn','signUp','getProfile','ensureProfile','syncProgress','getMyStats','publicProfile','leaderboard','restoreProgress','subscribeLeaderboard']) {
+    cloud[method] = (...args) => firebase().then(adapter => adapter[method](...args));
+  }
+  cloud.session = () => configured ? firebase().then(adapter => adapter.session()) : Promise.resolve(null);
+  cloud.logout = async () => { await (await firebase()).logout(); location.reload(); };
+  window.CalculusCloud = cloud;
+} else {
+  window.CalculusCloud = legacy;
+}
 })();

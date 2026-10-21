@@ -1,0 +1,27 @@
+name: Firestore rules
+on:
+  push:
+    branches: [main]
+    paths: ['firestore.rules', 'firestore.indexes.json', 'firebase.json', 'tools/firebase-tests/**', '.github/workflows/firestore-rules.yml']
+  pull_request:
+    paths: ['firestore.rules', 'firestore.indexes.json', 'firebase.json', 'tools/firebase-tests/**', '.github/workflows/firestore-rules.yml']
+permissions:
+  contents: read
+jobs:
+  rules:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: tools/firebase-tests/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+        working-directory: tools/firebase-tests
+      - run: npm test
+        working-directory: tools/firebase-tests

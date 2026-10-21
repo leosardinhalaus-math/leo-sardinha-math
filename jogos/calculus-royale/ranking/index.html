@@ -1,5 +1,24 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ranking · Calculus Royale</title><link rel="stylesheet" href="../player.css"></head><body><main class="shell"><div class="top"><a class="brand" href="../">CALCULUS <span>ROYALE</span></a><nav class="nav"><a href="../">Jogar</a><a href="../perfil/">Meu perfil</a><a href="../../../educacao.html">Educação</a></nav></div><section class="hero"><span class="eyebrow">RANKING ONLINE</span><h1>Quem domina o cálculo?</h1><p class="muted">Compare troféus, progresso e a melhor marca na Torre de Sobrevivência.</p></section><section class="panel" style="margin-top:14px"><div class="tabs"><button class="tab active" data-sort="trophies.desc">Geral</button><button class="tab" data-sort="best_tower_wave.desc">Torre</button><button class="tab" data-sort="completed_worlds.desc,xp.desc">Progresso</button></div><div id="rank" class="rank-list"><p class="muted">Carregando ranking...</p></div></section></main><script src="../player.js"></script><script>
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ranking · Calculus Royale</title><link rel="stylesheet" href="../player.css"></head><body><main class="shell"><div class="top"><a class="brand" href="../">CALCULUS <span>ROYALE</span></a><nav class="nav"><a href="../">Jogar</a><a href="../perfil/">Meu perfil</a><a href="../../../educacao.html">Educação</a></nav></div><section class="hero"><span class="eyebrow">RANKING ONLINE</span><h1>Quem domina o cálculo?</h1><p class="muted">Compare troféus, progresso e a melhor marca na Torre de Sobrevivência.</p></section><section class="panel" style="margin-top:14px"><div class="tabs"><button class="tab active" data-sort="trophies.desc">Geral</button><button class="tab" data-sort="best_tower_wave.desc">Torre</button><button class="tab" data-sort="completed_worlds.desc,xp.desc">Progresso</button></div><div id="rank" class="rank-list"><p class="muted">Carregando ranking...</p></div></section></main><script src="../cloud-config.js"></script><script src="../player.js"></script><script>
 const C=window.CalculusCloud,$=C.$,$$=C.$$;
-async function load(sort){$("#rank").innerHTML='<p class="muted">Carregando ranking...</p>';try{const rows=await C.leaderboard(sort);if(!rows.length){$("#rank").innerHTML='<p class="muted">Ainda não há jogadores no ranking. Seja o primeiro.</p>';return}$("#rank").innerHTML=rows.map((r,i)=>{const main=sort.startsWith("best_tower")?"Onda "+r.best_tower_wave:sort.startsWith("completed")?r.completed_worlds+"/5 mundos":r.trophies+" 🏆";return '<a class="rank-row" href="../perfil/?u='+encodeURIComponent(r.profile.public_slug)+'"><div class="rank-pos">#'+(i+1)+'</div><div><strong>'+C.safe(r.profile.username)+'</strong><div class="muted">Nível '+r.level+' · '+r.wins+' vitórias</div></div><div class="rank-score">'+C.safe(main)+'</div><div class="rank-sub">'+r.xp+' XP</div></a>'}).join("")}catch(e){$("#rank").innerHTML='<p class="msg">'+C.safe(e.message)+'</p>'}}
-$$(".tab").forEach(b=>b.onclick=()=>{$$(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");load(b.dataset.sort)});load("trophies.desc");
+let unsubscribe=()=>{},generation=0;
+function render(rows,sort){
+ if(!rows.length){$('#rank').innerHTML='<p class="muted">Ainda não há jogadores no ranking. Seja o primeiro.</p>';return}
+ $('#rank').innerHTML=rows.map((row,index)=>{
+  const score=sort.startsWith('best_tower')?'Onda '+row.best_tower_wave:sort.startsWith('completed')?row.completed_worlds+'/5 mundos':row.trophies+' 🏆';
+  return '<a class="rank-row" href="../perfil/?u='+encodeURIComponent(row.profile.public_slug)+'"><div class="rank-pos">#'+(index+1)+'</div><div><strong>'+C.safe(row.profile.username)+'</strong><div class="muted">Nível '+C.safe(row.level)+' · '+C.safe(row.wins)+' vitórias</div></div><div class="rank-score">'+C.safe(score)+'</div><div class="rank-sub">'+C.safe(row.xp)+' XP</div></a>';
+ }).join('');
+}
+async function load(sort){
+ const current=++generation;unsubscribe();unsubscribe=()=>{};
+ $('#rank').innerHTML='<p class="muted" role="status">Carregando ranking…</p>';
+ const show=rows=>{if(current===generation)render(rows,sort)};
+ const fail=()=>{if(current===generation)$('#rank').innerHTML='<p class="msg" role="status">O ranking online está indisponível agora. Você pode continuar jogando e tentar mais tarde.</p>'};
+ try{
+  if(C.subscribeLeaderboard){const stop=await C.subscribeLeaderboard(sort,show,fail);if(current!==generation)stop();else unsubscribe=stop}
+  else show(await C.leaderboard(sort));
+ }catch{fail()}
+}
+$$('.tab').forEach(button=>button.onclick=()=>{$$('.tab').forEach(item=>item.classList.remove('active'));button.classList.add('active');load(button.dataset.sort)});
+window.addEventListener?.('pagehide',()=>{generation++;unsubscribe()});
+load('trophies.desc');
 </script></body></html>

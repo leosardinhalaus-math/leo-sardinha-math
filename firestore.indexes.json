@@ -1,0 +1,14 @@
+{
+  "indexes": [{
+    "collectionGroup": "leaderboard",
+    "queryScope": "COLLECTION",
+    "fields": [
+      {"fieldPath": "completed_worlds", "order": "DESCENDING"},
+      {"fieldPath": "xp", "order": "DESCENDING"}
+    ]
+  }],
+  "fieldOverrides": [
+    {"collectionGroup": "progress", "fieldPath": "payload_json", "indexes": []},
+    {"collectionGroup": "progress", "fieldPath": "summary", "indexes": []}
+  ]
+}

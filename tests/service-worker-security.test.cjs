@@ -6,8 +6,8 @@ const vm=require('node:vm');
 const root=path.resolve(__dirname,'..');
 const origin='https://example.github.io';
 const targets=[
- {file:'jogos/calculus-royale/sw.js',scope:'/leo-sardinha-math/jogos/calculus-royale/',cache:'calculus-royale-v4',prefix:'calculus-royale-',navigation:true},
- {file:'jogos/calculus-royale-src/client/public/sw.js',scope:'/leo-sardinha-math/jogos/calculus-royale/',cache:'calculus-royale-v4',prefix:'calculus-royale-',navigation:true},
+ {file:'jogos/calculus-royale/sw.js',scope:'/leo-sardinha-math/jogos/calculus-royale/',cache:'calculus-royale-v5',prefix:'calculus-royale-',navigation:true},
+ {file:'jogos/calculus-royale-src/client/public/sw.js',scope:'/leo-sardinha-math/jogos/calculus-royale/',cache:'calculus-royale-v5',prefix:'calculus-royale-',navigation:true},
  {file:'jogos/laboratorio-digital-matematica/service-worker.js',scope:'/leo-sardinha-math/jogos/laboratorio-digital-matematica/',cache:'ldm-v24',prefix:'ldm-v',navigation:false}
 ];
 
