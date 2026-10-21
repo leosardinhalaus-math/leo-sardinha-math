@@ -74,7 +74,7 @@ jobs:
           python tools/verify_godot_export.py --engine godot --pack build/web/index.pck
       - name: Configure Android SDK and debug signing
         run: |
-          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.1"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-35" "build-tools;35.0.1"
           python tools/setup_godot_android.py
           keytool -genkeypair -keystore "$RUNNER_TEMP/debug.keystore" -alias androiddebugkey -storepass android -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
       - name: Export installable test APK
