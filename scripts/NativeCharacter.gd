@@ -82,7 +82,9 @@ func _humanoid() -> void:
 	pivots.append(body)
 	_p(body, "Torso", "sphere", Vector3(0, 0.12, 0), Vector3(0.29 * broad, 0.34, 0.19), steel if armored else cloth)
 	_p(body, "Waist", "sphere", Vector3(0, -0.12, 0), Vector3(0.23 * broad, 0.18, 0.17), cloth)
-	_p(body, "Breastplate", "sphere", Vector3(0, 0.16, -0.13), Vector3(0.25 * broad, 0.25, 0.10), cloth if armored else gold)
+	_p(body, "Breastplate", "sphere", Vector3(0, 0.16, -0.13), Vector3(0.25 * broad, 0.25, 0.10), steel if armored and str(get_meta("card_key")) in ["limit","cauchy","comparison"] else cloth)
+	for side in [-1.0,1.0]:
+		Geo.segment(body,"ChestTrim",Vector3(side*0.19,0.31,-0.20),Vector3(0,0.02,-0.24),0.012,gold)
 	_p(body, "Belt", "cylinder", Vector3(0, -0.12, 0), Vector3(0.25 * broad, 0.075, 0.19), gold)
 	_p(body, "Buckle", "box", Vector3(0, -0.12, -0.20), Vector3(0.11, 0.11, 0.035), glow)
 	if outfit in ["robe", "dress", "coat"]:
@@ -115,16 +117,16 @@ func _humanoid() -> void:
 			right_leg = leg
 	head = Geo.pivot(body, "Head", Vector3(0, 0.56, 0))
 	pivots.append(head)
-	_p(head, "Neck", "cylinder", Vector3(0, -0.20, 0), Vector3(0.10, 0.18, 0.10), skin)
+	_p(head, "Neck", "cylinder", Vector3(0, -0.20, 0), Vector3(0.10, 0.18, 0.10), steel if profile.get("hair_style") == "helmet" else skin)
 	var helmet = profile.get("hair_style") == "helmet"
 	_p(head, "Face", "sphere", Vector3.ZERO, Vector3(0.235, 0.28, 0.215), steel if helmet else skin)
 	for side in [-1.0, 1.0]:
-		_p(head, "Ear", "sphere", Vector3(side * 0.23, 0, 0), Vector3(0.055, 0.09, 0.055), skin, true)
-		_p(head, "Eye", "sphere", Vector3(side * 0.085, 0.045, -0.194), Vector3(0.055, 0.035, 0.025), glow if helmet else Geo.material(Color("f7f0dc")), true)
-		_p(head, "Pupil", "sphere", Vector3(side * 0.085, 0.045, -0.216), Vector3(0.024, 0.028, 0.012), dark, true)
+		_p(head, "Ear", "sphere", Vector3(side * 0.23, 0, 0), Vector3(0.035, 0.07, 0.04), steel if helmet else skin, true)
+		_p(head, "Eye", "sphere", Vector3(side * 0.085, 0.045, -0.248 if helmet else -0.194), Vector3(0.055 if helmet else 0.045, 0.023, 0.016), glow if helmet else Geo.material(Color("f7f0dc")), true)
+		_p(head, "Pupil", "sphere", Vector3(side * 0.085, 0.045, -0.261 if helmet else -0.209), Vector3(0.020, 0.022, 0.009), dark, true)
 		var brow = _p(head, "Brow", "box", Vector3(side * 0.085, 0.10, -0.19), Vector3(0.12, 0.025, 0.025), hair, true)
 		brow.rotation.z = side * -0.1
-	_p(head, "Nose", "sphere", Vector3(0, -0.01, -0.216), Vector3(0.039, 0.065, 0.04), skin, true)
+	_p(head, "Nose", "sphere", Vector3(0, -0.01, -0.216), Vector3(0.032, 0.055, 0.035), steel if helmet else skin, true)
 	_p(head, "Mouth", "box", Vector3(0, -0.11, -0.195), Vector3(0.075, 0.015, 0.013), Geo.material(Color("8a5148")), true)
 	_hair(helmet)
 	if profile.get("detail") == "beard":
@@ -160,15 +162,15 @@ func _hair(helmet: bool) -> void:
 			_p(head, "HoodEdge", "sphere", Vector3(side * 0.235, 0.0, -0.07), Vector3(0.067, 0.3, 0.12), cloth)
 		_p(head, "HoodPeak", "sphere", Vector3(0, 0.27, -0.05), Vector3(0.23, 0.09, 0.20), cloth)
 	else:
-		_p(head, "HairCap", "sphere", Vector3(0, 0.17, 0.015), Vector3(0.245, 0.16, 0.22), hair)
-		for index in range(5):
-			var lock = _p(head, "HairLock", "sphere", Vector3(-0.16 + index * 0.08, 0.18, -0.15), Vector3(0.08, 0.16 if index % 2 else 0.12, 0.055), hair)
+		_p(head, "HairCap", "sphere", Vector3(0, 0.17, 0.015), Vector3(0.24, 0.13, 0.215), hair)
+		for index in range(4):
+			var lock = _p(head, "HairLock", "sphere", Vector3(-0.14 + index * 0.085, 0.19, -0.15), Vector3(0.062, 0.105 if index % 2 else 0.09, 0.044), hair)
 			lock.rotation.z = 0.4
 		if style == "long":
 			for side in [-1.0, 1.0]:
 				_p(head, "LongHair", "sphere", Vector3(side * 0.2, -0.15, 0.07), Vector3(0.09, 0.36, 0.13), hair)
 		elif style == "ponytail":
-			var tail = _p(head, "Ponytail", "sphere", Vector3(0, 0.23, 0.24), Vector3(0.12, 0.30, 0.12), hair)
+			var tail = _p(head, "Ponytail", "sphere", Vector3(0, 0.13, 0.24), Vector3(0.105, 0.26, 0.105), hair)
 			tail.rotation.x = -0.8
 		elif style == "braid":
 			for side in [-1.0, 1.0]:
@@ -216,12 +218,13 @@ func _weapons() -> void:
 			var points: Array[Vector3] = []
 			for i in range(13):
 				var t = float(i) / 12 * PI
-				points.append(Vector3(-0.48 - sin(t) * 0.20, 0.75 + cos(t) * 0.58, -0.36))
+				points.append(Vector3(-0.14 - sin(t) * 0.18, 1.05 + cos(t) * 0.58, -0.53))
 			Geo.curve(gear, points, 0.028, gold)
-			Geo.segment(gear, "Bowstring", points.front(), points.back(), 0.009, glow)
-			Geo.segment(gear, "Arrow", Vector3(-0.48, 0.75, 0.0), Vector3(-0.48, 0.75, -0.85), 0.012, gold)
+			Geo.segment(gear, "BowstringTop", points.front(), Vector3(-0.24,1.09,-0.18), 0.008, glow)
+			Geo.segment(gear, "BowstringBottom", Vector3(-0.24,1.09,-0.18), points.back(), 0.008, glow)
+			Geo.segment(gear, "Arrow", Vector3(-0.24,1.09,-0.18), Vector3(-0.32,1.05,-0.95), 0.012, gold)
 			left_arm.rotation.x = 1.15
-			right_arm.rotation.x = 0.85
+			right_arm.rotation = Vector3(0.30,0,-1.2)
 		"shield_sword", "shield_pair", "sword":
 			_shield(Vector3(-0.49, 1.0, -0.18))
 			if weapon == "shield_pair":
@@ -281,6 +284,25 @@ func _weapons() -> void:
 			_p(gear,"RootSpark","sphere",Vector3(0.47,1.21,-0.31),Vector3.ONE*0.1,glow)
 		_:
 			_arcana(weapon)
+
+	# Rest poses place the wrists next to the corresponding physical equipment.
+	if left_arm and weapon != "bow":
+		match weapon:
+			"staff", "staff_book", "halberd", "root_hammer", "pickaxe", "mirror_staff":
+				right_arm.rotation = Vector3(0.10,0,0.32)
+				if weapon == "staff_book": left_arm.rotation = Vector3(0.65,0,-0.15)
+			"shield_sword", "shield_pair", "sword", "daggers", "twin_blades":
+				left_arm.rotation = Vector3(0.35,0,-0.22)
+				right_arm.rotation = Vector3(0.35,0,0.22)
+			"book", "scroll", "navigation", "wave_plot", "twin_persona":
+				left_arm.rotation = Vector3(0.80,0,0.12)
+				right_arm.rotation = Vector3(0.80,0,-0.12)
+			"clock", "scales", "simpson_rig", "wireframe":
+				left_arm.rotation = Vector3(0.6,0,-0.15)
+				right_arm.rotation = Vector3(0.6,0,0.15)
+			_:
+				left_arm.rotation = Vector3(0.9,0,0.05)
+				right_arm.rotation = Vector3(0.9,0,-0.05)
 
 func _arcana(weapon: String) -> void:
 	var center = Vector3(0, 1.10, -0.34)
@@ -357,6 +379,7 @@ func _build_animations() -> void:
 		for pivot in pivots:
 			_track(clip,pivot,"rotation",[pivot.rotation,pivot.rotation],clip.length)
 		_track(clip,rig,"scale",[Vector3.ONE,Vector3.ONE],clip.length)
+		_track(clip,gear,"rotation",[Vector3.ZERO,Vector3.ZERO],clip.length)
 		var base_y = 0.08 if profile.get("gender") == "relic" else 0.0
 		_track(clip,rig,"position",[Vector3(0,base_y,0),Vector3(0,base_y,0)],clip.length)
 		match state:
@@ -372,6 +395,7 @@ func _build_animations() -> void:
 				_track(clip,rig,"position",[Vector3(0,-0.1,0),Vector3(0,0.45,0),Vector3(0,base_y,0)],clip.length)
 				_track(clip,rig,"scale",[Vector3(0.8,1.1,0.8),Vector3(1.1,0.9,1.1),Vector3.ONE],clip.length)
 			"attack", "power":
+				_track(clip,gear,"rotation",[Vector3.ZERO,Vector3(-0.15,0,0),Vector3.ZERO],clip.length)
 				_track(clip,rig,"position",[Vector3(0,base_y,0),Vector3(0,base_y,-0.12),Vector3(0,base_y,0)],clip.length)
 				_track(clip,rig,"rotation",[Vector3(0,-0.16,0),Vector3(0,0.20,0),Vector3.ZERO],clip.length)
 				if right_arm:

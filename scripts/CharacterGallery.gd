@@ -1,5 +1,6 @@
 extends Control
 
+const Geo = preload("res://scripts/NativeGeometry.gd")
 const CHARACTER = preload("res://scenes/NativeCharacter.tscn")
 var selected = 0
 var character: Node3D
@@ -62,6 +63,7 @@ func _ready() -> void:
 	settings.ambient_light_energy = 0.65
 	env.environment = settings
 	world.add_child(env)
+	Geo.part(world,"DisplayStand","cylinder",Vector3(0,-0.08,0),Vector3(0.72,0.12,0.72),Geo.material(Color("233c50")))
 	var light = DirectionalLight3D.new()
 	light.rotation_degrees = Vector3(-35,-35,0)
 	light.light_energy = 0.8
