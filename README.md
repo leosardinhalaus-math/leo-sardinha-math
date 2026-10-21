@@ -14,3 +14,8 @@ Site educacional estático, preparado para GitHub Pages.
 ## Publicação
 
 Nas configurações do repositório, abra **Pages**, selecione **Deploy from a branch**, escolha a branch `main` e a pasta `/ (root)`.
+
+## Calculus Royale em Godot 4
+
+O projeto Godot está na raiz. Veja [README_GODOT.md](README_GODOT.md) para jogar,
+exportar Web/APK e configurar o workflow de publicação em GitHub Pages.

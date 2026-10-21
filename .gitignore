@@ -1,0 +1,11 @@
+.godot/
+build/
+*.tmp
+*.keystore
+*.jks
+export_credentials.cfg
+__pycache__/
+
+# Rebuilt lossless montage; original portraits remain in the repository.
+assets/source/cards_grid.webp
+assets/*.import

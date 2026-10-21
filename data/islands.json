@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "title": "Portões da Derivada",
+    "focus": "Taxas de mudança, limites e derivadas elementares.",
+    "chapters": [
+      "Reta tangente",
+      "O limite abre a porta",
+      "Potências em movimento",
+      "Continuidade",
+      "Quociente e seno",
+      "Guardião dos Portões"
+    ],
+    "image": "res://assets/islands/island_01.webp"
+  },
+  {
+    "id": 2,
+    "title": "Cânion da Cadeia",
+    "focus": "Composição, inversas e diferenciação implícita.",
+    "chapters": [
+      "Elo exterior",
+      "Elo interior",
+      "A ponte da inversa",
+      "Taxas relacionadas",
+      "Equação implícita",
+      "Guardião da Cadeia"
+    ],
+    "image": "res://assets/islands/island_02.webp"
+  },
+  {
+    "id": 3,
+    "title": "Observatório do Valor Médio",
+    "focus": "Crescimento, aproximações e otimização.",
+    "chapters": [
+      "O vale do máximo",
+      "A raiz de Newton",
+      "Crescimento",
+      "A torre de Taylor",
+      "Análise do gráfico",
+      "Guardião do Observatório"
+    ],
+    "image": "res://assets/islands/island_03.webp"
+  },
+  {
+    "id": 4,
+    "title": "Delta da Integral",
+    "focus": "Área, acumulação e teorema fundamental.",
+    "chapters": [
+      "A margem da área",
+      "Soma das parcelas",
+      "O teorema fundamental",
+      "A cidade das primitivas",
+      "Camadas de volume",
+      "Guardião do Delta"
+    ],
+    "image": "res://assets/islands/island_04.webp"
+  },
+  {
+    "id": 5,
+    "title": "Forja da Antiderivada",
+    "focus": "Substituição, técnicas e convergência.",
+    "chapters": [
+      "Transformação de u",
+      "As duas partes",
+      "A oficina dos trapézios",
+      "O caminho infinito",
+      "Séries e comparação",
+      "Guardião da Forja"
+    ],
+    "image": "res://assets/islands/island_05.webp"
+  }
+]
