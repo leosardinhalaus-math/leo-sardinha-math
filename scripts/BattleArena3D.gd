@@ -397,6 +397,7 @@ func _finish(victory: bool, draw: bool = false) -> void:
 	spawn_marker.hide()
 	cancel_button.hide()
 	_update_status()
+	info.text = "Partida encerrada. Volte ao mapa ou jogue novamente."
 	var score = 1
 	if answers > 0 and float(correct_answers) / answers >= 0.75:
 		score += 1
