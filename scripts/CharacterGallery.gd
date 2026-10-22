@@ -60,14 +60,20 @@ func _ready() -> void:
 	settings.background_color = Color("102538")
 	settings.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	settings.ambient_light_color = Color("dce5ef")
-	settings.ambient_light_energy = 0.65
+	settings.ambient_light_energy = 0.35
 	env.environment = settings
 	world.add_child(env)
 	Geo.part(world,"DisplayStand","cylinder",Vector3(0,-0.08,0),Vector3(0.72,0.12,0.72),Geo.material(Color("233c50")))
 	var light = DirectionalLight3D.new()
-	light.rotation_degrees = Vector3(-35,-35,0)
-	light.light_energy = 0.8
+	light.rotation_degrees = Vector3(-35,145,0)
+	light.light_energy = 1.0
+	light.shadow_enabled = true
 	world.add_child(light)
+	var rim = DirectionalLight3D.new()
+	rim.rotation_degrees = Vector3(-20,-35,0)
+	rim.light_color = Color("8bc7e9")
+	rim.light_energy = 0.35
+	world.add_child(rim)
 	var camera = Camera3D.new()
 	world.add_child(camera)
 	camera.position = Vector3(0,1.65,-4.5)

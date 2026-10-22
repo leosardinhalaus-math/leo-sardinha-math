@@ -160,7 +160,7 @@ func _humanoid() -> void:
 	_hair(helmet)
 	if profile.get("detail") == "beard":
 		var long_beard = profile.get("hair_style") in ["long","hood"]
-		Geo.loft(head,"SculptedBeard",Vector3(0,0,-0.08),[Vector3(0.025,-0.40 if long_beard else -0.23,0.035),Vector3(0.10,-0.20,0.09),Vector3(0.15,-0.08,0.09)],hair,8)
+		Geo.loft(head,"SculptedBeard",Vector3(0,0,-0.19),[Vector3(0.025,-0.40 if long_beard else -0.23,0.035),Vector3(0.10,-0.20,0.09),Vector3(0.15,-0.08,0.09)],hair,8)
 		for side in [-1.0,1.0]:
 			var moustache = _p(head,"Moustache","sphere",Vector3(side*0.055,-0.085,-0.18),Vector3(0.065,0.025,0.025),hair,true)
 			moustache.rotation.z = side*0.15
@@ -366,6 +366,8 @@ func _weapons() -> void:
 			"book", "scroll", "navigation", "wave_plot", "twin_persona":
 				left_arm.rotation = Vector3(0.80,0,0.12)
 				right_arm.rotation = Vector3(0.80,0,-0.12)
+			"trumpet":
+				right_arm.rotation = Vector3(2.0,0,0.55)
 			"clock", "scales", "simpson_rig", "wireframe":
 				left_arm.rotation = Vector3(0.6,0,-0.15)
 				right_arm.rotation = Vector3(0.6,0,0.15)

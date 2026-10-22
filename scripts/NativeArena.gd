@@ -43,8 +43,10 @@ func build(world_index: int, stage_index: int) -> void:
 	var accent = Geo.material(Color(theme.accent),false,true)
 	var water = Geo.material(Color(theme.water),true)
 	Geo.part(self,"FloatingFoundation","box",Vector3(0,-0.66,0),Vector3(14.2,1.2,20.3),stone)
-	Geo.part(self,"BattleFloor","box",Vector3(0,-0.08,0),Vector3(13.2,0.14,19.3),floor_mat)
-	Geo.part(self,"River","box",Vector3(0,-0.09,0),Vector3(13.1,0.055,1.65),water)
+	# Keep the river channel open: a single floor slab would conceal the water.
+	for side in [-1.0,1.0]:
+		Geo.part(self,"BattleFloor","box",Vector3(0,-0.08,side*5.285),Vector3(13.2,0.14,8.73),floor_mat)
+	Geo.part(self,"River","box",Vector3(0,-0.035,0),Vector3(13.1,0.035,RIVER_EDGE*2),water)
 	_floor_details(stage_index,stone,trim,accent)
 	# Thin inlaid tiles replace the old white road strips.
 	for lane_x in [-3.0,3.0]:
@@ -78,7 +80,7 @@ func _floor_details(stage_index: int, stone: Material, trim: Material, accent: M
 		var slabs: Array[Transform3D] = []
 		for x in range(-6,7):
 			for z in range(-9,10):
-				if abs(z)<1 or (abs(x*7+z*11)%3)!=tint: continue
+				if abs(z)<2 or (abs(x*7+z*11)%3)!=tint: continue
 				slabs.append(Transform3D(Basis.from_scale(Vector3(0.94,0.018,0.94)),Vector3(x,0.003,z)))
 		Geo.instances(self,"Flagstones%d"%tint,"box",slabs,Geo.material(Color(theme.floor).lightened(0.015+tint*0.022)))
 	# A stepped foundation, ribbed banks and horizontal river filaments give depth.
@@ -89,7 +91,7 @@ func _floor_details(stage_index: int, stone: Material, trim: Material, accent: M
 		var x = -6.0+index*0.54
 		if abs(abs(x)-3.0)<1.0: continue
 		var z = sin(index*2.7)*0.52
-		ripples.append(Transform3D(Basis.from_scale(Vector3(0.28+index%3*0.10,0.012,0.018)),Vector3(x,-0.054,z)))
+		ripples.append(Transform3D(Basis.from_scale(Vector3(0.28+index%3*0.10,0.012,0.018)),Vector3(x,-0.015,z)))
 	Geo.instances(self,"RiverFilaments","box",ripples,Geo.material(Color(theme.water).lightened(0.20)))
 	for side in [-1.0,1.0]:
 		# Mosaics sit flush on the floor, so placement and walking stay unobstructed.
