@@ -45,6 +45,24 @@ func run() -> void:
 	battle._pick_screen(battle.camera.unproject_position(Vector3(-4.5,0,8.7)))
 	await capture("06-math")
 	battle._cancel_placement()
+	battle.frozen = true
+	for unit in battle.units():
+		if unit.is_tower and not unit.is_king and unit.team == 1 and unit.lane == 0:
+			unit.take_damage(99999,null,true)
+	await create_timer(0.9).timeout
+	battle.frozen = false
+	battle.elixir = 10
+	battle._request_card(0)
+	battle._preview_screen(battle.camera.unproject_position(Vector3(-4,0,-6.8)))
+	await capture("07-conquered-left")
+	battle._preview_screen(battle.camera.unproject_position(Vector3(4,0,-6.8)))
+	await capture("08-protected-right")
+	for unit in battle.units():
+		if unit.is_tower and not unit.is_king and unit.team == 1 and unit.lane == 1:
+			unit.take_damage(99999,null,true)
+	await create_timer(0.9).timeout
+	battle._preview_screen(battle.camera.unproject_position(Vector3(4,0,-6.8)))
+	await capture("09-conquered-both")
 	battle.queue_free()
 	await process_frame
 	var gallery = load("res://scenes/CharacterGallery.tscn").instantiate()

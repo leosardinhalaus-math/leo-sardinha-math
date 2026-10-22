@@ -14,7 +14,12 @@ Na arena, toque em uma carta e marque no cenário o ponto onde ela deve nascer.
 Você pode escolher todo o seu campo ao sul do rio, incluindo as laterais e
 atrás da torre central. No celular, arraste o marcador e solte para confirmar;
 no computador, clique. O marcador fica vermelho em pontos inválidos.
-Rio, pontes, terreno inimigo e pontos ocupados não aceitam invocações.
+Ao destruir a torre lateral inimiga da esquerda, você conquista a metade
+esquerda do campo rival; a torre direita libera a metade direita. A conquista
+vale até o fim da partida, inclusive após a torre desaparecer. Ao selecionar
+uma carta, as áreas conquistadas aparecem em verde com bordas douradas.
+As regiões ainda protegidas pela torre, o rio, as pontes e os pontos ocupados
+não aceitam invocações. Derrubar a torre central encerra a batalha com vitória.
 A batalha pausa durante a escolha. **Cancelar escolha** ou Esc retoma o jogo
 sem gastar elixir. Unidades fora das rotas buscam rotas livres até as pontes.
 O jogo pausa os dois exércitos durante a pergunta. Uma resposta correta

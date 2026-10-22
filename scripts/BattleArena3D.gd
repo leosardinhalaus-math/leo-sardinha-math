@@ -14,7 +14,10 @@ var selected_spawn = Vector3.ZERO
 var candidate_position = Vector3.ZERO
 var candidate_valid = false
 var spawn_marker: Node3D
-var spawn_zone: MeshInstance3D
+var spawn_zone: Node3D
+var conquered_zones: Array[Node3D] = []
+# Conquests belong to this battle and survive removal of the fallen tower node.
+var conquered_lanes: Array[bool] = [false, false]
 var cancel_button: Button
 var rng = RandomNumberGenerator.new()
 var frozen = false
@@ -152,7 +155,7 @@ func _build_interface() -> void:
 	panel.add_child(controls)
 	elixir_label = RoyaleUI.label("",27,RoyaleUI.GOLD)
 	controls.add_child(elixir_label)
-	controls.add_child(RoyaleUI.label("Escolha uma carta. Toque ou clique no seu campo para marcar onde ela nasce.",17))
+	controls.add_child(RoyaleUI.label("Escolha uma carta e toque numa área liberada. Derrube torres inimigas para conquistar o lado correspondente.",17))
 	cancel_button = RoyaleUI.button("CANCELAR ESCOLHA", _cancel_placement,Vector2(200,42))
 	controls.add_child(cancel_button)
 	cancel_button.hide()
@@ -160,7 +163,7 @@ func _build_interface() -> void:
 	hand_row.columns = 2
 	hand_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	controls.add_child(hand_row)
-	info = RoyaleUI.label("Invoque em qualquer ponto livre do seu campo, inclusive atrás e ao lado das torres.",18,RoyaleUI.MINT)
+	info = RoyaleUI.label("Nasça no seu campo. Derrubar uma torre inimiga libera a metade correspondente do campo rival.",18,RoyaleUI.MINT)
 	ui.add_child(info)
 	info.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
 	info.offset_left = 20
@@ -256,7 +259,7 @@ func _request_card(index: int) -> void:
 	spawn_marker.hide()
 	spawn_zone.show()
 	cancel_button.show()
-	info.text = "%s: toque em um ponto livre do seu campo. Os dois exércitos estão pausados." % card.name
+	info.text = "%s: toque em um espaço livre das áreas destacadas. Os dois exércitos estão pausados." % card.name
 	_refresh_hand()
 
 func _open_math() -> void:
@@ -365,6 +368,11 @@ func _pause() -> void:
 func _on_defeated(unit: RoyaleUnit) -> void:
 	if unit.is_tower:
 		navigation.rebuild()
+		if not finished and unit.team == 1 and not unit.is_king and unit.lane in [0,1] and not conquered_lanes[unit.lane]:
+			conquered_lanes[unit.lane] = true
+			conquered_zones[unit.lane].show()
+			var side_name = "esquerda" if unit.lane == 0 else "direita"
+			info.text = "Torre inimiga da %s caiu! Nascimento liberado na metade %s do campo rival." % [side_name, side_name]
 	if unit.is_king:
 		_finish(unit.team == 1)
 
@@ -431,8 +439,24 @@ func effect(start: Vector3, end: Vector3, color: Color) -> void:
 	timer.timeout.connect(mesh.queue_free)
 
 func _build_spawn_marker() -> void:
-	spawn_zone = Geo.part(self,"DeploymentTerritory","box",Vector3(0,0.027,5.0),Vector3(12.3,0.01,8.25),Geo.material(Color(0.17,0.75,0.66,0.13)))
-	spawn_zone.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	spawn_zone = Geo.pivot(self,"DeploymentTerritory",Vector3.ZERO)
+	var depth = WORLD_SCENE.HALF_LENGTH - WORLD_SCENE.RIVER_EDGE
+	var center_z = (WORLD_SCENE.HALF_LENGTH + WORLD_SCENE.RIVER_EDGE) / 2.0
+	var home = Geo.part(spawn_zone,"HomeField","box",Vector3(0,0.055,center_z),Vector3(WORLD_SCENE.HALF_WIDTH*2,0.01,depth),Geo.material(Color(0.17,0.75,0.66,0.13)))
+	home.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	for lane in range(2):
+		var zone = Geo.pivot(spawn_zone,"ConqueredLeft" if lane == 0 else "ConqueredRight",Vector3.ZERO)
+		var x = WORLD_SCENE.HALF_WIDTH * (-0.5 if lane == 0 else 0.5)
+		var field = Geo.part(zone,"ConqueredField","box",Vector3(x,0.055,-center_z),Vector3(WORLD_SCENE.HALF_WIDTH,0.01,depth),Geo.material(Color(0.24,0.86,0.61,0.21)))
+		field.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		# The gold edge marks precisely the half unlocked by this tower.
+		for edge in [-1.0,1.0]:
+			var across = Geo.part(zone,"TerritoryEdgeX","box",Vector3(x,0.065,-center_z+edge*depth/2),Vector3(WORLD_SCENE.HALF_WIDTH,0.018,0.035),Geo.material(RoyaleUI.GOLD,false,true))
+			var along = Geo.part(zone,"TerritoryEdgeZ","box",Vector3(x+edge*WORLD_SCENE.HALF_WIDTH/2,0.065,-center_z),Vector3(0.035,0.018,depth),Geo.material(RoyaleUI.GOLD,false,true))
+			across.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			along.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		zone.hide()
+		conquered_zones.append(zone)
 	spawn_zone.hide()
 	spawn_marker = Node3D.new()
 	spawn_marker.name = "SpawnMarker"
@@ -447,8 +471,12 @@ func spawn_error(point: Vector3, team: int = 0) -> String:
 		return "Escolha um ponto dentro da arena."
 	if absf(point.z) < WORLD_SCENE.RIVER_EDGE:
 		return "Não é possível nascer no rio nem nas pontes."
-	if (team == 0 and point.z < WORLD_SCENE.RIVER_EDGE) or (team == 1 and point.z > -WORLD_SCENE.RIVER_EDGE):
-		return "Escolha um ponto no seu campo, ao sul do rio."
+	if team == 0 and point.z <= -WORLD_SCENE.RIVER_EDGE:
+		var lane = 0 if point.x < 0 else 1
+		if not conquered_lanes[lane]:
+			return "Derrube a torre inimiga da %s para nascer nesta área." % ("esquerda" if lane == 0 else "direita")
+	elif team == 1 and point.z >= WORLD_SCENE.RIVER_EDGE:
+		return "Escolha um ponto no campo da sua equipe."
 	for obstacle in native_world.obstacles:
 		if point.distance_to(obstacle.point) < float(obstacle.radius):
 			return "Esse ponto contém um elemento do cenário. Escolha um espaço livre."

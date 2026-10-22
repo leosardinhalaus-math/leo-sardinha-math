@@ -195,5 +195,113 @@ func run() -> void:
 	check(game.coins == coins and game.deck.size() == 8, "Progress and deck survive reload")
 	battle.queue_free()
 	await process_frame
+	await test_conquered_territory(cards,game)
 	print("GODOT TESTS: %d checks, %d failures" % [checks, failures.size()])
 	quit(0 if failures.is_empty() else 1)
+
+func tower_at(battle, team: int, lane: int) -> RoyaleUnit:
+	for unit in battle.units():
+		if unit.is_tower and not unit.is_king and unit.team == team and unit.lane == lane:
+			return unit
+	return null
+
+func test_conquered_territory(cards, game) -> void:
+	game.quick_battle = true
+	game.active_stage = 0
+	var battle = load("res://scenes/BattleArena3D.tscn").instantiate()
+	root.add_child(battle)
+	await process_frame
+	battle.frozen = true
+	var left = Vector3(-4,0,-6.8)
+	var right = Vector3(4,0,-6.8)
+	check(not battle.spawn_error(left).is_empty() and not battle.spawn_error(right).is_empty(), "Both enemy halves start locked")
+	check(not battle.spawn_error(Vector3(-4,0,-0.92)).is_empty(), "Enemy riverbank cannot bypass the locked territory")
+	check(battle.spawn_error(left,1).is_empty(), "Enemy home territory remains available to its team")
+	var soldier = battle._spawn(cards.card(1),1,0,Vector3(-4,0,-2))
+	soldier.take_damage(99999,null,true)
+	check(not battle.spawn_error(left).is_empty(), "Defeating a soldier does not conquer territory")
+	tower_at(battle,0,0).take_damage(99999,null,true)
+	check(not battle.spawn_error(left).is_empty(), "A friendly tower falling does not unlock enemy territory")
+	var left_tower = tower_at(battle,1,0)
+	var previous_revision = battle.navigation.revision
+	left_tower.take_damage(99999,null,true)
+	check(battle.conquered_lanes == [true,false], "Only the destroyed enemy tower's half is conquered")
+	check(battle.navigation.revision > previous_revision, "Destroyed tower also releases its navigation obstacle")
+	check(battle.spawn_error(left).is_empty(), "Left enemy half unlocks immediately")
+	check(battle.spawn_error(Vector3(-3,0,-4.4)).is_empty(), "Fallen tower position becomes deployable")
+	check(battle.spawn_error(Vector3(-4,0,-8.8)).is_empty(), "Conquest includes the rear of the matching half")
+	check(battle.spawn_error(Vector3(-4,0,-0.92)).is_empty(), "Captured enemy riverbank is usable")
+	check(not battle.spawn_error(right).is_empty(), "Standing right tower keeps the right half locked")
+	check(battle.spawn_error(Vector3(-0.01,0,-5.8)).is_empty(), "Left conquest reaches its central boundary")
+	check(not battle.spawn_error(Vector3(0.01,0,-5.8)).is_empty(), "Left conquest cannot leak across the central boundary")
+	check(not battle.spawn_error(Vector3(-3,0,0)).is_empty(), "Conquest never unlocks a bridge")
+	check(not battle.spawn_error(Vector3(-1,0,-0.5)).is_empty(), "Conquest never unlocks river water")
+	check(not battle.spawn_error(Vector3(-5.6,0,-7.5)).is_empty(), "Scenery remains blocked inside conquered land")
+	check(not battle.spawn_error(Vector3(-6.16,0,-5)).is_empty(), "Conquest never expands the arena bounds")
+	check(not battle.spawn_error(Vector3(-0.1,0,-7)).is_empty(), "The living king still blocks occupied points inside a conquered half")
+	check(battle.spawn_error(Vector3(-4,0,8.8)).is_empty(), "Home field remains available after conquest")
+	await create_timer(0.9).timeout
+	check(not is_instance_valid(left_tower) and battle.spawn_error(left).is_empty(), "Conquest survives the fallen tower being freed")
+	check(not battle.spawn_zone.visible, "Territory overlay stays hidden outside placement")
+	battle.frozen = false
+	battle.elixir = 10
+	battle._request_card(0)
+	check(battle.conquered_zones[0].is_visible_in_tree() and not battle.conquered_zones[1].is_visible_in_tree(), "Placement highlights exactly the conquered half")
+	var touch = InputEventScreenTouch.new()
+	touch.index = 0
+	touch.pressed = true
+	touch.position = battle.camera.unproject_position(right)
+	battle._unhandled_input(touch)
+	touch.pressed = false
+	battle._unhandled_input(touch)
+	check(battle.placing and not battle.candidate_valid, "Touch release in the protected half cannot open the question")
+	touch.pressed = true
+	touch.position = battle.camera.unproject_position(left)
+	battle._unhandled_input(touch)
+	touch.pressed = false
+	battle._unhandled_input(touch)
+	check(not battle.placing and battle.selected_spawn.distance_to(left)<0.001, "Touch can select the conquered enemy half")
+	var before_count = battle.units().size()
+	var before_elixir = battle.elixir
+	var cost = float(cards.card(int(battle.hand[0])).cost)
+	battle._summon_selected()
+	check(battle.units().size()==before_count and battle.elixir==before_elixir, "Conquered territory still requires the correct math answer")
+	battle._answer(int(battle.quiz.answer))
+	battle._summon_selected()
+	check(battle.units().size()==before_count+1, "Correct answer spawns one unit in conquered territory")
+	var advanced = battle.units().back()
+	check(advanced.team==0 and advanced.lane==0 and advanced.position.distance_to(left)<0.001, "Forward deployment preserves team, lane and touched point")
+	check(is_equal_approx(battle.elixir,before_elixir-cost), "Forward deployment spends the normal card cost once")
+	check(not battle.spawn_zone.visible, "Summoning hides all territory highlights")
+	check(not battle.spawn_error(left).is_empty(), "Newly deployed unit occupies the selected conquered point")
+	var path = battle.navigation.path_between(left,battle.enemy_king.position)
+	check(not path.is_empty(), "Forward-deployed unit has a route to the enemy king")
+	for point in path: check(point.z<=-0.92, "A unit born beyond the river need not cross a bridge to attack the enemy king")
+	battle.frozen = true
+	tower_at(battle,1,1).take_damage(99999,null,true)
+	check(battle.conquered_lanes == [true,true] and battle.spawn_error(right).is_empty(), "Both tower halves can be conquered independently")
+	check(not battle.finished, "Destroying both side towers does not end the battle")
+	check(not battle.spawn_error(battle.enemy_king.position).is_empty(), "Even two conquests cannot deploy inside the living king")
+	battle.frozen = false
+	battle.elixir = 10
+	battle._request_card(0)
+	check(battle.conquered_zones[0].is_visible_in_tree() and battle.conquered_zones[1].is_visible_in_tree(), "Both captured halves are highlighted on the next placement")
+	battle._cancel_placement()
+	battle.enemy_king.take_damage(99999,null,true)
+	check(battle.finished and battle.frozen, "The central tower still ends the battle with victory")
+	var final_count = battle.units().size()
+	battle._request_card(0)
+	battle._summon_selected()
+	check(not battle.placing and battle.units().size()==final_count, "No forward deployment is allowed after victory")
+	battle.queue_free()
+	await process_frame
+	var replay = load("res://scenes/BattleArena3D.tscn").instantiate()
+	root.add_child(replay)
+	await process_frame
+	replay.frozen = true
+	check(replay.conquered_lanes == [false,false], "Conquests reset for every new battle")
+	check(not replay.spawn_error(left).is_empty() and not replay.spawn_error(right).is_empty(), "Replay starts with both enemy halves protected")
+	tower_at(replay,1,1).take_damage(99999,null,true)
+	check(replay.spawn_error(right).is_empty() and not replay.spawn_error(left).is_empty(), "Destroying the right tower first unlocks only the right half")
+	replay.queue_free()
+	await process_frame
