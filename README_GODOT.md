@@ -105,7 +105,9 @@ usa um nome com hash para cada pacote Web, evitando misturar versões em cache
 sem apagar os dados de progresso do navegador.
 
 O workflow **Godot Web and Android** executa os testes, gera os arquivos Web
-e um APK Android de teste para ARMv7/ARM64. Os downloads ficam nos artifacts
+e um APK Android de teste para ARMv7/ARM64. A publicação Web e a geração do
+APK seguem etapas independentes após o build Web: um download lento do SDK
+Android não bloqueia a publicação do jogo no site. Os downloads ficam nos artifacts
 `calculus-royale-web` e `calculus-royale-android-debug` de cada execução,
 com retenção de 30 dias. A compilação Android usa Java 17, plataforma Android
 35 e build-tools 35.0.1. O APK usa assinatura de desenvolvimento gerada no
