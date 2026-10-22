@@ -552,6 +552,13 @@ func test_native_motion(cards,native_scene) -> void:
 					if follow.node.rotation.length()>0.001: follows = true
 					check(follow.node.rotation.length()<0.29, "Secondary motion remains bounded around its attachment")
 				check(follows,"Hair, cloth or accessories retain movement after contact")
+		if card.key=="limit":
+			avatar.animation.play("attack")
+			avatar.animation.seek(avatar.animation.current_animation_length*0.44,true)
+			var blade = avatar.find_child("ForgedBlade",true,false)
+			var tip = avatar.to_local(blade.to_global(Vector3(0,0.68,0)))
+			var grip = avatar.to_local(blade.get_parent().global_position)
+			check(tip.z<grip.z-0.20,"The guardian's blade reaches forward at contact instead of pointing behind the hand")
 		if not avatar.bow_links.is_empty():
 			avatar.animation.play("attack")
 			for phase in [0.0,0.18,0.30,0.44,0.75]:

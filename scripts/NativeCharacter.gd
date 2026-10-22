@@ -18,6 +18,8 @@ var body: Node3D
 var head: Node3D
 var left_elbow: Node3D
 var right_elbow: Node3D
+var left_wrist: Node3D
+var right_wrist: Node3D
 var left_knee: Node3D
 var right_knee: Node3D
 var left_foot: Node3D
@@ -59,6 +61,8 @@ func configure(card: Dictionary) -> void:
 	head = null
 	left_elbow = null
 	right_elbow = null
+	left_wrist = null
+	right_wrist = null
 	left_knee = null
 	right_knee = null
 	left_foot = null
@@ -501,8 +505,12 @@ func _articulate() -> void:
 			if str(node.name) in ["Bracer","BracerEdge","Hand","Thumb"]: lower_arm.append(node)
 			elif str(node.name) not in ["UpperSleeve","Elbow","Pauldron","ShoulderRim","PauldronGem"]: held.append(node)
 		var elbow = _joint(arm,"ElbowJoint",Vector3(0,-0.31,0),lower_arm)
+		var palm: Array = []
+		for node in elbow.get_children():
+			if str(node.name) in ["Hand","Thumb"]: palm.append(node)
+		var wrist = _joint(elbow,"WristJoint",Vector3(0,-0.27,-0.035),palm)
 		if not held.is_empty():
-			var grip = _joint(elbow,"GripFollow",Vector3(0,-0.27,-0.035),held)
+			var grip = _joint(wrist,"GripFollow",Vector3.ZERO,held)
 			follow_parts.append({"node":grip,"kind":"grip_left" if side==0 else "grip_right","delay":0.035,"amount":0.12})
 		var lower_leg: Array = []
 		for node in leg.get_children():
@@ -514,10 +522,12 @@ func _articulate() -> void:
 		var foot = _joint(knee,"AnkleJoint",Vector3(0,-0.26,0),shoe)
 		if side==0:
 			left_elbow = elbow
+			left_wrist = wrist
 			left_knee = knee
 			left_foot = foot
 		else:
 			right_elbow = elbow
+			right_wrist = wrist
 			right_knee = knee
 			right_foot = foot
 	if profile.get("weapon")=="bow":
@@ -526,7 +536,7 @@ func _articulate() -> void:
 		var arrow = find_child("Arrow",true,false)
 		var frame = top.get_parent().get_node_or_null("ArcaneFilament") if top else null
 		if top and bottom and arrow and frame:
-			bow_links = {"top":top,"bottom":bottom,"arrow":arrow,"frame":frame,"hand":right_elbow.get_node("Hand")}
+			bow_links = {"top":top,"bottom":bottom,"arrow":arrow,"frame":frame,"hand":right_wrist.get_node("Hand")}
 	_follow(head,"HairFollow",Vector3(0,0.12,0.04),["LongLock","Ponytail","HairTie","Braid"],"hair",0.085,0.8)
 	_follow(head,"BeardFollow",Vector3(0,-0.08,-0.16),["SculptedBeard","BeardVolume","Moustache"],"beard",0.07,0.55)
 	_follow(body,"CapeFollow",Vector3(0,0.29,0.22),["CutCape"],"cape",0.11,0.9)

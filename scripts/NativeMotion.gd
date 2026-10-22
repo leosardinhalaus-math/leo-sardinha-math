@@ -55,7 +55,7 @@ static func _pose(state: String,t: float,p: Dictionary) -> Dictionary:
 	var f = str(p.family)
 	var breath = sin(phase+p.phase)
 	var hip = sin(phase)*p.sway
-	var pose = {"rig_p":Vector3.ZERO,"rig_r":Vector3.ZERO,"rig_s":Vector3.ONE,"body_p":Vector3(hip,-0.009,0),"body_r":Vector3(0.018+breath*0.009,0.015*sin(phase+0.4),-hip*0.65),"body_s":Vector3(1.0+breath*p.breath,1.0+breath*p.breath*0.45,1.0+breath*p.breath),"head_r":Vector3(-breath*0.012,sin(phase+0.8)*0.026,hip*0.35),"la_r":Vector3(0.014*breath,0.012*sin(phase),-0.016*breath),"ra_r":Vector3(-0.012*breath,-0.016*sin(phase+0.3),0.02*breath),"le_r":Vector3(0.035+breath*0.012,0,0),"re_r":Vector3(0.045-breath*0.015,0,0),"ll_r":Vector3.ZERO,"rl_r":Vector3.ZERO,"lk_r":Vector3.ZERO,"rk_r":Vector3.ZERO,"lf_r":Vector3.ZERO,"rf_r":Vector3.ZERO,"ll_p":Vector3.ZERO,"rl_p":Vector3.ZERO,"gear_r":Vector3.ZERO}
+	var pose = {"rig_p":Vector3.ZERO,"rig_r":Vector3.ZERO,"rig_s":Vector3.ONE,"body_p":Vector3(hip,-0.009,0),"body_r":Vector3(0.018+breath*0.009,0.015*sin(phase+0.4),-hip*0.65),"body_s":Vector3(1.0+breath*p.breath,1.0+breath*p.breath*0.45,1.0+breath*p.breath),"head_r":Vector3(-breath*0.012,sin(phase+0.8)*0.026,hip*0.35),"la_r":Vector3(0.014*breath,0.012*sin(phase),-0.016*breath),"ra_r":Vector3(-0.012*breath,-0.016*sin(phase+0.3),0.02*breath),"lw_r":Vector3.ZERO,"rw_r":Vector3.ZERO,"le_r":Vector3(0.035+breath*0.012,0,0),"re_r":Vector3(0.045-breath*0.015,0,0),"ll_r":Vector3.ZERO,"rl_r":Vector3.ZERO,"lk_r":Vector3.ZERO,"rk_r":Vector3.ZERO,"lf_r":Vector3.ZERO,"rf_r":Vector3.ZERO,"ll_p":Vector3.ZERO,"rl_p":Vector3.ZERO,"gear_r":Vector3.ZERO}
 	if f == "dancer":
 		pose.body_r.y += sin(phase)*0.045
 		pose.la_r.z -= 0.035*(1+sin(phase+0.5))
@@ -132,10 +132,16 @@ static func _pose(state: String,t: float,p: Dictionary) -> Dictionary:
 			pose.ra_r = Vector3(-wind*0.45+hit*1.0,wind*0.2-hit*0.18,-hit*0.15)
 			pose.la_r = Vector3(wind*0.18+hit*0.65,-wind*0.13,hit*0.12)
 			pose.re_r.x = wind*0.4+hit*0.10
+			pose.rw_r.x = -hit*0.85
+			pose.lw_r.x = -hit*0.65
 			pose.le_r.x = wind*0.2+hit*0.12
 		elif f in ["guardian","heavy"]:
 			pose.ra_r = Vector3(-wind*0.60+hit*1.05,-wind*0.10,-hit*0.14)
 			pose.re_r.x = wind*0.38+hit*0.16
+			if p.weapon in ["sword","shield_sword","twin_blades"]:
+				pose.rw_r.x = wind*0.20-hit*1.50
+			elif p.weapon in ["halberd","root_hammer"]:
+				pose.rw_r.x = wind*0.15-hit*2.0
 			pose.la_r = Vector3(hit*0.10,-wind*0.04,hit*0.08)
 		else:
 			pose.ra_r = Vector3(wind*0.13+hit*0.36,-wind*0.08+hit*0.05,-hit*0.18)
@@ -173,8 +179,8 @@ static func _pose(state: String,t: float,p: Dictionary) -> Dictionary:
 static func _secondary(kind: String,pose: Dictionary) -> Vector3:
 	match kind:
 		"hair","beard": return pose.rig_r+pose.body_r+pose.head_r
-		"grip_left": return pose.rig_r+pose.body_r+pose.la_r+pose.le_r
-		"grip_right": return pose.rig_r+pose.body_r+pose.ra_r+pose.re_r
+		"grip_left": return pose.rig_r+pose.body_r+pose.la_r+pose.le_r+pose.lw_r
+		"grip_right": return pose.rig_r+pose.body_r+pose.ra_r+pose.re_r+pose.rw_r
 		"magic": return pose.rig_r+pose.gear_r
 		_: return pose.rig_r+pose.body_r
 
@@ -193,7 +199,7 @@ static func build(character: Node3D,card: Dictionary) -> void:
 		return
 	var library = AnimationLibrary.new()
 	var bindings: Array = []
-	var roles = {"rig":character.rig,"body":character.body,"head":character.head,"la":character.left_arm,"ra":character.right_arm,"le":character.left_elbow,"re":character.right_elbow,"ll":character.left_leg,"rl":character.right_leg,"lk":character.left_knee,"rk":character.right_knee,"lf":character.left_foot,"rf":character.right_foot,"gear":character.gear}
+	var roles = {"rig":character.rig,"body":character.body,"head":character.head,"la":character.left_arm,"ra":character.right_arm,"le":character.left_elbow,"re":character.right_elbow,"lw":character.left_wrist,"rw":character.right_wrist,"ll":character.left_leg,"rl":character.right_leg,"lk":character.left_knee,"rk":character.right_knee,"lf":character.left_foot,"rf":character.right_foot,"gear":character.gear}
 	for role in roles:
 		var node = roles[role]
 		if node == null: continue
