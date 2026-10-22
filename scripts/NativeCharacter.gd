@@ -93,7 +93,7 @@ func _humanoid() -> void:
 	_p(body,"BuckleInset","box",Vector3(0,-0.12,-0.197),Vector3(0.052,0.039,0.018),glow,true)
 	# Clothing has its own cut: separate coat tails, pleated robes and fitted leather.
 	if outfit in ["robe","dress"]:
-		Geo.loft(body,"PleatedRobe",Vector3.ZERO,[Vector3(0.40,-0.91,0.29),Vector3(0.36,-0.66,0.26),Vector3(0.26,-0.28,0.19),Vector3(0.22,-0.15,0.16)],cloth,12)
+		Geo.pleated_robe(body,cloth)
 		for side in [-1.0,1.0]:
 			Geo.segment(body,"EmbroideredHem",Vector3(side*0.09,-0.18,-0.17),Vector3(side*0.20,-0.87,-0.27),0.009,gold)
 			Geo.panel(body,"Collar",Vector3(0,0,-0.18),PackedVector2Array([Vector2(side*0.08,0.35),Vector2(side*0.22,0.29),Vector2(side*0.06,-0.06)]),0.025,gold)
@@ -121,7 +121,7 @@ func _humanoid() -> void:
 		pivots.append(leg)
 		Geo.loft(leg,"TrouserLeg",Vector3.ZERO,[Vector3(0.076*broad,-0.37,0.08),Vector3(0.09*broad,-0.17,0.105),Vector3(0.105*broad,0.02,0.12)],dark)
 		Geo.loft(leg,"BootShaft",Vector3.ZERO,[Vector3(0.085*broad,-0.56,0.09),Vector3(0.09*broad,-0.31,0.095)],shell if armored else leather)
-		_p(leg,"BootToe","box",Vector3(0,-0.575,-0.05),Vector3(0.19*broad,0.12,0.27),shell if armored else leather)
+		Geo.loft(leg,"BootToe",Vector3(0,-0.575,-0.05),[Vector3(0.09*broad,-0.06,0.13),Vector3(0.095*broad,0.015,0.135),Vector3(0.07*broad,0.06,0.105)],shell if armored else leather,12)
 		_p(leg,"Sole","box",Vector3(0,-0.635,-0.05),Vector3(0.20*broad,0.035,0.28),dark)
 		if armored:
 			Geo.loft(leg,"KneeGuard",Vector3(0,-0.23,-0.04),[Vector3(0.07,-0.09,0.075),Vector3(0.12,0.0,0.09),Vector3(0.09,0.08,0.08)],gold,6)
@@ -148,22 +148,35 @@ func _humanoid() -> void:
 	pivots.append(head)
 	var helmet = profile.get("hair_style") == "helmet"
 	_p(head,"Neck","cylinder",Vector3(0,-0.22,0),Vector3(0.08,0.18,0.08),steel if helmet else skin)
-	Geo.loft(head,"SculptedFace",Vector3.ZERO,[Vector3(0.10,-0.23,0.10),Vector3(0.17,-0.15,0.15),Vector3(0.205,0.01,0.175),Vector3(0.19,0.18,0.17),Vector3(0.13,0.25,0.12)],steel if helmet else skin,10)
+	Geo.sculpted_head(head,steel if helmet else skin)
 	for side in [-1.0,1.0]:
-		if not helmet: _p(head,"Ear","sphere",Vector3(side*0.20,-0.01,0),Vector3(0.028,0.055,0.035),skin,true)
-		_p(head,"Eye","sphere",Vector3(side*0.077,0.038,-0.173 if not helmet else -0.199),Vector3(0.035,0.016,0.012),glow if helmet else Geo.material(Color("eee5d8")),true)
-		_p(head,"Pupil","sphere",Vector3(side*0.077,0.038,-0.184),Vector3(0.013,0.016,0.006),dark,true)
-		var brow = _p(head,"Brow","box",Vector3(side*0.079,0.078,-0.169),Vector3(0.086,0.016,0.022),hair,true)
-		brow.rotation.z = side*-0.13
-	Geo.loft(head,"Nose",Vector3(0,-0.035,-0.17),[Vector3(0.025,-0.025,0.035),Vector3(0.018,0.055,0.015)],steel if helmet else skin,6)
-	_p(head,"Mouth","box",Vector3(0,-0.12,-0.143),Vector3(0.064,0.01,0.012),Geo.material(Color("92584d")),true)
+		if not helmet:
+			_p(head,"Ear","sphere",Vector3(side*0.196,-0.01,0),Vector3(0.028,0.055,0.035),skin,true)
+			_p(head,"EarInset","sphere",Vector3(side*0.213,-0.01,-0.015),Vector3(0.011,0.032,0.014),Geo.material(Color(profile.get("skin","#e4b98f")).darkened(0.20)),true)
+		_p(head,"Eye","sphere",Vector3(side*0.077,0.038,-0.153 if not helmet else -0.199),Vector3(0.028,0.013,0.018),glow if helmet else Geo.material(Color("d9d2bf")),true)
+		_p(head,"Iris","sphere",Vector3(side*0.077,0.038,-0.169),Vector3(0.010,0.012,0.005),Geo.material(Color("536a6c")),true)
+		_p(head,"Pupil","sphere",Vector3(side*0.077,0.038,-0.174),Vector3(0.005,0.009,0.003),dark,true)
+		var lid: Array[Vector3] = [Vector3(side*0.05,0.042,-0.162),Vector3(side*0.077,0.054,-0.166),Vector3(side*0.106,0.043,-0.154)]
+		Geo.curve(head,lid,0.006,steel if helmet else skin)
+		var brow: Array[Vector3] = [Vector3(side*0.045,0.083,-0.166),Vector3(side*0.079,0.09,-0.169),Vector3(side*0.115,0.077,-0.147)]
+		Geo.locks(head,"Eyebrow",[brow],0.012,hair)
+	Geo.loft(head,"NoseBridge",Vector3(0,-0.005,-0.17),[Vector3(0.023,-0.056,0.031),Vector3(0.019,0.02,0.018),Vector3(0.014,0.065,0.009)],steel if helmet else skin,12)
+	_p(head,"NoseTip","sphere",Vector3(0,-0.055,-0.198),Vector3(0.028,0.023,0.025),steel if helmet else skin,true)
+	_p(head,"LowerLip","sphere",Vector3(0,-0.119,-0.151),Vector3(0.033,0.008,0.010),Geo.material(Color(profile.get("skin","#e4b98f")).darkened(0.22)),true)
+	Geo.curve(head,[Vector3(-0.028,-0.111,-0.155),Vector3(0,-0.113,-0.161),Vector3(0.028,-0.111,-0.155)],0.0035,Geo.material(Color("855447")))
 	_hair(helmet)
 	if profile.get("detail") == "beard":
 		var long_beard = profile.get("hair_style") in ["long","hood"]
-		Geo.loft(head,"SculptedBeard",Vector3(0,0,-0.19),[Vector3(0.025,-0.40 if long_beard else -0.23,0.035),Vector3(0.10,-0.20,0.09),Vector3(0.15,-0.08,0.09)],hair,8)
+		var beard_paths: Array = []
+		for index in range(7):
+			var x = (index-3)*0.041
+			var length = (0.29 if long_beard else 0.14)*(1.0-absf(x)*2.2)
+			beard_paths.append([Vector3(x,-0.078,-0.16+absf(x)*0.2),Vector3(x*0.95,-0.15,-0.205),Vector3(x*0.74,-0.19-length*0.35,-0.217),Vector3(x*0.45,-0.17-length,-0.17)])
+		Geo.locks(head,"SculptedBeard",beard_paths,0.034,hair)
+		var moustache_paths: Array = []
 		for side in [-1.0,1.0]:
-			var moustache = _p(head,"Moustache","sphere",Vector3(side*0.055,-0.085,-0.18),Vector3(0.065,0.025,0.025),hair,true)
-			moustache.rotation.z = side*0.15
+			moustache_paths.append([Vector3(side*0.014,-0.079,-0.193),Vector3(side*0.06,-0.087,-0.208),Vector3(side*0.11,-0.115,-0.181)])
+		Geo.locks(head,"Moustache",moustache_paths,0.023,hair)
 	if profile.get("detail") in ["glasses","goggles"]:
 		var lens_y = 0.04 if profile.get("detail") == "glasses" else 0.19
 		for side in [-1.0,1.0]:
@@ -193,19 +206,22 @@ func _hair(helmet: bool) -> void:
 			Geo.panel(head,"CheekGuard",Vector3(0,0,-0.167),PackedVector2Array([Vector2(side*0.17,0.0),Vector2(side*0.19,-0.05),Vector2(side*0.08,-0.23),Vector2(side*0.045,-0.16)]),0.045,steel)
 		Geo.loft(head,"HelmetRidge",Vector3(0,0.27,0),[Vector3(0.08,-0.05,0.19),Vector3(0.025,0.15,0.08)],steel,6)
 	elif style == "hood":
-		_p(head,"HoodBack","sphere",Vector3(0,0.04,0.07),Vector3(0.26,0.31,0.19),cloth)
-		for side in [-1.0,1.0]:
-			Geo.loft(head,"HoodEdge",Vector3(side*0.21,0,-0.02),[Vector3(0.06,-0.25,0.12),Vector3(0.055,0.15,0.11)],cloth,6)
-		Geo.panel(head,"HoodPeak",Vector3(0,0,-0.13),PackedVector2Array([Vector2(-0.23,0.16),Vector2(0,0.34),Vector2(0.23,0.16),Vector2(0.16,0.15),Vector2(0,0.25),Vector2(-0.16,0.15)]),0.13,cloth)
+		Geo.cowl(head,cloth,gold)
 	else:
 		_p(head,"HairCap","sphere",Vector3(0,0.16,0.018),Vector3(0.207,0.13,0.178),hair)
-		for index in range(5):
-			var lock = Geo.loft(head,"SweptLock",Vector3(-0.14+index*0.065,0.1,-0.135),[Vector3(0.009,-0.04,0.02),Vector3(0.045,0.065,0.045),Vector3(0.03,0.16,0.04)],hair,6)
-			lock.rotation.z = -0.45
+		var swept_paths: Array = []
+		for index in range(7):
+			var x = -0.16+index*0.05
+			swept_paths.append([Vector3(x,0.23,-0.045),Vector3(x+0.025,0.215,-0.12),Vector3(x+0.04,0.155,-0.17),Vector3(x+0.025,0.10+index*0.007,-0.17)])
+		Geo.locks(head,"SweptLocks",swept_paths,0.033,hair)
 		if style == "long":
 			for side in [-1.0,1.0]:
-				for index in range(3):
-					Geo.loft(head,"LongLock",Vector3(side*(0.16+index*0.025),0,0.06+index*0.03),[Vector3(0.015,-0.39+index*0.025,0.025),Vector3(0.06,-0.10,0.07),Vector3(0.04,0.16,0.06)],hair,6)
+				var long_paths: Array = []
+				for index in range(4):
+					var x = side*(0.16+index*0.015)
+					var z = 0.015+index*0.04
+					long_paths.append([Vector3(x,0.17,z),Vector3(side*0.214,-0.01,z),Vector3(side*0.236,-0.23,z+0.02),Vector3(side*(0.22+index*0.015),-0.40+index*0.025,z-0.02)])
+				Geo.locks(head,"LongLocks",long_paths,0.034,hair)
 		elif style == "ponytail":
 			var tail = Geo.loft(head,"Ponytail",Vector3(0,0.14,0.23),[Vector3(0.015,-0.30,0.025),Vector3(0.08,-0.04,0.08),Vector3(0.055,0.13,0.065)],hair,8)
 			tail.rotation.x = -0.8

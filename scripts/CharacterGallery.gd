@@ -60,26 +60,27 @@ func _ready() -> void:
 	settings.background_color = Color("102538")
 	settings.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	settings.ambient_light_color = Color("dce5ef")
-	settings.ambient_light_energy = 0.25
+	settings.ambient_light_energy = 0.30
 	env.environment = settings
 	world.add_child(env)
 	Geo.part(world,"DisplayStand","cylinder",Vector3(0,-0.08,0),Vector3(0.72,0.12,0.72),Geo.material(Color("233c50")))
 	var light = DirectionalLight3D.new()
 	light.rotation_degrees = Vector3(-35,145,0)
-	light.light_energy = 0.75
+	light.light_energy = 0.85
+	light.light_color = Color("ffe3c3")
 	light.shadow_enabled = true
 	world.add_child(light)
 	var rim = DirectionalLight3D.new()
 	rim.rotation_degrees = Vector3(-20,-35,0)
 	rim.light_color = Color("8bc7e9")
-	rim.light_energy = 0.20
+	rim.light_energy = 0.30
 	world.add_child(rim)
 	var camera = Camera3D.new()
 	world.add_child(camera)
-	camera.position = Vector3(0,1.65,-4.5)
+	camera.position = Vector3(0,1.45,-4.8)
 	camera.look_at(Vector3(0,1.0,0))
-	camera.projection = Camera3D.PROJECTION_ORTHOGONAL
-	camera.size = 2.75
+	camera.projection = Camera3D.PROJECTION_PERSPECTIVE
+	camera.fov = 32
 	camera.current = true
 	var image = TextureRect.new()
 	image.texture = viewport.get_texture()
@@ -110,7 +111,7 @@ func show_card(index: int) -> void:
 	character = CHARACTER.instantiate()
 	world.add_child(character)
 	character.configure(card)
-	character.rotation.y = -0.15
+	character.rotation.y = -0.45
 	portrait.texture = Cards.texture(int(card.id))
 	heading.text = "%02d / 45 · %s" % [int(card.id),card.name]
 	description.text = str(card.visual.notes) + "\n\nEspecial: " + str(card.ability)

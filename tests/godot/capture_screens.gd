@@ -25,6 +25,9 @@ func run() -> void:
 	var overworld = load("res://scenes/IslandOverworld.tscn").instantiate()
 	root.add_child(overworld)
 	await capture("03-islands")
+	for island in range(1,5):
+		overworld.select_world(island)
+		await capture("island-%d" % (island+1))
 	overworld.queue_free()
 	await process_frame
 	var game = root.get_node("Game")

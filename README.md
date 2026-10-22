@@ -13,7 +13,7 @@ Site educacional estático, preparado para GitHub Pages.
 
 ## Publicação
 
-Nas configurações do repositório, abra **Pages**, selecione **Deploy from a branch**, escolha a branch `main` e a pasta `/ (root)`.
+Nas configurações do repositório, abra **Pages** e selecione **GitHub Actions** como fonte. O workflow **Godot Web and Android** preserva o site estático e publica o jogo Godot compilado junto dele.
 
 ## Calculus Royale em Godot 4
 

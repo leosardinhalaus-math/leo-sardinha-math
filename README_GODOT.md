@@ -9,6 +9,11 @@ anterior permanecem disponíveis. Este projeto não implementa multiplayer.
 Abra `project.godot` no Godot 4.7.2 e pressione F6 na cena MainMenu, ou F5.
 Escolha um nome, monte um deck de oito cartas e entre em **Explorar as ilhas**.
 Cada vitória libera a próxima caverna; seis cavernas formam uma ilha.
+Os cinco mapas são dioramas 3D com terreno irregular, falésias, trilhas,
+cavernas, água e marcos próprios de cada tema. Arraste o cenário para mudar
+ligeiramente o ângulo; os botões das seis missões acompanham suas cavernas.
+A cena `scenes/IslandDiorama.tscn` também permite trocar **Preview World**
+no editor. O relevo não altera a ordem nem os bloqueios da campanha.
 
 Na arena, toque em uma carta e marque no cenário o ponto onde ela deve nascer.
 Você pode escolher todo o seu campo ao sul do rio, incluindo as laterais e
@@ -50,7 +55,11 @@ espelho, orbe, balança, trombeta e outros elementos da carta. As silhuetas
 usam malhas próprias: escudos pontudos, elmos com viseira e proteção nas
 bochechas, couraças, ombreiras, mantos, pregas e abas de casaco. Equipamentos
 empunhados acompanham os braços durante as animações. Picareta, martelo,
-alabarda e pergaminho têm geometrias diferentes.
+alabarda e pergaminho têm geometrias diferentes. Os rostos têm relevo de
+maçãs, maxilar, nariz e cavidades dos olhos. Capuzes possuem abertura e borda
+em volume; as túnicas têm pregas radiais e cabelos/barbas usam mechas curvas
+afinadas. A galeria usa perspectiva e visão inicial em três quartos para
+mostrar a profundidade, com luz principal quente, recorte frio e sombras.
 
 `NativeArena.gd` constrói cinco arenas com pisos de pedra, muralhas,
 bandeiras, pontes, torres e motivos próprios de cada ilha. O campo é mais

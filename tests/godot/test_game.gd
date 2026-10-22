@@ -75,10 +75,26 @@ func run() -> void:
 	for world in range(5):
 		overworld.select_world(world)
 		check(overworld.cave_layer.get_child_count() == 6, "Six cave buttons on every island")
+		check(overworld.diorama.mission_points.size() == 6, "Every mission has a 3D cave")
+		check(overworld.map_image.texture is ViewportTexture, "Island map renders native 3D terrain")
+		var mesh_arrays = overworld.diorama.terrain.mesh.surface_get_arrays(0)
+		var positions = mesh_arrays[Mesh.ARRAY_VERTEX]
+		var normals = mesh_arrays[Mesh.ARRAY_NORMAL]
+		var has_cliff = false
+		var has_upward_surface = false
+		for vertex in range(positions.size()):
+			if positions[vertex].y < -1.0: has_cliff = true
+			if positions[vertex].y > 0.1 and normals[vertex].y > 0.8: has_upward_surface = true
+		check(has_cliff and has_upward_surface, "Island has outward terrain and visible cliff depth")
 		await process_frame
 		await process_frame
-		for cave in overworld.cave_layer.get_children():
-			check(cave.get_global_rect().end.y <= root.get_visible_rect().size.y, "Every cave stays within the visible map")
+		for angle in [-0.24,0.0,0.24]:
+			overworld.yaw = angle
+			overworld._process(0)
+			for cave in overworld.cave_layer.get_children():
+				check(Rect2(Vector2.ZERO,overworld.cave_layer.size).encloses(cave.get_rect()), "Every cave stays visible while rotating the island")
+				var stage = world*6+cave.get_index()
+				check(cave.disabled == not game.is_unlocked(stage), "Rotating a diorama preserves mission locks")
 	overworld.queue_free()
 	await process_frame
 	var gallery = load("res://scenes/CharacterGallery.tscn").instantiate()
