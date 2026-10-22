@@ -367,7 +367,7 @@ func _weapons() -> void:
 				left_arm.rotation = Vector3(0.80,0,0.12)
 				right_arm.rotation = Vector3(0.80,0,-0.12)
 			"trumpet":
-				right_arm.rotation = Vector3(2.0,0,0.55)
+				right_arm.quaternion = Quaternion(Vector3(0,-0.58,-0.035).normalized(),Vector3(-0.20,0.22,-0.50).normalized())
 			"clock", "scales", "simpson_rig", "wireframe":
 				left_arm.rotation = Vector3(0.6,0,-0.15)
 				right_arm.rotation = Vector3(0.6,0,0.15)
