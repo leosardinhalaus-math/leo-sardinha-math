@@ -196,6 +196,9 @@ func run() -> void:
 	battle.queue_free()
 	await process_frame
 	await test_conquered_territory(cards,game)
+	await test_combat_regressions(cards,game)
+	await test_quiz_layout(game)
+	test_progress_recovery(game)
 	print("GODOT TESTS: %d checks, %d failures" % [checks, failures.size()])
 	quit(0 if failures.is_empty() else 1)
 
@@ -305,3 +308,162 @@ func test_conquered_territory(cards, game) -> void:
 	check(replay.spawn_error(right).is_empty() and not replay.spawn_error(left).is_empty(), "Destroying the right tower first unlocks only the right half")
 	replay.queue_free()
 	await process_frame
+
+func test_combat_regressions(cards,game) -> void:
+	game.quick_battle = true
+	game.result_claimed = false
+	var battle = load("res://scenes/BattleArena3D.tscn").instantiate()
+	root.add_child(battle)
+	await process_frame
+	battle.frozen = true
+	var guard = tower_at(battle,0,0)
+	var intruder = battle._spawn(cards.card(1),1,1,guard.position+Vector3(0,0,-2.4))
+	check(battle.find_target(guard)==intruder, "A guard detects a nearby intruder arriving from the other lane")
+	var previous_hp = intruder.hp
+	battle.frozen = false
+	guard._physics_process(1.0/30)
+	battle.frozen = true
+	check(intruder.hp<previous_hp, "A guard defends against the other lane within its weapon range")
+	var stationary = battle._spawn(cards.card(1),0,1,Vector3(4,0,6))
+	var behind = battle._spawn(cards.card(2),1,1,Vector3(4,0,7))
+	stationary.attack_clock = 10
+	battle.frozen = false
+	stationary._physics_process(0)
+	battle.frozen = true
+	check((-stationary.global_basis.z).dot((behind.position-stationary.position).normalized())>0.99, "A stationary attacker faces its target even without walking first")
+	var attacker = battle._spawn(cards.card(3),0,0,Vector3(-2,0,3))
+	var reflector = battle._spawn(cards.card(2),1,0,Vector3(-2,0,2))
+	attacker.hp = 1
+	attacker.damage = 30
+	attacker.special_hits = 2
+	attacker.stats.ability_kind = "double"
+	reflector.hp = 500
+	reflector.max_hp = 500
+	reflector.reflect_timer = 5
+	attacker.attack(reflector)
+	check(attacker.dead, "Lethal reflected damage defeats the attacker")
+	check(is_equal_approx(reflector.hp,470), "An attacker killed by reflection cannot cast its third-hit special")
+	attacker.attack(reflector)
+	battle.special(attacker,reflector)
+	check(is_equal_approx(reflector.hp,470), "Dead attackers cannot deal another hit or cast a special")
+	var supporter = battle._spawn(cards.card(2),0,0,Vector3(-4,0,7.5))
+	var weak = battle._spawn(cards.card(1),1,0,Vector3(-4,0,6.8))
+	supporter.special_hits = 2
+	weak.hp = 1
+	supporter.attack(weak)
+	check(weak.dead and supporter.shield==28, "Third-hit self buffs still activate when the normal strike defeats its target")
+	var healer = battle._spawn(cards.card(3),0,0,Vector3(-2,0,5))
+	var weak2 = battle._spawn(cards.card(1),1,0,Vector3(-2,0,4.5))
+	healer.stats.ability_kind = "heal"
+	healer.special_hits = 2
+	healer.hp = healer.max_hp-30
+	weak2.hp = 1
+	healer.attack(weak2)
+	check(weak2.dead and is_equal_approx(healer.hp,healer.max_hp-10), "Third-hit healing survives a lethal normal strike")
+	battle.frozen = false
+	battle.elixir = 10
+	battle._request_card(0)
+	battle.enemy_king.take_damage(99999,null,true)
+	check(battle.outcome=="victory" and battle.finished and battle.frozen, "Central tower defeat records a frozen victory")
+	check(not battle.placing and not battle.touch_placing and not battle.summon_authorized, "Victory clears all placement and authorization state")
+	check(not battle.spawn_zone.visible and not battle.spawn_marker.visible and not battle.cancel_button.visible, "Victory hides deployment overlays and the cancel control")
+	check("RIVAL 0" in battle.top_status.text, "The result updates the defeated king's displayed health")
+	var result_panel = battle.popup
+	battle._close_popup()
+	battle._answer(0)
+	check(battle.frozen and battle.popup==result_panel, "A delayed cancel or answer cannot dismiss the result or resume battle")
+	var final_hp = intruder.hp
+	battle.frozen = false
+	guard.attack_clock = 0
+	guard._physics_process(1.0/30)
+	guard.attack(intruder)
+	check(intruder.hp==final_hp, "Finished battles reject combat even if the pause flag changes")
+	battle.queue_free()
+	await process_frame
+	for fixture in [{"own":1.0,"enemy":1.0,"expected":"draw"},{"own":0.5,"enemy":0.25,"expected":"victory"},{"own":0.5,"enemy":0.75,"expected":"defeat"}]:
+		game.result_claimed = false
+		var timed = load("res://scenes/BattleArena3D.tscn").instantiate()
+		root.add_child(timed)
+		await process_frame
+		timed.player_king.hp = timed.player_king.max_hp*fixture.own
+		timed.enemy_king.hp = timed.enemy_king.max_hp*fixture.enemy
+		var previous_wins = game.wins
+		timed.remaining = 0.01
+		timed._process(0.02)
+		check(timed.outcome==fixture.expected, "Timeout compares health proportions and distinguishes a draw: "+fixture.expected)
+		check(timed.finished and timed.frozen, "All timeout outcomes freeze the battle")
+		check(game.wins==previous_wins+(1 if fixture.expected=="victory" else 0), "A timeout draw or defeat never awards a win")
+		if fixture.expected=="draw": check(timed.popup.get_child(0).get_child(0).text=="EMPATE", "The timeout draw is explained on screen")
+		timed.queue_free()
+		await process_frame
+
+func test_quiz_layout(game) -> void:
+	game.quick_battle = true
+	game.result_claimed = false
+	var battle = load("res://scenes/BattleArena3D.tscn").instantiate()
+	root.add_child(battle)
+	await process_frame
+	for world in range(5):
+		for stage in range(6):
+			battle.world_index = world
+			battle.stage_index = stage
+			battle.elixir = 10
+			battle._request_card(0)
+			check(battle._pick_screen(battle.camera.unproject_position(Vector3(-4,0,8.8))), "Each mission opens its math question from a valid point")
+			await process_frame
+			await process_frame
+			check(root.get_visible_rect().encloses(battle.popup.get_global_rect()), "Question and buttons stay inside the viewport for mission %d" % (world*6+stage+1))
+			battle._answer(int(battle.quiz.answer))
+			await process_frame
+			await process_frame
+			check(root.get_visible_rect().encloses(battle.popup.get_global_rect()), "Explanation and summon button stay inside the viewport for mission %d" % (world*6+stage+1))
+			battle._cancel_placement()
+	battle.queue_free()
+	await process_frame
+
+func write_test_save(path: String, text: String) -> void:
+	var file = FileAccess.open(path,FileAccess.WRITE)
+	check(file!=null, "Isolated save fixture can be written")
+	if file:
+		file.store_string(text)
+		file.close()
+
+func test_progress_recovery(game) -> void:
+	var original = FileAccess.get_file_as_string(game.SAVE_PATH)
+	var original_backup = FileAccess.get_file_as_string(game.SAVE_PATH+".bak")
+	var payload = {"version":1,"player_name":"Teste","hero_class":"Calculante","coins":137,"wins":4,"completed":[0],"stars":{"0":2},"unlocked":[1,2,3,4,5,6,7,8,9,10,11],"deck":[1,2,3,4,5,6,7,11]}
+	write_test_save(game.SAVE_PATH,JSON.stringify(payload))
+	write_test_save(game.SAVE_PATH+".bak",JSON.stringify(payload))
+	game.unlocked.append(45)
+	game.load_progress()
+	check(not game.unlocked.has(45) and game.unlocked.has(11), "Reload restores exactly the saved collection without unsaved card unlocks")
+	check(game.deck==payload.deck and game.coins==137 and game.stars=={"0":2}, "A valid save restores deck, coins and stars")
+	write_test_save(game.SAVE_PATH,"{broken JSON")
+	game.load_progress()
+	check(game.coins==137 and game.deck==payload.deck, "A corrupt primary save falls back to the healthy backup")
+	game.coins = 138
+	game.save_progress()
+	check(game.save_error.is_empty(), "A recovered save can be repaired successfully")
+	var backup = JSON.parse_string(FileAccess.get_file_as_string(game.SAVE_PATH+".bak"))
+	check(backup is Dictionary and backup.coins==137, "Repairing corrupt primary data preserves the healthy backup")
+	var repaired = JSON.parse_string(FileAccess.get_file_as_string(game.SAVE_PATH))
+	check(repaired is Dictionary and repaired.coins==138, "The repaired primary contains the updated progress")
+	write_test_save(game.SAVE_PATH,"{corrupt again")
+	game.load_progress()
+	check(game.coins==137, "The backup still works after recovery and a second primary corruption")
+	var invalid_deck = payload.duplicate(true)
+	invalid_deck.unlocked = [1,2,3,4,5,6,7,8,9,10]
+	invalid_deck.deck = [1,1,2,3,45]
+	invalid_deck.stars = {"0":{},"1":99,"-1":3,"bad":2}
+	write_test_save(game.SAVE_PATH,JSON.stringify(invalid_deck))
+	game.load_progress()
+	check(game.deck==[1,2,3,4,5,6,7,8], "Invalid saved decks fall back to eight distinct unlocked starter cards")
+	check(game.stars=={"1":3}, "Invalid star records cannot corrupt later rewards")
+	var invalid_type = payload.duplicate(true)
+	invalid_type.coins = {"bad":1}
+	write_test_save(game.SAVE_PATH,JSON.stringify(invalid_type))
+	game.load_progress()
+	check(game.coins==137 and game.deck==payload.deck, "A save with invalid field types also falls back to the backup")
+	write_test_save(game.SAVE_PATH,original)
+	write_test_save(game.SAVE_PATH+".bak",original_backup)
+	game.load_progress()

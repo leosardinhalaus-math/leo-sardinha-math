@@ -26,6 +26,11 @@ O jogo pausa os dois exércitos durante a pergunta. Uma resposta correta
 permite invocar a unidade; o erro custa um ponto de elixir. A carta usada
 volta para a fila do deck. Destrua a torre central adversária antes de
 180 segundos; no limite de tempo, vence a maior proporção de vida da torre.
+Proporções iguais resultam em empate, sem conceder vitória ou recompensa.
+O resultado encerra os ataques e a seleção de nascimento. Torres defendem
+contra inimigos próximos, inclusive quando eles vieram da outra faixa.
+Especiais defensivos e de área podem ativar após o golpe normal eliminar o
+alvo; um atacante morto por reflexão não continua atacando nem lança o especial.
 Os 45 personagens são construídos nativamente no Godot, em
 `NativeCharacter.tscn` / `NativeCharacter.gd`, com peças 3D articuladas,
 AnimationPlayer e dez animações. `data/native_visuals.json` registra roupas,
@@ -57,7 +62,10 @@ rasos não acrescentam obstáculos ao campo de nascimento.
 
 Vitórias inéditas concedem moedas e novas cartas. O treino não altera
 a campanha. Nome, deck e progresso são salvos localmente em
-`user://calculus_royale_v1.json`, com cópia de segurança. No navegador,
+`user://calculus_royale_v1.json`, com cópia de segurança. Arquivos inválidos
+são recuperados pela cópia válida; reparar o salvamento não sobrescreve essa
+cópia com o arquivo danificado. Recarregar restaura a coleção salva e um deck
+inválido recebe oito cartas iniciais disponíveis. No navegador,
 limpar os dados do site também pode apagar esse progresso. O salvamento
 é independente do jogo anterior e não está integrado ao Firebase.
 

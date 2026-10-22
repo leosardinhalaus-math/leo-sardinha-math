@@ -4,14 +4,16 @@ signal progress_changed
 
 const SAVE_PATH = "user://calculus_royale_v1.json"
 const MAX_STAGE = 30
+const STARTER_CARDS = [1,2,3,4,5,6,7,8,9,10]
+const DEFAULT_DECK = [1,2,3,4,5,6,7,8]
 var player_name = "Calculante"
 var hero_class = "Calculante"
 var coins = 0
 var wins = 0
 var completed: Array = []
 var stars: Dictionary = {}
-var unlocked: Array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-var deck: Array = [1, 2, 3, 4, 5, 6, 7, 8]
+var unlocked: Array = STARTER_CARDS.duplicate()
+var deck: Array = DEFAULT_DECK.duplicate()
 var active_stage = 0
 var quick_battle = false
 var last_reward: Dictionary = {}
@@ -77,20 +79,40 @@ func save_progress() -> void:
 		save_error = "Não foi possível salvar neste aparelho."
 		return
 	file.store_string(JSON.stringify(payload))
+	file.flush()
+	var write_error = file.get_error()
 	file.close()
-	if FileAccess.file_exists(SAVE_PATH):
-		DirAccess.copy_absolute(SAVE_PATH, SAVE_PATH + ".bak")
+	if write_error != OK:
+		save_error = "Não foi possível gravar o progresso neste aparelho."
+		return
+	# A recovered save must never replace its healthy backup with corrupt input.
+	if _read_progress(SAVE_PATH) is Dictionary:
+		if DirAccess.copy_absolute(SAVE_PATH, SAVE_PATH + ".bak") != OK:
+			save_error = "Não foi possível guardar a cópia de segurança do progresso."
+			return
 	var error = DirAccess.rename_absolute(SAVE_PATH + ".tmp", SAVE_PATH)
 	save_error = "" if error == OK else "Não foi possível atualizar o salvamento."
+
+func _read_progress(path: String) -> Variant:
+	if not FileAccess.file_exists(path): return null
+	var parsed = JSON.new()
+	if parsed.parse(FileAccess.get_file_as_string(path)) != OK: return null
+	var data = parsed.data
+	if not data is Dictionary or data.get("version") != 1: return null
+	for field in ["coins","wins"]:
+		if data.has(field) and typeof(data[field]) not in [TYPE_INT,TYPE_FLOAT]: return null
+	for field in ["completed","unlocked","deck"]:
+		if data.has(field) and not data[field] is Array: return null
+	if data.has("stars") and not data.stars is Dictionary: return null
+	return data
 
 func load_progress() -> void:
 	var payload = null
 	for path in [SAVE_PATH, SAVE_PATH + ".bak"]:
-		if FileAccess.file_exists(path):
-			var candidate = JSON.parse_string(FileAccess.get_file_as_string(path))
-			if candidate is Dictionary and candidate.get("version") == 1:
-				payload = candidate
-				break
+		var candidate = _read_progress(path)
+		if candidate is Dictionary:
+			payload = candidate
+			break
 	if not payload is Dictionary:
 		return
 	player_name = str(payload.get("player_name", "Calculante")).left(24)
@@ -102,7 +124,13 @@ func load_progress() -> void:
 		for stage in payload.completed:
 			if typeof(stage) in [TYPE_INT, TYPE_FLOAT] and int(stage) >= 0 and int(stage) < MAX_STAGE and not completed.has(int(stage)):
 				completed.append(int(stage))
-	stars = payload.get("stars", {}) if payload.get("stars") is Dictionary else {}
+	stars = {}
+	for stage in payload.get("stars", {}):
+		var count = payload.stars[stage]
+		if str(stage).is_valid_int() and int(stage) >= 0 and int(stage) < MAX_STAGE and typeof(count) in [TYPE_INT,TYPE_FLOAT]:
+			stars[str(int(stage))] = clampi(int(count),1,3)
+	unlocked = STARTER_CARDS.duplicate()
+	deck = DEFAULT_DECK.duplicate()
 	if payload.get("unlocked") is Array:
 		for id in payload.unlocked:
 			if typeof(id) in [TYPE_INT, TYPE_FLOAT] and Cards.lookup.has(int(id)) and not unlocked.has(int(id)):

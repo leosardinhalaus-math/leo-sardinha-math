@@ -63,7 +63,18 @@ func run() -> void:
 	await create_timer(0.9).timeout
 	battle._preview_screen(battle.camera.unproject_position(Vector3(4,0,-6.8)))
 	await capture("09-conquered-both")
+	battle.enemy_king.take_damage(99999,null,true)
+	await capture("10-victory")
 	battle.queue_free()
+	await process_frame
+	game.result_claimed = false
+	var timed = load("res://scenes/BattleArena3D.tscn").instantiate()
+	root.add_child(timed)
+	await process_frame
+	timed.remaining = 0.01
+	timed._process(0.02)
+	await capture("11-timeout-draw")
+	timed.queue_free()
 	await process_frame
 	var gallery = load("res://scenes/CharacterGallery.tscn").instantiate()
 	root.add_child(gallery)

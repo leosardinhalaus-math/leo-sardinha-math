@@ -22,6 +22,7 @@ var cancel_button: Button
 var rng = RandomNumberGenerator.new()
 var frozen = false
 var finished = false
+var outcome = ""
 var elixir = 5.0
 var enemy_elixir = 4.0
 var remaining = 180.0
@@ -199,7 +200,9 @@ func _process(delta: float) -> void:
 		_enemy_play()
 	_update_status()
 	if remaining <= 0.0:
-		_finish(player_king.hp / player_king.max_hp > enemy_king.hp / enemy_king.max_hp)
+		var own_ratio = player_king.hp / player_king.max_hp
+		var enemy_ratio = enemy_king.hp / enemy_king.max_hp
+		_finish(own_ratio > enemy_ratio, is_equal_approx(own_ratio,enemy_ratio))
 
 func _update_status() -> void:
 	if not is_instance_valid(player_king) or not is_instance_valid(enemy_king):
@@ -213,11 +216,12 @@ func units() -> Array[Node]:
 func find_target(source: RoyaleUnit) -> RoyaleUnit:
 	var closest: RoyaleUnit = null
 	var closest_distance = INF
+	var engagement_range = maxf(3.0,source.attack_range)
 	for candidate in units():
 		if candidate.dead or candidate.team == source.team:
 			continue
 		var distance = source.position.distance_squared_to(candidate.position)
-		if not source.is_king and not candidate.is_king and candidate.lane != source.lane and distance > 3.0:
+		if not source.is_king and not candidate.is_king and candidate.lane != source.lane and distance > engagement_range * engagement_range:
 			continue
 		if distance < closest_distance:
 			closest = candidate
@@ -282,7 +286,7 @@ func _open_math() -> void:
 	body.add_child(RoyaleUI.button("VOLTAR SEM JOGAR", _close_popup))
 
 func _answer(value: int) -> void:
-	if answer_locked or selected_card < 0 or placing or not is_instance_valid(popup):
+	if finished or answer_locked or selected_card < 0 or placing or not is_instance_valid(popup):
 		return
 	answer_locked = true
 	answers += 1
@@ -339,6 +343,7 @@ func _cancel_placement() -> void:
 	_close_popup()
 
 func _close_popup() -> void:
+	if finished: return
 	placing = false
 	touch_placing = false
 	summon_authorized = false
@@ -376,19 +381,32 @@ func _on_defeated(unit: RoyaleUnit) -> void:
 	if unit.is_king:
 		_finish(unit.team == 1)
 
-func _finish(victory: bool) -> void:
+func _finish(victory: bool, draw: bool = false) -> void:
 	if finished:
 		return
 	finished = true
 	frozen = true
+	outcome = "draw" if draw else ("victory" if victory else "defeat")
+	placing = false
+	touch_placing = false
+	summon_authorized = false
+	selected_card = -1
+	candidate_valid = false
+	quiz.clear()
+	spawn_zone.hide()
+	spawn_marker.hide()
+	cancel_button.hide()
+	_update_status()
 	var score = 1
 	if answers > 0 and float(correct_answers) / answers >= 0.75:
 		score += 1
 	if is_instance_valid(player_king) and player_king.hp > player_king.max_hp * 0.55:
 		score += 1
-	var reward = Game.complete_battle(victory, score)
+	var reward = Game.complete_battle(victory and not draw, score)
 	var body = _popup_body()
-	body.add_child(RoyaleUI.label("VITÓRIA DO CONHECIMENTO" if victory else "A JORNADA CONTINUA", 32, RoyaleUI.GOLD))
+	body.add_child(RoyaleUI.label("EMPATE" if draw else ("VITÓRIA DO CONHECIMENTO" if victory else "A JORNADA CONTINUA"), 32, RoyaleUI.GOLD))
+	if draw:
+		body.add_child(RoyaleUI.label("Tempo esgotado com a mesma proporção de vida nas torres centrais.", 22))
 	body.add_child(RoyaleUI.label("%d acertos em %d desafios. %d moeda(s) recebida(s)." % [correct_answers, answers, reward.coins], 23))
 	if not reward.cards.is_empty():
 		var names: Array[String] = []
@@ -401,6 +419,7 @@ func _finish(victory: bool) -> void:
 	body.add_child(RoyaleUI.button("JOGAR NOVAMENTE", func(): Game.select_stage(Game.active_stage, Game.quick_battle)))
 
 func special(source: RoyaleUnit, target: RoyaleUnit) -> void:
+	if finished or source.dead: return
 	var kind = str(source.stats.get("ability_kind", "strike"))
 	match kind:
 		"shield": source.shield += 28
@@ -416,6 +435,7 @@ func special(source: RoyaleUnit, target: RoyaleUnit) -> void:
 					ally.haste_timer = 4.0
 		"chain":
 			for other in units():
+				if finished or source.dead: break
 				if other.team != source.team and not other.dead and other.position.distance_to(target.position) < 2.5:
 					other.take_damage(source.damage * 0.5, source)
 		"reflect": source.reflect_timer = 5.0

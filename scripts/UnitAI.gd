@@ -89,7 +89,7 @@ static func material(color: Color) -> StandardMaterial3D:
 func _physics_process(delta: float) -> void:
 	if dead or arena == null:
 		return
-	if arena.frozen:
+	if arena.frozen or arena.finished:
 		if animation and animation.is_playing():
 			animation.pause()
 			animation_paused = true
@@ -116,6 +116,8 @@ func _physics_process(delta: float) -> void:
 		return
 	var direction = target.position - position
 	direction.y = 0.0
+	if not is_tower and direction.length_squared() > 0.001:
+		look_at(position + direction, Vector3.UP)
 	if direction.length() > attack_range:
 		if not is_tower:
 			var multiplier = 0.55 if slow_timer > 0 else 1.0
@@ -126,8 +128,6 @@ func _physics_process(delta: float) -> void:
 			travel.y = 0
 			var next_position = position + travel.normalized() * minf(travel.length(), speed * multiplier * delta)
 			position = arena.constrain_walk(next_position, position)
-			if direction.length_squared() > 0.001:
-				look_at(position + direction, Vector3.UP)
 			play_animation("walk")
 		else:
 			play_animation("idle")
@@ -141,13 +141,16 @@ func _physics_process(delta: float) -> void:
 			play_animation("idle")
 
 func attack(target: RoyaleUnit) -> void:
-	if not is_instance_valid(target) or target.dead:
+	if dead or arena.finished or not is_instance_valid(target) or target.dead:
 		return
 	play_animation("attack", true)
 	target.take_damage(damage, self, stats.get("ability_kind") == "pierce")
 	arena.attack_effect(self,target)
 	special_hits += 1
-	if not is_tower and special_hits % 3 == 0 and not target.dead:
+	# Reflection can kill the attacker during take_damage; it cannot cast after death.
+	# Self buffs and area effects remain useful after a lethal triggering hit.
+	var affects_others = str(stats.get("ability_kind","strike")) in ["shield","heal","haste","reflect","chain"]
+	if not dead and not arena.finished and not is_tower and special_hits % 3 == 0 and (not target.dead or affects_others):
 		play_animation("power", true)
 		arena.special(self, target)
 
