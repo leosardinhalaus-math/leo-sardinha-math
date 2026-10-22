@@ -2,6 +2,8 @@
 extends Node3D
 
 const Geo = preload("res://scripts/NativeGeometry.gd")
+const Motion = preload("res://scripts/NativeMotion.gd")
+signal strike
 @export_enum("slope","limit","power","sine","euler","chain","ln","implicit","rate","cauchy","taylor","newton","opt","area","ftc","cavalieri","fractal","sub","parts","trap","improper","continuity","quotient","secant","bernoulli","inverse","expchain","root","mirror","mean","growth","taylor2","miner","average","volume","surface","gabriel","cavalieri-advanced","surface-flux","parts2","simpson","compare","series","simpson-advanced","comparison")
 var preview_key: String = "slope":
 	set(value):
@@ -12,7 +14,17 @@ var preview_key: String = "slope":
 var profile: Dictionary = {}
 var animation: AnimationPlayer
 var rig: Node3D
+var body: Node3D
 var head: Node3D
+var left_elbow: Node3D
+var right_elbow: Node3D
+var left_knee: Node3D
+var right_knee: Node3D
+var left_foot: Node3D
+var right_foot: Node3D
+var follow_parts: Array = []
+var motion_profile: Dictionary = {}
+var bow_links: Dictionary = {}
 var left_arm: Node3D
 var right_arm: Node3D
 var left_leg: Node3D
@@ -41,6 +53,16 @@ func configure(card: Dictionary) -> void:
 		remove_child(child)
 		child.queue_free()
 	pivots.clear()
+	follow_parts.clear()
+	bow_links.clear()
+	body = null
+	head = null
+	left_elbow = null
+	right_elbow = null
+	left_knee = null
+	right_knee = null
+	left_foot = null
+	right_foot = null
 	left_arm = null
 	right_arm = null
 	left_leg = null
@@ -66,13 +88,16 @@ func configure(card: Dictionary) -> void:
 		_humanoid()
 	_weapons()
 	_bind_equipment()
-	_build_animations()
+	_articulate()
+	Motion.build(self,card)
 	var height = float(profile.get("height", 1.85))
 	scale = Vector3.ONE * height / 1.85
 	animation.play("idle")
 
 func _p(parent: Node3D, label: String, kind: String, point: Vector3, dimensions: Vector3, mat: Material, detail: bool = false) -> MeshInstance3D:
-	return Geo.part(parent, label, kind, point, dimensions, mat, detail)
+	var node = Geo.part(parent, label, kind, point, dimensions, mat, detail)
+	node.set_meta("motion_piece",label)
+	return node
 
 func _humanoid() -> void:
 	var outfit = str(profile.get("outfit", "robe"))
@@ -80,7 +105,7 @@ func _humanoid() -> void:
 	var golem = profile.get("gender") == "golem"
 	var female = profile.get("gender") == "female"
 	var broad = 1.48 if golem else (0.9 if female else 1.0)
-	var body = Geo.pivot(rig, "Body", Vector3(0, 1.03, 0))
+	body = Geo.pivot(rig, "Body", Vector3(0, 1.03, 0))
 	pivots.append(body)
 	var shell = steel if armored else cloth
 	if armored and str(get_meta("card_key")) not in ["limit","cauchy","comparison","implicit"]: shell = Geo.material(Color(profile.get("color","#294975")).lightened(0.08),true)
@@ -100,7 +125,7 @@ func _humanoid() -> void:
 	elif outfit == "coat":
 		_p(body,"Waistcoat","box",Vector3(0,0.10,-0.175),Vector3(0.18,0.36,0.03),Geo.material(Color("d8c7a4")))
 		for side in [-1.0,1.0]:
-			Geo.panel(body,"CoatTail",Vector3(side*0.07,0,0.12),PackedVector2Array([Vector2(side*0.08,-0.12),Vector2(side*0.21,-0.12),Vector2(side*0.32,-0.76),Vector2(side*0.07,-0.67)]),0.08,cloth)
+			Geo.panel(body,"CoatTail",Vector3(side*0.07,0,0.12),PackedVector2Array([Vector2(side*0.08,-0.12),Vector2(side*0.21,-0.12),Vector2(side*0.32,-0.76),Vector2(side*0.07,-0.67)]),0.08,cloth).set_meta("motion_piece","CoatTail")
 			Geo.panel(body,"Lapel",Vector3(0,0,-0.20),PackedVector2Array([Vector2(side*0.08,0.35),Vector2(side*0.24,0.27),Vector2(side*0.09,-0.01),Vector2(side*0.04,0.15)]),0.025,cloth)
 		for index in range(3): _p(body,"CoatButton","sphere",Vector3(0,0.23-index*0.09,-0.20),Vector3.ONE*0.016,gold,true)
 	elif armored:
@@ -194,6 +219,7 @@ func _humanoid() -> void:
 			for index in range(7):
 				var wing = Geo.loft(body,"TaperedFeather",Vector3(side*(0.30+index*0.065),0.22-index*0.025,0.24),[Vector3(0.007,-0.38+index*0.018,0.01),Vector3(0.07,0.02,0.035),Vector3(0.025,0.21,0.025)],Geo.material(Color("e9e5d6")),6)
 				wing.rotation.z = side*-0.8
+				wing.set_meta("motion_piece","TaperedFeather")
 	if golem:
 		Geo.loft(body,"StoneCore",Vector3(0,0,-0.24),[Vector3(0.02,-0.03,0.025),Vector3(0.11,0.14,0.04),Vector3(0.02,0.29,0.025)],glow,6)
 		for side in [-1.0,1.0]: Geo.segment(body,"Crack",Vector3(0,0.17,-0.25),Vector3(side*0.29,-0.03,-0.18),0.012,glow)
@@ -222,7 +248,7 @@ func _hair(helmet: bool) -> void:
 					var x = side*(0.16+index*0.015)
 					var z = 0.015+index*0.04
 					long_paths.append([Vector3(x,0.17,z),Vector3(side*0.214,-0.01,z),Vector3(side*0.236,-0.23,z+0.02),Vector3(side*(0.22+index*0.015),-0.40+index*0.025,z-0.02)])
-				Geo.locks(head,"LongLocks",long_paths,0.034,hair)
+				Geo.locks(head,"LongLocks",long_paths,0.034,hair).set_meta("motion_piece","LongLocks")
 		elif style == "ponytail":
 			var tail = Geo.loft(head,"Ponytail",Vector3(0,0.14,0.23),[Vector3(0.015,-0.30,0.025),Vector3(0.08,-0.04,0.08),Vector3(0.055,0.13,0.065)],hair,8)
 			tail.rotation.x = -0.8
@@ -444,54 +470,87 @@ func _arcana(weapon: String) -> void:
 		for index in range(3):
 			_ring(center,0.36+index*0.08,glow,Vector3(0.3+index*0.5,0.2,index*0.4))
 
-func _track(clip: Animation, node: Node3D, property: String, values: Array, duration: float) -> void:
-	var path = NodePath(str(get_path_to(node)) + ":" + property)
-	var previous = clip.find_track(path, Animation.TYPE_VALUE)
-	if previous >= 0:
-		clip.remove_track(previous)
-	var index = clip.add_track(Animation.TYPE_VALUE)
-	clip.track_set_path(index, path)
-	for key in range(values.size()):
-		clip.track_insert_key(index, duration * key / maxf(1, values.size()-1), values[key])
+# Inserting joints preserves every mesh's authored rest transform.
+func _joint(parent: Node3D,label: String,point: Vector3,pieces: Array) -> Node3D:
+	var joint = Geo.pivot(parent,label,point)
+	for node in pieces: node.reparent(joint,true)
+	return joint
 
-func _build_animations() -> void:
-	animation = AnimationPlayer.new()
-	animation.name = "AnimationPlayer"
-	add_child(animation)
-	var library = AnimationLibrary.new()
-	for state in ["idle","walk","run","jump","summon","attack","power","hurt","victory","defeat"]:
-		var clip = Animation.new()
-		clip.length = 1.6 if state == "idle" else (0.75 if state in ["walk","run"] else 0.6)
-		clip.loop_mode = Animation.LOOP_LINEAR if state in ["idle","walk","run"] else Animation.LOOP_NONE
-		# Reset all animated pivots on each state; blends never leave limbs in the previous attack pose.
-		for pivot in pivots:
-			_track(clip,pivot,"rotation",[pivot.rotation,pivot.rotation],clip.length)
-		_track(clip,rig,"scale",[Vector3.ONE,Vector3.ONE],clip.length)
-		_track(clip,gear,"rotation",[Vector3.ZERO,Vector3.ZERO],clip.length)
-		var base_y = 0.08 if profile.get("gender") == "relic" else 0.0
-		_track(clip,rig,"position",[Vector3(0,base_y,0),Vector3(0,base_y,0)],clip.length)
-		match state:
-			"idle": _track(clip,rig,"position",[Vector3(0,base_y,0),Vector3(0,base_y+0.035,0),Vector3(0,base_y,0)],clip.length)
-			"walk", "run":
-				_track(clip,rig,"position",[Vector3(0,base_y,0),Vector3(0,base_y+0.06,0),Vector3(0,base_y,0)],clip.length)
-				if left_leg:
-					_track(clip,left_leg,"rotation",[Vector3(0.52,0,0),Vector3(-0.52,0,0),Vector3(0.52,0,0)],clip.length)
-					_track(clip,right_leg,"rotation",[Vector3(-0.52,0,0),Vector3(0.52,0,0),Vector3(-0.52,0,0)],clip.length)
-					_track(clip,left_arm,"rotation",[left_arm.rotation+Vector3(-0.22,0,0),left_arm.rotation+Vector3(0.22,0,0),left_arm.rotation+Vector3(-0.22,0,0)],clip.length)
-					_track(clip,right_arm,"rotation",[right_arm.rotation+Vector3(0.22,0,0),right_arm.rotation+Vector3(-0.22,0,0),right_arm.rotation+Vector3(0.22,0,0)],clip.length)
-			"summon", "jump":
-				_track(clip,rig,"position",[Vector3(0,-0.1,0),Vector3(0,0.45,0),Vector3(0,base_y,0)],clip.length)
-				_track(clip,rig,"scale",[Vector3(0.8,1.1,0.8),Vector3(1.1,0.9,1.1),Vector3.ONE],clip.length)
-			"attack", "power":
-				_track(clip,gear,"rotation",[Vector3.ZERO,Vector3(-0.15,0,0),Vector3.ZERO],clip.length)
-				_track(clip,rig,"position",[Vector3(0,base_y,0),Vector3(0,base_y,-0.12),Vector3(0,base_y,0)],clip.length)
-				_track(clip,rig,"rotation",[Vector3(0,-0.16,0),Vector3(0,0.20,0),Vector3.ZERO],clip.length)
-				if right_arm:
-					_track(clip,right_arm,"rotation",[right_arm.rotation,Vector3(1.55,0,-0.2),right_arm.rotation],clip.length)
-			"hurt": _track(clip,rig,"rotation",[Vector3.ZERO,Vector3(-0.18,0,0),Vector3.ZERO],clip.length)
-			"victory":
-				_track(clip,rig,"position",[Vector3.ZERO,Vector3(0,0.2,0),Vector3.ZERO],clip.length)
-				if left_arm: _track(clip,left_arm,"rotation",[left_arm.rotation,Vector3(0,0,2.5),left_arm.rotation],clip.length)
-			"defeat": _track(clip,rig,"rotation",[Vector3.ZERO,Vector3(0,0,1.5)],clip.length)
-		library.add_animation(state,clip)
-	animation.add_animation_library("",library)
+func _follow(parent: Node3D,label: String,point: Vector3,prefixes: Array,kind: String,delay: float,amount: float) -> void:
+	var pieces: Array = []
+	for node in parent.get_children():
+		var piece_name = str(node.get_meta("motion_piece",node.name))
+		for prefix in prefixes:
+			if piece_name.begins_with(prefix):
+				pieces.append(node)
+				break
+	if pieces.is_empty(): return
+	var joint = _joint(parent,label,point,pieces)
+	follow_parts.append({"node":joint,"kind":kind,"delay":delay,"amount":amount})
+
+func _articulate() -> void:
+	if not body:
+		_follow(gear,"OrbitFollow",Vector3(0,1.1,0),["Arcane","Spell","Link","Mirror","Compass","Crystal","Fractal","Leaf"],"magic",0.09,0.5)
+		return
+	for side in range(2):
+		var arm = left_arm if side==0 else right_arm
+		var leg = left_leg if side==0 else right_leg
+		var lower_arm: Array = []
+		var held: Array = []
+		for node in arm.get_children():
+			if str(node.name) in ["Bracer","BracerEdge","Hand","Thumb"]: lower_arm.append(node)
+			elif str(node.name) not in ["UpperSleeve","Elbow","Pauldron","ShoulderRim","PauldronGem"]: held.append(node)
+		var elbow = _joint(arm,"ElbowJoint",Vector3(0,-0.31,0),lower_arm)
+		if not held.is_empty():
+			var grip = _joint(elbow,"GripFollow",Vector3(0,-0.27,-0.035),held)
+			follow_parts.append({"node":grip,"kind":"grip_left" if side==0 else "grip_right","delay":0.035,"amount":0.12})
+		var lower_leg: Array = []
+		for node in leg.get_children():
+			if str(node.name) in ["BootShaft","KneeGuard","BootToe","Sole"]: lower_leg.append(node)
+		var knee = _joint(leg,"KneeJoint",Vector3(0,-0.29,0),lower_leg)
+		var shoe: Array = []
+		for node in knee.get_children():
+			if str(node.name) in ["BootToe","Sole"]: shoe.append(node)
+		var foot = _joint(knee,"AnkleJoint",Vector3(0,-0.26,0),shoe)
+		if side==0:
+			left_elbow = elbow
+			left_knee = knee
+			left_foot = foot
+		else:
+			right_elbow = elbow
+			right_knee = knee
+			right_foot = foot
+	if profile.get("weapon")=="bow":
+		var top = find_child("BowstringTop",true,false)
+		var bottom = find_child("BowstringBottom",true,false)
+		var arrow = find_child("Arrow",true,false)
+		var frame = top.get_parent().get_node_or_null("ArcaneFilament") if top else null
+		if top and bottom and arrow and frame:
+			bow_links = {"top":top,"bottom":bottom,"arrow":arrow,"frame":frame,"hand":right_elbow.get_node("Hand")}
+	_follow(head,"HairFollow",Vector3(0,0.12,0.04),["LongLock","Ponytail","HairTie","Braid"],"hair",0.085,0.8)
+	_follow(head,"BeardFollow",Vector3(0,-0.08,-0.16),["SculptedBeard","BeardVolume","Moustache"],"beard",0.07,0.55)
+	_follow(body,"CapeFollow",Vector3(0,0.29,0.22),["CutCape"],"cape",0.11,0.9)
+	_follow(body,"RobeFollow",Vector3(0,-0.15,0),["PleatedRobe"],"robe",0.07,0.38)
+	_follow(body,"TailFollow",Vector3(0,-0.12,0.12),["CoatTail"],"tail",0.095,0.75)
+	_follow(body,"WingFollow",Vector3(0,0.20,0.24),["TaperedFeather"],"wings",0.09,0.4)
+	# Unheld magical accessories trail the gesture without changing their design.
+	_follow(gear,"MagicFollow",Vector3(0,1.1,0),["Arcane","Spell","Link","Flask","Ribbon","Solid","Flow"],"magic",0.075,0.55)
+
+func _motion_impact() -> void:
+	strike.emit()
+
+# The nock follows the drawing hand; the existing string and arrow meshes stay intact.
+func _process(_delta: float) -> void:
+	if bow_links.is_empty(): return
+	var frame: Node3D = bow_links.frame
+	var hand: Vector3 = bow_links.hand.global_position
+	_fit_bow_segment(bow_links.top,frame.to_global(Vector3(-0.14,1.63,-0.53)),hand,0.008)
+	_fit_bow_segment(bow_links.bottom,hand,frame.to_global(Vector3(-0.14,0.47,-0.53)),0.008)
+	_fit_bow_segment(bow_links.arrow,hand,frame.to_global(Vector3(-0.32,1.05,-0.95)),0.012)
+
+func _fit_bow_segment(node: Node3D,start: Vector3,end: Vector3,radius: float) -> void:
+	var direction = end-start
+	if direction.length_squared()<0.00001: return
+	var turn = Basis(Quaternion(Vector3.UP,direction.normalized()))
+	var width = radius*global_basis.get_scale().y
+	node.global_transform = Transform3D(turn*Basis.from_scale(Vector3(width,direction.length(),width)),(start+end)/2)

@@ -37,6 +37,7 @@ func run() -> void:
 			native.animation.advance(0.2)
 		native.queue_free()
 		await process_frame
+	await test_native_motion(cards,native_scene)
 	var rng = RandomNumberGenerator.new()
 	rng.seed = 20261021
 	for world in range(5):
@@ -193,7 +194,8 @@ func run() -> void:
 		check(unit.position.z < -3.0, "Both free deployment routes reach enemy territory")
 	unit.position = previous_position
 	var enemy = battle._spawn(cards.card(2), 1, 0, Vector3(-3,0,1))
-	unit.attack(enemy)
+	unit.position = enemy.position+Vector3(0,0,1)
+	contact(unit,enemy)
 	check(enemy.hp < enemy.max_hp, "Units deal combat damage")
 	for tick in range(10):
 		await physics_frame
@@ -356,17 +358,17 @@ func test_combat_regressions(cards,game) -> void:
 	reflector.hp = 500
 	reflector.max_hp = 500
 	reflector.reflect_timer = 5
-	attacker.attack(reflector)
+	contact(attacker,reflector)
 	check(attacker.dead, "Lethal reflected damage defeats the attacker")
 	check(is_equal_approx(reflector.hp,470), "An attacker killed by reflection cannot cast its third-hit special")
-	attacker.attack(reflector)
+	contact(attacker,reflector)
 	battle.special(attacker,reflector)
 	check(is_equal_approx(reflector.hp,470), "Dead attackers cannot deal another hit or cast a special")
 	var supporter = battle._spawn(cards.card(2),0,0,Vector3(-4,0,7.5))
 	var weak = battle._spawn(cards.card(1),1,0,Vector3(-4,0,6.8))
 	supporter.special_hits = 2
 	weak.hp = 1
-	supporter.attack(weak)
+	contact(supporter,weak)
 	check(weak.dead and supporter.shield==28, "Third-hit self buffs still activate when the normal strike defeats its target")
 	var healer = battle._spawn(cards.card(3),0,0,Vector3(-2,0,5))
 	var weak2 = battle._spawn(cards.card(1),1,0,Vector3(-2,0,4.5))
@@ -374,8 +376,9 @@ func test_combat_regressions(cards,game) -> void:
 	healer.special_hits = 2
 	healer.hp = healer.max_hp-30
 	weak2.hp = 1
-	healer.attack(weak2)
+	contact(healer,weak2)
 	check(weak2.dead and is_equal_approx(healer.hp,healer.max_hp-10), "Third-hit healing survives a lethal normal strike")
+	await test_attack_timing(battle,cards)
 	battle.frozen = false
 	battle.elixir = 10
 	battle._request_card(0)
@@ -483,3 +486,132 @@ func test_progress_recovery(game) -> void:
 	write_test_save(game.SAVE_PATH,original)
 	write_test_save(game.SAVE_PATH+".bak",original_backup)
 	game.load_progress()
+
+# Advance actual animation markers rather than bypassing the combat resolver.
+func contact(unit, target) -> void:
+	var was_frozen = unit.arena.frozen
+	unit.arena.frozen = false
+	unit.attack(target)
+	if unit.pending_target and unit.animation:
+		unit.animation.advance(0)
+		for step in range(12):
+			unit.animation.advance((unit.animation.current_animation_length*0.44+0.002)/12.0)
+	unit.arena.frozen = was_frozen
+
+func test_native_motion(cards,native_scene) -> void:
+	var personalities: Dictionary = {}
+	for card in cards.entries:
+		var avatar = native_scene.instantiate()
+		root.add_child(avatar)
+		avatar.configure(card)
+		personalities[str(avatar.motion_profile)] = true
+		for state in ["idle","walk","run"]:
+			var clip = avatar.animation.get_animation(state)
+			for track in range(clip.get_track_count()):
+				if clip.track_get_type(track)==Animation.TYPE_VALUE:
+					check(clip.track_get_key_value(track,0).is_equal_approx(clip.track_get_key_value(track,clip.track_get_key_count(track)-1)), "Locomotion and breathing loops have a seamless return")
+		check(avatar.animation.get_animation("run").length<avatar.animation.get_animation("walk").length, "Running has a faster cadence than walking")
+		for state in ["attack","power"]:
+			var clip = avatar.animation.get_animation(state)
+			var markers = 0
+			for track in range(clip.get_track_count()):
+				if clip.track_get_type(track)==Animation.TYPE_METHOD:
+					markers += clip.track_get_key_count(track)
+					check(clip.track_get_key_time(track,0)>clip.length*0.30 and clip.track_get_key_time(track,0)<clip.length*0.60, "Contact follows anticipation and precedes recovery")
+			check(markers==1, "An attack emits exactly one contact marker")
+		if avatar.body:
+			avatar.animation.play("idle")
+			avatar.animation.advance(0)
+			var feet = [avatar.left_foot.get_node("Sole"),avatar.right_foot.get_node("Sole")]
+			var planted = [avatar.to_local(feet[0].global_position),avatar.to_local(feet[1].global_position)]
+			var hip_min = 10.0
+			var hip_max = -10.0
+			for sample in range(17):
+				avatar.animation.seek(avatar.animation.current_animation_length*sample/16.0,true)
+				hip_min = minf(hip_min,avatar.body.position.x)
+				hip_max = maxf(hip_max,avatar.body.position.x)
+				for side in range(2):
+					check(avatar.to_local(feet[side].global_position).distance_to(planted[side])<0.008, "Idle weight transfer keeps the feet planted")
+			check(hip_max-hip_min>0.025, "Idle shifts weight between both sides")
+			avatar.animation.play("walk")
+			avatar.animation.advance(0)
+			var max_lift = 0.0
+			for sample in range(25):
+				var phase = sample/24.0
+				avatar.animation.seek(avatar.animation.current_animation_length*phase,true)
+				for side in range(2):
+					var foot = avatar.to_local(feet[side].global_position)
+					max_lift = maxf(max_lift,foot.y-planted[side].y)
+					check(foot.y>=planted[side].y-0.006, "Walking never pushes the sole through the floor")
+			check(max_lift>0.055, "A walking foot lifts during its swing")
+			if not avatar.follow_parts.is_empty():
+				avatar.animation.play("attack")
+				avatar.animation.seek(avatar.animation.current_animation_length*0.52,true)
+				var follows = false
+				for follow in avatar.follow_parts:
+					if follow.node.rotation.length()>0.001: follows = true
+					check(follow.node.rotation.length()<0.29, "Secondary motion remains bounded around its attachment")
+				check(follows,"Hair, cloth or accessories retain movement after contact")
+		if not avatar.bow_links.is_empty():
+			avatar.animation.play("attack")
+			for phase in [0.0,0.18,0.30,0.44,0.75]:
+				avatar.animation.seek(avatar.animation.current_animation_length*phase,true)
+				avatar._process(0)
+				var links = avatar.bow_links
+				var nock = links.hand.global_position
+				check((links.top.global_position+links.top.global_basis.y*0.5).distance_to(nock)<0.0001,"The upper bowstring follows the drawing hand")
+				check((links.bottom.global_position-links.bottom.global_basis.y*0.5).distance_to(nock)<0.0001,"The lower bowstring follows the drawing hand")
+				check((links.arrow.global_position-links.arrow.global_basis.y*0.5).distance_to(nock)<0.0001,"The arrow nock remains in the drawing hand")
+		avatar.queue_free()
+		await process_frame
+	check(personalities.size()==45,"Every card receives its own motion personality")
+
+func test_attack_timing(battle,cards) -> void:
+	var striker = battle._spawn(cards.card(2),0,1,Vector3(5.5,0,6))
+	var target = battle._spawn(cards.card(1),1,1,Vector3(5.5,0,5.3))
+	var hp_before = target.hp
+	battle.frozen = false
+	striker.attack(target)
+	striker.animation.advance(0)
+	striker.animation.advance(striker.animation.current_animation_length*0.30)
+	check(target.hp==hp_before,"Anticipation does not apply damage")
+	var planted = striker.position
+	striker._physics_process(0)
+	check(striker.position==planted,"A committed attack cannot turn into walking before contact")
+	battle.frozen = true
+	striker.animation.advance(striker.animation.current_animation_length*0.18)
+	striker._physics_process(0.2)
+	check(target.hp==hp_before and striker.pending_target!=null,"A contact marker during pause cannot damage or lose the queued attack")
+	battle.frozen = false
+	striker._physics_process(0)
+	check(is_equal_approx(target.hp,hp_before-striker.damage),"Unpausing resolves the contact once")
+	striker._resolve_attack()
+	check(is_equal_approx(target.hp,hp_before-striker.damage),"Duplicate contact callbacks cannot repeat damage")
+	check(striker.animation.is_playing(),"Recovery continues after the damage frame")
+	var doomed = battle._spawn(cards.card(3),0,1,Vector3(4.7,0,6))
+	var survivor = battle._spawn(cards.card(2),1,1,Vector3(4.7,0,5.3))
+	doomed.attack(survivor)
+	var safe_hp = survivor.hp
+	doomed.take_damage(99999,null,true)
+	doomed._resolve_attack()
+	check(survivor.hp==safe_hp,"An attacker defeated during anticipation cannot hit later")
+	var miss = battle._spawn(cards.card(2),0,0,Vector3(-5.5,0,6))
+	var runner = battle._spawn(cards.card(1),1,0,Vector3(-5.5,0,5.3))
+	miss.attack(runner)
+	var runner_hp = runner.hp
+	runner.position.z = 1
+	miss.animation.advance(0)
+	miss.animation.advance(miss.animation.current_animation_length*0.45)
+	check(runner.hp==runner_hp and miss.special_hits==0,"A target that leaves reach before contact does not receive a ghost hit")
+	var walker = battle._spawn(cards.card(2),0,0,Vector3(-5.4,0,8.5))
+	for rate in ["normal","slow","haste"]:
+		walker.slow_timer = 1.0 if rate=="slow" else 0.0
+		walker.haste_timer = 1.0 if rate=="haste" else 0.0
+		var previous = walker.position
+		walker._physics_process(1.0/30)
+		var actual_speed = walker.position.distance_to(previous)*30.0
+		check(actual_speed>0.01,"The gait fixture can move through a free area")
+		var actor = walker.animation.get_parent()
+		var foot_speed = load("res://scripts/NativeMotion.gd").locomotion_speed(walker.animation_state,actor.motion_profile)*actor.scale.y*walker.animation.speed_scale
+		check(absf(actual_speed-foot_speed)<0.001,"Foot cadence matches movement during normal, slowed and hasted travel")
+	battle.frozen = true

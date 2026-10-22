@@ -91,6 +91,14 @@ func run() -> void:
 	await capture("native-02-attack")
 	gallery.character.rotation.y = PI/2
 	await capture("native-02-side")
+	for index in [0,1,2]:
+		gallery.show_card(index)
+		for state in ["idle","walk","attack"]:
+			gallery.character.animation.play(state)
+			gallery.character.animation.pause()
+			for phase in [0.0,0.18,0.30,0.44,0.60,0.85]:
+				gallery.character.animation.seek(gallery.character.animation.current_animation_length*phase,true)
+				await capture("motion-%02d-%s-%02d" % [index+1,state,int(phase*100)])
 	gallery.queue_free()
 	await process_frame
 	for world in range(1,5):

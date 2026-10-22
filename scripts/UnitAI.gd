@@ -2,6 +2,7 @@ extends CharacterBody3D
 class_name RoyaleUnit
 
 const CHARACTER_SCENE = preload("res://scenes/NativeCharacter.tscn")
+const MOTION = preload("res://scripts/NativeMotion.gd")
 
 signal defeated(unit: RoyaleUnit)
 
@@ -30,6 +31,8 @@ var visual: Node3D
 var hp_fill: MeshInstance3D
 var animation_state = ""
 var animation_paused = false
+var pending_target: WeakRef
+var pending_power = false
 var walk_path: Array[Vector3] = []
 var path_step = 0
 var path_revision = -1
@@ -62,6 +65,7 @@ func _build_visual() -> void:
 		visual.add_child(character)
 		character.configure(stats)
 		animation = character.animation
+		character.strike.connect(_resolve_attack)
 	var base = MeshInstance3D.new()
 	var marker = TorusMesh.new()
 	marker.inner_radius = 0.34
@@ -110,14 +114,19 @@ func _physics_process(delta: float) -> void:
 			take_damage(4.0, null, true)
 			if dead:
 				return
+	# An animation marker commits the hit; pause/resume cannot consume it early.
+	if pending_target and animation and animation.current_animation_position >= animation.current_animation_length*MOTION.IMPACT_PHASE:
+		_resolve_attack()
+	if animation and animation.is_playing() and animation_state in ["attack","power","summon","hurt"]:
+		return
 	var target = arena.find_target(self) as RoyaleUnit
 	if target == null:
 		play_animation("idle")
 		return
 	var direction = target.position - position
 	direction.y = 0.0
-	if not is_tower and direction.length_squared() > 0.001:
-		look_at(position + direction, Vector3.UP)
+	if not is_tower and direction.length_squared()>0.001 and direction.length()<=attack_range:
+		_face(direction,delta)
 	if direction.length() > attack_range:
 		if not is_tower:
 			var multiplier = 0.55 if slow_timer > 0 else 1.0
@@ -126,9 +135,19 @@ func _physics_process(delta: float) -> void:
 			var waypoint: Vector3 = arena.walk_target(self, target)
 			var travel = waypoint - position
 			travel.y = 0
+			_face(travel,delta)
 			var next_position = position + travel.normalized() * minf(travel.length(), speed * multiplier * delta)
+			var before_move = position
 			position = arena.constrain_walk(next_position, position)
-			play_animation("walk")
+			var actual_speed = position.distance_to(before_move)/maxf(delta,0.0001)
+			if actual_speed < 0.01:
+				play_animation("idle")
+			else:
+				play_animation("run" if haste_timer>0 or actual_speed>1.45 else "walk")
+				if animation:
+					var actor = animation.get_parent()
+					var stride_speed = MOTION.locomotion_speed(animation_state,actor.motion_profile)*actor.scale.y
+					animation.speed_scale = clampf(actual_speed/maxf(0.01,stride_speed),0.1,3.0)
 		else:
 			play_animation("idle")
 	else:
@@ -140,19 +159,43 @@ func _physics_process(delta: float) -> void:
 		elif animation == null or not animation.is_playing():
 			play_animation("idle")
 
+func _face(direction: Vector3,delta: float) -> void:
+	if direction.length_squared()<0.00001: return
+	var heading = atan2(-direction.x,-direction.z)
+	rotation.y = lerp_angle(rotation.y,heading,1.0-exp(-delta*16.0)) if delta>0 else heading
+
 func attack(target: RoyaleUnit) -> void:
-	if dead or arena.finished or not is_instance_valid(target) or target.dead:
+	if dead or arena.frozen or arena.finished or not is_instance_valid(target) or target.dead or pending_target:
 		return
-	play_animation("attack", true)
-	target.take_damage(damage, self, stats.get("ability_kind") == "pierce")
+	if animation and animation.is_playing() and animation_state in ["attack","power"]:
+		return
+	if position.distance_to(target.position) > attack_range+0.25: return
+	pending_target = weakref(target)
+	pending_power = not is_tower and (special_hits+1)%3==0
+	play_animation("power" if pending_power else "attack",true)
+	if animation:
+		# Keep the whole recovery inside the current attack interval, also under haste.
+		var interval = float(stats.get("interval",1.05))*(0.7 if haste_timer>0 else 1.0)
+		animation.speed_scale = maxf(1.0,animation.current_animation_length/(interval*0.92))
+	else:
+		_resolve_attack()
+
+func _resolve_attack() -> void:
+	if not pending_target: return
+	if arena.frozen and not arena.finished and not dead: return
+	var target = pending_target.get_ref() as RoyaleUnit
+	var use_power = pending_power
+	pending_target = null
+	pending_power = false
+	if dead or arena.finished or not is_instance_valid(target) or target.dead: return
+	if position.distance_to(target.position)>attack_range+0.25: return
+	target.take_damage(damage,self,stats.get("ability_kind")=="pierce")
 	arena.attack_effect(self,target)
 	special_hits += 1
-	# Reflection can kill the attacker during take_damage; it cannot cast after death.
-	# Self buffs and area effects remain useful after a lethal triggering hit.
+	# Reflection can kill the attacker at contact. Self buffs still survive a lethal hit.
 	var affects_others = str(stats.get("ability_kind","strike")) in ["shield","heal","haste","reflect","chain"]
-	if not dead and not arena.finished and not is_tower and special_hits % 3 == 0 and (not target.dead or affects_others):
-		play_animation("power", true)
-		arena.special(self, target)
+	if use_power and not dead and not arena.finished and (not target.dead or affects_others):
+		arena.special(self,target)
 
 func take_damage(amount: float, source: RoyaleUnit = null, pierce: bool = false) -> void:
 	if dead:
@@ -168,6 +211,8 @@ func take_damage(amount: float, source: RoyaleUnit = null, pierce: bool = false)
 		source.take_damage(amount * 0.3, null, true)
 	if hp <= 0.0:
 		dead = true
+		pending_target = null
+		pending_power = false
 		play_animation("defeat", true)
 		defeated.emit(self)
 		var tween = create_tween()
@@ -189,5 +234,6 @@ func play_animation(state: String, force: bool = false) -> void:
 			animation_state = state
 			var clip = animation.get_animation(animation_name)
 			clip.loop_mode = Animation.LOOP_LINEAR if state in ["idle", "walk", "run"] else Animation.LOOP_NONE
-			animation.play(animation_name, 0.12)
+			animation.speed_scale = 1.0
+			animation.play(animation_name, 0.10 if state in ["attack","power"] else 0.16)
 			return

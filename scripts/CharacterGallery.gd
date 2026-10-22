@@ -92,6 +92,7 @@ func _ready() -> void:
 	column.add_child(footer)
 	footer.add_child(RoyaleUI.button("← ANTERIOR",func(): show_card(posmod(selected-1,45))))
 	state_menu = OptionButton.new()
+	state_menu.allow_reselect = true
 	for state in ["idle","walk","run","jump","summon","attack","power","hurt","victory","defeat"]:
 		state_menu.add_item(state)
 	state_menu.item_selected.connect(func(index): character.animation.play(state_menu.get_item_text(index)))

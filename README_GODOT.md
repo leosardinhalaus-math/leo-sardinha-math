@@ -61,6 +61,17 @@ em volume; as túnicas têm pregas radiais e cabelos/barbas usam mechas curvas
 afinadas. A galeria usa perspectiva e visão inicial em três quartos para
 mostrar a profundidade, com luz principal quente, recorte frio e sombras.
 
+As animações são definidas em `NativeMotion.gd`, sem alterar as malhas,
+cores, roupas ou armas das cartas. Cada carta recebe ritmo, postura e
+amplitudes próprios a partir de sua identidade e função. O repouso transfere
+peso com os pés apoiados; a caminhada articula joelhos e tornozelos, e a cadência
+acompanha a velocidade real de deslocamento. Cabelos, barbas, mantos, abas,
+asas e acessórios têm atraso limitado, com encaixes preservados. Ataques
+passam por preparação, contato e recuperação; o dano ocorre no marcador de
+contato, respeitando pausa, alcance e a morte do atacante. A galeria permite
+repetir uma animação selecionando novamente o mesmo estado. A referência a
+jogos de luta se aplica à expressividade do movimento dos personagens.
+
 `NativeArena.gd` constrói cinco arenas com pisos de pedra, muralhas,
 bandeiras, pontes, torres e motivos próprios de cada ilha. O campo é mais
 profundo para permitir o nascimento atrás das torres. A câmera permanece
