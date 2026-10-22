@@ -45,6 +45,7 @@ func build(world_index: int, stage_index: int) -> void:
 	Geo.part(self,"FloatingFoundation","box",Vector3(0,-0.66,0),Vector3(14.2,1.2,20.3),stone)
 	Geo.part(self,"BattleFloor","box",Vector3(0,-0.08,0),Vector3(13.2,0.14,19.3),floor_mat)
 	Geo.part(self,"River","box",Vector3(0,-0.09,0),Vector3(13.1,0.055,1.65),water)
+	_floor_details(stage_index,stone,trim,accent)
 	# Thin inlaid tiles replace the old white road strips.
 	for lane_x in [-3.0,3.0]:
 		for index in range(18):
@@ -70,6 +71,68 @@ func build(world_index: int, stage_index: int) -> void:
 		var seal = Geo.part(self,"KingSeal","ring",Vector3(0,0.017,side*7.0),Vector3(1.15,0.035,1.15),trim)
 		seal.rotation.y = stage_index * 0.13
 		Geo.part(self,"RearRune","box",Vector3(0,0.018,side*8.85),Vector3(0.05,0.02,0.35),accent)
+
+func _floor_details(stage_index: int, stone: Material, trim: Material, accent: Material) -> void:
+	# Repeated floor geometry is batched, keeping draw calls independent of tile count.
+	for tint in range(3):
+		var slabs: Array[Transform3D] = []
+		for x in range(-6,7):
+			for z in range(-9,10):
+				if abs(z)<1 or (abs(x*7+z*11)%3)!=tint: continue
+				slabs.append(Transform3D(Basis.from_scale(Vector3(0.94,0.018,0.94)),Vector3(x,0.003,z)))
+		Geo.instances(self,"Flagstones%d"%tint,"box",slabs,Geo.material(Color(theme.floor).lightened(0.015+tint*0.022)))
+	# A stepped foundation, ribbed banks and horizontal river filaments give depth.
+	Geo.part(self,"FoundationCornice","box",Vector3(0,-0.22,0),Vector3(14.3,0.12,20.4),trim)
+	Geo.part(self,"LowerFoundation","box",Vector3(0,-1.20,0),Vector3(13.4,0.25,19.5),stone)
+	var ripples: Array[Transform3D] = []
+	for index in range(23):
+		var x = -6.0+index*0.54
+		if abs(abs(x)-3.0)<1.0: continue
+		var z = sin(index*2.7)*0.52
+		ripples.append(Transform3D(Basis.from_scale(Vector3(0.28+index%3*0.10,0.012,0.018)),Vector3(x,-0.054,z)))
+	Geo.instances(self,"RiverFilaments","box",ripples,Geo.material(Color(theme.water).lightened(0.20)))
+	for side in [-1.0,1.0]:
+		# Mosaics sit flush on the floor, so placement and walking stay unobstructed.
+		var center = Vector3(0,0.03,side*4.0)
+		Geo.part(self,"MosaicRim","ring",center,Vector3(1.25,0.018,1.25),trim)
+		Geo.part(self,"MosaicInnerRim","ring",center,Vector3(1.12,0.018,1.12),Geo.material(Color(theme.floor).lightened(0.12)))
+		var curve: Array[Vector3] = []
+		for index in range(17):
+			var t = index/16.0
+			curve.append(center+Vector3(sin(t*TAU)*0.25,0.0,(t-0.5)*1.45))
+		Geo.curve(self,curve,0.014,trim)
+		for i in range(8):
+			var angle = i*TAU/8+stage_index*0.1
+			Geo.part(self,"MosaicStud","cylinder",center+Vector3(cos(angle)*1.18,0,sin(angle)*1.18),Vector3(0.026,0.015,0.026),accent)
+		for x in [-1.0,1.0]:
+			var point = Vector3(x*6.78,0,side*9.55)
+			Geo.loft(self,"CornerSpire",point,[Vector3(0.24,0,0.24),Vector3(0.21,0.65,0.21),Vector3(0.13,0.85,0.13)],stone,8)
+			Geo.part(self,"SpireCap","cone",point+Vector3(0,1.05,0),Vector3(0.24,0.42,0.24),Geo.material(Color(theme.banner)))
+	# Island-specific floor inlays reinforce the five native environments.
+	if theme.motif == "tree":
+		for side in [-1.0,1.0]:
+			for z in [-8.0,-5.0,5.0,8.0]:
+				Geo.part(self,"GardenBed","box",Vector3(side*4.8,0.01,z),Vector3(0.8,0.025,1.6),Geo.material(Color("305340")))
+				for leaf in range(3):
+					Geo.part(self,"GardenLeaf","sphere",Vector3(side*4.8,0.04,z-0.5+leaf*0.5),Vector3(0.17,0.025,0.24),Geo.material(Color("477857")))
+	elif theme.motif == "orrery":
+		for side in [-1.0,1.0]:
+			for z in [-6.0,6.0]:
+				Geo.part(self,"CelestialDial","ring",Vector3(side*4.5,0.032,z),Vector3(0.58,0.017,0.58),trim)
+				for rotation_index in range(4):
+					var spoke = Geo.part(self,"DialSpoke","box",Vector3(side*4.5,0.034,z),Vector3(0.035,0.015,1.1),trim)
+					spoke.rotation.y = rotation_index*PI/4
+	elif theme.motif == "flame":
+		for side in [-1.0,1.0]:
+			for z in [-8.0,-6.0,-4.0,4.0,6.0,8.0]:
+				Geo.part(self,"ForgeInlay","box",Vector3(side*4.8,0.026,z),Vector3(0.55,0.018,0.035),accent)
+	elif theme.motif == "chain":
+		var links: Array[Transform3D] = []
+		for side in [-1.0,1.0]:
+			for z in range(-8,9):
+				if abs(z)<2: continue
+				links.append(Transform3D(Basis.from_scale(Vector3(0.17,0.015,0.29)),Vector3(side*4.7,0.025,z)))
+		Geo.instances(self,"ChainInlays","ring",links,trim)
 
 func _bridge(x: float, stone: Material, trim: Material, accent: Material) -> void:
 	var bridge = Geo.pivot(self,"StoneBridge",Vector3(0,-0.21,0))

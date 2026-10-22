@@ -36,12 +36,19 @@ para mostrar a geometria diretamente na área 3D do editor.
 O menu **Galeria 3D · 45 personagens** mostra a carta ao lado do personagem.
 Arraste para girá-lo e escolha uma animação. Os modelos têm rosto, mãos,
 botas e equipamentos próprios: arco, cajado, escudos, adagas, livro, picareta,
-espelho, orbe, balança, trombeta e outros elementos da carta.
+espelho, orbe, balança, trombeta e outros elementos da carta. As silhuetas
+usam malhas próprias: escudos pontudos, elmos com viseira e proteção nas
+bochechas, couraças, ombreiras, mantos, pregas e abas de casaco. Equipamentos
+empunhados acompanham os braços durante as animações. Picareta, martelo,
+alabarda e pergaminho têm geometrias diferentes.
 
 `NativeArena.gd` constrói cinco arenas com pisos de pedra, muralhas,
 bandeiras, pontes, torres e motivos próprios de cada ilha. O campo é mais
 profundo para permitir o nascimento atrás das torres. A câmera permanece
-fixa no sentido sul → norte e as cartas ficam na lateral.
+fixa no sentido sul → norte e as cartas ficam na lateral. Mosaicos de integral,
+lajes e detalhes do rio são geometria nativa. As lajes e outros elementos
+repetidos usam MultiMesh para reduzir chamadas de desenho. Os novos detalhes
+rasos não acrescentam obstáculos ao campo de nascimento.
 
 Vitórias inéditas concedem moedas e novas cartas. O treino não altera
 a campanha. Nome, deck e progresso são salvos localmente em

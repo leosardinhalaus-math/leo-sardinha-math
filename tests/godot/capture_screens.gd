@@ -49,9 +49,16 @@ func run() -> void:
 	await process_frame
 	var gallery = load("res://scenes/CharacterGallery.tscn").instantiate()
 	root.add_child(gallery)
-	for index in [0,1,2,4,7,10,16,28,32,36]:
+	for index in [0,1,2,3,4,7,10,11,13,14,16,18,28,32,36]:
 		gallery.show_card(index)
 		await capture("native-%02d" % (index+1))
+	gallery.show_card(1)
+	gallery.character.animation.play("attack")
+	gallery.character.animation.advance(0.3)
+	gallery.character.animation.pause()
+	await capture("native-02-attack")
+	gallery.character.rotation.y = PI/2
+	await capture("native-02-side")
 	gallery.queue_free()
 	await process_frame
 	for world in range(1,5):

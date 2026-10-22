@@ -100,3 +100,80 @@ static func curve(parent: Node3D, points: Array[Vector3], radius: float, mat: Ma
 	mesh.mesh = surface.commit()
 	mesh.material_override = mat
 	parent.add_child(mesh)
+
+# Closed, tailored cross sections: x/z are half widths and y is the height.
+# Meshes are cached across every card that shares the same silhouette.
+static func loft(parent: Node3D, label: String, point: Vector3, sections: Array[Vector3], mat: Material, sides: int = 10) -> MeshInstance3D:
+	var key = "loft:" + str(sections) + ":" + str(sides)
+	if not meshes.has(key):
+		var surface = SurfaceTool.new()
+		surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+		for row in range(sections.size()-1):
+			var a = sections[row]
+			var b = sections[row+1]
+			for side in range(sides):
+				var angle = (side+0.5)*TAU/sides
+				var next = (side+1.5)*TAU/sides
+				var vertices = [Vector3(cos(angle)*a.x,a.y,sin(angle)*a.z),Vector3(cos(angle)*b.x,b.y,sin(angle)*b.z),Vector3(cos(next)*b.x,b.y,sin(next)*b.z),Vector3(cos(next)*a.x,a.y,sin(next)*a.z)]
+				for index in [0,2,1,0,3,2]: surface.add_vertex(vertices[index])
+		surface.set_smooth_group(-1)
+		for cap in [0,sections.size()-1]:
+			var row = sections[cap]
+			for side in range(sides):
+				var a = (side+0.5)*TAU/sides
+				var b = (side+1.5)*TAU/sides
+				var ring_a = Vector3(cos(a)*row.x,row.y,sin(a)*row.z)
+				var ring_b = Vector3(cos(b)*row.x,row.y,sin(b)*row.z)
+				for vertex in [Vector3(0,row.y,0),ring_b if cap==0 else ring_a,ring_a if cap==0 else ring_b]: surface.add_vertex(vertex)
+		surface.generate_normals()
+		meshes[key] = surface.commit()
+	var node = MeshInstance3D.new()
+	node.name = label
+	node.mesh = meshes[key]
+	node.position = point
+	node.material_override = mat
+	parent.add_child(node)
+	return node
+
+# Extruded front silhouette, used for kite shields, cloth panels and lapels.
+# Outline points follow the perimeter clockwise when looking at the front (-Z).
+static func panel(parent: Node3D, label: String, point: Vector3, outline: PackedVector2Array, depth: float, mat: Material) -> MeshInstance3D:
+	var key = "panel:" + str(outline) + ":" + str(depth)
+	if not meshes.has(key):
+		var surface = SurfaceTool.new()
+		surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+		surface.set_smooth_group(-1)
+		var triangles = Geometry2D.triangulate_polygon(outline)
+		for face in [-1.0,1.0]:
+			for i in range(0,triangles.size(),3):
+				var order = [0,1,2] if face<0 else [2,1,0]
+				for j in order:
+					var v = outline[triangles[i+j]]
+					surface.add_vertex(Vector3(v.x,v.y,face*depth/2))
+		for i in range(outline.size()):
+			var a = outline[i]
+			var b = outline[(i+1)%outline.size()]
+			var vertices = [Vector3(a.x,a.y,-depth/2),Vector3(a.x,a.y,depth/2),Vector3(b.x,b.y,depth/2),Vector3(b.x,b.y,-depth/2)]
+			for index in [0,2,1,0,3,2]: surface.add_vertex(vertices[index])
+		surface.generate_normals()
+		meshes[key] = surface.commit()
+	var node = MeshInstance3D.new()
+	node.name = label
+	node.mesh = meshes[key]
+	node.position = point
+	node.material_override = mat
+	parent.add_child(node)
+	return node
+
+static func instances(parent: Node3D, label: String, kind: String, transforms: Array[Transform3D], mat: Material) -> MultiMeshInstance3D:
+	var multi = MultiMesh.new()
+	multi.transform_format = MultiMesh.TRANSFORM_3D
+	multi.mesh = primitive(kind)
+	multi.instance_count = transforms.size()
+	for index in range(transforms.size()): multi.set_instance_transform(index,transforms[index])
+	var node = MultiMeshInstance3D.new()
+	node.name = label
+	node.multimesh = multi
+	node.material_override = mat
+	parent.add_child(node)
+	return node
