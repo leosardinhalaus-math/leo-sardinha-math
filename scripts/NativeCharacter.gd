@@ -53,7 +53,7 @@ func configure(card: Dictionary) -> void:
 	cloth = Geo.material(Color(profile.get("color", "#294975")))
 	gold = Geo.material(Color(profile.get("trim", "#d4ac59")), true)
 	skin = Geo.material(Color(profile.get("skin", "#e4b98f")))
-	hair = Geo.material(Color(profile.get("hair", "#30251f")))
+	hair = Geo.material(Color(profile.get("hair", "#30251f")).darkened(0.06))
 	glow = Geo.material(Color(profile.get("glow", "#8defff")), false, true)
 	steel = Geo.material(Color("899aaa"), true)
 	dark = Geo.material(Color("142032"))
@@ -167,12 +167,13 @@ func _humanoid() -> void:
 	_hair(helmet)
 	if profile.get("detail") == "beard":
 		var long_beard = profile.get("hair_style") in ["long","hood"]
+		_p(head,"BeardVolume","sphere",Vector3(0,-0.15,-0.15),Vector3(0.145,0.09,0.095),hair)
 		var beard_paths: Array = []
 		for index in range(7):
 			var x = (index-3)*0.041
 			var length = (0.29 if long_beard else 0.14)*(1.0-absf(x)*2.2)
 			beard_paths.append([Vector3(x,-0.078,-0.16+absf(x)*0.2),Vector3(x*0.95,-0.15,-0.205),Vector3(x*0.74,-0.19-length*0.35,-0.217),Vector3(x*0.45,-0.17-length,-0.17)])
-		Geo.locks(head,"SculptedBeard",beard_paths,0.034,hair)
+		Geo.locks(head,"SculptedBeard",beard_paths,0.044,hair)
 		var moustache_paths: Array = []
 		for side in [-1.0,1.0]:
 			moustache_paths.append([Vector3(side*0.014,-0.079,-0.193),Vector3(side*0.06,-0.087,-0.208),Vector3(side*0.11,-0.115,-0.181)])

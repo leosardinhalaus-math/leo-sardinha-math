@@ -276,14 +276,15 @@ static func locks(parent: Node3D, label: String, paths: Array, radius: float, ma
 	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for path in paths:
 		for row in range(path.size()-1):
-			var tangent = (path[row+1]-path[row]).normalized()
-			var normal = tangent.cross(Vector3.FORWARD)
-			if normal.length_squared()<0.01: normal = tangent.cross(Vector3.UP)
-			normal = normal.normalized()
-			var binormal = tangent.cross(normal).normalized()
 			for side in range(8):
 				for offset in [Vector2i(0,0),Vector2i(1,0),Vector2i(1,1),Vector2i(0,0),Vector2i(1,1),Vector2i(0,1)]:
-					var progress = float(row+offset.x)/(path.size()-1)
+					var at = row+offset.x
+					var tangent = (path[mini(at+1,path.size()-1)]-path[maxi(at-1,0)]).normalized()
+					var normal = tangent.cross(Vector3.FORWARD)
+					if normal.length_squared()<0.01: normal = tangent.cross(Vector3.UP)
+					normal = normal.normalized()
+					var binormal = tangent.cross(normal).normalized()
+					var progress = float(at)/(path.size()-1)
 					var width = radius*maxf(0.035,1.0-pow(progress,1.6))
 					var angle = (side+offset.y)*TAU/8
 					var shade = 0.9+0.1*cos(angle)

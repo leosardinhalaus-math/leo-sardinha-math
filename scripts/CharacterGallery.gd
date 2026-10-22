@@ -67,7 +67,7 @@ func _ready() -> void:
 	var light = DirectionalLight3D.new()
 	light.rotation_degrees = Vector3(-35,145,0)
 	light.light_energy = 0.85
-	light.light_color = Color("ffe3c3")
+	light.light_color = Color("fff1e2")
 	light.shadow_enabled = true
 	world.add_child(light)
 	var rim = DirectionalLight3D.new()
@@ -111,7 +111,7 @@ func show_card(index: int) -> void:
 	character = CHARACTER.instantiate()
 	world.add_child(character)
 	character.configure(card)
-	character.rotation.y = -0.45
+	character.rotation.y = 0.45
 	portrait.texture = Cards.texture(int(card.id))
 	heading.text = "%02d / 45 · %s" % [int(card.id),card.name]
 	description.text = str(card.visual.notes) + "\n\nEspecial: " + str(card.ability)

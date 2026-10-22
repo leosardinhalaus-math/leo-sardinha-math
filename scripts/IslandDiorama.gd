@@ -169,8 +169,13 @@ func _landmarks(stone: Material,gold: Material,glow: Material) -> void:
      chain.rotation.x = PI/2 if link%2==0 else 0.0
  # A waterfall (or lava fall) reveals the cliff height at the front shore.
  var fall_color = Color("ec9453") if world_index==4 else Color("72b5c6")
+ var shore = _shore(1.27)
+ var fall_top = height_at(shore.x,shore.y)+0.04
+ var fall_bottom = -1.68
  for strip in range(5):
-  Geo.part(self,"LavaFall" if world_index==4 else "Waterfall","box",Vector3(2.1+strip*0.10,-0.65,3.31),Vector3(0.075,1.70+sin(strip)*0.10,0.04),Geo.material(fall_color.lightened((strip%2)*0.10),false,world_index==4))
+  Geo.part(self,"LavaFall" if world_index==4 else "Waterfall","box",Vector3(shore.x+(strip-2)*0.085,(fall_top+fall_bottom)/2,shore.y+0.045),Vector3(0.09,fall_top-fall_bottom,0.055),Geo.material(fall_color.lightened((strip%2)*0.10),false,world_index==4))
+ var spray = Geo.part(self,"WaterfallFoam","ring",Vector3(shore.x,-1.68,shore.y+0.13),Vector3(0.40,0.09,0.24),Geo.material(fall_color.lightened(0.20)))
+ spray.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
 func set_progress(completed: Array,unlocked: Array[bool]) -> void:
  for index in range(6):
