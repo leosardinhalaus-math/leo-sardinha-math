@@ -1,0 +1,39 @@
+name: Calculus Royale pull request checks
+
+on:
+  pull_request:
+    paths:
+      - 'jogos/calculus-royale-src/**'
+      - '.github/workflows/calculus-royale-pr-checks.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: jogos/calculus-royale-src
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: jogos/calculus-royale-src/package-lock.json
+      - name: Install locked dependencies without lifecycle scripts
+        run: npm ci --ignore-scripts --no-fund
+      - name: Check types
+        run: npm run check
+      - name: Test game rules and security-sensitive progression
+        run: |
+          npm run test:combat
+          npm run test:save
+          npm run test:progression
+          npm run test:battle-rules
+          npm run test:cave-encounters
