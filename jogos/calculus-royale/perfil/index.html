@@ -7,7 +7,7 @@ async function renderPublic(slug){
  const data=await C.publicProfile(slug);
  if(!data){$('#profilePanel').innerHTML='<h2>Jogador não encontrado</h2>';return}
  $('#authPanel').style.display='none';$('#heroTitle').textContent=data.profile.username;
- $('#heroText').textContent='Perfil público no Calculus Royale';$('#profilePanel').className='panel span12';
+ $('#heroText').textContent='Perfil público no Calculus Royale. As estatísticas são informadas pelo jogador e não verificadas pelo servidor.';$('#profilePanel').className='panel span12';
  $('#profilePanel').innerHTML=profileHTML(data.profile)+statsHTML(data.stats||{});
 }
 async function renderMine(){
