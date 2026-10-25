@@ -14,3 +14,28 @@ for (const page of pages) test('SEO favicon path: '+page, () => {
  assert.match(html,/<title>[^<]+<\/title>/i);
 });
 test('sitemap exists',()=>{assert.ok(fs.existsSync(path.join(root,'sitemap.xml')));assert.ok(fs.existsSync(path.join(root,'robots.txt')))});
+
+test('sitemap URLs are well-formed, unique and reference project pages',()=>{
+ const xml=fs.readFileSync(path.join(root,'sitemap.xml'),'utf8');
+ const urls=[...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match=>match[1]);
+ assert.ok(urls.length>0,'empty sitemap');
+ assert.equal(new Set(urls).size,urls.length,'duplicate sitemap URLs');
+ for(const raw of urls){
+  const url=new URL(raw);
+  assert.equal(url.protocol,'https:');
+  assert.equal(url.hash,'');
+  assert.equal(url.search,'');
+  assert.ok(url.pathname.includes('/leo-sardinha-math/'),'unexpected project path');
+  const relative=url.pathname.split('/leo-sardinha-math/')[1];
+  assert.ok(!relative.includes('..'),'invalid URL path');
+  const file=path.join(root,relative,relative.endsWith('/')||relative===''?'index.html':'');
+  assert.ok(fs.existsSync(file),'sitemap points to missing page: '+raw);
+ }
+});
+test('robots sitemap matches the generated sitemap location',()=>{
+ const robots=fs.readFileSync(path.join(root,'robots.txt'),'utf8');
+ const match=robots.match(/^Sitemap:\s*(\S+)/mi);
+ assert.ok(match,'robots.txt is missing Sitemap');
+ const sitemap=new URL(match[1]);
+ assert.equal(sitemap.pathname,'/leo-sardinha-math/sitemap.xml');
+});
