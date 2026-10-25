@@ -36,6 +36,11 @@ O PR #3 **não deve ser fechado ainda**: conserva mudanças exclusivas em `index
 ## Risco prioritário: build com push automático
 O workflow `.github/workflows/build-calculus-royale.yml` da `main` usa `contents: write` e faz `git push origin HEAD:main` após compilar. Por isso, **um merge que altera a fonte do jogo pode acionar uma segunda escrita automática em produção**. Antes de autorizar o merge do #2 ou alterações futuras na fonte, migrar para um fluxo de build de PR em somente leitura e publicação explicitamente aprovada, ou configurar proteção da branch e revisar o mecanismo de deploy. Não remover essa automação às cegas, pois isso também afeta a atualização do jogo.
 
+## Atualização — build sem push automático
+No PR #4, o workflow `.github/workflows/build-calculus-royale.yml` foi alterado: o job agora tem `contents: read`, `persist-credentials: false`, não executa `git push` nem `git commit` e faz upload de um artefato `calculus-royale-build-candidate` para revisão. Uma regressão automatizada testa esses invariantes. **A alteração está apenas no PR**, não na `main` publicada.
+Ao integrar #4, alterações futuras no código-fonte deixam de enviar automaticamente a pasta compilada `jogos/calculus-royale/` ao repositório. Será necessária uma etapa deliberada de promoção/publicação do artefato, com revisão e testes visuais.
+Atenção: o workflow separado `.github/workflows/deploy.yml` do Godot ainda é disparado a cada push em `main` e publica o site via GitHub Pages. Portanto, **mesclar em `main` continua sendo um evento de publicação**, mesmo quando o workflow específico do Calculus Royale já não faz push.
+
 ## Critérios que impedem publicação
 - Projeto público e jogos estáticos podem ser copiados tecnicamente; nunca expor segredos ou `service_role` no navegador.
 - Placar informado pelo navegador ainda não é placar homologado: falta servidor verificar partidas.
