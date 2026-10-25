@@ -1,6 +1,6 @@
 import { getCardProfile } from './cardProfiles.ts';
-export type CombatUnit={id:number;cardId:string;icon:string;name:string;kind:'tropa'|'feitiço'|'estrutura'|'relíquia';progress:number;power:number;color:string;lane?:number;hp?:number;maxHp?:number;shield?:number;cooldown?:number;slow?:number;slowTime?:number;burn?:number;burnTime?:number;haste?:number;hasteTime?:number;reflect?:number;reflectTime?:number;lastAttack?:number};
-export type CombatEvent={id:string;sourceId:number;cardId:string;enemy:boolean;x:number;z:number;label:string;type:'ability'|'defeat'|'tower'};
+export type CombatUnit={id:number;cardId:string;icon:string;name:string;kind:'tropa'|'feitiço'|'estrutura'|'relíquia';progress:number;power:number;color:string;lane?:number;hp?:number;maxHp?:number;shield?:number;cooldown?:number;slow?:number;slowTime?:number;burn?:number;burnTime?:number;haste?:number;hasteTime?:number;reflect?:number;reflectTime?:number;lastAttack?:number;lifetime?:number};
+export type CombatEvent={id:string;sourceId:number;cardId:string;enemy:boolean;x:number;z:number;label:string;type:'ability'|'defeat'|'tower';targetX?:number;targetZ?:number};
 export const SPAWN_ZONES=[-1.65,1.65].flatMap((lane,row)=>[5,14,23].map((progress,col)=>({id:`${row?'B':'A'}${col+1}`,lane,progress,label:['Retaguarda','Meio','Frente'][col]})));
 export const unitX=(unit:Pick<CombatUnit,'progress'>,enemy:boolean)=>(enemy?1:-1)*(9-unit.progress*.18);
 export function zoneAvailable(id:string,units:CombatUnit[]){const zone=SPAWN_ZONES.find(z=>z.id===id);return Boolean(zone&&!units.some(u=>Math.abs((u.lane??1.65)-zone.lane)<1&&Math.abs(u.progress-zone.progress)<7));}

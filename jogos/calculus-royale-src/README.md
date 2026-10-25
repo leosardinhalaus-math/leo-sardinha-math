@@ -55,17 +55,27 @@ Abra http://localhost:8000. Não abra `index.html` por `file://`: módulos, mani
 
 O jogo continua sendo comandado pelas cartas, com câmera estratégica elevada e fixa do sul para o norte. Roda/pinça aproxima, R centraliza e os botões alternam entre a ilha inteira e o combate. As fases, recompensas, deck, retratos e desafios permanecem.
 
-A arena normal agora começa após a primeira invocação. Toque numa carta, escolha A1–A3 (faixa superior) ou B1–B3 (inferior), veja a prévia 3D e confirme. Também é possível tocar numa zona diretamente no canvas, usando Raycaster. A posição determina a faixa e o avanço inicial. Zonas ocupadas são bloqueadas. A batalha pausa durante a escolha; cancelar não gasta elixir nem altera o rodízio. A confirmação custa o elixir da carta uma única vez e requer a prévia carregada. Sem WebGL, os botões continuam disponíveis no modo ilustrado.
+A arena normal usa seis torres funcionais, coroas e colocação em grade com prévia.
+Tropas, feitiços, estruturas e relíquias têm comportamentos diferentes; tropas
+cruzam o rio pelas duas pontes. Use toque/mouse no campo ou os controles de avanço
+e lateral com teclado para posicionar. Cancelar não gasta elixir. Sem WebGL, o modo
+ilustrado continua disponível.
 
-**Mudança intencional nas regras, conforme o briefing:** tropas da mesma faixa param ao contato e ativam sua habilidade a cada 1,2 s. Há HP por tropa (20 + 2 × poder), escudo, cura, lentidão, fluxo de dano por segundo, aceleração, reflexão, perfuração, golpes duplos e ataques em cadeia. Cada uma das 45 cartas possui nome de habilidade, parâmetros, paleta e motivo visual próprios. As animações de ataque são compartilhadas por arquétipo; os efeitos distinguem as cartas. Consulte [o catálogo completo](docs/CARTAS_3D.md).
+A campanha concede 25 moedas e 1 essência por casa inédita, inclusive na última.
+Concluir uma ilha dá mais 3 essências e um baú pendente. Abra-o no inventário para
+receber seu conteúdo garantido uma única vez. Baús antigos permanecem abertos e
+não são pagos novamente. Leia [a análise, o plano e as regras implementadas](docs/RECOMPENSAS_E_COMBATE.md).
 
-A simulação pura em `combat.ts` roda em passos de 100 ms e independe de FPS/WebGL. O avanço vira X entre −9 e +9; a faixa vira Z = ±1,65. Tropas de faixas diferentes não colidem. A colisão com a torre, em 96% de avanço, aplica o poder da carta uma única vez e consome a unidade; os efeitos secundários são aplicados nos duelos entre tropas. Feitiços não causam mais dano remoto imediato ao serem lançados. Zoom agora acelera por 3 s, sem teletransportar através do rival. O antigo modal de choque foi substituído por partículas e um registro dos efeitos reais. Vitória/derrota aparecem antes de seguir ao fluxo de recompensas.
+O combate tático determinístico fica em `tacticalBattle.ts`; `combat.ts` mantém o
+motor legado e seus testes. O tempo regulamentar é de 180 s, com elixir dobrado no
+último minuto e triplicado na morte súbita. Destruir o Rei vence imediatamente;
+coroas e frações de vida das torres resolvem o resultado por tempo.
 
 A Sobrevivência recebe os novos modelos e animações, mas conserva seu sistema próprio de defesa por cartas e ondas; a escolha de spawn e os duelos com status pertencem à arena normal.
 
 ## Progresso e funcionamento offline
 
-O progresso local usa um envelope de save com versão de esquema. Na primeira leitura, moedas, deck, inventário, nome, recordes e demais dados das chaves anteriores são migrados automaticamente para `calculus-royale:save-v2`, sem apagar nem renomear as chaves legadas. As gravações continuam atualizando os dois formatos para preservar compatibilidade com versões já publicadas. Dados ausentes, inválidos ou armazenamento indisponível não impedem a inicialização do jogo.
+O progresso local usa um envelope de save com versão de esquema 3 e mantém a chave `calculus-royale:save-v2`. Na primeira leitura, moedas, deck, inventário, nome, recordes e demais dados das chaves anteriores são migrados automaticamente para `calculus-royale:save-v2`, sem apagar nem renomear as chaves legadas. As gravações continuam atualizando os dois formatos para preservar compatibilidade com versões já publicadas. Dados ausentes, inválidos ou armazenamento indisponível não impedem a inicialização do jogo.
 
 O manifesto e o service worker tornam o jogo instalável como PWA. Depois da primeira visita com conexão, o shell da aplicação e os recursos usados são mantidos em cache para novas aberturas offline. Navegações procuram primeiro uma versão atualizada e usam o cache como recuperação. O service worker só é registrado no build de produção; durante o desenvolvimento, o Vite continua sem cache persistente.
 

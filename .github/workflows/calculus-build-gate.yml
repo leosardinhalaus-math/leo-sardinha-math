@@ -37,5 +37,9 @@ jobs:
           npm run test:progression
           npm run test:battle-rules
           npm run test:cave-encounters
+          npm run test:chests
+          npm run test:tactical
+          npm run test:campaign
+          npm run test:card-characters
       - name: Build game and assets
         run: npm run build

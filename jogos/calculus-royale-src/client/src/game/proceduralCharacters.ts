@@ -62,7 +62,7 @@ export function createProceduralCharacter(cardId:string){
   const armored=look.armor||['guardian','golem'].includes(p.archetype)||(p.archetype==='titan'&&cardId==='ftc'),robed=['mage','priest','angel','dancer'].includes(p.archetype);
   const width=p.archetype==='golem'?.45:p.archetype==='titan'?.36:look.female?.27:.31;
   mesh(new T.CylinderGeometry(.085,.105,.16,16),skin,0,1.48,0);
-  mesh(new T.CapsuleGeometry(width*.88,.35,8,18),armored?steel:cloth,0,1.05,0);mesh(new T.BoxGeometry(width*2.15,.1,.43),gold,0,.78,0);
+  mesh(new T.CapsuleGeometry(width*.88,.35,8,18),cardId==='slope'?dark:armored?steel:cloth,0,1.05,0);mesh(new T.BoxGeometry(width*2.15,.1,.43),gold,0,.78,0);
   if(robed){mesh(new T.CylinderGeometry(width*.78,.43,.68,24),cloth,0,.54,0);for(const side of [-1,0,1]){const fold=mesh(new T.CapsuleGeometry(.022,.42,5,10),side===0?gold:glow,side*.19,.5,.37);fold.scale.y=.85;}}
   if(armored){mesh(new T.BoxGeometry(width*2.2,.12,.48),gold,0,1.32,0);for(const side of [-1,1])mesh(new T.SphereGeometry(.17,18,12),gold,side*(width+.08),1.34,0);}
   if(!['dancer','engineer'].includes(p.archetype)){const cape=mesh(new T.ConeGeometry(.5,1.05,24,3,true,0,Math.PI),cloth,0,.88,-.18);cape.rotation.x=.08;}
@@ -82,9 +82,9 @@ export function createProceduralCharacter(cardId:string){
   if(style==='helmet'){mesh(new T.SphereGeometry(.255,22,16),steel,0,1.69,0);mesh(new T.BoxGeometry(.035,.34,.27),gold,0,1.74,.08);mesh(new T.BoxGeometry(.3,.08,.06),dark,0,1.67,.225);return;}
   if(style==='hood'){const back=mesh(new T.SphereGeometry(.29,24,18),cloth,0,1.7,-.2);back.scale.set(1,1.14,.72);const rim=mesh(new T.TorusGeometry(.245,.065,12,32),cloth,0,1.69,.015);rim.scale.y=1.12;}
   else if(style!=='bald')mesh(new T.SphereGeometry(.245,24,18,0,Math.PI*2,0,Math.PI*.55),hair,0,1.73,-.02);
-  if(style==='long')for(const side of [-1,1]){const lock=mesh(new T.CapsuleGeometry(.075,.72,8,14),hair,side*.19,1.34,-.1);lock.rotation.z=side*.14;}
+  if(style==='long'&&cardId!=='slope')for(const side of [-1,1]){const lock=mesh(new T.CapsuleGeometry(.075,.72,8,14),hair,side*.19,1.34,-.1);lock.rotation.z=side*.14;}
   if(style==='curly')for(let i=0;i<11;i++){const a=i/11*Math.PI*2;mesh(new T.SphereGeometry(.082,16,12),hair,Math.cos(a)*.22,1.64+Math.sin(a)*.17,-.1);}
-  if(look.beard){const beard=mesh(new T.ConeGeometry(.18,.38,18),hair,0,1.43,.11);beard.rotation.z=Math.PI;for(const side of [-1,1])mesh(new T.CapsuleGeometry(.025,.13,5,10),hair,side*.09,1.58,.22).rotation.z=side*.55;}
+  if(look.beard&&cardId!=='power'){const beard=mesh(new T.ConeGeometry(.18,.38,18),hair,0,1.43,.11);beard.rotation.z=Math.PI;for(const side of [-1,1])mesh(new T.CapsuleGeometry(.025,.13,5,10),hair,side*.09,1.58,.22).rotation.z=side*.55;}
   if(look.female)for(const side of [-1,1]){const earring=orb(.035,side*.22,1.59,.08);earring.material=gold;}
  }
 
@@ -114,12 +114,22 @@ export function createProceduralCharacter(cardId:string){
   const shoulderMantle=(m:T.Material)=>{for(const side of [-1,1]){const pad=piece(new T.SphereGeometry(.16,18,12),m,side*.34,1.36,0);pad.scale.set(1.15,.72,1);}};
   const shield=(x:number,m:T.Material=steel,r=.31)=>{const value=piece(new T.CylinderGeometry(r,r,.07,20),m,x,1.03,.28);value.rotation.x=Math.PI/2;const rim=identityTorus(r*.82,.025,glow,x,1.03,.33);rim.rotation.x=Math.PI/2;return value;};
   if(cardId==='slope'){
-   // A arqueira da carta tem rabo de cavalo alto, corpete vermelho, ombreiras e faixa assimétrica.
-   identityOrb(.075,.18,1.83,-.17,gold);
-   for(let i=0;i<4;i++){const lock=piece(new T.CapsuleGeometry(.075-i*.009,.24,8,14),hair,.24+i*.09,1.74-i*.13,-.2);lock.rotation.z=-.55-i*.09;}
-   const chest=piece(new T.CapsuleGeometry(.255,.22,8,20),cloth,0,1.16,.08);chest.scale.set(1.04,1,.72);
-   for(const side of [-1,1]){const strap=identityBar(new T.Vector3(side*.2,.92,.25),new T.Vector3(-side*.08,1.36,.25),.025,gold);strap.rotation.z=side*.04;piece(new T.CylinderGeometry(.13,.15,.18,18),gold,side*.3,1.3,0);}
-   const sash=piece(new T.ConeGeometry(.38,.72,24,2,true),cloth,.12,.58,.02);sash.rotation.z=-.16;
+   // Arqueira: cabelo preso alto, corpete azul-escuro, capa vermelha e detalhes dourados.
+   const corset=piece(new T.CapsuleGeometry(.245,.38,8,20),dark,0,1.09,.10);corset.scale.set(.94,1,.72);corset.name='slope-navy-corset';
+   for(const side of [-1,1]){
+    identityBar(new T.Vector3(side*.18,.84,.30),new T.Vector3(side*.18,1.32,.27),.018,gold).name='slope-gold-corset-seam';
+    identityBar(new T.Vector3(side*.2,.93,.27),new T.Vector3(-side*.075,1.38,.25),.023,gold);
+    piece(new T.CylinderGeometry(.13,.15,.18,18),gold,side*.3,1.34,0).name='slope-shoulder-guard';
+    piece(new T.CylinderGeometry(.12,.10,.24,16),dark,side*.44,.97,.1).name='slope-archer-bracer';
+   }
+   piece(new T.TorusGeometry(.28,.06,10,32,Math.PI*1.6),cloth,0,1.48,-.02).name='slope-red-collar';
+   const sash=piece(new T.ConeGeometry(.36,.74,24,2,true),cloth,.1,.57,.015);sash.rotation.z=-.15;
+   const ponytail=new T.Bone();ponytail.name='ponytail';ponytail.position.set(.17,1.92,-.23);identity.add(ponytail);
+   mesh(new T.SphereGeometry(.12,16,12),hair,0,0,0,ponytail).name='slope-high-hair-knot';
+   mesh(new T.TorusGeometry(.09,.03,8,18),gold,0,-.04,-.04,ponytail).name='slope-ponytail-gold-tie';
+   for(let i=0;i<4;i++){const strand=mesh(new T.CapsuleGeometry(.078-i*.012,.49+i*.08,8,14),hair,.025+i*.036,-.25-i*.09,-.12-i*.04,ponytail);strand.rotation.z=.35+i*.17;strand.name='slope-ponytail-strand-'+i;}
+   const capeHem=new T.Bone();capeHem.name='capeHem';capeHem.position.set(0,1.35,-.23);identity.add(capeHem);
+   for(const side of [-1,1]){const clothPanel=mesh(new T.ConeGeometry(.26,.92,14,2,true),cloth,side*.22,-.40,-.13,capeHem);clothPanel.rotation.z=side*.16;clothPanel.name='slope-red-cape-panel';}
   }else if(cardId==='limit'){
    // Elmo fechado, crista, peitoral facetado e capa azul formam a leitura do guardião da carta.
    const crest=piece(new T.ConeGeometry(.085,.58,12),gold,0,2.08,-.04);crest.rotation.z=-.08;
@@ -127,9 +137,19 @@ export function createProceduralCharacter(cardId:string){
    for(const side of [-1,1]){const trim=identityBar(new T.Vector3(side*.08,.88,.27),new T.Vector3(side*.27,1.35,.2),.028,gold);trim.rotation.z=side*.1;}
    identityOrb(.075,0,1.37,.18);
   }else if(cardId==='power'){
-   // O mago mantém o capuz rubro, barba branca longa, medalhão e espirais exponenciais douradas.
-   const medallion=identityTorus(.105,.025,gold,0,1.27,.28);medallion.rotation.x=Math.PI/2;
-   for(const y of [.43,.72,.98]){const trim=identityTorus(.34+(y-.43)*.1,.018,gold,0,y,.01);trim.rotation.x=Math.PI/2;}
+   // Mago: capuz rubro pontudo, longa barba branca, bordados e medalhão dourados.
+   const medallion=identityTorus(.105,.025,gold,0,1.27,.28);medallion.rotation.x=Math.PI/2;medallion.name='power-gold-medallion';
+   piece(new T.ConeGeometry(.27,.42,20),cloth,0,2.02,-.11).name='power-pointed-ruby-hood';
+   const hoodTrim=identityTorus(.26,.04,gold,0,1.69,.05);hoodTrim.rotation.x=Math.PI/2;hoodTrim.name='power-hood-gold-border';
+   for(const side of [-1,1]){
+    const mantle=piece(new T.SphereGeometry(.22,16,12),cloth,side*.25,1.41,-.1);mantle.scale.set(1.2,.65,1);mantle.name='power-crimson-mantle';
+    for(const y of [.5,.81,1.1])identityBar(new T.Vector3(side*.27,y,.24),new T.Vector3(side*.3,y+.14,.25),.017,gold).name='power-gold-robe-embroidery';
+    const moustache=piece(new T.CapsuleGeometry(.038,.16,7,12),hair,side*.08,1.56,.24);moustache.rotation.z=side*.5;
+   }
+   const beardTail=new T.Bone();beardTail.name='beardTail';beardTail.position.set(0,1.51,.14);identity.add(beardTail);
+   for(let i=-2;i<=2;i++){const strand=mesh(new T.ConeGeometry(.095-Math.abs(i)*.012,.70-Math.abs(i)*.10,12),hair,i*.077,-.27+Math.abs(i)*.018,.063,beardTail);strand.rotation.z=i*.14;strand.name='power-long-white-beard-'+i;}
+   const capeHem=new T.Bone();capeHem.name='capeHem';capeHem.position.set(0,1.3,-.28);identity.add(capeHem);
+   for(const side of [-1,1]){const tail=mesh(new T.ConeGeometry(.32,1.1,16,2,true),cloth,side*.23,-.47,-.16,capeHem);tail.rotation.z=side*.13;tail.name='power-crimson-cloak-panel';}
    for(let i=0;i<13;i++){const a=i*.82,r=.22+i*.012;identityOrb(.028,Math.cos(a)*r,.52+i*.075,Math.sin(a)*r-.24);}
   }else if(cardId==='sine'){
    // Saia em camadas, coque, joias e fitas ondulantes reproduzem a bailarina verde e dourada.
@@ -286,7 +306,17 @@ export function createProceduralCharacter(cardId:string){
  function addSignature(left:T.Object3D,right:T.Object3D){
   if(cardId==='slope'){
    const points=Array.from({length:17},(_,i)=>{const a=-Math.PI/2+i*Math.PI/16;return new T.Vector3(.25*Math.cos(a),.55*Math.sin(a)-.25,.2);});
-   mesh(new T.TubeGeometry(new T.CatmullRomCurve3(points),18,.027,6,false),gold,0,0,0,left);bar(points[0],points[16],.008,glow,left);bar(new T.Vector3(0,-.42,-.1),new T.Vector3(0,-.42,.7),.014,gold,right);
+   const bow=mesh(new T.TubeGeometry(new T.CatmullRomCurve3(points),24,.032,8,false),gold,0,0,0,left);bow.name='slope-gold-bow';
+   bar(points[0],points[16],.009,glow,left).name='slope-drawn-bowstring';
+   bar(new T.Vector3(0,-.42,-.1),new T.Vector3(0,-.42,.75),.015,gold,right).name='slope-arrow-shaft';
+   const tip=mesh(new T.ConeGeometry(.052,.18,8),glow,0,-.42,.76,right);tip.rotation.x=Math.PI/2;tip.name='slope-arrow-tip';
+  }else if(cardId==='power'){
+    const staff=bar(new T.Vector3(0,-.83,.11),new T.Vector3(0,.77,.11),.052,gold,left);staff.name='power-ornate-gold-staff';
+    for(const y of [-.65,-.25,.1,.46,.68]){const ring=torus(.073,.018,gold,0,y,.11,left);ring.rotation.x=Math.PI/2;}
+    const halo=torus(.2,.03,glow,0,.88,.11,left);halo.rotation.x=Math.PI/2;halo.name='power-staff-flame-halo';
+    const fire=Array.from({length:28},(_,i)=>{const t=i/27,a=t*Math.PI*4;return new T.Vector3(Math.sin(a)*(.08+t*.11),.56+t*.7,.11+Math.cos(a)*(.08+t*.11));});
+    mesh(new T.TubeGeometry(new T.CatmullRomCurve3(fire),64,.027,8,false),glow,0,0,0,left).name='power-golden-energy-helix';
+    orb(.16,0,-.32,.48,right).name='power-casting-orb';
   }else if(['ln','quotient','parts','parts2','growth'].includes(cardId)){
    for(const arm of [left,right]){const blade=mesh(new T.ConeGeometry(.07,.68,5),crystal,0,-.44,.4,arm);blade.rotation.x=Math.PI/2;bar(new T.Vector3(-.13,-.45,.12),new T.Vector3(.13,-.45,.12),.022,gold,arm);}
   }else if(['limit','cauchy','comparison','root','secant'].includes(cardId)){
@@ -328,7 +358,16 @@ export function createProceduralCharacter(cardId:string){
    if((name==='attack'||name==='power')&&part.startsWith('arm'))values=name==='power'?[0,-2.45,-2.2,-2.45,0]:p.archetype==='archer'?(part==='armL'?[0,-1.5,-1.5,-1.5,0]:[0,-1.2,-.6,-1.6,0]):p.archetype==='dancer'?[0,-1,-2,-1,0]:p.archetype==='rogue'?[0,-2,1,-2,0]:['guardian','titan','golem'].includes(p.archetype)?[0,-2.7,-2.7,.5,0]:[0,-1.5,-1.7,-1.5,0];
    tracks.push(new T.NumberKeyframeTrack(`${part}.rotation[x]`,times,values));
   }
-  if(floating||p.archetype==='dancer')tracks.push(new T.NumberKeyframeTrack('body.rotation[y]',times,name==='attack'?[0,Math.PI*.5,Math.PI,Math.PI*1.5,Math.PI*2]:[0,.1,0,-.1,0]));clips.push(new T.AnimationClip(name,duration,tracks));
+  if(floating||p.archetype==='dancer')tracks.push(new T.NumberKeyframeTrack('body.rotation[y]',times,name==='attack'?[0,Math.PI*.5,Math.PI,Math.PI*1.5,Math.PI*2]:[0,.1,0,-.1,0]));
+  if(cardId==='slope'||cardId==='power'){
+   const strike=name==='attack'||name==='power',stride=name==='walk'||name==='run';
+   tracks.push(new T.NumberKeyframeTrack('body.rotation[y]',times,strike?[0,-.14,-.2,.12,0]:stride?[0,.05,0,-.05,0]:[0,.018,0,-.018,0]));
+   tracks.push(new T.NumberKeyframeTrack('body.rotation[x]',times,strike?[0,-.09,-.13,.09,0]:[0,.012,0,-.012,0]));
+   tracks.push(new T.NumberKeyframeTrack('capeHem.rotation[z]',times,strike?[0,-.11,.17,-.2,0]:stride?[0,-.12,.08,-.08,0]:[0,.04,.07,-.025,0]));
+   if(cardId==='slope')tracks.push(new T.NumberKeyframeTrack('ponytail.rotation[z]',times,strike?[0,.06,-.28,.24,0]:stride?[0,.17,-.13,.14,0]:[0,-.03,.08,.035,0]));
+   if(cardId==='power')tracks.push(new T.NumberKeyframeTrack('beardTail.rotation[x]',times,strike?[0,.08,-.18,.11,0]:stride?[0,.09,-.06,.07,0]:[0,.035,.07,-.015,0]));
+  }
+  clips.push(new T.AnimationClip(name,duration,tracks));
  }
  root.userData.cardId=cardId;root.userData.reference='geometry-only';return {root,clips};
 }
