@@ -10,7 +10,7 @@ for(const p of builds){
   for(const endpoint of ['player_profiles?public_slug=eq.','game_stats?user_id=eq.']){
    const line=src.split('\n').find(line=>line.includes(endpoint));
    assert.ok(line,'missing endpoint '+endpoint);
-   assert.doesNotMatch(line,/select=\\*/,'public endpoint must avoid wildcard select');
+   assert.equal(line.includes('select=*'),false,'public endpoint must avoid wildcard select');
   }
  });
 }
