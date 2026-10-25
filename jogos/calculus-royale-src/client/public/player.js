@@ -161,6 +161,8 @@ async function publicProfile(slug) {
 }
 
 async function leaderboard(sort="trophies.desc") {
+  const allowedSorts = new Set(["trophies.desc", "best_tower_wave.desc", "completed_worlds.desc,xp.desc"]);
+  if (!allowedSorts.has(sort)) throw new Error("Ordenação de ranking inválida.");
   const [stats, profiles] = await Promise.all([
     api("/rest/v1/game_stats?select=user_id,level,xp,trophies,wins,losses,completed_worlds,best_tower_wave,current_streak,best_streak,chests_opened,coins,essence&order=" + encodeURIComponent(sort) + "&limit=100"),
     api("/rest/v1/player_profiles?select=user_id,username,public_slug,avatar_seed&limit=100"),
