@@ -163,10 +163,13 @@ async function publicProfile(slug) {
 async function leaderboard(sort="trophies.desc") {
   const allowedSorts = new Set(["trophies.desc", "best_tower_wave.desc", "completed_worlds.desc,xp.desc"]);
   if (!allowedSorts.has(sort)) throw new Error("Ordenação de ranking inválida.");
-  const [stats, profiles] = await Promise.all([
-    api("/rest/v1/game_stats?select=user_id,level,xp,trophies,wins,losses,completed_worlds,best_tower_wave,current_streak,best_streak,chests_opened,coins,essence&order=" + encodeURIComponent(sort) + "&limit=100"),
-    api("/rest/v1/player_profiles?select=user_id,username,public_slug,avatar_seed&limit=100"),
-  ]);
+  const stats = await api("/rest/v1/game_stats?select=user_id,level,xp,trophies,wins,losses,completed_worlds,best_tower_wave,current_streak,best_streak,chests_opened,coins,essence&order=" + encodeURIComponent(sort) + "&limit=100");
+  if (!Array.isArray(stats) || stats.length === 0) return [];
+  // Read only profiles belonging to the selected ranking entries, rather than
+  // taking an unrelated first page of profiles (which can hide ranked players).
+  const ids = [...new Set(stats.map(s => s.user_id).filter(id => typeof id === "string" && /^[0-9a-f-]{36}$/i.test(id)))];
+  if (!ids.length) return [];
+  const profiles = await api("/rest/v1/player_profiles?select=user_id,username,public_slug,avatar_seed&user_id=in.(" + ids.join(",") + ")&limit=100");
   const byId = new Map((profiles || []).map(p => [p.user_id, p]));
   return (stats || []).map(s => ({ ...s, profile: byId.get(s.user_id) })).filter(x => x.profile);
 }
