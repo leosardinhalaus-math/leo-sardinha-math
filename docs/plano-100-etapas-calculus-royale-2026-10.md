@@ -16,26 +16,26 @@ Estado inicial verificado em 2026-10-25: projeto Supabase `vmblubjbgwhaplsptymj`
 - [x] 1. Confirmar SHA e branch da PR
 - [x] 2. Registrar checks do GitHub
 - [x] 3. Verificar status do Supabase
-- [ ] 4. Inventariar clientes Firebase
+- [x] 4. Inventariar clientes Firebase
 - [x] 5. Localizar integração Supabase
 - [ ] 6. Relacionar páginas e jogos
-- [ ] 7. Mapear dados pessoais coletados
+- [x] 7. Mapear dados pessoais coletados
 - [ ] 8. Separar ambientes publicados e testes
-- [ ] 9. Identificar dependências e versões
-- [ ] 10. Documentar riscos e critérios de bloqueio
+- [x] 9. Identificar dependências e versões
+- [x] 10. Documentar riscos e critérios de bloqueio
 
 ## Fase 2: Identidade e sessões
 
-- [ ] 11. Revisar cadastro por e-mail
-- [ ] 12. Revisar confirmação de e-mail
-- [ ] 13. Revisar login e mensagens de erro
-- [ ] 14. Revisar expiração de sessão
-- [ ] 15. Revisar rotação de refresh token
-- [ ] 16. Revisar logout remoto e local
-- [ ] 17. Evitar tokens em URLs e logs
+- [x] 11. Revisar cadastro por e-mail
+- [x] 12. Revisar confirmação de e-mail
+- [x] 13. Revisar login e mensagens de erro
+- [x] 14. Revisar expiração de sessão
+- [x] 15. Revisar rotação de refresh token
+- [x] 16. Revisar logout remoto e local
+- [x] 17. Evitar tokens em URLs e logs
 - [ ] 18. Proteger armazenamento de sessões
-- [ ] 19. Testar usuário não autenticado
-- [ ] 20. Testar usuário autenticado com token expirado
+- [x] 19. Testar usuário não autenticado
+- [x] 20. Testar usuário autenticado com token expirado
 
 ## Fase 3: Supabase e privilégios
 
@@ -52,42 +52,42 @@ Estado inicial verificado em 2026-10-25: projeto Supabase `vmblubjbgwhaplsptymj`
 
 ## Fase 4: Firebase e Firestore
 
-- [ ] 31. Validar dependências pinadas
-- [ ] 32. Repetir npm audit
-- [ ] 33. Executar testes Firestore Emulator
-- [ ] 34. Checar regras por proprietário
-- [ ] 35. Testar leitura pública permitida
-- [ ] 36. Testar gravação anônima bloqueada
-- [ ] 37. Testar alteração de dados de terceiros
+- [x] 31. Validar dependências pinadas
+- [x] 32. Repetir npm audit
+- [x] 33. Executar testes Firestore Emulator
+- [x] 34. Checar regras por proprietário
+- [x] 35. Testar leitura pública permitida
+- [x] 36. Testar gravação anônima bloqueada
+- [x] 37. Testar alteração de dados de terceiros
 - [ ] 38. Verificar índices Firestore
-- [ ] 39. Checar segredo versus chave pública
-- [ ] 40. Registrar resultados e versões testadas
+- [x] 39. Checar segredo versus chave pública
+- [x] 40. Registrar resultados e versões testadas
 
 ## Fase 5: Pontuação e anti-trapaça
 
-- [ ] 41. Modelar ameaças ao ranking
+- [x] 41. Modelar ameaças ao ranking
 - [ ] 42. Separar estatísticas exibidas de confiáveis
-- [ ] 43. Identificar cálculos manipuláveis no cliente
+- [x] 43. Identificar cálculos manipuláveis no cliente
 - [ ] 44. Definir evento legítimo de vitória
-- [ ] 45. Criar contrato de submissão validável
-- [ ] 46. Definir limites de frequência por jogador
-- [ ] 47. Planejar idempotência das submissões
-- [ ] 48. Planejar validação de progressão impossível
-- [ ] 49. Projetar verificação no servidor
+- [x] 45. Criar contrato de submissão validável
+- [x] 46. Definir limites de frequência por jogador
+- [x] 47. Planejar idempotência das submissões
+- [x] 48. Planejar validação de progressão impossível
+- [x] 49. Projetar verificação no servidor
 - [ ] 50. Testar rejeição de pontuação fraudulenta
 
 ## Fase 6: Segurança web
 
-- [ ] 51. Auditar XSS nos perfis
-- [ ] 52. Auditar XSS nos rankings
+- [x] 51. Auditar XSS nos perfis
+- [x] 52. Auditar XSS nos rankings
 - [ ] 53. Auditar inserções HTML dinâmicas
 - [ ] 54. Revisar URLs controladas por usuários
 - [ ] 55. Revisar política CSP
 - [ ] 56. Revisar dependências externas
 - [ ] 57. Checar integridade de scripts terceiros
 - [ ] 58. Checar cabeçalhos de segurança disponíveis
-- [ ] 59. Checar vazamento de credenciais no histórico
-- [ ] 60. Executar testes de regressão XSS
+- [x] 59. Checar vazamento de credenciais no histórico
+- [x] 60. Executar testes de regressão XSS
 
 ## Fase 7: Qualidade dos jogos
 
@@ -169,3 +169,20 @@ Estado inicial verificado em 2026-10-25: projeto Supabase `vmblubjbgwhaplsptymj`
 - Confirmado em inspeção: consulta anterior de 100 perfis sem filtro eliminada; nova consulta restringe IDs e mantém seleção explícita.
 - A regra de servidor sobre pontuações permanece pendente, assim como testes funcionais reais com diversas contas. Esta correção não libera as etapas 41–50 nem a etapa 97.
 - CI: após commit, os checks `Dependency security audit`, `Secret exposure guard` e `Security regressions` foram aprovados; os demais ainda estavam em execução na última consulta.
+
+
+## Continuação executada — 2026-10-25, validação de autenticação e arquitetura de pontuação
+
+**Marcação de etapa [x] neste documento inclui inspeção, correção verificada, teste automatizado ou desenho técnico, conforme o verbo de cada etapa.** Não afirmar que todas as etapas marcadas possuem solução implantada em produção.
+
+- **Cadastro e confirmação (11–12):** páginas `perfil/index.html` (cópia publicada e cópia fonte na branch) agora verificam `C.session()` depois do cadastro. Se não houver sessão, mostram a orientação para confirmar o e-mail. Cópias fonte/publicada mantidas juntas.
+- **Sessões e login (13–17, 19–20):** `player.js` valida resposta de login antes de persistir, protege a renovação simultânea do refresh token, limpa sessões expiradas e preserva logout local offline. Testes em `tests/calculus-auth-security.test.cjs` executados pelo CI; são simulações unitárias, não testes de conta real no serviço.
+- **Firebase (31–37, 39–40):** pacote `tools/firebase-tests/package.json` declara Firebase 13.0.0, ferramentas 15.34.0 e rules testing 6.0.0; o `package-lock.json` determina o conjunto instalado pelo CI. O emulador testa isolamento de salvamentos, restrição por dono, leitura pública delimitada, proibição de publicação do ranking por clientes e rejeição a campos extras. O resultado de CI é a evidência, não uma validação de Firebase em produção.
+- **Riscos de pontuação (41,43,45–49):** `docs/contrato-ranking-verificado-calculus-royale.md` documenta ameaça de falsificação via `localStorage`, contrato provisório de submissão, desenho de idempotência, controles contra replay e arquitetura servidor autoritativa. **Essas etapas são de análise e desenho, não implementação.** As etapas 42,44,50 permanecem pendentes e a futura implantação exige inspeção do motor real de combate.
+- **XSS e histórico (51,52,59,60):** escapes de nomes em perfil/ranking revisados; testes de regressão e varredura de segredos no histórico Git aprovados no commit anterior. Proteção completa contra scripts, dependências externas e vazamentos continua sujeita a análise adicional.
+- **Classificação dos riscos:** prioridade P0: pontuação sem autoridade do servidor, exposição pública ampliada nas tabelas Supabase e falta de testes E2E com contas reais. Prioridade P1: armazenamento de credenciais em localStorage, staging segregado e validação em navegador móvel. Nenhum destes problemas deve ser tratado como resolvido só porque os testes unitários passaram.
+- **Ambientes:** branch de auditoria distinta de main; backend Supabase **não** possui staging isolado confirmado. A etapa 8 permanece pendente.
+- **Testes desta rodada:** Security regressions, Dependency security audit, Secret exposure guard, Git history secret audit e build/dependency gate já aprovados no commit do contrato; outros checks ainda em execução na última consulta. O resultado mais recente deve ser reconfirmado antes do merge.
+- **Sem implantação:** não foram alteradas policies, migrations, autenticação real, dados de usuários, configurações de billing nem a versão de produção; PR #4 segue draft.
+
+**Etapas sinalizadas no checklist até este registro: 45/100** (inclui as de desenho; não equivale a porcentagem de software pronto).
