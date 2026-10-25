@@ -1,0 +1,35 @@
+name: Dependency security audit
+
+on:
+  pull_request:
+    paths:
+      - 'jogos/calculus-royale-src/package.json'
+      - 'jogos/calculus-royale-src/package-lock.json'
+      - 'tools/firebase-tests/package.json'
+      - 'tools/firebase-tests/package-lock.json'
+      - '.github/workflows/dependency-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        directory:
+          - jogos/calculus-royale-src
+          - tools/firebase-tests
+    defaults:
+      run:
+        working-directory: ${{ matrix.directory }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check installed dependency advisory database
+        run: npm audit --package-lock-only --audit-level=high
