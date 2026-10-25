@@ -140,3 +140,33 @@ test('refresh response without a user clears expired session', async () => {
   assert.equal(await cloud.session(),null);
   assert.equal(records.has(SESSION_KEY),false);
 });
+
+test('late refresh cannot restore credentials after logout', async () => {
+  const old={access_token:'old',refresh_token:'old-refresh',expires_at:1,user:{id:uid}};
+  let resolveRefresh;
+  const {cloud,records}=harness(async (url) => {
+    if (url.includes('grant_type=refresh_token')) {
+      return new Promise(resolve => { resolveRefresh=resolve; });
+    }
+    if (url.endsWith('/auth/v1/logout')) return reply({});
+    throw Error('Unexpected request '+url);
+  },{[SESSION_KEY]:JSON.stringify(old)});
+  const refreshing=cloud.session();
+  assert.equal(typeof resolveRefresh,'function');
+  await cloud.logout();
+  assert.equal(records.has(SESSION_KEY),false);
+  resolveRefresh(reply({access_token:'late',refresh_token:'late-refresh',expires_in:3600,user:{id:uid}}));
+  assert.equal(await refreshing,null);
+  assert.equal(records.has(SESSION_KEY),false);
+});
+
+test('logout clears browser tokens even before server responds', async () => {
+  const old={access_token:'old',refresh_token:'refresh',expires_at:10000000000,user:{id:uid}};
+  let finish;
+  const {cloud,records}=harness(async ()=>new Promise(resolve=>{finish=resolve;}),{[SESSION_KEY]:JSON.stringify(old)});
+  const logout=cloud.logout();
+  assert.equal(records.has(SESSION_KEY),false);
+  assert.equal(typeof finish,'function');
+  finish(reply({}));
+  await logout;
+});
