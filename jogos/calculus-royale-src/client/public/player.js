@@ -153,17 +153,17 @@ async function getMyStats(s) {
 }
 
 async function publicProfile(slug) {
-  const profiles = await api("/rest/v1/player_profiles?public_slug=eq." + encodeURIComponent(slug) + "&select=*");
+  const profiles = await api("/rest/v1/player_profiles?public_slug=eq." + encodeURIComponent(slug) + "&select=user_id,username,public_slug,avatar_seed&limit=1");
   const profile = profiles?.[0];
   if (!profile) return null;
-  const stats = await api("/rest/v1/game_stats?user_id=eq." + encodeURIComponent(profile.user_id) + "&select=*");
+  const stats = await api("/rest/v1/game_stats?user_id=eq." + encodeURIComponent(profile.user_id) + "&select=level,xp,trophies,wins,losses,completed_worlds,best_tower_wave,current_streak,best_streak,chests_opened,coins,essence&limit=1");
   return { profile, stats: stats?.[0] || null };
 }
 
 async function leaderboard(sort="trophies.desc") {
   const [stats, profiles] = await Promise.all([
-    api("/rest/v1/game_stats?select=*&order=" + encodeURIComponent(sort) + "&limit=100"),
-    api("/rest/v1/player_profiles?select=user_id,username,public_slug,avatar_seed"),
+    api("/rest/v1/game_stats?select=user_id,level,xp,trophies,wins,losses,completed_worlds,best_tower_wave,current_streak,best_streak,chests_opened,coins,essence&order=" + encodeURIComponent(sort) + "&limit=100"),
+    api("/rest/v1/player_profiles?select=user_id,username,public_slug,avatar_seed&limit=100"),
   ]);
   const byId = new Map((profiles || []).map(p => [p.user_id, p]));
   return (stats || []).map(s => ({ ...s, profile: byId.get(s.user_id) })).filter(x => x.profile);
