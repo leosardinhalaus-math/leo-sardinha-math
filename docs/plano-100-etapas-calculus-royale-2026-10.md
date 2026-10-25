@@ -13,11 +13,11 @@ Estado inicial verificado em 2026-10-25: projeto Supabase `vmblubjbgwhaplsptymj`
 
 ## Fase 1: Inventário e diagnóstico
 
-- [ ] 1. Confirmar SHA e branch da PR
-- [ ] 2. Registrar checks do GitHub
-- [ ] 3. Verificar status do Supabase
+- [x] 1. Confirmar SHA e branch da PR
+- [x] 2. Registrar checks do GitHub
+- [x] 3. Verificar status do Supabase
 - [ ] 4. Inventariar clientes Firebase
-- [ ] 5. Localizar integração Supabase
+- [x] 5. Localizar integração Supabase
 - [ ] 6. Relacionar páginas e jogos
 - [ ] 7. Mapear dados pessoais coletados
 - [ ] 8. Separar ambientes publicados e testes
@@ -39,16 +39,16 @@ Estado inicial verificado em 2026-10-25: projeto Supabase `vmblubjbgwhaplsptymj`
 
 ## Fase 3: Supabase e privilégios
 
-- [ ] 21. Inspecionar RLS em tabelas públicas
-- [ ] 22. Auditar políticas SELECT
-- [ ] 23. Auditar políticas INSERT
-- [ ] 24. Auditar políticas UPDATE
-- [ ] 25. Auditar políticas DELETE
-- [ ] 26. Inventariar GRANTs por papel
-- [ ] 27. Limitar projeções REST do cliente
+- [x] 21. Inspecionar RLS em tabelas públicas
+- [x] 22. Auditar políticas SELECT
+- [x] 23. Auditar políticas INSERT
+- [x] 24. Auditar políticas UPDATE
+- [x] 25. Auditar políticas DELETE
+- [x] 26. Inventariar GRANTs por papel
+- [x] 27. Limitar projeções REST do cliente
 - [ ] 28. Definir exposição mínima do ranking
 - [ ] 29. Testar acesso cruzado entre jogadores
-- [ ] 30. Reexecutar security advisors
+- [x] 30. Reexecutar security advisors
 
 ## Fase 4: Firebase e Firestore
 
@@ -147,3 +147,16 @@ Estado inicial verificado em 2026-10-25: projeto Supabase `vmblubjbgwhaplsptymj`
 - SELECT público atualmente permitido nessas tabelas: é preciso projetar e proteger a superfície pública antes de apertar privilégios sem quebrar ranking.
 - Cliente Supabase já usa projeções explícitas nas consultas privadas da branch; a autenticação funcional de ponta a ponta ainda não foi comprovada.
 - Risco aberto: pontuação calculada pelo cliente pode ser manipulada. Não marcar etapa 50 como concluída sem verificação no servidor.
+
+
+## Acompanhamento — 2026-10-25, validação atual
+
+**12/100 etapas verificadas documentalmente ou por inspeção técnica:** 1, 2, 3, 5, 21, 22, 23, 24, 25, 26, 27 e 30. Marcação significa que o exame correspondente foi realizado, não que o sistema seja totalmente seguro.
+
+- GitHub: commit de referência `dced0697710d4db3359fb500a3d3850b6a715f84`, PR #4 draft, nove GitHub Actions completados com resultado success.
+- Supabase: `public.player_profiles` e `public.game_stats` com RLS ligado, ambas vazias na consulta de resumo; `get_advisors(type=security)` retornou zero alertas.
+- Políticas RLS revisadas: SELECT público para ambos os papéis; INSERT e UPDATE vinculados a `auth.uid() = user_id` com `WITH CHECK`; sem política DELETE identificada na inspeção anterior.
+- GRANTs de leitura ampla inspecionados; desenho de mínimo privilégio **não implementado**. A etapa 28 permanece pendente.
+- Integração Supabase localizada em `jogos/calculus-royale/player.js` e `jogos/calculus-royale-src/client/public/player.js`. Ambos idênticos e com projeções REST explícitas; isso **não reduz** as permissões do banco.
+- Pendências críticas: validação real de autenticação e gravação (19, 20, 29, 96, 97), proteção contra falsificação de pontuação (41–50), eventual restrição de SELECT público (28).
+- Alterações de banco em produção e fusão da PR não foram executadas nesta rodada.
