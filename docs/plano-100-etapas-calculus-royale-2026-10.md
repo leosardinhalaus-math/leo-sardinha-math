@@ -160,3 +160,12 @@ Estado inicial verificado em 2026-10-25: projeto Supabase `vmblubjbgwhaplsptymj`
 - Integração Supabase localizada em `jogos/calculus-royale/player.js` e `jogos/calculus-royale-src/client/public/player.js`. Ambos idênticos e com projeções REST explícitas; isso **não reduz** as permissões do banco.
 - Pendências críticas: validação real de autenticação e gravação (19, 20, 29, 96, 97), proteção contra falsificação de pontuação (41–50), eventual restrição de SELECT público (28).
 - Alterações de banco em produção e fusão da PR não foram executadas nesta rodada.
+
+
+## Correção de ranking — 2026-10-25
+
+- Commit `96cc3c9dfd6dd157db7859e956f83ec1e269f955`: ranking agora busca perfis com filtro de `user_id` exclusivamente dos 100 resultados retornados, corrigindo a junção entre páginas independentes.
+- Alteração replicada nos dois arquivos `jogos/calculus-royale/player.js` e `jogos/calculus-royale-src/client/public/player.js`; conteúdo idêntico verificado depois do commit.
+- Confirmado em inspeção: consulta anterior de 100 perfis sem filtro eliminada; nova consulta restringe IDs e mantém seleção explícita.
+- A regra de servidor sobre pontuações permanece pendente, assim como testes funcionais reais com diversas contas. Esta correção não libera as etapas 41–50 nem a etapa 97.
+- CI: após commit, os checks `Dependency security audit`, `Secret exposure guard` e `Security regressions` foram aprovados; os demais ainda estavam em execução na última consulta.
