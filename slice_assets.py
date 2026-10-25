@@ -24,7 +24,7 @@ def font(size):
     return ImageFont.load_default(size=size)
 
 def metadata():
-    source = (ROOT / 'jogos/calculus-royale-src/client/src/components/GameCanvas.tsx').read_text()
+    source = (ROOT / 'jogos/calculus-royale-src/client/src/data/cardCatalog.ts').read_text()
     pattern = r'\{ id: "([^"]+)", name: "([^"]+)", icon: "([^"]+)", kind: "([^"]+)", cost: (\d+), rarity: "([^"]+)", formula: "([^"]+)", effect: "([^"]+)", power: (\d+) \}'
     matches = re.findall(pattern, source)
     if len(matches) != 45 or len({row[0] for row in matches}) != 45:

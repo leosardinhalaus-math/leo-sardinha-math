@@ -1,0 +1,61 @@
+name: Godot native characters QA
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/**'
+      - 'scenes/**'
+      - 'data/**'
+      - 'tests/godot/**'
+      - 'slice_assets.py'
+      - '.github/workflows/godot-native-characters-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  GODOT_VERSION: 4.7.2
+
+jobs:
+  test-godot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install asset verification dependencies
+        run: python -m pip install Pillow==11.3.0
+      - name: Prepare and verify Godot source assets
+        run: |
+          python slice_assets.py
+          python tests/godot/test_assets.py
+      - uses: actions/cache@v4
+        id: godot-cache
+        with:
+          path: ~/.local/bin/calculus-godot
+          key: godot-${{ runner.os }}-${{ env.GODOT_VERSION }}-character-qa-v1
+      - name: Download pinned Godot engine
+        if: steps.godot-cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p "$HOME/.local/bin/calculus-godot"
+          curl --fail --location --retry 3 "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip" -o "$RUNNER_TEMP/godot.zip"
+          unzip -q "$RUNNER_TEMP/godot.zip" -d "$HOME/.local/bin/calculus-godot"
+          chmod +x "$HOME/.local/bin/calculus-godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          ln -sf "$HOME/.local/bin/calculus-godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" "$HOME/.local/bin/calculus-godot/godot"
+      - name: Add Godot binary to PATH
+        run: echo "$HOME/.local/bin/calculus-godot" >> "$GITHUB_PATH"
+      - name: Import native Godot project
+        run: godot --headless --editor --import --quit
+      - name: Run Arqueira and Mago identity tests
+        env:
+          XDG_DATA_HOME: ${{ runner.temp }}/godot-test-identity
+        run: godot --headless --script tests/godot/test_character_identity.gd
+      - name: Run full Godot gameplay and animation regressions
+        env:
+          XDG_DATA_HOME: ${{ runner.temp }}/godot-test-game
+        run: godot --headless --script tests/godot/test_game.gd
