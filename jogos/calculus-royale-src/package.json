@@ -20,7 +20,8 @@
     "test:models": "node --experimental-strip-types scripts/test-generated-models.ts",
     "test:chests": "node --experimental-strip-types scripts/test-chest-rewards.ts",
     "test:tactical": "node --experimental-strip-types scripts/test-tactical-battle.ts",
-    "test:campaign": "node --experimental-strip-types scripts/test-campaign-balance.ts"
+    "test:campaign": "node --experimental-strip-types scripts/test-campaign-balance.ts",
+    "test:card-characters": "node --experimental-strip-types scripts/test-card-character-fidelity.ts"
   },
   "dependencies": {
     "lucide-react": "^0.453.0",
