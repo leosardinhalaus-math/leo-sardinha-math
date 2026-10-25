@@ -48,8 +48,16 @@ def smoke(browser, name, *, width, height, mobile=False):
     if cards.count() > 0 and cards.first.is_enabled():
         cards.first.click()
         expect(page.locator(".spawn-heading")).to_be_visible(timeout=10000)
-        page.get_by_role("button", name="Cancelar posicionamento").click()
+        page.screenshot(path=str(OUT / f"{name}-posicionamento.png"), full_page=True)
+        confirm = page.locator(".spawn-confirm")
+        expect(confirm).to_be_enabled(timeout=15000)
+        confirm.click()
         expect(page.locator(".spawn-heading")).to_have_count(0, timeout=10000)
+        page.wait_for_function(
+            "() => Number(document.querySelector('.world-arena canvas')?.dataset.units ?? 0) >= 1",
+            timeout=20000,
+        )
+        page.screenshot(path=str(OUT / f"{name}-personagem-invocado.png"), full_page=True)
     overflow = page.evaluate(
         "() => document.documentElement.scrollWidth - document.documentElement.clientWidth"
     )
