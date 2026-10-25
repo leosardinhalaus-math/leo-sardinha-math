@@ -28,4 +28,4 @@ O frontend do Calculus Royale usa `provider: supabase`; portanto, `firestore.rul
 4. Nenhuma chave privada exposta; eventuais chaves comprometidas revogadas.
 5. Revisão humana final do PR antes de mesclar.
 
-**Não houve acesso ao painel Supabase ou teste de privilégio entre contas reais nesta etapa.**
+**Atualização de 25/10/2026:** o projeto `vmblubjbgwhaplsptymj` foi restaurado com sucesso e confirmou estado `ACTIVE_HEALTHY`. As tabelas `public.player_profiles` e `public.game_stats` possuem RLS ativada e políticas de leitura pública e escrita própria (`auth.uid() = user_id`). Uma migração aplicada no banco revogou `TRUNCATE`, `TRIGGER`, `REFERENCES` e `DELETE` de `anon` e `authenticated`, além de `INSERT` e `UPDATE` de `anon`. Um SELECT posterior com `has_table_privilege` confirmou o bloqueio dessas permissões. O consultor de segurança não retornou avisos. **Ainda falta testar entre contas reais distintas; as políticas de SELECT seguem públicas por projeto.**
