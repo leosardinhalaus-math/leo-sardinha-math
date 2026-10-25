@@ -28,3 +28,12 @@ test('release security gates: policies and CI',()=>{
  assert.match(rules,/allow read, delete: if owner\(id\)/);
  assert.ok(read('.github/workflows/dependency-audit.yml').includes('npm audit'));
 });
+
+test('Calculus Royale build cannot push unreviewed artifacts to main',()=>{
+ const workflow=read('.github/workflows/build-calculus-royale.yml');
+ assert.match(workflow,/contents: read/);
+ assert.match(workflow,/persist-credentials: false/);
+ assert.match(workflow,/actions\/upload-artifact@v4/);
+ assert.doesNotMatch(workflow,/git push|git commit|contents:\s*write/);
+ assert.match(workflow,/calculus-royale-build-candidate/);
+});
