@@ -41,22 +41,36 @@ function saveSession(data) {
   return session;
 }
 
+let pendingRefresh = null;
 async function session() {
   let s = null;
   try { s = JSON.parse(localStorage.getItem(SESSION_KEY) || "null"); } catch {}
   if (!s?.access_token) return null;
   if ((s.expires_at || 0) > Math.floor(Date.now()/1000) + 60) return s;
-  if (!s.refresh_token) return null;
-  try {
-    const data = await api("/auth/v1/token?grant_type=refresh_token", {
-      method: "POST",
-      body: JSON.stringify({ refresh_token: s.refresh_token }),
-    });
-    return saveSession(data);
-  } catch {
+  if (!s.refresh_token) {
     localStorage.removeItem(SESSION_KEY);
     return null;
   }
+  // Refresh tokens rotate: concurrent profile requests must share one refresh.
+  if (!pendingRefresh) {
+    pendingRefresh = (async () => {
+      try {
+        const data = await api("/auth/v1/token?grant_type=refresh_token", {
+          method: "POST",
+          body: JSON.stringify({ refresh_token: s.refresh_token }),
+        });
+        const renewed = saveSession(data);
+        if (!renewed?.user?.id) throw new Error("Invalid session refresh");
+        return renewed;
+      } catch {
+        localStorage.removeItem(SESSION_KEY);
+        return null;
+      } finally {
+        pendingRefresh = null;
+      }
+    })();
+  }
+  return pendingRefresh;
 }
 
 async function signIn(email, password) {
@@ -68,12 +82,15 @@ async function signIn(email, password) {
 }
 
 async function signUp(email, password, username) {
-  localStorage.setItem(PENDING_NAME_KEY, username);
+  const cleanName = String(username || "").trim().slice(0, 24);
+  if (cleanName.length < 3) throw new Error("Escolha um nome com pelo menos três caracteres.");
   const redirectTo = location.origin + location.pathname;
   const data = await api("/auth/v1/signup?redirect_to=" + encodeURIComponent(redirectTo), {
     method: "POST",
     body: JSON.stringify({ email, password }),
   });
+  // Keep the name only after successful registration (confirmation may be pending).
+  localStorage.setItem(PENDING_NAME_KEY, cleanName);
   return data?.access_token ? saveSession(data) : data;
 }
 
