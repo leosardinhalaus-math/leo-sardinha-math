@@ -44,9 +44,12 @@ def smoke(browser, name, *, width, height, mobile=False):
     page.screenshot(path=str(OUT / f"{name}-arena.png"), full_page=True)
     assert page.locator("canvas.world-arena-canvas").count() == 1
     # Testar a abertura e cancelamento de posicionamento, sem consumir elixir.
-    cards = page.locator(".card-stack button")
-    if cards.count() > 0 and cards.first.is_enabled():
-        cards.first.click()
+    cards = page.locator(".card-stack button.royale-card-hitarea")
+    mage = cards.filter(has_text="Mago da Potência")
+    # Valida o modelo reformulado do Mago, não apenas uma unidade genérica.
+    expect(mage).to_have_count(1, timeout=10000)
+    if mage.is_enabled():
+        mage.click()
         expect(page.locator(".spawn-heading")).to_be_visible(timeout=10000)
         page.screenshot(path=str(OUT / f"{name}-posicionamento.png"), full_page=True)
         confirm = page.locator(".spawn-confirm")
@@ -65,7 +68,8 @@ def smoke(browser, name, *, width, height, mobile=False):
             "() => document.querySelector('.world-arena canvas')?.dataset.cameraMode === 'character'",
             timeout=10000,
         )
-        assert page.locator(".world-arena canvas").get_attribute("data-focused-card-id")
+        assert page.locator(".world-arena canvas").get_attribute("data-focused-card-id") == "power", "Mago 3D must match the played card"
+        page.screenshot(path=str(OUT / f"{name}-mago-potencia-3d.png"), full_page=True)
         page.screenshot(path=str(OUT / f"{name}-personagem-em-destaque.png"), full_page=True)
         page.get_by_role("button", name="Centralizar câmera").click()
         assert page.locator(".world-arena canvas").get_attribute("data-camera-mode") == "combat"
