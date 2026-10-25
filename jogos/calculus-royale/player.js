@@ -84,7 +84,7 @@ function slugify(name, uid) {
 }
 
 async function getProfile(s) {
-  const rows = await api("/rest/v1/player_profiles?user_id=eq." + encodeURIComponent(s.user.id) + "&select=*", {}, s.access_token);
+  const rows = await api("/rest/v1/player_profiles?user_id=eq." + encodeURIComponent(s.user.id) + "&select=user_id,username,public_slug,avatar_seed,created_at,updated_at", {}, s.access_token);
   return rows?.[0] || null;
 }
 
@@ -148,7 +148,7 @@ async function syncProgress(s) {
 }
 
 async function getMyStats(s) {
-  const rows = await api("/rest/v1/game_stats?user_id=eq." + encodeURIComponent(s.user.id) + "&select=*", {}, s.access_token);
+  const rows = await api("/rest/v1/game_stats?user_id=eq." + encodeURIComponent(s.user.id) + "&select=user_id,level,xp,trophies,wins,losses,completed_worlds,best_tower_wave,current_streak,best_streak,chests_opened,coins,essence,updated_at", {}, s.access_token);
   return rows?.[0] || null;
 }
 
