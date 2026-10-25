@@ -2,7 +2,7 @@
 
 > Status **Verificado** indica exame de arquivo, log ou configuração, não comprova segurança total. **Pendente** exige teste ou correção adicional.
 
-Última evidência: preview de remediação Vite/Calulus Royale passou com zero vulnerabilidades; Firebase continua com 5 altas e 5 moderadas. PR #4 permanece como rascunho. Não publicar até resolver os bloqueios.
+**Atualização de 25/10/2026:** PR #4 continua rascunho; todos os oito workflows passaram após ajustes de dependências (incluindo Firebase Emulator). O Firebase tem três vulnerabilidades moderadas restantes e nenhuma alta no limite configurado. O Supabase foi restaurado, está ACTIVE_HEALTHY e RLS está habilitada nas duas tabelas existentes; privilégios SQL perigosos foram revogados e verificados. Permanecem pendentes testes de isolamento com duas contas reais, revisão de pontuações adulteráveis e regressões manuais antes da publicação.
 
 ## Credenciais e histórico
 1. **Verificado** — Confirmar PR em rascunho.
