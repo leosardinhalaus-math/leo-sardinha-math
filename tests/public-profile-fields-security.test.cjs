@@ -7,10 +7,14 @@ const builds=['jogos/calculus-royale/player.js','jogos/calculus-royale-src/clien
 for(const p of builds){
  test(p+' public endpoints request only explicit columns',()=>{
   const src=fs.readFileSync(path.join(root,p),'utf8');
-  for(const endpoint of ['player_profiles?public_slug=eq.','game_stats?user_id=eq.']){
-   const line=src.split('\n').find(line=>line.includes(endpoint));
-   assert.ok(line,'missing endpoint '+endpoint);
+  const lines=src.split('\n');
+  const profile=lines.find(line=>line.includes('player_profiles?public_slug=eq.'));
+  const stats=lines.find(line=>line.includes('game_stats?user_id=eq.')&&line.includes('profile.user_id'));
+  assert.ok(profile,'missing public profile endpoint');
+  assert.ok(stats,'missing public game stats endpoint');
+  for(const line of [profile,stats]){
    assert.equal(line.includes('select=*'),false,'public endpoint must avoid wildcard select');
+   assert.match(line,/select=[\w,]+/,'public endpoint must list explicit columns');
   }
  });
 }
