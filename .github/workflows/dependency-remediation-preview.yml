@@ -40,6 +40,12 @@ jobs:
       - name: Check that lockfile is installable
         working-directory: ${{ matrix.project }}
         run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Validate Calculus Royale typecheck and build
+        if: matrix.project == 'jogos/calculus-royale-src'
+        working-directory: jogos/calculus-royale-src
+        run: |
+          npm run check
+          npm run build
       - name: Upload proposed patch for review
         if: always()
         run: git diff --binary -- jogos/calculus-royale-src/package-lock.json tools/firebase-tests/package-lock.json > remediation.patch
