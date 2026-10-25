@@ -36,9 +36,10 @@ export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(w
   const [key,ally]=focused;
   const point=ally.visual.group.position;
   const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight);
-  const distance=Math.max(10,3.8/(Math.tan(T.MathUtils.degToRad(21))*aspect));
+  const distance=Math.max(8,2.2/(Math.tan(T.MathUtils.degToRad(21))*aspect));
   controls.target.set(point.x,point.y+1.1,point.z);
-  camera.position.set(point.x-distance*.7,point.y+distance*.76,point.z+distance*.32);
+  // O rosto dos aliados olha para +X: mostrar os detalhes FRONTais, não apenas a capa pelas costas.
+  camera.position.set(point.x+distance*.65,point.y+distance*.7,point.z+distance*.38);
   controls.update();
   focusAllyKey=key;
   canvas.dataset.cameraMode='character';
