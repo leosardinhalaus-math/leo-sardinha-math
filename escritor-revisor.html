@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Escreva, organize e revise textos com ferramentas gratuitas no Leo Sardinha.Math.">
+<title>Escritor e Revisor | Leo Sardinha.Math</title><link rel="stylesheet" href="assets/site.css">
+<style>
+.editor-wrap{padding:42px 0 80px;max-width:990px}.tools{display:grid;grid-template-columns:1fr 1fr;gap:18px}.tool{background:#fff;border:1px solid #cdeaf5;border-radius:18px;padding:22px;box-shadow:0 8px 24px #082f4915}
+.tool h2{margin-top:0}.tool label{display:block;font-weight:700;margin:12px 0 6px}.tool input,.tool select,.tool textarea{font:inherit;width:100%;padding:12px;border:2px solid #a8cfdf;border-radius:10px;background:#fff;color:#123047}.tool textarea{min-height:270px;resize:vertical;line-height:1.6}.tool button{font:inherit;font-weight:700;cursor:pointer;background:#0369a1;color:#fff;padding:11px 18px;border:0;border-radius:10px;margin:12px 6px 2px 0}.tool button.secondary{background:#e0f2fe;color:#082f49}.tool button:focus-visible,.tool textarea:focus-visible,.tool input:focus-visible,.tool select:focus-visible{outline:3px solid #facc15;outline-offset:2px}.note{color:#49687a;line-height:1.6}.report{padding:12px;background:#f1f9fc;border-radius:10px;white-space:pre-wrap;line-height:1.6;min-height:70px}.status{min-height:24px;color:#14532d}@media(max-width:720px){.tools{grid-template-columns:1fr}}
+</style></head><body>
+<header class="site-header"><nav class="nav" aria-label="Navegação principal"><a class="brand" href="index.html">Leo Sardinha<span>.Math</span></a><div class="menu"><a href="index.html">Início</a><a href="educacao.html">Educação</a><a href="escritor-revisor.html" aria-current="page">Escritor e Revisor</a><a href="wiki.html">Wiki</a></div></nav></header>
+<main class="wrap editor-wrap"><p class="eyebrow">Ferramentas de escrita</p><h1>Escritor e Revisor</h1><p class="lead">Organize ideias, prepare um rascunho e revise os detalhes do texto sem sair do site.</p>
+<p class="note"><strong>Funciona gratuitamente no navegador e sem enviar o texto a um servidor.</strong> O revisor oferece verificações automáticas básicas; não substitui uma revisão humana ou uma IA linguística.</p>
+<div class="tools">
+<section class="tool" aria-labelledby="writerTitle"><h2 id="writerTitle">✍️ Escritor</h2>
+<label for="topic">Tema ou título</label><input id="topic" placeholder="Ex.: Frações no cotidiano" maxlength="160">
+<label for="audience">Público</label><select id="audience"><option>Estudantes</option><option>Professores</option><option>Famílias</option><option>Público geral</option></select>
+<label for="genre">Formato</label><select id="genre"><option value="artigo">Artigo</option><option value="atividade">Atividade educativa</option><option value="historia">História</option><option value="resumo">Resumo</option></select>
+<button id="outline">Criar roteiro</button><button class="secondary" id="sendReview">Enviar ao Revisor</button>
+<label for="draft">Seu texto</label><textarea id="draft" placeholder="Escreva aqui. O roteiro é um ponto de partida e pode ser editado livremente."></textarea>
+<button id="save">Exportar .txt</button><p class="status" id="writerStatus" role="status"></p></section>
+<section class="tool" aria-labelledby="reviewTitle"><h2 id="reviewTitle">🔎 Revisor</h2>
+<label for="reviewText">Texto a revisar</label><textarea id="reviewText" placeholder="Cole um texto ou envie do Escritor."></textarea>
+<button id="analyze">Analisar texto</button><button class="secondary" id="apply">Aplicar correções simples</button>
+<h3>Observações</h3><div id="report" class="report" role="status" aria-live="polite">Nenhuma análise realizada.</div>
+<button id="exportReview">Exportar revisão .txt</button><p class="status" id="reviewStatus" role="status"></p></section>
+</div></main><script src="assets/editorial.js" defer></script></body></html>
