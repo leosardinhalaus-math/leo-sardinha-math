@@ -30,7 +30,7 @@ async function api(path, options={}, token="") {
 }
 
 function saveSession(data) {
-  if (!data?.access_token) return null;
+  if (!data?.access_token || !data?.user?.id || typeof data.refresh_token !== "string") return null;
   const session = {
     access_token: data.access_token,
     refresh_token: data.refresh_token,
@@ -78,7 +78,9 @@ async function signIn(email, password) {
     method: "POST",
     body: JSON.stringify({ email, password }),
   });
-  return saveSession(data);
+  const signedIn = saveSession(data);
+  if (!signedIn) throw new Error("Não foi possível confirmar o login. Tente novamente.");
+  return signedIn;
 }
 
 async function signUp(email, password, username) {
