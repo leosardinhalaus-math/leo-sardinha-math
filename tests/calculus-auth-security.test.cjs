@@ -106,3 +106,37 @@ test('profile pages distinguish email-confirmation response from active session'
     assert.doesNotMatch(html, /result\?\.user\?\.id\|\|result\?\.access_token/);
   }
 });
+
+test('valid login persists only the returned authenticated session', async () => {
+  const {cloud,records} = harness(async (url,opts) => {
+    assert.match(url,/grant_type=password/);
+    assert.equal(opts.method,'POST');
+    assert.equal(JSON.parse(opts.body).email,'player@example.org');
+    return reply({access_token:'access',refresh_token:'refresh',expires_in:3600,user:{id:uid}});
+  });
+  const logged = await cloud.signIn('player@example.org','secret123');
+  assert.equal(logged.user.id,uid);
+  assert.equal(JSON.parse(records.get(SESSION_KEY)).access_token,'access');
+});
+
+test('malformed login response does not create an authenticated session', async () => {
+  const {cloud,records} = harness(async () => reply({user:{id:uid},access_token:'token'}));
+  await assert.rejects(cloud.signIn('player@example.org','secret123'), /confirmar o login/);
+  assert.equal(records.has(SESSION_KEY),false);
+});
+
+test('missing session never makes a network request', async () => {
+  let calls=0;
+  const {cloud} = harness(async () => {calls++;throw Error('Unexpected request');});
+  assert.equal(await cloud.session(),null);
+  assert.equal(calls,0);
+});
+
+test('refresh response without a user clears expired session', async () => {
+  const old = {access_token:'old',refresh_token:'refresh',expires_at:1,user:{id:uid}};
+  const {cloud,records}=harness(async () => reply({access_token:'next',refresh_token:'next-refresh',expires_in:3600}),{
+    [SESSION_KEY]:JSON.stringify(old)
+  });
+  assert.equal(await cloud.session(),null);
+  assert.equal(records.has(SESSION_KEY),false);
+});
