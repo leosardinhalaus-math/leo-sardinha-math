@@ -186,3 +186,11 @@ Estado inicial verificado em 2026-10-25: projeto Supabase `vmblubjbgwhaplsptymj`
 - **Sem implantação:** não foram alteradas policies, migrations, autenticação real, dados de usuários, configurações de billing nem a versão de produção; PR #4 segue draft.
 
 **Etapas sinalizadas no checklist até este registro: 45/100** (inclui as de desenho; não equivale a porcentagem de software pronto).
+
+
+### Proteção complementar de logout concorrente — 2026-10-25
+
+- Corrigida corrida entre renovação de sessão e logout: a cada saída ou novo login muda-se a geração lógica da sessão, impedindo que uma resposta atrasada do refresh restaure credenciais removidas.
+- Logout agora remove tokens do armazenamento local **antes** de aguardar a chamada remota, inclusive quando esta estiver lenta/indisponível.
+- Acrescentados testes de corrida em `tests/calculus-auth-security.test.cjs`: refresh atrasado após logout e limpeza imediata de tokens.
+- Status: alteração apenas na branch PR #4; testes CI do commit `e2fb0ebaef3879ea979bd96cfaef9bc90d0f272d` ainda estavam rodando na última consulta. Nenhuma alegação de cobertura E2E de autenticação real.
