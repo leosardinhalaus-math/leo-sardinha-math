@@ -1,0 +1,63 @@
+name: Firebase dependency remediation experiment
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/firebase-remediation-experiment.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-patched-transitives:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: tools/firebase-tests
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.12.0'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Pin patched grpc and OpenTelemetry in experimental manifest
+        run: |
+          npm pkg set "overrides.@grpc/grpc-js=1.13.6"
+          npm pkg set "overrides.@opentelemetry/core=^2.8.0"
+          npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+      - name: Apply compatible automatic patch proposals
+        run: npm audit fix --package-lock-only --ignore-scripts --no-fund || true
+      - name: Audit patched dependency tree (must pass)
+        id: audit
+        continue-on-error: true
+        run: npm audit --package-lock-only --audit-level=high
+      - name: Reproducible dependency installation
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Firebase emulator security tests
+        id: tests
+        continue-on-error: true
+        run: npm test
+      - name: Produce manifest and lockfile patch
+        if: always()
+        working-directory: .
+        run: git diff --binary -- tools/firebase-tests/package.json tools/firebase-tests/package-lock.json > firebase-remediation.patch
+      - name: Upload proposal for review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: firebase-dependency-proposal
+          path: firebase-remediation.patch
+          retention-days: 7
+      - name: Reject unresolved high-severity vulnerabilities and regression
+        if: always()
+        env:
+          AUDIT_STATUS: ${{ steps.audit.outcome }}
+          TEST_STATUS: ${{ steps.tests.outcome }}
+        run: |
+          test "$AUDIT_STATUS" = "success"
+          test "$TEST_STATUS" = "success"
