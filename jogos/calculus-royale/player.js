@@ -171,9 +171,21 @@ async function leaderboard(sort="trophies.desc") {
   return (stats || []).map(s => ({ ...s, profile: byId.get(s.user_id) })).filter(x => x.profile);
 }
 
-function logout() {
-  localStorage.removeItem(SESSION_KEY);
-  location.reload();
+async function logout() {
+  let token = "";
+  try {
+    const stored = JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
+    if (typeof stored?.access_token === "string") token = stored.access_token;
+  } catch {}
+  try {
+    if (token) await api("/auth/v1/logout", { method: "POST" }, token);
+  } catch {
+    // Offline or expired sessions must still sign out locally.
+  } finally {
+    localStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem(PENDING_NAME_KEY);
+    location.reload();
+  }
 }
 
 const legacy = { $, $$, safe, api, session, signIn, signUp, getProfile, ensureProfile, syncProgress, getMyStats, publicProfile, leaderboard, logout, localProgress, provider: 'supabase' };
