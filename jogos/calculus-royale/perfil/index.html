@@ -27,6 +27,6 @@ async function renderMine(){
 }
 async function authenticate(action){$('#loginBtn').disabled=$('#signupBtn').disabled=true;try{await action()}catch(error){$('#authMsg').textContent=error.message}finally{$('#loginBtn').disabled=$('#signupBtn').disabled=false}}
 $('#loginBtn').onclick=()=>authenticate(async()=>{$('#authMsg').textContent='Entrando…';await C.signIn($('#email').value.trim(),$('#password').value);await renderMine()});
-$('#signupBtn').onclick=()=>authenticate(async()=>{const name=$('#username').value.trim();if(name.length<3)throw Error('Escolha um nome com pelo menos três caracteres.');$('#authMsg').textContent='Criando conta…';const result=await C.signUp($('#email').value.trim(),$('#password').value,name);if(result?.user?.id||result?.access_token)await renderMine();else $('#authMsg').textContent='Confira seu e-mail para confirmar a conta e depois entre aqui.'});
+$('#signupBtn').onclick=()=>authenticate(async()=>{const name=$('#username').value.trim();if(name.length<3)throw Error('Escolha um nome com pelo menos três caracteres.');$('#authMsg').textContent='Criando conta…';await C.signUp($('#email').value.trim(),$('#password').value,name);if(await C.session())await renderMine();else $('#authMsg').textContent='Confira seu e-mail para confirmar a conta e depois entre aqui.'});
 (async()=>{try{const slug=new URLSearchParams(location.search).get('u');if(slug)await renderPublic(slug);else await renderMine()}catch(error){$('#authMsg').textContent=error.message}})();
 </script></body></html>
