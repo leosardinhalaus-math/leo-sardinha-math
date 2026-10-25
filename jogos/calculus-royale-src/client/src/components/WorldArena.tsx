@@ -23,6 +23,6 @@ export default function WorldArena({worldIndex,stageIndex=0,active,allies=[],ene
   {status==='fallback'&&placement&&<img className="arena-fallback-unit" src={getCardImage(placement.unit.cardId)} alt={`Prévia de ${placement.unit.name}`} style={{left:placement.point.lane<0?'56%':'44%',top:`${82-placement.point.progress*.64}%`,outline:'3px solid #ffe18c'}}/>}
   {warnings>0&&status==='ready'&&<span className="arena-fallback-note">Alguns modelos usam a versão provisória</span>}
   <div className="arena-world-name"><span>ILHA {String(world.id).padStart(2,'0')} · {worldIndex===0?'CAVERNA':'CASA'} {world.id}.{stageIndex+1}</span><strong>{world.title}</strong></div>
-  <div className="arena-camera-help"><span>SUL ↑ NORTE · pinça para zoom</span><div className="arena-view-buttons"><button onClick={()=>handle.current?.viewIsland()} aria-label="Ver ilha inteira">Ilha inteira</button><button onClick={()=>handle.current?.resetCamera()} aria-label="Centralizar câmera">Combate</button></div></div>
+  <div className="arena-camera-help"><span>SUL ↑ NORTE · pinça para zoom</span><div className="arena-view-buttons"><button onClick={()=>handle.current?.viewIsland()} aria-label="Ver ilha inteira">Ilha inteira</button><button onClick={()=>handle.current?.resetCamera()} aria-label="Centralizar câmera">Combate</button><button onClick={()=>handle.current?.focusLastAlly()} disabled={status!=='ready'||allies.length===0} aria-label="Aproximar personagem 3D">Personagem</button></div></div>
  </div>;
 }
