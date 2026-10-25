@@ -30,6 +30,14 @@ func _ready() -> void:
 		card_menu.add_item("%02d · %s" % [int(card.id),card.name])
 	card_menu.item_selected.connect(show_card)
 	header.add_child(card_menu)
+	# Acesso direto aos dois personagens de referência; o restante da coleção permanece disponível.
+	var favorites = HBoxContainer.new()
+	favorites.add_theme_constant_override("separation",12)
+	column.add_child(favorites)
+	favorites.add_child(RoyaleUI.label("REVISÃO VISUAL · GODOT NATIVO",15,RoyaleUI.MINT))
+	favorites.add_child(RoyaleUI.button("ARQUEIRA DA DERIVADA",func(): show_card(0)))
+	favorites.add_child(RoyaleUI.button("MAGO DA POTÊNCIA",func(): show_card(2)))
+	favorites.add_child(RoyaleUI.label("A arte da carta fica ao lado do modelo 3D.",14))
 	var content = HBoxContainer.new()
 	content.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	column.add_child(content)
@@ -97,7 +105,7 @@ func _ready() -> void:
 		state_menu.add_item(state)
 	state_menu.item_selected.connect(func(index): character.animation.play(state_menu.get_item_text(index)))
 	footer.add_child(state_menu)
-	scene_label = RoyaleUI.label("Arraste para girar o personagem. Modelos 3D nativos do Godot.",17,RoyaleUI.MINT)
+	scene_label = RoyaleUI.label("Arraste ou toque para girar. Idle, caminhada, corrida e ataques disponíveis.",17,RoyaleUI.MINT)
 	scene_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	footer.add_child(scene_label)
 	footer.add_child(RoyaleUI.button("PRÓXIMO →",func(): show_card(posmod(selected+1,45))))
