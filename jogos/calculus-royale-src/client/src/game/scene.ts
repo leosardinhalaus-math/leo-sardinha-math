@@ -11,7 +11,7 @@ import { type Tower, type Placement } from './tacticalBattle';
 export type ArenaUnit={id:number;cardId:string;name:string;kind:string;progress:number;color:string;lane?:number;hp?:number;maxHp?:number;lastAttack?:number};
 export type ArenaState={allies:ArenaUnit[];enemies:ArenaUnit[];paused:boolean;events?:CombatEvent[];towers?:Tower[];placement?:{unit:ArenaUnit;point:Placement;valid:boolean;radius:number};outcome?:'victory'|'defeat'|null;modelIds?:string[]};
 type Manifest={useGenerated?:boolean;characters?:Record<string,ModelSpec>;worlds?:Record<string,{url:string}>};
-export type GameHandle={setState:(state:ArenaState)=>void;resetCamera:()=>void;viewIsland:()=>void;dispose:()=>void};
+export type GameHandle={setState:(state:ArenaState)=>void;resetCamera:()=>void;viewIsland:()=>void;focusLastAlly:()=>boolean;dispose:()=>void};
 
 export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(warnings:number)=>void,onError:()=>void,onSelectPoint?:(point:Placement)=>void,stageIndex=0):GameHandle{
  const renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:false});
@@ -29,6 +29,19 @@ export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(w
  function viewIsland(){const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight),distance=Math.max(26,10/(Math.tan(T.MathUtils.degToRad(21))*aspect));camera.position.set(-distance*.78,distance*.9,0);controls.target.set(.6,.28,0);controls.update();canvas.dataset.cameraMode='island';}
 
  viewIsland();
+ function focusLastAlly():boolean{
+  const ally=[...actors.values()].reverse().find(a=>!a.enemy&&a.exitAge===undefined);
+  if(!ally)return false;
+  const point=ally.visual.group.position;
+  const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight);
+  const distance=Math.max(10,3.8/(Math.tan(T.MathUtils.degToRad(21))*aspect));
+  controls.target.set(point.x,point.y+1.1,point.z);
+  camera.position.set(point.x-distance*.7,point.y+distance*.76,point.z+distance*.32);
+  controls.update();
+  canvas.dataset.cameraMode='character';
+  canvas.dataset.focusedCardId=ally.unit.cardId;
+  return true;
+ }
  const observer=new ResizeObserver(()=>{const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();});observer.observe(canvas);
  let state:ArenaState={allies:[],enemies:[],paused:false},disposed=false,ready=false,warnings=0;
  let manifest:Manifest={};const assets=new Map<string,GLTF>();
@@ -121,5 +134,5 @@ export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(w
   canvas.dataset.frames=String(Number(canvas.dataset.frames??0)+1);
  }
  render();
- return {setState(next){state=next;},resetCamera,viewIsland,dispose(){disposed=true;abort.abort();cancelAnimationFrame(frame);observer.disconnect();controls.dispose();canvas.removeEventListener('keydown',keydown);canvas.removeEventListener('webglcontextlost',lost);canvas.removeEventListener('pointerdown',pointerDown);canvas.removeEventListener('pointerup',pointerUp);actors.forEach(a=>{a.visual.dispose();a.health.geometry.dispose();(a.health.material as T.Material).dispose();});preview?.dispose();deployment.geometry.dispose();deployment.material.dispose();spellRadius.geometry.dispose();spellRadius.material.dispose();towerVisuals.forEach(v=>disposeObject(v.group));shots.forEach(s=>{s.mesh.geometry.dispose();(s.mesh.material as T.Material).dispose();});effects.forEach(e=>e.dispose());disposeObject(world.root);assets.forEach(a=>disposeObject(a.scene));sun.shadow.dispose();renderer.dispose();renderer.forceContextLoss();}};
+ return {setState(next){state=next;},resetCamera,viewIsland,focusLastAlly,dispose(){disposed=true;abort.abort();cancelAnimationFrame(frame);observer.disconnect();controls.dispose();canvas.removeEventListener('keydown',keydown);canvas.removeEventListener('webglcontextlost',lost);canvas.removeEventListener('pointerdown',pointerDown);canvas.removeEventListener('pointerup',pointerUp);actors.forEach(a=>{a.visual.dispose();a.health.geometry.dispose();(a.health.material as T.Material).dispose();});preview?.dispose();deployment.geometry.dispose();deployment.material.dispose();spellRadius.geometry.dispose();spellRadius.material.dispose();towerVisuals.forEach(v=>disposeObject(v.group));shots.forEach(s=>{s.mesh.geometry.dispose();(s.mesh.material as T.Material).dispose();});effects.forEach(e=>e.dispose());disposeObject(world.root);assets.forEach(a=>disposeObject(a.scene));sun.shadow.dispose();renderer.dispose();renderer.forceContextLoss();}};
 }
