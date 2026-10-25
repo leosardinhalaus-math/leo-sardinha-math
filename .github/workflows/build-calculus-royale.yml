@@ -1,6 +1,10 @@
 name: Build Calculus Royale
 
 on:
+  pull_request:
+    paths:
+      - 'jogos/calculus-royale-src/**'
+      - '.github/workflows/build-calculus-royale.yml'
   push:
     branches: [main]
     paths:
@@ -9,7 +13,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: calculus-royale-build-${{ github.ref }}
@@ -18,9 +22,12 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Prepare illustrated assets
         working-directory: jogos/calculus-royale-src
@@ -36,7 +43,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: '24.12.0'
 
       - name: Install dependencies
         working-directory: jogos/calculus-royale-src
@@ -67,24 +74,14 @@ jobs:
         working-directory: jogos/calculus-royale-src
         run: npm run test:models
 
-      - name: Publish built game into site
+      - name: Prepare built game for review
         run: |
-          rm -rf jogos/calculus-royale
-          mkdir -p jogos/calculus-royale
-          cp -R jogos/calculus-royale-src/dist/public/. jogos/calculus-royale/
-
-      - name: Commit generated game
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add jogos/calculus-royale
-          if git diff --cached --quiet; then
-            echo "No generated changes to commit."
-          else
-            git commit -m "Build Calculus Royale"
-            # Generated source assets are build-time temporaries; remove them before rebasing.
-            git reset --hard HEAD
-            git clean -fd jogos/calculus-royale-src/client/public/assets/maps jogos/calculus-royale-src/client/public/assets/cards
-            git pull --rebase origin main
-            git push origin HEAD:main
-          fi
+          test -s jogos/calculus-royale-src/dist/public/index.html
+          mkdir -p release/calculus-royale
+          cp -R jogos/calculus-royale-src/dist/public/. release/calculus-royale/
+      - name: Upload reviewed build candidate (no automatic push)
+        uses: actions/upload-artifact@v4
+        with:
+          name: calculus-royale-build-candidate
+          path: release/calculus-royale
+          retention-days: 14
