@@ -1,0 +1,69 @@
+name: Calculus Royale browser smoke (desktop/mobile)
+
+on:
+  pull_request:
+    paths:
+      - 'jogos/calculus-royale-src/**'
+      - 'tests/browser/calculus-smoke.py'
+      - '.github/workflows/calculus-browser-smoke.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.12.0'
+          cache: npm
+          cache-dependency-path: jogos/calculus-royale-src/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install assets and browser test dependencies
+        run: python -m pip install Pillow==11.3.0 playwright==1.56.0
+      - name: Prepare visual assets
+        working-directory: jogos/calculus-royale-src
+        run: |
+          mkdir -p client/public/assets/cards
+          python scripts/extract_world_maps.py
+          cat .packed/card-sprite.webp.b64.part{1,2,3,4,5,6} | base64 -d > client/public/assets/cards/card-sprite.webp
+          test "$(wc -c < client/public/assets/cards/card-sprite.webp)" -gt 50000
+          python scripts/split_card_sprite.py
+          python scripts/generate_character_assets.py
+      - name: Build a reproducible game
+        working-directory: jogos/calculus-royale-src
+        run: |
+          npm ci --no-audit --no-fund
+          npm run check
+          npm run build
+      - name: Check browser availability
+        run: google-chrome --version
+      - name: Start local static web server
+        run: |
+          python -m http.server 8765 --bind 127.0.0.1 --directory jogos/calculus-royale-src/dist/public > "$RUNNER_TEMP/calculus-http.log" 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --silent --fail http://127.0.0.1:8765/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/calculus-http.log"
+          exit 1
+      - name: Test desktop and mobile, capture screenshots
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: python tests/browser/calculus-smoke.py
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: calculus-tactical-browser-screens
+          path: browser-screenshots/*.png
+          if-no-files-found: warn
+          retention-days: 14
