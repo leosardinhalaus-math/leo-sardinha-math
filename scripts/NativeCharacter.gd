@@ -115,7 +115,9 @@ func _humanoid() -> void:
 	if armored and str(get_meta("card_key")) not in ["limit","cauchy","comparison","implicit"]: shell = Geo.material(Color(profile.get("color","#294975")).lightened(0.08),true)
 	if str(get_meta("card_key")) == "ftc": shell = gold
 	var leather = Geo.material(Color("342c36"))
-	if outfit == "leather": shell = leather
+	if outfit == "leather":
+		# O corpete da Arqueira é azul-escuro nas cartas; a capa e as ombreiras ficam rubras.
+		shell = Geo.material(Color("20324a")) if str(get_meta("card_key")) == "slope" else leather
 	Geo.loft(body,"TailoredTorso",Vector3.ZERO,[Vector3(0.21*broad,-0.16,0.145),Vector3(0.22*broad,0.02,0.16),Vector3(0.30*broad,0.27,0.19),Vector3(0.23*broad,0.37,0.15)],shell)
 	Geo.loft(body,"Belt",Vector3.ZERO,[Vector3(0.23*broad,-0.16,0.17),Vector3(0.235*broad,-0.09,0.17)],leather)
 	_p(body,"Buckle","box",Vector3(0,-0.12,-0.176),Vector3(0.095,0.085,0.032),gold)
@@ -141,6 +143,10 @@ func _humanoid() -> void:
 		for side in [-1.0,1.0]:
 			Geo.panel(body,"RedLeatherPanel",Vector3(0,0,-0.18),PackedVector2Array([Vector2(side*0.08,-0.08),Vector2(side*0.21,-0.05),Vector2(side*0.29,0.28),Vector2(side*0.18,0.35)]),0.035,cloth)
 		Geo.segment(body,"LeatherStrap",Vector3(-0.21,0.32,-0.19),Vector3(0.17,-0.06,-0.18),0.025,gold)
+		if str(get_meta("card_key")) == "slope":
+			for side in [-1.0,1.0]:
+				Geo.segment(body,"SlopeGoldCorsetPiping",Vector3(side*0.19,0.34,-0.20),Vector3(side*0.15,-0.14,-0.20),0.013,gold)
+				_p(body,"SlopeCapeClasp","sphere",Vector3(side*0.22,0.28,-0.20),Vector3(0.045,0.035,0.03),gold,true)
 	if profile.get("detail") in ["cape","beard","wings"] or outfit == "armor":
 		var cape_mat = Geo.material(Color("e4e0ce")) if str(get_meta("card_key")) == "area" else cloth
 		Geo.panel(body,"CutCape",Vector3(0,0,0.22),PackedVector2Array([Vector2(-0.24,0.29),Vector2(0.24,0.29),Vector2(0.36,-0.51),Vector2(0.22,-0.63),Vector2(0,-0.55),Vector2(-0.22,-0.63),Vector2(-0.36,-0.51)]),0.045,cape_mat).rotation.x = -0.18
@@ -200,7 +206,7 @@ func _humanoid() -> void:
 		var beard_paths: Array = []
 		for index in range(7):
 			var x = (index-3)*0.041
-			var length = (0.29 if long_beard else 0.14)*(1.0-absf(x)*2.2)
+			var length = (0.41 if str(get_meta("card_key")) == "power" else (0.29 if long_beard else 0.14))*(1.0-absf(x)*2.2)
 			beard_paths.append([Vector3(x,-0.078,-0.16+absf(x)*0.2),Vector3(x*0.95,-0.15,-0.205),Vector3(x*0.74,-0.19-length*0.35,-0.217),Vector3(x*0.45,-0.17-length,-0.17)])
 		Geo.locks(head,"SculptedBeard",beard_paths,0.044,hair)
 		var moustache_paths: Array = []
@@ -257,6 +263,11 @@ func _hair(helmet: bool) -> void:
 			var tail = Geo.loft(head,"Ponytail",Vector3(0,0.14,0.23),[Vector3(0.015,-0.30,0.025),Vector3(0.08,-0.04,0.08),Vector3(0.055,0.13,0.065)],hair,8)
 			tail.rotation.x = -0.8
 			_p(head,"HairTie","sphere",Vector3(0,0.14,0.21),Vector3(0.07,0.06,0.07),gold)
+			var swept_tail: Array = []
+			for strand in range(4):
+				var x = (strand-1.5)*0.039
+				swept_tail.append([Vector3(x,0.16,0.25),Vector3(x+0.027,0.04,0.31),Vector3(x+0.05,-0.17,0.37),Vector3(x+0.073,-0.38,0.43)])
+			Geo.locks(head,"PonytailLocks",swept_tail,0.028,hair).set_meta("motion_piece","PonytailLocks")
 		elif style == "braid":
 			for side in [-1.0,1.0]:
 				for index in range(5): _p(head,"Braid","sphere",Vector3(side*(0.20+sin(index*PI/2)*0.012),-0.02-index*0.075,0.035),Vector3(0.048-index*0.004,0.065,0.05),hair)
@@ -353,6 +364,14 @@ func _weapons() -> void:
 			else:
 				_p(gear, "StaffGem", "sphere", Vector3(0.5, 1.89, -0.14), Vector3(0.16, 0.22, 0.16), glow)
 				_ring(Vector3(0.5, 1.89, -0.14), 0.25, gold, Vector3(PI/2, 0, 0))
+				if str(get_meta("card_key")) == "power":
+					var helix: Array[Vector3] = []
+					for step in range(31):
+						var t = float(step)/30.0
+						var angle = t*TAU*2.5
+						helix.append(Vector3(0.5+cos(angle)*(.07+t*.10),1.35+t*.70,-0.14+sin(angle)*(.07+t*.10)))
+					Geo.curve(gear,helix,0.023,glow)
+					_p(gear,"PowerStaffRunestone","sphere",Vector3(0.5,2.03,-0.14),Vector3(0.11,0.13,0.11),gold,true)
 			if weapon == "staff_book":
 				_book(Vector3(-0.4, 1.02, -0.28))
 		"book", "scroll", "wave_plot", "navigation", "twin_persona":
@@ -537,7 +556,7 @@ func _articulate() -> void:
 		var frame = top.get_parent().get_node_or_null("ArcaneFilament") if top else null
 		if top and bottom and arrow and frame:
 			bow_links = {"top":top,"bottom":bottom,"arrow":arrow,"frame":frame,"hand":right_wrist.get_node("Hand")}
-	_follow(head,"HairFollow",Vector3(0,0.12,0.04),["LongLock","Ponytail","HairTie","Braid"],"hair",0.085,0.8)
+	_follow(head,"HairFollow",Vector3(0,0.12,0.04),["LongLock","Ponytail","PonytailLocks","HairTie","Braid"],"hair",0.085,0.8)
 	_follow(head,"BeardFollow",Vector3(0,-0.08,-0.16),["SculptedBeard","BeardVolume","Moustache"],"beard",0.07,0.55)
 	_follow(body,"CapeFollow",Vector3(0,0.29,0.22),["CutCape"],"cape",0.11,0.9)
 	_follow(body,"RobeFollow",Vector3(0,-0.15,0),["PleatedRobe"],"robe",0.07,0.38)
