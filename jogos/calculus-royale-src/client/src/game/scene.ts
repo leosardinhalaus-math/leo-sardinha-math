@@ -5,14 +5,15 @@ import { createCharacter, disposeObject, type ModelSpec } from './characters';
 import { arenaPosition, moveWithCollisions } from './collisions';
 import { createWorld } from './world';
 import { createAbilityEffect } from './effects';
-import { SPAWN_ZONES, type CombatEvent } from './combat';
+import { type CombatEvent } from './combat';
+import { type Tower, type Placement } from './tacticalBattle';
 
 export type ArenaUnit={id:number;cardId:string;name:string;kind:string;progress:number;color:string;lane?:number;hp?:number;maxHp?:number;lastAttack?:number};
-export type ArenaState={allies:ArenaUnit[];enemies:ArenaUnit[];paused:boolean;events?:CombatEvent[];placement?:{unit:ArenaUnit;zoneId:string;blocked:string[]};outcome?:'victory'|'defeat'|null;modelIds?:string[]};
+export type ArenaState={allies:ArenaUnit[];enemies:ArenaUnit[];paused:boolean;events?:CombatEvent[];towers?:Tower[];placement?:{unit:ArenaUnit;point:Placement;valid:boolean;radius:number};outcome?:'victory'|'defeat'|null;modelIds?:string[]};
 type Manifest={useGenerated?:boolean;characters?:Record<string,ModelSpec>;worlds?:Record<string,{url:string}>};
 export type GameHandle={setState:(state:ArenaState)=>void;resetCamera:()=>void;viewIsland:()=>void;dispose:()=>void};
 
-export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(warnings:number)=>void,onError:()=>void,onSelectZone?:(id:string)=>void,stageIndex=0):GameHandle{
+export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(warnings:number)=>void,onError:()=>void,onSelectPoint?:(point:Placement)=>void,stageIndex=0):GameHandle{
  const renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:false});
  renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
  renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;
@@ -26,18 +27,22 @@ export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(w
  // Câmera fixa ao sul: aliados nascem embaixo e avançam para o norte da tela.
  function resetCamera(){const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight),distance=Math.max(24,11/(Math.tan(T.MathUtils.degToRad(21))*aspect));camera.position.set(-distance*.78,distance*.86,0);controls.target.set(0,.35,0);controls.update();canvas.dataset.cameraMode='combat';}
  function viewIsland(){const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight),distance=Math.max(26,10/(Math.tan(T.MathUtils.degToRad(21))*aspect));camera.position.set(-distance*.78,distance*.9,0);controls.target.set(.6,.28,0);controls.update();canvas.dataset.cameraMode='island';}
- function focusSpawn(x:number){const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight),distance=Math.max(8.5,4/(Math.tan(T.MathUtils.degToRad(21))*aspect));controls.target.set(x,.72,0);camera.position.set(x-distance*.78,distance*.86,0);controls.update();canvas.dataset.cameraMode='spawn';}
+
  viewIsland();
  const observer=new ResizeObserver(()=>{const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();});observer.observe(canvas);
  let state:ArenaState={allies:[],enemies:[],paused:false},disposed=false,ready=false,warnings=0;
  let manifest:Manifest={};const assets=new Map<string,GLTF>();
  const actors=new Map<string,{visual:ReturnType<typeof createCharacter>;unit:ArenaUnit;enemy:boolean;age:number;lane:number;exitAge?:number;exitMotion?:'victory'|'defeat';attackFor:number;hurtFor:number;lastAttack:number;lastHp:number;health:T.Mesh}>();
- const zoneMeshes=SPAWN_ZONES.map(zone=>{const material=new T.MeshBasicMaterial({color:0x5bffcc,transparent:true,opacity:.35,side:T.DoubleSide,depthWrite:false});const mesh=new T.Mesh(new T.PlaneGeometry(1.35,1.2),material);mesh.rotation.x=-Math.PI/2;mesh.position.copy(arenaPosition(zone.progress,false,zone.lane));mesh.position.y=.13;mesh.userData.zoneId=zone.id;mesh.visible=false;scene.add(mesh);return mesh;});
- let preview:ReturnType<typeof createCharacter>|undefined,previewId='',focusedZone='';let worldTime=0;
+ const deployment=new T.Mesh(new T.PlaneGeometry(7,6),new T.MeshBasicMaterial({color:0x5bffcc,transparent:true,opacity:.12,side:T.DoubleSide,depthWrite:false}));deployment.rotation.x=-Math.PI/2;deployment.position.set(-4.8,.15,0);scene.add(deployment);
+ const spellRadius=new T.Mesh(new T.RingGeometry(2.05,2.2,48),new T.MeshBasicMaterial({color:0xffd77c,transparent:true,opacity:.75,side:T.DoubleSide,depthWrite:false}));spellRadius.rotation.x=-Math.PI/2;scene.add(spellRadius);
+ const towerVisuals=new Map<string,{group:T.Group;health:T.Mesh;body:T.Mesh}>();
+ const shots:{mesh:T.Line;age:number}[]=[];
+
+ let preview:ReturnType<typeof createCharacter>|undefined,previewId='';let worldTime=0;
  const effects:ReturnType<typeof createAbilityEffect>[]=[];const seenEvents=new Set<string>();
  const raycaster=new T.Raycaster(),pointer=new T.Vector2();let down={x:0,y:0};
  const pointerDown=(e:PointerEvent)=>{down={x:e.clientX,y:e.clientY};};
- const pointerUp=(e:PointerEvent)=>{if(!state.placement||Math.hypot(e.clientX-down.x,e.clientY-down.y)>8)return;const rect=canvas.getBoundingClientRect();pointer.set((e.clientX-rect.left)/rect.width*2-1,-(e.clientY-rect.top)/rect.height*2+1);raycaster.setFromCamera(pointer,camera);const hit=raycaster.intersectObjects(zoneMeshes)[0];if(hit&&!state.placement.blocked.includes(hit.object.userData.zoneId))onSelectZone?.(hit.object.userData.zoneId);};
+ const pointerUp=(e:PointerEvent)=>{if(!state.placement||Math.hypot(e.clientX-down.x,e.clientY-down.y)>8)return;const rect=canvas.getBoundingClientRect();pointer.set((e.clientX-rect.left)/rect.width*2-1,-(e.clientY-rect.top)/rect.height*2+1);raycaster.setFromCamera(pointer,camera);const hit=new T.Vector3();if(raycaster.ray.intersectPlane(new T.Plane(new T.Vector3(0,1,0),0),hit))onSelectPoint?.({progress:(hit.x+9)/.18,lane:hit.z});};
  canvas.addEventListener('pointerdown',pointerDown);canvas.addEventListener('pointerup',pointerUp);
  function keydown(e:KeyboardEvent){if(document.activeElement===canvas&&e.key.toLowerCase()==='r')resetCamera();}
  canvas.addEventListener('keydown',keydown);
@@ -47,8 +52,7 @@ export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(w
  async function prepare(){
   try{const response=await fetch(`${import.meta.env.BASE_URL}assets/models/manifest.json`,{signal:abort.signal});if(!response.ok)throw new Error('Manifesto indisponível');manifest=await response.json();}catch(e){if(disposed)return;console.warn('Usando personagens provisórios.',e);warnings++;}
   if(manifest.useGenerated){try{const response=await fetch(`${import.meta.env.BASE_URL}assets/models/generated/manifest.json`,{signal:abort.signal});if(!response.ok)throw new Error('Modelos não gerados');const generated:Manifest=await response.json();manifest.characters={...generated.characters,...manifest.characters};}catch(e){if(disposed)return;warnings++;console.warn('Usando geometria procedural direta.',e);}}
-  // Carrega apenas o deck ativo. Os demais continuam disponíveis pela versão
-  // procedural idêntica, evitando baixar os 45 GLBs de uma vez no celular.
+  // Carrega apenas os personagens do deck em uso no aparelho.
   const specs=[...new Set(state.modelIds??[])].map(id=>manifest.characters?.[id]).filter((spec):spec is ModelSpec=>Boolean(spec));const map=manifest.worlds?.[String(index+1)];
   const urls=[...new Set([...specs.map(s=>s.url),...(map?[map.url]:[])])];
   await Promise.all(urls.map(async url=>{try{const model=await loader.loadAsync(new URL(url,document.baseURI).href);if(disposed){disposeObject(model.scene);return;}assets.set(url,model);}catch(e){warnings++;console.warn(`Modelo indisponível: ${url}`,e);}}));
@@ -67,18 +71,31 @@ export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(w
    const key=`${enemy?'e':'a'}${unit.id}`;live.add(key);let actor=actors.get(key);
    if(!actor){const spec=manifest.characters?.[unit.cardId]??manifest.characters?.default;const visual=createCharacter(enemy?'#ff816f':'#69f2e0',unit.kind,spec?assets.get(spec.url):undefined,spec,unit.cardId);const lane=unit.lane??(enemy?-1.65:1.65);visual.group.position.copy(arenaPosition(unit.progress,enemy,lane));visual.group.rotation.y=enemy?-Math.PI/2:Math.PI/2;
     const health=new T.Mesh(new T.PlaneGeometry(.8,.08),new T.MeshBasicMaterial({color:enemy?0xff8866:0x67f5bd,side:T.DoubleSide}));health.position.y=2.4;visual.group.add(health);scene.add(visual.group);actor={visual,unit,enemy,age:0,lane,attackFor:0,hurtFor:0,lastAttack:0,lastHp:unit.hp??1,health};actors.set(key,actor);
-   }if((unit.hp??1)<actor.lastHp)actor.hurtFor=.38;actor.lastHp=unit.hp??1;actor.unit=unit;if((unit.lastAttack??0)!==actor.lastAttack){actor.lastAttack=unit.lastAttack??0;actor.attackFor=.7;}
+   }if((unit.hp??1)<actor.lastHp)actor.hurtFor=.38;actor.lastHp=unit.hp??1;actor.unit=unit;actor.lane=unit.lane??actor.lane;if((unit.lastAttack??0)!==actor.lastAttack){actor.lastAttack=unit.lastAttack??0;actor.attackFor=.7;}
   }
   for(const [key,actor] of actors)if(!live.has(key)&&actor.exitAge===undefined){actor.exitAge=0;actor.exitMotion=state.events?.some(e=>e.sourceId===actor.unit.id&&e.enemy===actor.enemy&&e.type==='tower')?'victory':'defeat';}
-  for(const event of state.events??[]){if(seenEvents.has(event.id))continue;seenEvents.add(event.id);if(event.type!=='defeat'){const effect=createAbilityEffect(event);effects.push(effect);scene.add(effect.group);}}
+  for(const event of state.events??[]){if(seenEvents.has(event.id))continue;seenEvents.add(event.id);if(event.type!=='defeat'){const effect=createAbilityEffect(event);effects.push(effect);scene.add(effect.group);if(event.targetX!==undefined){const geometry=new T.BufferGeometry().setFromPoints([new T.Vector3(event.x,1.8,event.z),new T.Vector3(event.targetX,.9,event.targetZ??0)]);const mesh=new T.Line(geometry,new T.LineBasicMaterial({color:event.enemy?0xff8866:0x67f5bd}));scene.add(mesh);shots.push({mesh,age:0});}}}
   while(seenEvents.size>250)seenEvents.delete(seenEvents.values().next().value!);
   canvas.dataset.units=String(live.size);canvas.dataset.effects=String(effects.length);
-  for(const mesh of zoneMeshes){mesh.visible=Boolean(state.placement);mesh.material.color.set(state.placement?.blocked.includes(mesh.userData.zoneId)?0xf1746d:state.placement?.zoneId===mesh.userData.zoneId?0xffd77c:0x5bffcc);mesh.material.opacity=state.placement?.zoneId===mesh.userData.zoneId ? .65 : .25;}
+  for(const tower of state.towers??[]){
+   let visual=towerVisuals.get(tower.id);
+   if(!visual){
+    const group=new T.Group();group.position.set(tower.x,.15,tower.lane);
+    const body=new T.Mesh(new T.CylinderGeometry(tower.role==='king'?.75:.5,.65,tower.role==='king'?2.5:1.7,12),new T.MeshStandardMaterial({color:tower.enemy?0xc75955:0x329da2,roughness:.5}));body.position.y=tower.role==='king'?1.25:.85;body.castShadow=true;group.add(body);
+    const crown=new T.Mesh(new T.TorusGeometry(tower.role==='king'?.7:.5,.12,8,12),new T.MeshStandardMaterial({color:0xffd77c,metalness:.6,roughness:.3}));crown.rotation.x=Math.PI/2;crown.position.y=tower.role==='king'?2.6:1.8;group.add(crown);
+    const health=new T.Mesh(new T.PlaneGeometry(1.15,.13),new T.MeshBasicMaterial({color:tower.enemy?0xff8866:0x67f5bd,side:T.DoubleSide}));health.position.y=3;group.add(health);scene.add(group);visual={group,body,health};towerVisuals.set(tower.id,visual);
+   }
+   visual.group.visible=tower.hp>0;visual.health.scale.x=Math.max(.01,tower.hp/tower.maxHp);visual.health.quaternion.copy(camera.quaternion);(visual.body.material as T.MeshStandardMaterial).emissive.set(tower.active?0x17313a:0x000000);
+  }
   const placement=state.placement;
-  if(placement&&focusedZone!==placement.zoneId){const zone=SPAWN_ZONES.find(z=>z.id===placement.zoneId);if(zone)focusSpawn(arenaPosition(zone.progress,false,zone.lane).x);focusedZone=placement.zoneId;}else if(!placement&&focusedZone){focusedZone='';resetCamera();}
+  deployment.visible=Boolean(placement);deployment.material.color.set(placement?.valid?0x5bffcc:0xf1746d);
+  if(placement){const spell=placement.unit.kind==='feitiço';deployment.scale.x=spell?17/7:1;deployment.position.x=spell?0:-4.8;}
+  spellRadius.visible=Boolean(placement);if(placement){spellRadius.position.copy(arenaPosition(placement.point.progress,false,placement.point.lane));spellRadius.position.y=.18;spellRadius.scale.setScalar(placement.radius/2.2);spellRadius.material.color.set(placement.valid?0xffd77c:0xf1746d);}
+
   if(!placement||previewId!==placement.unit.cardId){if(preview){scene.remove(preview.group);preview.dispose();preview=undefined;}previewId='';}
-  if(placement){if(!preview){const spec=manifest.characters?.[placement.unit.cardId]??manifest.characters?.default;preview=createCharacter('#ffe18c',placement.unit.kind,spec?assets.get(spec.url):undefined,spec,placement.unit.cardId);previewId=placement.unit.cardId;scene.add(preview.group);}const zone=SPAWN_ZONES.find(z=>z.id===placement.zoneId)!;preview.group.position.copy(arenaPosition(zone.progress,false,zone.lane));preview.group.rotation.y=Math.PI/2;preview.play('idle');}
-  canvas.dataset.previewCard=previewId;canvas.dataset.previewZone=placement?.zoneId??'';
+  if(placement){if(!preview){const spec=manifest.characters?.[placement.unit.cardId]??manifest.characters?.default;preview=createCharacter('#ffe18c',placement.unit.kind,spec?assets.get(spec.url):undefined,spec,placement.unit.cardId);previewId=placement.unit.cardId;scene.add(preview.group);}preview.group.position.copy(arenaPosition(placement.point.progress,false,placement.point.lane));preview.group.rotation.y=Math.PI/2;preview.play('idle');}
+  canvas.dataset.previewCard=previewId;canvas.dataset.previewValid=String(placement?.valid??false);
+
  }
 
  const clock=new T.Clock();let frame=0;
@@ -98,10 +115,11 @@ export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(w
    visual.play(motion);visual.mixer.update(state.paused?0:dt);
   }}
   preview?.mixer.update(dt);
+  for(let i=shots.length-1;i>=0;i--){shots[i].age+=dt;if(shots[i].age>.3){const shot=shots.splice(i,1)[0];scene.remove(shot.mesh);shot.mesh.geometry.dispose();(shot.mesh.material as T.Material).dispose();}}
   for(let i=effects.length-1;i>=0;i--)if(!effects[i].update(state.paused&&!state.outcome?0:dt)){scene.remove(effects[i].group);effects[i].dispose();effects.splice(i,1);}
   controls.update();renderer.render(scene,camera);
   canvas.dataset.frames=String(Number(canvas.dataset.frames??0)+1);
  }
  render();
- return {setState(next){state=next;},resetCamera,viewIsland,dispose(){disposed=true;abort.abort();cancelAnimationFrame(frame);observer.disconnect();controls.dispose();canvas.removeEventListener('keydown',keydown);canvas.removeEventListener('webglcontextlost',lost);canvas.removeEventListener('pointerdown',pointerDown);canvas.removeEventListener('pointerup',pointerUp);actors.forEach(a=>{a.visual.dispose();a.health.geometry.dispose();(a.health.material as T.Material).dispose();});preview?.dispose();zoneMeshes.forEach(m=>{m.geometry.dispose();m.material.dispose();});effects.forEach(e=>e.dispose());disposeObject(world.root);assets.forEach(a=>disposeObject(a.scene));sun.shadow.dispose();renderer.dispose();renderer.forceContextLoss();}};
+ return {setState(next){state=next;},resetCamera,viewIsland,dispose(){disposed=true;abort.abort();cancelAnimationFrame(frame);observer.disconnect();controls.dispose();canvas.removeEventListener('keydown',keydown);canvas.removeEventListener('webglcontextlost',lost);canvas.removeEventListener('pointerdown',pointerDown);canvas.removeEventListener('pointerup',pointerUp);actors.forEach(a=>{a.visual.dispose();a.health.geometry.dispose();(a.health.material as T.Material).dispose();});preview?.dispose();deployment.geometry.dispose();deployment.material.dispose();spellRadius.geometry.dispose();spellRadius.material.dispose();towerVisuals.forEach(v=>disposeObject(v.group));shots.forEach(s=>{s.mesh.geometry.dispose();(s.mesh.material as T.Material).dispose();});effects.forEach(e=>e.dispose());disposeObject(world.root);assets.forEach(a=>disposeObject(a.scene));sun.shadow.dispose();renderer.dispose();renderer.forceContextLoss();}};
 }
