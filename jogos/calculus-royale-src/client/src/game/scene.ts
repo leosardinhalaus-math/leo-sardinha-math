@@ -23,21 +23,24 @@ export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(w
  const rim=new T.DirectionalLight(0x65cfff,1.15);rim.position.set(14,10,-12);scene.add(rim);
  const world=createWorld(index,stageIndex);scene.background=new T.Color(world.sky);scene.fog=new T.FogExp2(world.fog,.008);rim.color.set(world.accent);scene.add(world.root);
  const camera=new T.PerspectiveCamera(42,1,.1,120);const controls=new OrbitControls(camera,canvas);
+ let focusAllyKey:string|undefined;
  controls.enableDamping=true;controls.enableRotate=false;controls.enablePan=false;controls.enableZoom=true;controls.minDistance=7;controls.maxDistance=65;
  // Câmera fixa ao sul: aliados nascem embaixo e avançam para o norte da tela.
- function resetCamera(){const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight),distance=Math.max(24,11/(Math.tan(T.MathUtils.degToRad(21))*aspect));camera.position.set(-distance*.78,distance*.86,0);controls.target.set(0,.35,0);controls.update();canvas.dataset.cameraMode='combat';}
- function viewIsland(){const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight),distance=Math.max(26,10/(Math.tan(T.MathUtils.degToRad(21))*aspect));camera.position.set(-distance*.78,distance*.9,0);controls.target.set(.6,.28,0);controls.update();canvas.dataset.cameraMode='island';}
+ function resetCamera(){const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight),distance=Math.max(24,11/(Math.tan(T.MathUtils.degToRad(21))*aspect));camera.position.set(-distance*.78,distance*.86,0);controls.target.set(0,.35,0);controls.update();focusAllyKey=undefined;canvas.dataset.cameraMode='combat';}
+ function viewIsland(){const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight),distance=Math.max(26,10/(Math.tan(T.MathUtils.degToRad(21))*aspect));camera.position.set(-distance*.78,distance*.9,0);controls.target.set(.6,.28,0);controls.update();focusAllyKey=undefined;canvas.dataset.cameraMode='island';}
 
  viewIsland();
  function focusLastAlly():boolean{
-  const ally=[...actors.values()].reverse().find(a=>!a.enemy&&a.exitAge===undefined);
-  if(!ally)return false;
+  const focused=[...actors.entries()].reverse().find(([,a])=>!a.enemy&&a.exitAge===undefined);
+  if(!focused)return false;
+  const [key,ally]=focused;
   const point=ally.visual.group.position;
   const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight);
   const distance=Math.max(10,3.8/(Math.tan(T.MathUtils.degToRad(21))*aspect));
   controls.target.set(point.x,point.y+1.1,point.z);
   camera.position.set(point.x-distance*.7,point.y+distance*.76,point.z+distance*.32);
   controls.update();
+  focusAllyKey=key;
   canvas.dataset.cameraMode='character';
   canvas.dataset.focusedCardId=ally.unit.cardId;
   return true;
@@ -130,6 +133,16 @@ export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(w
   preview?.mixer.update(dt);
   for(let i=shots.length-1;i>=0;i--){shots[i].age+=dt;if(shots[i].age>.3){const shot=shots.splice(i,1)[0];scene.remove(shot.mesh);shot.mesh.geometry.dispose();(shot.mesh.material as T.Material).dispose();}}
   for(let i=effects.length-1;i>=0;i--)if(!effects[i].update(state.paused&&!state.outcome?0:dt)){scene.remove(effects[i].group);effects[i].dispose();effects.splice(i,1);}
+  // Follow the selected actual 3D actor (not a billboard); preserve user zoom.
+  if(focusAllyKey&&canvas.dataset.cameraMode==='character'){
+   const ally=actors.get(focusAllyKey);
+   if(ally&&ally.exitAge===undefined){
+    const desired=ally.visual.group.position.clone().add(new T.Vector3(0,1.1,0));
+    const delta=desired.sub(controls.target).multiplyScalar(Math.min(1,dt*8));
+    controls.target.add(delta);
+    camera.position.add(delta);
+   }else focusAllyKey=undefined;
+  }
   controls.update();renderer.render(scene,camera);
   canvas.dataset.frames=String(Number(canvas.dataset.frames??0)+1);
  }
