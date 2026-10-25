@@ -39,3 +39,36 @@ test('robots sitemap matches the generated sitemap location',()=>{
  const sitemap=new URL(match[1]);
  assert.equal(sitemap.pathname,'/leo-sardinha-math/sitemap.xml');
 });
+
+test('SEO launch guards: robots and sitemap consistency',()=>{
+ const robots=fs.readFileSync(path.join(root,'robots.txt'),'utf8');
+ const xml=fs.readFileSync(path.join(root,'sitemap.xml'),'utf8');
+ const urls=[...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m=>m[1]);
+ assert.match(robots,/^User-agent:\s*\*/mi);
+ assert.match(robots,/^Allow:\s*\//mi);
+ assert.doesNotMatch(robots,/^Disallow:\s*\/\s*$/mi);
+ assert.match(xml,/<urlset\s+xmlns="http:\/\/www\.sitemaps\.org\/schemas\/sitemap\/0\.9">/);
+ assert.ok(urls.every(u=>u.startsWith('https://')));
+ assert.ok(urls.every(u=>!u.includes('/perfil/')));
+ assert.ok(urls.every(u=>!u.includes('/404')));
+ const origin=new URL(urls[0]).origin;
+ assert.ok(urls.every(u=>new URL(u).origin===origin));
+ const declared=robots.match(/^Sitemap:\s*(\S+)/mi);
+ assert.ok(declared);
+ assert.equal(new URL(declared[1]).origin,origin);
+});
+test('SEO launch guards: page titles and descriptions',()=>{
+ for(const name of ['index.html','educacao.html','sobre.html','classroom.html','imagens.html','wiki.html']){
+  const html=fs.readFileSync(path.join(root,name),'utf8');
+  assert.match(html,/<html[^>]+lang="pt-BR"/i);
+  assert.match(html,/<meta\s+name="description"\s+content="[^"]{30,}"/i);
+  assert.match(html,/<meta\s+property="og:title"/i);
+  assert.match(html,/<meta\s+property="og:description"/i);
+  assert.match(html,/<meta\s+name="twitter:card"/i);
+  assert.match(html,/<meta\s+name="viewport"/i);
+ }
+ const error=fs.readFileSync(path.join(root,'404.html'),'utf8');
+ assert.match(error,/noindex/i);
+ const profile=fs.readFileSync(path.join(root,'jogos/calculus-royale/perfil/index.html'),'utf8');
+ assert.match(profile,/noindex/i);
+});
