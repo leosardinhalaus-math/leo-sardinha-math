@@ -306,7 +306,17 @@ export function createProceduralCharacter(cardId:string){
  function addSignature(left:T.Object3D,right:T.Object3D){
   if(cardId==='slope'){
    const points=Array.from({length:17},(_,i)=>{const a=-Math.PI/2+i*Math.PI/16;return new T.Vector3(.25*Math.cos(a),.55*Math.sin(a)-.25,.2);});
-   mesh(new T.TubeGeometry(new T.CatmullRomCurve3(points),18,.027,6,false),gold,0,0,0,left);bar(points[0],points[16],.008,glow,left);bar(new T.Vector3(0,-.42,-.1),new T.Vector3(0,-.42,.7),.014,gold,right);
+   const bow=mesh(new T.TubeGeometry(new T.CatmullRomCurve3(points),24,.032,8,false),gold,0,0,0,left);bow.name='slope-gold-bow';
+   bar(points[0],points[16],.009,glow,left).name='slope-drawn-bowstring';
+   bar(new T.Vector3(0,-.42,-.1),new T.Vector3(0,-.42,.75),.015,gold,right).name='slope-arrow-shaft';
+   const tip=mesh(new T.ConeGeometry(.052,.18,8),glow,0,-.42,.76,right);tip.rotation.x=Math.PI/2;tip.name='slope-arrow-tip';
+  }else if(cardId==='power'){
+    const staff=bar(new T.Vector3(0,-.83,.11),new T.Vector3(0,.77,.11),.052,gold,left);staff.name='power-ornate-gold-staff';
+    for(const y of [-.65,-.25,.1,.46,.68]){const ring=torus(.073,.018,gold,0,y,.11,left);ring.rotation.x=Math.PI/2;}
+    const halo=torus(.2,.03,glow,0,.88,.11,left);halo.rotation.x=Math.PI/2;halo.name='power-staff-flame-halo';
+    const fire=Array.from({length:28},(_,i)=>{const t=i/27,a=t*Math.PI*4;return new T.Vector3(Math.sin(a)*(.08+t*.11),.56+t*.7,.11+Math.cos(a)*(.08+t*.11));});
+    mesh(new T.TubeGeometry(new T.CatmullRomCurve3(fire),64,.027,8,false),glow,0,0,0,left).name='power-golden-energy-helix';
+    orb(.16,0,-.32,.48,right).name='power-casting-orb';
   }else if(['ln','quotient','parts','parts2','growth'].includes(cardId)){
    for(const arm of [left,right]){const blade=mesh(new T.ConeGeometry(.07,.68,5),crystal,0,-.44,.4,arm);blade.rotation.x=Math.PI/2;bar(new T.Vector3(-.13,-.45,.12),new T.Vector3(.13,-.45,.12),.022,gold,arm);}
   }else if(['limit','cauchy','comparison','root','secant'].includes(cardId)){
@@ -348,7 +358,16 @@ export function createProceduralCharacter(cardId:string){
    if((name==='attack'||name==='power')&&part.startsWith('arm'))values=name==='power'?[0,-2.45,-2.2,-2.45,0]:p.archetype==='archer'?(part==='armL'?[0,-1.5,-1.5,-1.5,0]:[0,-1.2,-.6,-1.6,0]):p.archetype==='dancer'?[0,-1,-2,-1,0]:p.archetype==='rogue'?[0,-2,1,-2,0]:['guardian','titan','golem'].includes(p.archetype)?[0,-2.7,-2.7,.5,0]:[0,-1.5,-1.7,-1.5,0];
    tracks.push(new T.NumberKeyframeTrack(`${part}.rotation[x]`,times,values));
   }
-  if(floating||p.archetype==='dancer')tracks.push(new T.NumberKeyframeTrack('body.rotation[y]',times,name==='attack'?[0,Math.PI*.5,Math.PI,Math.PI*1.5,Math.PI*2]:[0,.1,0,-.1,0]));clips.push(new T.AnimationClip(name,duration,tracks));
+  if(floating||p.archetype==='dancer')tracks.push(new T.NumberKeyframeTrack('body.rotation[y]',times,name==='attack'?[0,Math.PI*.5,Math.PI,Math.PI*1.5,Math.PI*2]:[0,.1,0,-.1,0]));
+  if(cardId==='slope'||cardId==='power'){
+   const strike=name==='attack'||name==='power',stride=name==='walk'||name==='run';
+   tracks.push(new T.NumberKeyframeTrack('body.rotation[y]',times,strike?[0,-.14,-.2,.12,0]:stride?[0,.05,0,-.05,0]:[0,.018,0,-.018,0]));
+   tracks.push(new T.NumberKeyframeTrack('body.rotation[x]',times,strike?[0,-.09,-.13,.09,0]:[0,.012,0,-.012,0]));
+   tracks.push(new T.NumberKeyframeTrack('capeHem.rotation[z]',times,strike?[0,-.11,.17,-.2,0]:stride?[0,-.12,.08,-.08,0]:[0,.04,.07,-.025,0]));
+   if(cardId==='slope')tracks.push(new T.NumberKeyframeTrack('ponytail.rotation[z]',times,strike?[0,.06,-.28,.24,0]:stride?[0,.17,-.13,.14,0]:[0,-.03,.08,.035,0]));
+   if(cardId==='power')tracks.push(new T.NumberKeyframeTrack('beardTail.rotation[x]',times,strike?[0,.08,-.18,.11,0]:stride?[0,.09,-.06,.07,0]:[0,.035,.07,-.015,0]));
+  }
+  clips.push(new T.AnimationClip(name,duration,tracks));
  }
  root.userData.cardId=cardId;root.userData.reference='geometry-only';return {root,clips};
 }
