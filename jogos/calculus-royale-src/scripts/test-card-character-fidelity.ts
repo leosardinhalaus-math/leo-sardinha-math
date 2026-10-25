@@ -23,7 +23,7 @@ for(const id of ['slope','power'] as const){
    assert.ok(clip.tracks.some(t=>t.name===`capeHem.rotation[z]`),`${id}: cape doesn't move ${motion}`);
    assert.ok(clip.tracks.some(t=>t.name.startsWith(accessory+'.rotation')),`${id}: accessory doesn't move ${motion}`);
    assert.ok(clip.tracks.some(t=>t.name==='body.rotation[y]'),`${id}: no weight shift ${motion}`);
-   T.AnimationClip.validate(clip);
+   assert.equal(clip.validate(),true,`${id}: invalid animation ${motion}`);
   }
   const clip=clips.find(x=>x.name==='attack')!;
   const mixer=new T.AnimationMixer(root);mixer.clipAction(clip).setLoop(T.LoopOnce,1).play();
