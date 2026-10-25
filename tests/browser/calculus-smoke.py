@@ -9,7 +9,7 @@ OUT = Path(os.environ.get("SCREENSHOT_DIR", "browser-screenshots"))
 OUT.mkdir(parents=True, exist_ok=True)
 
 
-def smoke(browser, name, *, width, height, mobile=False):
+def smoke(browser, name, *, width, height, mobile=False, card_id='power'):
     context = browser.new_context(
         viewport={"width": width, "height": height},
         device_scale_factor=1,
@@ -17,6 +17,11 @@ def smoke(browser, name, *, width, height, mobile=False):
         has_touch=mobile,
         reduced_motion="reduce",
     )
+    if card_id == "slope":
+        # Apenas no navegador de teste: coloca Arqueira na mão inicial, sem editar dados reais.
+        context.add_init_script(
+            "localStorage.setItem('calculus-royale:main-deck', JSON.stringify(['slope','limit','power','sine','euler','continuity','quotient','secant']))"
+        )
     page = context.new_page()
     errors = []
     page.on("pageerror", lambda err: errors.append(str(err)))
@@ -45,11 +50,11 @@ def smoke(browser, name, *, width, height, mobile=False):
     assert page.locator("canvas.world-arena-canvas").count() == 1
     # Testar a abertura e cancelamento de posicionamento, sem consumir elixir.
     cards = page.locator(".card-stack button.royale-card-hitarea")
-    mage = cards.filter(has_text="Mago da Potência")
-    # Valida o modelo reformulado do Mago, não apenas uma unidade genérica.
-    expect(mage).to_have_count(1, timeout=10000)
-    if mage.is_enabled():
-        mage.click()
+    model_name = "Arqueira da Derivada" if card_id == "slope" else "Mago da Potência"
+    selected = cards.filter(has_text=model_name)
+    expect(selected).to_have_count(1, timeout=10000)
+    expect(selected).to_be_enabled(timeout=10000)
+    selected.click()
         expect(page.locator(".spawn-heading")).to_be_visible(timeout=10000)
         page.screenshot(path=str(OUT / f"{name}-posicionamento.png"), full_page=True)
         confirm = page.locator(".spawn-confirm")
@@ -68,8 +73,8 @@ def smoke(browser, name, *, width, height, mobile=False):
             "() => document.querySelector('.world-arena canvas')?.dataset.cameraMode === 'character'",
             timeout=10000,
         )
-        assert page.locator(".world-arena canvas").get_attribute("data-focused-card-id") == "power", "Mago 3D must match the played card"
-        page.screenshot(path=str(OUT / f"{name}-mago-potencia-3d.png"), full_page=True)
+        assert page.locator(".world-arena canvas").get_attribute("data-focused-card-id") == card_id, "3D actor must match the played card"
+        page.screenshot(path=str(OUT / f"{name}-carta-{card_id}-3d.png"), full_page=True)
         page.screenshot(path=str(OUT / f"{name}-personagem-em-destaque.png"), full_page=True)
         page.get_by_role("button", name="Centralizar câmera").click()
         assert page.locator(".world-arena canvas").get_attribute("data-camera-mode") == "combat"
@@ -97,8 +102,10 @@ def main():
             ],
         )
         try:
-            smoke(browser, "desktop", width=1440, height=900)
-            smoke(browser, "celular", width=390, height=844, mobile=True)
+            smoke(browser, "desktop-mago", width=1440, height=900, card_id="power")
+            smoke(browser, "celular-mago", width=390, height=844, mobile=True, card_id="power")
+            smoke(browser, "desktop-arqueira", width=1440, height=900, card_id="slope")
+            smoke(browser, "celular-arqueira", width=390, height=844, mobile=True, card_id="slope")
         finally:
             browser.close()
 
