@@ -58,6 +58,17 @@ def smoke(browser, name, *, width, height, mobile=False):
             timeout=20000,
         )
         page.screenshot(path=str(OUT / f"{name}-personagem-invocado.png"), full_page=True)
+        focus = page.get_by_role("button", name="Aproximar personagem 3D")
+        expect(focus).to_be_enabled(timeout=10000)
+        focus.click()
+        page.wait_for_function(
+            "() => document.querySelector('.world-arena canvas')?.dataset.cameraMode === 'character'",
+            timeout=10000,
+        )
+        assert page.locator(".world-arena canvas").get_attribute("data-focused-card-id")
+        page.screenshot(path=str(OUT / f"{name}-personagem-em-destaque.png"), full_page=True)
+        page.get_by_role("button", name="Centralizar câmera").click()
+        assert page.locator(".world-arena canvas").get_attribute("data-camera-mode") == "combat"
     overflow = page.evaluate(
         "() => document.documentElement.scrollWidth - document.documentElement.clientWidth"
     )
