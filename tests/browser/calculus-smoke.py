@@ -55,29 +55,29 @@ def smoke(browser, name, *, width, height, mobile=False, card_id='power'):
     expect(selected).to_have_count(1, timeout=10000)
     expect(selected).to_be_enabled(timeout=10000)
     selected.click()
-        expect(page.locator(".spawn-heading")).to_be_visible(timeout=10000)
-        page.screenshot(path=str(OUT / f"{name}-posicionamento.png"), full_page=True)
-        confirm = page.locator(".spawn-confirm")
-        expect(confirm).to_be_enabled(timeout=15000)
-        confirm.click()
-        expect(page.locator(".spawn-heading")).to_have_count(0, timeout=10000)
-        page.wait_for_function(
-            "() => Number(document.querySelector('.world-arena canvas')?.dataset.units ?? 0) >= 1",
-            timeout=20000,
-        )
-        page.screenshot(path=str(OUT / f"{name}-personagem-invocado.png"), full_page=True)
-        focus = page.get_by_role("button", name="Aproximar personagem 3D")
-        expect(focus).to_be_enabled(timeout=10000)
-        focus.click()
-        page.wait_for_function(
-            "() => document.querySelector('.world-arena canvas')?.dataset.cameraMode === 'character'",
-            timeout=10000,
-        )
-        assert page.locator(".world-arena canvas").get_attribute("data-focused-card-id") == card_id, "3D actor must match the played card"
-        page.screenshot(path=str(OUT / f"{name}-carta-{card_id}-3d.png"), full_page=True)
-        page.screenshot(path=str(OUT / f"{name}-personagem-em-destaque.png"), full_page=True)
-        page.get_by_role("button", name="Centralizar câmera").click()
-        assert page.locator(".world-arena canvas").get_attribute("data-camera-mode") == "combat"
+    expect(page.locator(".spawn-heading")).to_be_visible(timeout=10000)
+    page.screenshot(path=str(OUT / f"{name}-posicionamento.png"), full_page=True)
+    confirm = page.locator(".spawn-confirm")
+    expect(confirm).to_be_enabled(timeout=15000)
+    confirm.click()
+    expect(page.locator(".spawn-heading")).to_have_count(0, timeout=10000)
+    page.wait_for_function(
+        "() => Number(document.querySelector('.world-arena canvas')?.dataset.units ?? 0) >= 1",
+        timeout=20000,
+    )
+    page.screenshot(path=str(OUT / f"{name}-personagem-invocado.png"), full_page=True)
+    focus = page.get_by_role("button", name="Aproximar personagem 3D")
+    expect(focus).to_be_enabled(timeout=10000)
+    focus.click()
+    page.wait_for_function(
+        "() => document.querySelector('.world-arena canvas')?.dataset.cameraMode === 'character'",
+        timeout=10000,
+    )
+    assert page.locator(".world-arena canvas").get_attribute("data-focused-card-id") == card_id, "3D actor must match the played card"
+    page.screenshot(path=str(OUT / f"{name}-carta-{card_id}-3d.png"), full_page=True)
+    page.screenshot(path=str(OUT / f"{name}-personagem-em-destaque.png"), full_page=True)
+    page.get_by_role("button", name="Centralizar câmera").click()
+    assert page.locator(".world-arena canvas").get_attribute("data-camera-mode") == "combat"
     overflow = page.evaluate(
         "() => document.documentElement.scrollWidth - document.documentElement.clientWidth"
     )
