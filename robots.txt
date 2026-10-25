@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://leosardinhalaus-math.github.io/leo-sardinha-math/sitemap.xml

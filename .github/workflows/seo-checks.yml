@@ -1,0 +1,35 @@
+name: SEO metadata checks
+
+on:
+  pull_request:
+    paths:
+      - '**/*.html'
+      - 'favicon.svg'
+      - 'robots.txt'
+      - 'sitemap.xml'
+      - 'tests/seo-metadata.test.cjs'
+      - '.github/workflows/seo-checks.yml'
+  push:
+    branches: [main]
+    paths:
+      - '**/*.html'
+      - 'favicon.svg'
+      - 'robots.txt'
+      - 'sitemap.xml'
+      - 'tests/seo-metadata.test.cjs'
+      - '.github/workflows/seo-checks.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  seo-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate SEO metadata and favicon paths
+        run: node --test tests/seo-metadata.test.cjs
