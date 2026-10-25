@@ -8,7 +8,7 @@ for(const p of builds){
  test(p+' public endpoints request only explicit columns',()=>{
   const src=fs.readFileSync(path.join(root,p),'utf8');
   for(const endpoint of ['player_profiles?public_slug=eq.','game_stats?user_id=eq.']){
-   const line=src.split('\\n').find(line=>line.includes(endpoint));
+   const line=src.split('\n').find(line=>line.includes(endpoint));
    assert.ok(line,'missing endpoint '+endpoint);
    assert.doesNotMatch(line,/select=\\*/,'public endpoint must avoid wildcard select');
   }
