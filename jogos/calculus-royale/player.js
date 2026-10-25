@@ -42,6 +42,7 @@ function saveSession(data) {
 }
 
 let pendingRefresh = null;
+let sessionEpoch = 0;
 async function session() {
   let s = null;
   try { s = JSON.parse(localStorage.getItem(SESSION_KEY) || "null"); } catch {}
@@ -54,16 +55,18 @@ async function session() {
   // Refresh tokens rotate: concurrent profile requests must share one refresh.
   if (!pendingRefresh) {
     pendingRefresh = (async () => {
+      const epoch = sessionEpoch;
       try {
         const data = await api("/auth/v1/token?grant_type=refresh_token", {
           method: "POST",
           body: JSON.stringify({ refresh_token: s.refresh_token }),
         });
+        if (epoch !== sessionEpoch) return null; // logout or a new login invalidated this request
         const renewed = saveSession(data);
         if (!renewed?.user?.id) throw new Error("Invalid session refresh");
         return renewed;
       } catch {
-        localStorage.removeItem(SESSION_KEY);
+        if (epoch === sessionEpoch) localStorage.removeItem(SESSION_KEY);
         return null;
       } finally {
         pendingRefresh = null;
@@ -78,6 +81,7 @@ async function signIn(email, password) {
     method: "POST",
     body: JSON.stringify({ email, password }),
   });
+  sessionEpoch += 1; // newer login takes precedence over any in-flight refresh
   const signedIn = saveSession(data);
   if (!signedIn) throw new Error("Não foi possível confirmar o login. Tente novamente.");
   return signedIn;
@@ -93,7 +97,9 @@ async function signUp(email, password, username) {
   });
   // Keep the name only after successful registration (confirmation may be pending).
   localStorage.setItem(PENDING_NAME_KEY, cleanName);
-  return data?.access_token ? saveSession(data) : data;
+  if (!data?.access_token) return data;
+  sessionEpoch += 1;
+  return saveSession(data);
 }
 
 function slugify(name, uid) {
@@ -194,11 +200,14 @@ async function leaderboard(sort="trophies.desc") {
 }
 
 async function logout() {
+  sessionEpoch += 1; // do not let an in-flight refresh restore this session
   let token = "";
   try {
     const stored = JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
     if (typeof stored?.access_token === "string") token = stored.access_token;
   } catch {}
+  localStorage.removeItem(SESSION_KEY);
+  localStorage.removeItem(PENDING_NAME_KEY);
   try {
     if (token) await api("/auth/v1/logout", { method: "POST" }, token);
   } catch {
