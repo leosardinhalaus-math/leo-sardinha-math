@@ -30,5 +30,12 @@ jobs:
         run: npm ci --no-audit --no-fund
       - name: TypeScript check
         run: npm run check
+      - name: Game rules and progression regressions
+        run: |
+          npm run test:combat
+          npm run test:save
+          npm run test:progression
+          npm run test:battle-rules
+          npm run test:cave-encounters
       - name: Build game and assets
         run: npm run build
