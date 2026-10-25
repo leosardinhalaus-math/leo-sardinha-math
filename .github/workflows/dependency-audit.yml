@@ -2,12 +2,6 @@ name: Dependency security audit
 
 on:
   pull_request:
-    paths:
-      - 'jogos/calculus-royale-src/package.json'
-      - 'jogos/calculus-royale-src/package-lock.json'
-      - 'tools/firebase-tests/package.json'
-      - 'tools/firebase-tests/package-lock.json'
-      - '.github/workflows/dependency-audit.yml'
   workflow_dispatch:
 
 permissions:
