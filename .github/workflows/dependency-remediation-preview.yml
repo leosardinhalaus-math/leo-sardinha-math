@@ -23,12 +23,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24.12.0'
       - name: Show current vulnerability status
         continue-on-error: true
         working-directory: ${{ matrix.project }}
         run: npm audit --package-lock-only --audit-level=high
       - name: Preview safe non-force lockfile updates
+        continue-on-error: true
         working-directory: ${{ matrix.project }}
         run: npm audit fix --package-lock-only --ignore-scripts --no-fund
       - name: Confirm package manifests remain unchanged
