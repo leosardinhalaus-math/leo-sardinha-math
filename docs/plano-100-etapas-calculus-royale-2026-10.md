@@ -59,7 +59,7 @@ Estado inicial verificado em 2026-10-25: projeto Supabase `vmblubjbgwhaplsptymj`
 - [x] 35. Testar leitura pública permitida
 - [x] 36. Testar gravação anônima bloqueada
 - [x] 37. Testar alteração de dados de terceiros
-- [ ] 38. Verificar índices Firestore
+- [x] 38. Verificar índices Firestore
 - [x] 39. Checar segredo versus chave pública
 - [x] 40. Registrar resultados e versões testadas
 
@@ -68,7 +68,7 @@ Estado inicial verificado em 2026-10-25: projeto Supabase `vmblubjbgwhaplsptymj`
 - [x] 41. Modelar ameaças ao ranking
 - [ ] 42. Separar estatísticas exibidas de confiáveis
 - [x] 43. Identificar cálculos manipuláveis no cliente
-- [ ] 44. Definir evento legítimo de vitória
+- [x] 44. Definir evento legítimo de vitória
 - [x] 45. Criar contrato de submissão validável
 - [x] 46. Definir limites de frequência por jogador
 - [x] 47. Planejar idempotência das submissões
@@ -81,7 +81,7 @@ Estado inicial verificado em 2026-10-25: projeto Supabase `vmblubjbgwhaplsptymj`
 - [x] 51. Auditar XSS nos perfis
 - [x] 52. Auditar XSS nos rankings
 - [ ] 53. Auditar inserções HTML dinâmicas
-- [ ] 54. Revisar URLs controladas por usuários
+- [x] 54. Revisar URLs controladas por usuários
 - [ ] 55. Revisar política CSP
 - [ ] 56. Revisar dependências externas
 - [ ] 57. Checar integridade de scripts terceiros
@@ -94,11 +94,11 @@ Estado inicial verificado em 2026-10-25: projeto Supabase `vmblubjbgwhaplsptymj`
 - [ ] 61. Testar entrada na arena
 - [ ] 62. Testar escolha de personagem
 - [ ] 63. Testar fidelidade visual das cartas
-- [ ] 64. Testar nascimento permitido no mapa
+- [x] 64. Testar nascimento permitido no mapa
 - [ ] 65. Testar desbloqueio após queda de torre
 - [ ] 66. Testar pontuação por vitória
 - [ ] 67. Testar reinício sem duplicação
-- [ ] 68. Testar salvamento offline
+- [x] 68. Testar salvamento offline
 - [ ] 69. Testar sincronização após reconexão
 - [ ] 70. Testar ranking com contas diferentes
 
@@ -117,9 +117,9 @@ Estado inicial verificado em 2026-10-25: projeto Supabase `vmblubjbgwhaplsptymj`
 
 ## Fase 9: Documentação e LGPD
 
-- [ ] 81. Atualizar mapa de dados tratados
+- [x] 81. Atualizar mapa de dados tratados
 - [ ] 82. Descrever finalidade das estatísticas
-- [ ] 83. Revisar aviso de privacidade
+- [x] 83. Revisar aviso de privacidade
 - [ ] 84. Documentar tratamento de contas infantis
 - [ ] 85. Definir período de retenção
 - [ ] 86. Especificar exclusão de conta e dados
@@ -194,3 +194,30 @@ Estado inicial verificado em 2026-10-25: projeto Supabase `vmblubjbgwhaplsptymj`
 - Logout agora remove tokens do armazenamento local **antes** de aguardar a chamada remota, inclusive quando esta estiver lenta/indisponível.
 - Acrescentados testes de corrida em `tests/calculus-auth-security.test.cjs`: refresh atrasado após logout e limpeza imediata de tokens.
 - Status: alteração apenas na branch PR #4; testes CI do commit `e2fb0ebaef3879ea979bd96cfaef9bc90d0f272d` ainda estavam rodando na última consulta. Nenhuma alegação de cobertura E2E de autenticação real.
+
+
+## Rodada adicional — 25/10/2026, integridade do salvamento e privacidade
+
+**Total com evidências: 52/100.** A marcação significa teste de unidade, inspeção documental ou desenho técnico quando aplicável; não implica implantação integral. Não confundir testes verdes com segurança completa.
+
+### Correções implementadas na branch da auditoria
+
+- Supabase: `ensureProfile` e `syncProgress` **não** anunciam êxito quando o servidor responde com lista vazia ou `user_id` diferente. Testes exercitam respostas confirmadas, vazias e inconsistentes em `tests/calculus-cloud-persistence-security.test.cjs`. Dados locais preservados em caso de falha.
+- Sessões: tokens persistidos são validados antes do uso; erros transitórios de conexão, 503 ou 429 durante refresh **não** apagam o token de renovação. Erros definitivos de autenticação o invalidam. Testes de recuperação da conexão foram adicionados em `tests/calculus-auth-security.test.cjs`.
+- URLs: `publicProfile(slug)` rejeita slugs malformados antes de formar filtros REST; os links do ranking continuam codificados adequadamente.
+- Progressão: novo jogador começava com 12 vitórias fictícias. Corrigido para zero no `GameCanvas.tsx`, com teste estático de regressão em `scripts/test-progression.ts`. A correção não retroage sobre salvamentos já existentes.
+- Integridade de números: `localProgress` transforma dados inválidos em inteiros não negativos e dentro de limites compatíveis com colunas Postgres; há testes de salvamento corrompido e normal. **Isso não impede um usuário de adulterar os números**, portanto não liberar ranking competitivo com base nisso.
+
+### Evidências específicas das novas etapas marcadas
+
+- **38 — índices Firestore:** `firestore.indexes.json` tem índice composto `completed_worlds DESC / xp DESC` em `leaderboard`; campos privados de progresso têm índices desligados. Não foram confirmados deploys em produção Firebase.
+- **44 — evento legítimo de vitória:** a especificação em `docs/contrato-ranking-verificado-calculus-royale.md` relaciona `compareTowerHealth`, 180 s + até 60 s, simulação `stepCombat` de 100 ms e `finishBattle`. Trata-se de definição de evento e desenho, **não** de verificador de partidas implantado.
+- **54 — parâmetro de URL:** validação de `public_slug` e regressão automática contra filtros arbitrários; manter inspeção de outras URLs do site.
+- **64 — nascimento em zonas:** a suíte `test:combat` verifica `zoneAvailable` em zonas ocupadas, livres e inválidas; não há ainda teste físico de gesto de toque e Raycaster.
+- **68 — salvamento offline:** a suíte `test:save` avalia envelope, migração e recuperação de JSON inválido; ainda falta simulação completa de PWA desconectado em um aparelho real.
+- **81 — mapa de dados:** novo `docs/mapa-de-dados-calculus-royale-lgpd.md` diferencia Auth, perfis e estatísticas públicas, chaves locais, tokens e Firebase alternativo desligado.
+- **83 — aviso de privacidade:** `privacidade.html` atualizado na branch para informar armazenamento local de tokens e que o provedor atualmente configurado é Supabase; permanece minuta em revisão sem alegação de conformidade. Teste em `tests/calculus-privacy-security.test.cjs`.
+
+### Impedimentos mantidos
+
+A classificação Supabase continua informal e **sem validação autoritativa de vitória**. Ainda falta ambiente de staging do banco, testes A/B com contas reais, restrição da exposição pública sem quebrar clientes, validação em celular/desktop, responsável LGPD e processo de exclusão/retensão. Todas as mudanças aqui documentadas ficam na PR #4, sem merge e sem escrita no banco nesta rodada.
