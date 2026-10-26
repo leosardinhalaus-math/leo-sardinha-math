@@ -9,6 +9,7 @@ import "./world-arena.css";
 import "./battle-preparation.css";
 import "./combat-ui.css";
 import "./special-items.css";
+import "./accessibility.css";
 
 createRoot(document.getElementById("root")!).render(<App />);
 
