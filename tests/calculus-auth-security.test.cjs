@@ -218,3 +218,17 @@ test('login does not persist email or other Auth metadata in browser session', a
   assert.equal(JSON.stringify(saved).includes('private@example.org'),false);
   assert.equal(JSON.stringify(saved).includes('not for localStorage'),false);
 });
+
+test('restoring an old session purges stored email and metadata without contacting Auth',async()=>{
+ const old={access_token:'old',refresh_token:'valid',expires_at:10000000000,user:{id:uid,email:'sensitive@example.org',app_metadata:{irrelevant:true}},other_metadata:'remove'};
+ let calls=0;
+ const {cloud,records}=harness(async()=>{calls++;throw Error('unexpected network call');},{[SESSION_KEY]:JSON.stringify(old)});
+ const loaded=await cloud.session();
+ assert.equal(loaded.user.id,uid);
+ assert.deepEqual(Object.keys(loaded.user),['id']);
+ const migrated=JSON.parse(records.get(SESSION_KEY));
+ assert.deepEqual(Object.keys(migrated.user),['id']);
+ assert.equal(JSON.stringify(migrated).includes('sensitive@example.org'),false);
+ assert.equal(Object.hasOwn(migrated,'other_metadata'),false);
+ assert.equal(calls,0);
+});
