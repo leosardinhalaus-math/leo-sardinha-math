@@ -18,7 +18,7 @@ Estado inicial verificado em 2026-10-25: projeto Supabase `vmblubjbgwhaplsptymj`
 - [x] 3. Verificar status do Supabase
 - [x] 4. Inventariar clientes Firebase
 - [x] 5. Localizar integração Supabase
-- [ ] 6. Relacionar páginas e jogos
+- [x] 6. Relacionar páginas e jogos
 - [x] 7. Mapear dados pessoais coletados
 - [ ] 8. Separar ambientes publicados e testes
 - [x] 9. Identificar dependências e versões
@@ -104,7 +104,7 @@ Estado inicial verificado em 2026-10-25: projeto Supabase `vmblubjbgwhaplsptymj`
 
 ## Fase 8: Compatibilidade e desempenho
 
-- [ ] 71. Verificar viewport móvel
+- [x] 71. Verificar viewport móvel
 - [ ] 72. Verificar controles por toque
 - [ ] 73. Testar navegadores desktop
 - [ ] 74. Testar redução de movimento
@@ -118,7 +118,7 @@ Estado inicial verificado em 2026-10-25: projeto Supabase `vmblubjbgwhaplsptymj`
 ## Fase 9: Documentação e LGPD
 
 - [x] 81. Atualizar mapa de dados tratados
-- [ ] 82. Descrever finalidade das estatísticas
+- [x] 82. Descrever finalidade das estatísticas
 - [x] 83. Revisar aviso de privacidade
 - [ ] 84. Documentar tratamento de contas infantis
 - [ ] 85. Definir período de retenção
@@ -126,19 +126,19 @@ Estado inicial verificado em 2026-10-25: projeto Supabase `vmblubjbgwhaplsptymj`
 - [ ] 87. Documentar responsáveis por acessos
 - [ ] 88. Documentar fluxo de incidentes
 - [ ] 89. Registrar dependências e licenças
-- [ ] 90. Atualizar wiki técnica com evidências
+- [x] 90. Atualizar wiki técnica com evidências
 
 ## Fase 10: Portões de liberação
 
-- [ ] 91. Executar testes de unidade
-- [ ] 92. Executar testes de regressão
-- [ ] 93. Executar auditoria de dependências
-- [ ] 94. Executar verificador de segredos
-- [ ] 95. Executar teste de compilação
+- [x] 91. Executar testes de unidade
+- [x] 92. Executar testes de regressão
+- [x] 93. Executar auditoria de dependências
+- [x] 94. Executar verificador de segredos
+- [x] 95. Executar teste de compilação
 - [ ] 96. Validar login e logout reais
 - [ ] 97. Validar perfil e ranking reais
 - [ ] 98. Revisar alterações de banco antes da aplicação
-- [ ] 99. Preparar rollback e notas de lançamento
+- [x] 99. Preparar rollback e notas de lançamento
 - [ ] 100. Liberar merge apenas com critérios atendidos
 
 ## Evidências existentes
@@ -230,3 +230,28 @@ A classificação Supabase continua informal e **sem validação autoritativa de
 - **Evidência CI:** no SHA `37961a3f68c68c4ce53a214fa3283cbc9bda52f1`, o job `Security regressions` (run `40316574141`, job `121550560238`) executou com sucesso `node --test tests/*security.test.cjs`. Os nove workflows da PR concluíram com `success`, incluindo compilação, dependências, Firestore e varredura de segredos.
 - **Escopo e limites:** este teste protege os dois controladores examinados contra regressões específicas; não é navegador real, não prova ausência de XSS em todo o portal, não valida CSP nem pontuação autoritativa. **Etapa 53 continua pendente** até inventário e auditoria dos demais pontos de HTML dinâmico. **Total permanece 52/100**; não foi marcada nenhuma etapa nova sem cobertura integral.
 - **Risco/rollback:** alteração exclusivamente de teste; caso cause falha espúria, reverter o commit do teste. Nenhuma mudança em Supabase de produção, cobrança, deploy, `main` ou política de segurança.
+
+
+## Continuação de 26/10/2026 — rotas, testes de publicação e rollback
+
+**Novo total: 62/100 etapas com evidências; 38 pendentes.** Inclui tarefas de auditoria e documentação, não é índice de segurança, nem afirma que a produção está pronta. PR #4 continua `draft`; `main` e políticas Supabase não foram alteradas.
+
+### Falha real corrigida
+
+- Em `index.html` e `educacao.html`, a CTA "Jogar versão Godot 3D" apontava para `jogos/calculus-royale-godot/`, mas o GitHub não continha `index.html` para esse destino na branch.
+- Criado `jogos/calculus-royale-godot/index.html` com página responsiva, link à arena Three.js que já é jogável e informação honesta de desenvolvimento, **sem afirmar que Godot foi entregue**.
+- Botões corrigidos para "Godot 3D · em desenvolvimento".
+- Adicionado `tests/game-routes-security.test.cjs`, que verifica os destinos de jogo citados por `index.html` e `educacao.html`, a existência do HTML Godot, o rótulo e o link à arena ativa. Documento `docs/inventario-rotas-jogos-2026-10.md` reúne o inventário.
+
+### Justificativa das etapas marcadas
+
+- **6:** inventário das nove rotas de jogos anunciadas pelas páginas principais; 8 entradas verificadas originalmente e 1 destino Godot criado e testado.
+- **71:** meta `viewport` identificada em todas as nove entradas inspecionadas. **Somente inspeção estática:** layout responsivo/touch físico continua pendente nas etapas 72–73.
+- **82:** finalidade de estatísticas e identidade documentada em `docs/mapa-de-dados-calculus-royale-lgpd.md`, distinguindo perfil público, ranking informal e salvamento local/online.
+- **90:** nova seção na `wiki.html` referencia plano, inventário, riscos do ranking, evidências e critérios de rollback; publicação depende de merge.
+- **91–95:** Github Actions no commit `41d8770c1894e1e40f84a9bfb9359bd25cae9e6d` concluíram com `success` nos 9 workflows. Regressões e testes de segurança: run `40350076512`, job `121667404767`; build/TypeScript/progressão: run `40350076675`, job `121667405367`; auditoria de dependências: run `40350076622`, jobs `121667406624` e `121667407070`; histórico de segredos: run `40350076627`, job `121667406405`; `Secret exposure guard` também concluiu com `success`. Verificações valem para esse SHA; **documentação posterior não alterou código executável**, mas a PR exige a validação do SHA final antes do merge.
+- **99:** `docs/rollback-e-criterios-lancamento-2026-10.md` contém gates pré-merge, plano de reversão por commit, manejo de incidentes, limitação de rollback de dados e notas provisórias de release.
+
+### Bloqueadores preservados
+
+Faltam segurança completa de armazenamento de sessão (18), minimização pública da API Supabase (28), testes A/B com usuários reais (29, 70, 96–97), **pontuação realmente verificada no servidor** (42, 50), auditoria integral de HTML dinâmico e CSP/recursos externos (53, 55–58), testes de jogabilidade em navegador/dispositivo e conexão instável (61–63, 65–67, 69, 72–80), definições finais LGPD (84–89) e autorização de merge condicionada (98, 100). Esses itens **não serão marcados como aprovados** por um teste de sintaxe, um documento, nem simulações unitárias.
