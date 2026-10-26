@@ -274,7 +274,7 @@ export default function GameCanvas() {
     const progress=normalizeStageProgress(worlds.map(item=>item.chapters.length),readStorage<unknown>(storageKeys.stages,[]),completed);
     return Math.min(worlds[selectedWorld].chapters.length-1,progress[selectedWorld]);
   });
-  const [wins, setWins] = useState(() => readStorage(storageKeys.wins, 12));
+  const [wins, setWins] = useState(() => readStorage(storageKeys.wins, 0));
   const [coins, setCoins] = useState(() => readStorage(storageKeys.coins, 320));
   const [soundVolume, setSoundVolume] = useState(() => readStorage(storageKeys.volume, 0.7));
   const [soundMuted, setSoundMuted] = useState(() => readStorage(storageKeys.muted, false));
