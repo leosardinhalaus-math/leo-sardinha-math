@@ -82,3 +82,20 @@ Os nomes `kind` e `payload` são **provisórios**; alinhar aos controles e estad
 - `docs/plano-100-etapas-calculus-royale-2026-10.md`: registrar etapas de **desenho** separadas de implementação de servidor e testes reais.
 
 **Não aplicar** GRANT/REVOKE, trigger, exclusão de perfil, mudança de provedor, elevação de privilégios ou nova infraestrutura diretamente na produção com base apenas neste documento.
+
+## 8. Evento real de vitória já existente no motor de jogo
+
+Inspeção da implementação TypeScript de 2026-10-25:
+
+1. Em `client/src/game/battleRules.ts`, cada batalha regula **180 s** e tem até **60 s de prorrogação**; `BATTLE_TICK_SECONDS=0.1`, `DECK_SIZE=8`, energia inicial 5. A avaliação de HP usa `compareTowerHealth(allyHp, enemyHp, 96, enemyMax)`: compara as frações de vida e trata diferença absoluta menor que `0.005` como empate.
+2. Em `client/src/components/GameCanvas.tsx`, a arena atualiza tropas com `stepCombat(..., 0.1, ...)`, e o estado `battleOutcome` vira `victory` quando a torre inimiga cai, quando há vantagem válida ao término de tempo ou quando um primeiro ataque resolve a morte súbita. Derrota e empate não concedem vitória.
+3. `finishBattle()` é chamado somente após `battleOutcome === 'victory'` e utiliza `battleResolvedRef` para prevenir a dupla conclusão **neste cliente**. Incrementa `wins` mesmo em *replay* de casa já vencida; recompensas de avanço dependem de `resolveStageVictory()`.
+4. O código originalmente inicializava `wins` de um jogador novo com **12**, sem partida. A correção da branch muda para **zero** e há regressão na suíte `test:progression`. Isso evita dados fictícios de origem, mas não oferece garantia contra adulteração de salvamento.
+5. `client/src/game/combat.ts` é uma simulação isolada da renderização e tem testes em `test:combat` cobrindo 45 habilidades, cooldown, dano na torre uma vez, faixas de tropa e zonas de nascimento. Esse motor é um candidato para replay autoritativo após isolar a versão exata das regras e todas as entradas determinísticas.
+6. **Atenção:** o combate não equivale ao estado completo da partida; a inteligência artificial, custo de cartas, timers, interações com desafios e resultados ainda dependem do controlador `GameCanvas.tsx`. A simples presença de `stepCombat` no servidor não valida uma vitória; é necessário reproduzir o estado e a sequência de escolhas.
+
+### Critério técnico de “vitória verificada” para um servidor futuro
+
+Uma submissão somente pode contar como vitória oficial quando o servidor: (a) conhece o jogador, modo, mundo, casa, baralho inicial e versão das regras; (b) recebe ou executa escolhas legalmente possíveis em ordem; (c) mantém/reexecuta HP das torres, energia, cronômetro, tropas e adversário; (d) determina resultado `victory` com as mesmas regras da fase; (e) grava **uma única** conclusão em transação associada à partida. Não inferir vitória apenas de `battleOutcome`, `wins`, screenshots, relógio do dispositivo ou `localStorage` enviados pelo navegador.
+
+Enquanto isso não estiver implementado, a classificação Supabase continua **informal, não verificada**.
