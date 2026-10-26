@@ -24,7 +24,9 @@ async function api(path, options={}, token="") {
   try { data = text ? JSON.parse(text) : null; } catch { data = text; }
   if (!res.ok) {
     const message = data?.msg || data?.message || data?.error_description || data?.error || `Erro ${res.status}`;
-    throw new Error(message);
+    const failure = new Error(message);
+    failure.status = res.status;
+    throw failure;
   }
   return data;
 }
@@ -68,8 +70,12 @@ async function session() {
         const renewed = saveSession(data);
         if (!renewed?.user?.id) throw new Error("Invalid session refresh");
         return renewed;
-      } catch {
-        if (epoch === sessionEpoch) localStorage.removeItem(SESSION_KEY);
+      } catch (error) {
+        // Never sign the player out because of temporary network/server trouble.
+        // Invalidate only definitely rejected or malformed refresh credentials.
+        const rejected = (Number.isInteger(error?.status) && error.status >= 400 && error.status < 500 && error.status !== 429)
+          || error?.message === "Invalid session refresh";
+        if (epoch === sessionEpoch && rejected) localStorage.removeItem(SESSION_KEY);
         return null;
       } finally {
         pendingRefresh = null;
