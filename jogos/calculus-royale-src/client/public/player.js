@@ -53,6 +53,12 @@ async function session() {
     if (s !== null) localStorage.removeItem(SESSION_KEY);
     return null;
   }
+  // Migrate older sessions that cached a full Auth user (including email)
+  // to the minimal identifier required by the game, without rotating tokens.
+  if (Object.keys(s.user).some(key => key !== "id") || Object.keys(s).some(key => !["access_token","refresh_token","expires_at","user"].includes(key))) {
+    s = { access_token: s.access_token, refresh_token: s.refresh_token, expires_at: s.expires_at, user: { id: s.user.id } };
+    try { localStorage.setItem(SESSION_KEY, JSON.stringify(s)); } catch {}
+  }
   if ((s.expires_at || 0) > Math.floor(Date.now()/1000) + 60) return s;
   if (!s.refresh_token) {
     localStorage.removeItem(SESSION_KEY);
