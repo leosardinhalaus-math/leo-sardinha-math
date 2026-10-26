@@ -109,3 +109,37 @@ test('invalid local session missing owner is purged without network access',asyn
   assert.equal(calls,0);
   assert.equal(store.has(SESSION),false);
 });
+
+test('corrupted numeric offline saves cannot overflow signed database integer fields',()=>{
+  const {cloud}=harness(async()=>{throw Error('no request expected')},{
+    'calculus-royale:wins':'1e1000',
+    'calculus-royale:coins':'-350',
+    'calculus-royale:essence':'"not-a-number"',
+    'calculus-royale:completed-worlds':JSON.stringify(Array(12).fill(true)),
+    'calculus-royale:survival-leaderboard':'[{"wave":1e1000}]'
+  });
+  const stats=cloud.localProgress();
+  const numbers=['level','xp','trophies','wins','losses','completed_worlds','best_tower_wave','current_streak','best_streak','chests_opened','coins','essence'];
+  for(const key of numbers){
+    assert.equal(Number.isSafeInteger(stats[key]),true,key+' must be an integer');
+    assert.ok(stats[key]>=0 && stats[key]<=2000000000,key+' must fit the database');
+  }
+  assert.equal(stats.wins,0);
+  assert.equal(stats.coins,0);
+  assert.equal(stats.essence,0);
+  assert.equal(stats.completed_worlds,5);
+  assert.equal(stats.best_tower_wave,0);
+});
+
+test('normal local progress still reports victory values unchanged',()=>{
+  const {cloud}=harness(async()=>{throw Error('no request expected')},{
+    'calculus-royale:wins':'2',
+    'calculus-royale:coins':'320',
+    'calculus-royale:completed-worlds':'[true,false,false,false,false]'
+  });
+  const stats=cloud.localProgress();
+  assert.equal(stats.wins,2);
+  assert.equal(stats.trophies,300);
+  assert.equal(stats.xp,640);
+  assert.equal(stats.coins,320);
+});
