@@ -82,9 +82,9 @@ Estado inicial verificado em 2026-10-25: projeto Supabase `vmblubjbgwhaplsptymj`
 - [x] 52. Auditar XSS nos rankings
 - [ ] 53. Auditar inserções HTML dinâmicas
 - [x] 54. Revisar URLs controladas por usuários
-- [ ] 55. Revisar política CSP
-- [ ] 56. Revisar dependências externas
-- [ ] 57. Checar integridade de scripts terceiros
+- [x] 55. Revisar política CSP
+- [x] 56. Revisar dependências externas
+- [x] 57. Checar integridade de scripts terceiros
 - [ ] 58. Checar cabeçalhos de segurança disponíveis
 - [x] 59. Checar vazamento de credenciais no histórico
 - [x] 60. Executar testes de regressão XSS
@@ -255,3 +255,35 @@ A classificação Supabase continua informal e **sem validação autoritativa de
 ### Bloqueadores preservados
 
 Faltam segurança completa de armazenamento de sessão (18), minimização pública da API Supabase (28), testes A/B com usuários reais (29, 70, 96–97), **pontuação realmente verificada no servidor** (42, 50), auditoria integral de HTML dinâmico e CSP/recursos externos (53, 55–58), testes de jogabilidade em navegador/dispositivo e conexão instável (61–63, 65–67, 69, 72–80), definições finais LGPD (84–89) e autorização de merge condicionada (98, 100). Esses itens **não serão marcados como aprovados** por um teste de sintaxe, um documento, nem simulações unitárias.
+
+
+## Rodada de 26/10/2026 — acessibilidade, sessões minimizadas e revisão de CSP
+
+**Checklist: 65/100 etapas com evidência de correção, revisão ou documentação; 35 permanecem abertas.** A numeração não certifica segurança nem implantação em produção. **A PR #4 segue em rascunho**; não houve deploy, merge ou alteração do Supabase.
+
+### Implementação e testes na branch
+
+- **Acessibilidade do perfil:** rótulos `for` vinculados a e-mail, senha e apelido, mensagens de autenticação com `aria-live`, foco visível para teclado e apelido exemplar não identificável. As cópias `perfil/index.html` publicada/fonte foram mantidas sincronizadas.
+- **Ranking:** as opções de ordenação agora comunicam `aria-pressed`, atualizada no clique. Foi detectada e corrigida uma regressão introduzida na primeira edição que havia trocado incorretamente o seletor de todos os botões pelo seletor de um só elemento. O teste integrado de regressão da PR confirmou a correção. A CI posterior ao conserto passou nos testes de segurança.
+- **Preferência por movimento reduzido:** nova folha de acessibilidade importada ao final do bundle aplica foco de teclado e interrompe transições/animações cosméticas quando o sistema pede redução; em `scene.ts`, o motor 3D evita interpolação visual e mistura animada desnecessária, preservando a simulação de combate. `tests/calculus-accessibility-security.test.cjs` cobre o código e a presença de regras. **Etapa 74 permanece pendente** de validação visual em navegador real com a preferência ativada. Etapa 79 também permanece aberta para revisão de todos os controles do jogo.
+- **Minimização de perfil na sessão:** `player.js` agora persiste somente `user.id` do objeto de Auth, sem e-mail, metadados nem identidades; sessões legadas com esses campos são migradas para o formato mínimo. Os tokens de autenticação ainda residem no `localStorage`, logo a **etapa 18 permanece aberta** até uma solução de proteção de sessão adequada.
+- **Testes:** `tests/calculus-auth-security.test.cjs` valida remoção de e-mail/metadados tanto em novos logins quanto em sessões legadas. Todas as mudanças mantidas na branch, e fontes `player.js` duplicadas sincronizadas.
+
+### Revisão de CSP e dependências externas (55–57)
+
+`docs/revisao-csp-recursos-externos-calculus-2026-10.md` documenta:
+- A ausência de CSP estrita implantada e os scripts/estilos inline que exigem refatoração antes da aplicação.
+- Bundles do jogo na própria origem e Supabase como serviço ativo.
+- Imports externos do `gstatic.com/firebasejs/13.0.0` na alternativa Firebase **desativada**, sem verificação de integridade de módulos configurada. É uma constatação de auditoria, não prova de comprometimento da CDN.
+- Necessidade de testar CSP, CORS, scripts externos, offline, perfil, ranking e 3D antes de habilitar restrições. **Não** foi inventado hash SRI, nem aplicada política que quebrasse recursos.
+- Não foi possível consultar diretamente os cabeçalhos HTTP do site por falha de DNS no ambiente; **etapa 58 permanece pendente**, assim como a aplicação efetiva de CSP.
+
+### Evidência CI
+
+- No SHA `c76e4e15243604efb40598e877651703cf85b354`, os testes de regressão, regras Firestore, dependências e gate de build passaram após restaurar o seletor correto do ranking.
+- No SHA `4e61e1d2283f303988a02064dc042e7ef1d33631`, `Security regressions`, `Calculus Royale build and dependency gate`, `Dependency security audit`, `Secret exposure guard` e os demais jobs concluídos consultados estavam verdes. O workflow de artefato `Build Calculus Royale` ainda estava em fila no momento da consulta.
+- Como novos commits de documentação podem disparar pipelines, **validar novamente o SHA final** antes da publicação. Falhas não devem ser dadas como aprovadas.
+
+### Bloqueios intactos
+
+Ainda é necessário implementar validação de pontuação pelo servidor, ambiente de teste, política mínima de leitura pública, teste de acesso entre contas A/B, login/ranking reais, segurança de sessão robusta, testes mobile e LGPD final. Não marcar passos pendentes sem comprovação.
