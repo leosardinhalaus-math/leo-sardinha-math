@@ -204,3 +204,17 @@ test('refresh rate limiting preserves credentials for a later retry',async()=>{
   assert.equal(await cloud.session(),null);
   assert.equal(records.has(SESSION_KEY),true);
 });
+
+test('login does not persist email or other Auth metadata in browser session', async()=>{
+  const {cloud,records}=harness(async()=>reply({
+    access_token:'access',refresh_token:'refresh',expires_in:3600,
+    user:{id:uid,email:'private@example.org',user_metadata:{secret:'not for localStorage'},identities:[{id:'private'}]}
+  }));
+  const session=await cloud.signIn('private@example.org','secret123');
+  assert.equal(session.user.id,uid);
+  assert.equal(session.user.email,undefined);
+  const saved=JSON.parse(records.get(SESSION_KEY));
+  assert.deepEqual(Object.keys(saved.user),['id']);
+  assert.equal(JSON.stringify(saved).includes('private@example.org'),false);
+  assert.equal(JSON.stringify(saved).includes('not for localStorage'),false);
+});
