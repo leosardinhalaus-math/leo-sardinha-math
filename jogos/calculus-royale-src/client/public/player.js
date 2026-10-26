@@ -37,7 +37,8 @@ function saveSession(data) {
     access_token: data.access_token,
     refresh_token: data.refresh_token,
     expires_at: Math.floor(Date.now()/1000) + (data.expires_in || 3600),
-    user: data.user,
+    // Keep only the account identifier; never cache email or other Auth profile fields.
+    user: { id: data.user.id },
   };
   localStorage.setItem(SESSION_KEY, JSON.stringify(session));
   return session;
