@@ -150,19 +150,25 @@ function localProgress() {
   const read = (key, fallback) => {
     try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; }
   };
+  // These bounds protect the REST integer columns from corrupted/offline saves.
+  // They do NOT make locally generated scores authoritative or anti-cheat.
+  const safeInt = value => {
+    const number = Number(value);
+    return Number.isFinite(number) ? Math.min(2000000000, Math.max(0, Math.floor(number))) : 0;
+  };
   const worlds = read("calculus-royale:completed-worlds", [false,false,false,false,false]);
-  const wins = Number(read("calculus-royale:wins", 0)) || 0;
-  const coins = Number(read("calculus-royale:coins", 0)) || 0;
-  const essence = Number(read("calculus-royale:essence", 0)) || 0;
+  const wins = safeInt(read("calculus-royale:wins", 0));
+  const coins = safeInt(read("calculus-royale:coins", 0));
+  const essence = safeInt(read("calculus-royale:essence", 0));
   const inventory = read("calculus-royale:inventory", []);
   const leaderboard = read("calculus-royale:survival-leaderboard", []);
   const badges = read("calculus-royale:survival-badges", []);
-  const completed = Array.isArray(worlds) ? worlds.filter(Boolean).length : 0;
-  const bestWave = Array.isArray(leaderboard) ? leaderboard.reduce((m,e)=>Math.max(m, Number(e?.wave)||0),0) : 0;
-  const chests = Array.isArray(inventory) ? inventory.length : 0;
-  const badgeCount = Array.isArray(badges) ? badges.length : 0;
-  const xp = wins*120 + completed*400 + bestWave*80 + badgeCount*150 + chests*60;
-  const trophies = wins*25 + completed*250 + bestWave*35 + badgeCount*100 + chests*20;
+  const completed = Array.isArray(worlds) ? Math.min(5, worlds.filter(Boolean).length) : 0;
+  const bestWave = Array.isArray(leaderboard) ? leaderboard.reduce((m,e)=>Math.max(m,safeInt(e?.wave)),0) : 0;
+  const chests = Array.isArray(inventory) ? safeInt(inventory.length) : 0;
+  const badgeCount = Array.isArray(badges) ? safeInt(badges.length) : 0;
+  const xp = safeInt(wins*120 + completed*400 + bestWave*80 + badgeCount*150 + chests*60);
+  const trophies = safeInt(wins*25 + completed*250 + bestWave*35 + badgeCount*100 + chests*20);
   return {
     level: 1 + Math.floor(xp/500),
     xp, trophies, wins, losses: 0,
