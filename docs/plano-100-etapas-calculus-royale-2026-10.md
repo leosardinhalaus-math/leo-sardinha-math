@@ -221,3 +221,12 @@ Estado inicial verificado em 2026-10-25: projeto Supabase `vmblubjbgwhaplsptymj`
 ### Impedimentos mantidos
 
 A classificação Supabase continua informal e **sem validação autoritativa de vitória**. Ainda falta ambiente de staging do banco, testes A/B com contas reais, restrição da exposição pública sem quebrar clientes, validação em celular/desktop, responsável LGPD e processo de exclusão/retensão. Todas as mudanças aqui documentadas ficam na PR #4, sem merge e sem escrita no banco nesta rodada.
+
+
+## Continuação — 26/10/2026: regressão de HTML dinâmico em perfil e ranking
+
+- **Implementado:** novo teste `tests/calculus-dynamic-html-security.test.cjs` no commit `37961a3f68c68c4ce53a214fa3283cbc9bda52f1`. Executa os controladores inline reais de `perfil/index.html` e `ranking/index.html` em DOM simulado, carregando a implementação real de `C.safe` de `player.js`.
+- **Casos cobertos:** valores hostis em avatar, apelido, slug, troféus, vitórias, nível e XP com `<img onerror>` e `<svg onload>`; verifica que dados inseridos por `innerHTML` são escapados, que o título usa `textContent` e que o slug não injeta atributos no link do ranking.
+- **Evidência CI:** no SHA `37961a3f68c68c4ce53a214fa3283cbc9bda52f1`, o job `Security regressions` (run `40316574141`, job `121550560238`) executou com sucesso `node --test tests/*security.test.cjs`. Os nove workflows da PR concluíram com `success`, incluindo compilação, dependências, Firestore e varredura de segredos.
+- **Escopo e limites:** este teste protege os dois controladores examinados contra regressões específicas; não é navegador real, não prova ausência de XSS em todo o portal, não valida CSP nem pontuação autoritativa. **Etapa 53 continua pendente** até inventário e auditoria dos demais pontos de HTML dinâmico. **Total permanece 52/100**; não foi marcada nenhuma etapa nova sem cobertura integral.
+- **Risco/rollback:** alteração exclusivamente de teste; caso cause falha espúria, reverter o commit do teste. Nenhuma mudança em Supabase de produção, cobrança, deploy, `main` ou política de segurança.
