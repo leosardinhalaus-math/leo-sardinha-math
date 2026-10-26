@@ -18,7 +18,7 @@ async function load(sort){
   else show(await C.leaderboard(sort));
  }catch{fail()}
 }
-$('.tab').forEach(button=>button.onclick=()=>{$('.tab').forEach(item=>{const selected=item===button;item.classList.toggle('active',selected);item.setAttribute('aria-pressed',String(selected));});load(button.dataset.sort)});
+$$('.tab').forEach(button=>button.onclick=()=>{$$('.tab').forEach(item=>{const selected=item===button;item.classList.toggle('active',selected);item.setAttribute('aria-pressed',String(selected));});load(button.dataset.sort)});
 window.addEventListener?.('pagehide',()=>{generation++;unsubscribe()});
 load('trophies.desc');
 </script></body></html>
