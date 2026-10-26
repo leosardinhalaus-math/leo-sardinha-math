@@ -170,3 +170,37 @@ test('logout clears browser tokens even before server responds', async () => {
   finish(reply({}));
   await logout;
 });
+
+test('temporary offline refresh keeps credentials for a later retry', async () => {
+  const old={access_token:'old',refresh_token:'old-refresh',expires_at:1,user:{id:uid}};
+  let attempts=0;
+  const {cloud,records}=harness(async () => {
+    attempts++;
+    if (attempts===1) throw Error('Network temporarily offline');
+    return reply({access_token:'renewed',refresh_token:'new-refresh',expires_in:3600,user:{id:uid}});
+  },{[SESSION_KEY]:JSON.stringify(old)});
+  assert.equal(await cloud.session(),null);
+  assert.equal(JSON.parse(records.get(SESSION_KEY)).refresh_token,'old-refresh');
+  const next=await cloud.session();
+  assert.equal(next.access_token,'renewed');
+  assert.equal(JSON.parse(records.get(SESSION_KEY)).refresh_token,'new-refresh');
+  assert.equal(attempts,2);
+});
+
+test('temporary HTTP 503 keeps refresh credentials, but invalid 401 removes them',async()=>{
+  const old={access_token:'old',refresh_token:'refresh',expires_at:1,user:{id:uid}};
+  let status=503;
+  const {cloud,records}=harness(async()=>reply({message:'Unavailable'},status),{[SESSION_KEY]:JSON.stringify(old)});
+  assert.equal(await cloud.session(),null);
+  assert.equal(records.has(SESSION_KEY),true);
+  status=401;
+  assert.equal(await cloud.session(),null);
+  assert.equal(records.has(SESSION_KEY),false);
+});
+
+test('refresh rate limiting preserves credentials for a later retry',async()=>{
+  const old={access_token:'old',refresh_token:'refresh',expires_at:1,user:{id:uid}};
+  const {cloud,records}=harness(async()=>reply({message:'Too many requests'},429),{[SESSION_KEY]:JSON.stringify(old)});
+  assert.equal(await cloud.session(),null);
+  assert.equal(records.has(SESSION_KEY),true);
+});
