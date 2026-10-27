@@ -287,3 +287,12 @@ Faltam segurança completa de armazenamento de sessão (18), minimização públ
 ### Bloqueios intactos
 
 Ainda é necessário implementar validação de pontuação pelo servidor, ambiente de teste, política mínima de leitura pública, teste de acesso entre contas A/B, login/ranking reais, segurança de sessão robusta, testes mobile e LGPD final. Não marcar passos pendentes sem comprovação.
+
+
+## Continuação — 27/10/2026: auditoria de tamanho dos assets (validação pendente)
+
+- **Mudança proposta na branch:** `scripts/audit-asset-sizes.mjs` percorre o `dist/public` gerado pelo Vite, registra os dez maiores arquivos, o volume total da distribuição e confere inventário, ausência de modelos GLB órfãos, limite de 1 MiB por GLB e 32 MiB para os 45 modelos somados.
+- **Integração:** workflow `Build Calculus Royale` passa a executar a auditoria **após o build e a validação dos modelos**, sem publicar nem fazer deploy.
+- **Verificação local limitada:** script exercitado com 45 arquivos sintéticos; caso normal passou e remoção de um GLB foi corretamente rejeitada. Isto **não** comprova tamanho dos assets reais; aguardar GitHub Actions antes de marcar a etapa 76.
+- **Risco/rollback:** se o orçamento de tamanho falhar em assets legítimos, inspecionar medidas e revisar limites explicitamente; reversão restrita ao script e ao passo de CI. Não altera Supabase, pontuação, `main` nem dados de usuários.
+- **Estado:** etapa 76 continua [ ] até confirmação do build completo no SHA desta alteração. O total permanece 65/100.

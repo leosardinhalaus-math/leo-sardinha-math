@@ -74,6 +74,10 @@ jobs:
         working-directory: jogos/calculus-royale-src
         run: npm run test:models
 
+      - name: Audit built asset sizes
+        working-directory: jogos/calculus-royale-src
+        run: node scripts/audit-asset-sizes.mjs
+
       - name: Prepare built game for review
         run: |
           test -s jogos/calculus-royale-src/dist/public/index.html
