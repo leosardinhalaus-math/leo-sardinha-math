@@ -109,7 +109,7 @@ Estado inicial verificado em 2026-10-25: projeto Supabase `vmblubjbgwhaplsptymj`
 - [ ] 73. Testar navegadores desktop
 - [ ] 74. Testar redução de movimento
 - [ ] 75. Medir carregamento inicial
-- [ ] 76. Auditar tamanho de assets
+- [x] 76. Auditar tamanho de assets
 - [ ] 77. Checar erros JavaScript no console
 - [ ] 78. Avaliar requests ao carregar partida
 - [ ] 79. Revisar acessibilidade dos controles
@@ -296,3 +296,11 @@ Ainda é necessário implementar validação de pontuação pelo servidor, ambie
 - **Verificação local limitada:** script exercitado com 45 arquivos sintéticos; caso normal passou e remoção de um GLB foi corretamente rejeitada. Isto **não** comprova tamanho dos assets reais; aguardar GitHub Actions antes de marcar a etapa 76.
 - **Risco/rollback:** se o orçamento de tamanho falhar em assets legítimos, inspecionar medidas e revisar limites explicitamente; reversão restrita ao script e ao passo de CI. Não altera Supabase, pontuação, `main` nem dados de usuários.
 - **Estado:** etapa 76 continua [ ] até confirmação do build completo no SHA desta alteração. O total permanece 65/100.
+
+### Verificação concluída — 27/10/2026 (etapa 76)
+
+- **Etapa 76 verificada e marcada [x]**, total atualizado para **66/100** (34 pendentes). Esta etapa significa **inventário e auditoria automatizada de tamanho**, não otimização concluída nem desempenho móvel aprovado.
+- **Commit auditado:** `6ede8735357169e0cb4b3dbf184f9481af33b89e`. GitHub Actions `Build Calculus Royale`: run `40499170199`, job `122172214657`, step `Audit built asset sizes` **success** após `Build game` e `Validate generated GLB models` também aprovados. Os nove workflows associados ao SHA concluíram `success`.
+- **Medições no log do CI:** **45 GLBs gerados = 20,48 MiB** (limite 32 MiB), **120 arquivos de distribuição = 26,00 MiB**; maior arquivo `assets/index-TrdF4SGH.js` = 0,98 MiB, maior GLB `power.glb` = 0,65 MiB. O script falha se algum GLB do manifesto faltar, houver GLB órfão, se um modelo exceder 1 MiB ou se a soma dos GLBs exceder 32 MiB.
+- **Escopo:** `dist/public` no runner Linux, após geração dos modelos e das artes; o tamanho total é **informativo**, não significa 26 MiB transferidos na primeira visita. **Etapas 75, 77, 78 e testes de dispositivos continuam pendentes**: não há medição de tempo de carregamento, tráfego real ou WebGL em celular.
+- **Evidências:** [execução CI](https://github.com/leosardinhalaus-math/leo-sardinha-math/actions/runs/40499170199), [script](https://github.com/leosardinhalaus-math/leo-sardinha-math/blob/auditoria-lgpd-video-2026-10/jogos/calculus-royale-src/scripts/audit-asset-sizes.mjs) e [workflow](https://github.com/leosardinhalaus-math/leo-sardinha-math/blob/auditoria-lgpd-video-2026-10/.github/workflows/build-calculus-royale.yml). Sem deploy, merge, cobrança ou mudança em Supabase.
