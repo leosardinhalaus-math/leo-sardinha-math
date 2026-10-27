@@ -15,3 +15,18 @@ console.log('PASS: casas avançam uma a uma e a próxima ilha só libera após a
 const gameCanvas = readFileSync(new URL('../client/src/components/GameCanvas.tsx', import.meta.url), 'utf8');
 assert.match(gameCanvas, /readStorage\(storageKeys\.wins,\s*0\)/);
 assert.doesNotMatch(gameCanvas, /readStorage\(storageKeys\.wins,\s*12\)/);
+
+
+ // Regression: replaying a cleared house cannot advance the island.
+ for (let progress = 1; progress <= 6; progress++) {
+   for (let stage = 0; stage < progress; stage++) {
+     assert.deepEqual(resolveStageVictory(progress, stage, 6), {kind:'replay',nextProgress:progress});
+   }
+ }
+ // The final house completes the island exactly once; a completed world remains a replay.
+ assert.deepEqual(resolveStageVictory(5,5,6,true), {kind:'replay',nextProgress:5});
+ assert.deepEqual(resolveStageVictory(6,5,6), {kind:'replay',nextProgress:6});
+ // Invalid or missing saved progress must not unlock additional houses.
+ assert.deepEqual(normalizeStageProgress([6,6],[NaN,-5],[false,false]),[0,0]);
+ assert.deepEqual(normalizeStageProgress([6,6],[99,2.9],[false,false]),[6,2]);
+ assert(!isStageUnlocked(3,2));
