@@ -14,7 +14,7 @@ export function isStageUnlocked(stage:number,progress:number){return stage<=prog
 
 export function resolveStageVictory(progress:number,selectedStage:number,totalStages:number,worldCompleted=false):StageVictory{
  const safeProgress=Math.max(0,Math.min(totalStages,progress));
- if(worldCompleted||selectedStage<safeProgress)return {kind:'replay',nextProgress:safeProgress};
+ // Only the currently unlocked house may advance progress; replays and invalid selections do not.\n if(worldCompleted||safeProgress>=totalStages||!Number.isInteger(selectedStage)||selectedStage!==safeProgress)return {kind:'replay',nextProgress:safeProgress};
  const nextProgress=Math.min(totalStages,safeProgress+1);
  if(nextProgress>=totalStages)return {kind:'complete',nextProgress};
  return {kind:'advance',nextProgress,nextStage:nextProgress};

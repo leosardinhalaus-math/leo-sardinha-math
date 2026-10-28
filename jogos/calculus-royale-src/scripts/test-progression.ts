@@ -30,3 +30,12 @@ assert.doesNotMatch(gameCanvas, /readStorage\(storageKeys\.wins,\s*12\)/);
  assert.deepEqual(normalizeStageProgress([6,6],[NaN,-5],[false,false]),[0,0]);
  assert.deepEqual(normalizeStageProgress([6,6],[99,2.9],[false,false]),[6,2]);
  assert(!isStageUnlocked(3,2));
+
+ // Locked or malformed house selections cannot unlock the next house after a victory.
+ assert.deepEqual(resolveStageVictory(0,2,6),{kind:'replay',nextProgress:0});
+ assert.deepEqual(resolveStageVictory(4,5,6),{kind:'replay',nextProgress:4});
+ assert.deepEqual(resolveStageVictory(3,3.5,6),{kind:'replay',nextProgress:3});
+ assert.deepEqual(resolveStageVictory(6,6,6),{kind:'replay',nextProgress:6});
+ assert.deepEqual(resolveStageVictory(0,-1,6),{kind:'replay',nextProgress:0});
+ // The current house still unlocks exactly one next house.
+ assert.deepEqual(resolveStageVictory(4,4,6),{kind:'advance',nextProgress:5,nextStage:5});
