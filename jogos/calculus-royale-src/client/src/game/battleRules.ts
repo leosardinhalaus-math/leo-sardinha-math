@@ -26,7 +26,7 @@ export function normalizeDeck(savedIds: string[], availableIds: string[]): strin
 }
 
 export function battleClockLabel(elapsedSeconds: number): string {
-  const elapsed = Math.max(0, Math.floor(elapsedSeconds));
+  const elapsed = Number.isFinite(elapsedSeconds) ? Math.max(0, Math.floor(elapsedSeconds)) : 0;
   const format = (seconds: number) => `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
   if (elapsed >= REGULATION_SECONDS) return `OT ${format(Math.min(OVERTIME_SECONDS, elapsed - REGULATION_SECONDS))}`;
   return format(REGULATION_SECONDS - elapsed);
