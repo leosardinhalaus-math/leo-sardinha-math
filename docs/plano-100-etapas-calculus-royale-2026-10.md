@@ -322,3 +322,12 @@ Ainda é necessário implementar validação de pontuação pelo servidor, ambie
 - **CI confirmado no commit corrigido:** nove workflows do GitHub Actions concluíram com `success`; `Calculus Royale build and dependency gate` run `40682528118` confirmou o passo `Game rules and progression regressions` e o build. Ver [execução do gate](https://github.com/leosardinhalaus-math/leo-sardinha-math/actions/runs/40682528118) e [build completo](https://github.com/leosardinhalaus-math/leo-sardinha-math/actions/runs/40682528066).
 - **Limites:** valida apenas regras locais e testes no CI, não uma sessão de navegador real, não garante impossibilidade de adulteração pelo cliente, não comprova proteção antifraude nem valida vitória no servidor. Etapas 50, 61, 65, 67 e 69 permanecem pendentes. **Total: 66/100**, sem marcar novas etapas.
 - **Risco e rollback:** mudança pequena e reversível na função de progressão e testes; se surgir regressão, reverter os commits `138f34a` e `ea18a43` em conjunto. Sem alteração de Supabase, deploy, `main`, merge ou cobrança.
+
+
+## Continuação — 28/10/2026: regressões de relógio e proporção de torres
+
+- **Mudança:** commit `e0f4a2e` adicionou casos de limites de relógio, elixir e comparação de vida das torres em `scripts/test-battle-rules.ts`. O gate de build falhou porque o caso de empate usou HP absoluto igual em torres com máximos padrão distintos (96 e 82); isso não representa empate por proporção.
+- **Correção do teste:** commit `76705852a02a07ada1e8130133954387ea0df251` informa máximos iguais (100/100) no caso de empate, sem modificar as regras do jogo.
+- **CI observado no SHA corrigido:** `Calculus Royale build and dependency gate` run `40691389436` **success** (inclui regressões de regras e progressão), `Build Calculus Royale` run `40691389444` **success**, além de `Security regressions`, `Secret exposure guard`, `Dependency security audit` e `Git history secret audit` aprovados. `Firestore rules`, `Dependency remediation preview` e `Firebase dependency remediation experiment` ainda estavam `in_progress` no momento desta consulta. Não alegar nove aprovações até todos concluírem.
+- **Escopo e limite:** apenas testes automatizados; não comprova vitória real em dispositivo, pontuação autoritativa ou prevenção de fraude. Etapas 50, 61, 66, 70 e 97 permanecem abertas. **Total 66/100**, sem marcação nova.
+- **Rollback:** reverter as asserções adicionadas em `test-battle-rules.ts` caso haja regressão no teste; não há mudança de banco, deploy, cobrança ou merge.
