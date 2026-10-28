@@ -39,3 +39,11 @@ assert.doesNotMatch(gameCanvas, /readStorage\(storageKeys\.wins,\s*12\)/);
  assert.deepEqual(resolveStageVictory(0,-1,6),{kind:'replay',nextProgress:0});
  // The current house still unlocks exactly one next house.
  assert.deepEqual(resolveStageVictory(4,4,6),{kind:'advance',nextProgress:5,nextStage:5});
+
+// Invalid progress or stage counts must never create non-finite or fractional unlocks.
+assert.deepEqual(resolveStageVictory(NaN,0,6),{kind:'advance',nextProgress:1,nextStage:1});
+assert.deepEqual(resolveStageVictory(Infinity,0,6),{kind:'advance',nextProgress:1,nextStage:1});
+assert.deepEqual(resolveStageVictory(2.9,2,6),{kind:'advance',nextProgress:3,nextStage:3});
+assert.deepEqual(resolveStageVictory(0,0,0),{kind:'replay',nextProgress:0});
+assert.deepEqual(resolveStageVictory(0,0,NaN),{kind:'replay',nextProgress:0});
+assert.deepEqual(resolveStageVictory(0,0,-3),{kind:'replay',nextProgress:0});
