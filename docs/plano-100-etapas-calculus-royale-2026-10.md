@@ -331,3 +331,12 @@ Ainda é necessário implementar validação de pontuação pelo servidor, ambie
 - **CI observado no SHA corrigido:** `Calculus Royale build and dependency gate` run `40691389436` **success** (inclui regressões de regras e progressão), `Build Calculus Royale` run `40691389444` **success**, além de `Security regressions`, `Secret exposure guard`, `Dependency security audit` e `Git history secret audit` aprovados. `Firestore rules`, `Dependency remediation preview` e `Firebase dependency remediation experiment` ainda estavam `in_progress` no momento desta consulta. Não alegar nove aprovações até todos concluírem.
 - **Escopo e limite:** apenas testes automatizados; não comprova vitória real em dispositivo, pontuação autoritativa ou prevenção de fraude. Etapas 50, 61, 66, 70 e 97 permanecem abertas. **Total 66/100**, sem marcação nova.
 - **Rollback:** reverter as asserções adicionadas em `test-battle-rules.ts` caso haja regressão no teste; não há mudança de banco, deploy, cobrança ou merge.
+
+
+## Continuação — 28/10/2026: normalização defensiva de progressão
+
+- **Problema e correção:** `resolveStageVictory` podia propagar `NaN`, infinito ou frações em `progress` e `totalStages`, apesar das guardas de seleção de casa. Commit `546b3d198d98e974c7f189dba1056cd1a8f19670` normaliza o progresso finito para inteiro dentro dos limites e trata quantidade de casas não inteira ou não positiva como zero. Não altera o fluxo normal de casas válidas.
+- **Regressões:** commit `0ecba14159f835fd5efc6e4ba2507029be7d6117` adiciona testes para `NaN`, infinito, progresso fracionário e total inválido em `scripts/test-progression.ts`.
+- **CI observado no SHA dos testes:** `Calculus Royale build and dependency gate`, `Security regressions`, `Secret exposure guard`, `Firestore rules`, `Firebase dependency remediation experiment`, `Git history secret audit`, `Dependency security audit` e `Dependency remediation preview` concluíram **success**. `Build Calculus Royale` ainda `in_progress` nesta consulta. Não alegar build final aprovado até confirmação.
+- **Limites:** os testes de domínio não validam interação real, persistência de vitória, login, pontuação confiável nem antifraude. **Total permanece 66/100**; etapas 61, 66, 67 e 69 seguem abertas.
+- **Rollback:** reverter conjuntamente os commits `546b3d1` e `0ecba14`; sem merge, deploy ou alteração de Supabase de produção.
