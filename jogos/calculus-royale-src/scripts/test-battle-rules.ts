@@ -32,4 +32,8 @@ assert.equal(battleClockLabel(REGULATION_SECONDS + 1), "OT 00:01");
 assert.equal(compareTowerHealth(50, 50, 100, 100), "draw");
 assert.equal(compareTowerHealth(100, 0), "victory");
 assert.equal(compareTowerHealth(0, 100), "defeat");
+assert.equal(battleClockLabel(NaN), "03:00");
+assert.equal(battleClockLabel(Infinity), "03:00");
+assert.equal(battleClockLabel(-Infinity), "03:00");
+assert.equal(battleClockLabel(-5), "03:00");
 console.log("PASS: deck de 8 cartas, rotação compatível, relógio, elixir duplo/triplo e desempate por proporção de torre.");
