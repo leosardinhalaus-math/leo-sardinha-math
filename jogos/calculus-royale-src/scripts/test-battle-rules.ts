@@ -29,7 +29,7 @@ for (const elapsed of [REGULATION_SECONDS - 60, REGULATION_SECONDS - 1]) assert.
 for (const elapsed of [REGULATION_SECONDS, REGULATION_SECONDS + 1]) assert.equal(elixirMultiplier(elapsed), 3);
 assert.equal(battleClockLabel(60), "02:00");
 assert.equal(battleClockLabel(REGULATION_SECONDS + 1), "OT 00:01");
-assert.equal(compareTowerHealth(50, 50), "draw");
+assert.equal(compareTowerHealth(50, 50, 100, 100), "draw");
 assert.equal(compareTowerHealth(100, 0), "victory");
 assert.equal(compareTowerHealth(0, 100), "defeat");
 console.log("PASS: deck de 8 cartas, rotação compatível, relógio, elixir duplo/triplo e desempate por proporção de torre.");
