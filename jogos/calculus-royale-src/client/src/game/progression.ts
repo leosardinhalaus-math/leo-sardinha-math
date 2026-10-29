@@ -10,7 +10,9 @@ export function normalizeStageProgress(lengths:number[],saved:unknown,completedW
   : Math.max(0,Math.min(length,Number.isFinite(values[index])?Math.floor(values[index] as number):0)));
 }
 
-export function isStageUnlocked(stage:number,progress:number){return stage<=progress;}
+export function isStageUnlocked(stage:number,progress:number){
+ return Number.isInteger(stage)&&stage>=0&&Number.isFinite(progress)&&progress>=0&&stage<=Math.floor(progress);
+}
 
 export function resolveStageVictory(progress:number,selectedStage:number,totalStages:number,worldCompleted=false):StageVictory{
  const safeTotal=Number.isInteger(totalStages)&&totalStages>0?totalStages:0;
