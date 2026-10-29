@@ -6,6 +6,12 @@ assert.deepEqual(normalizeStageProgress([6,5],[2,99],[false,false]),[2,5]);
 assert.deepEqual(normalizeStageProgress([6,5],[],[true,false]),[6,0]);
 assert(isStageUnlocked(2,2));
 assert(!isStageUnlocked(3,2));
+// Invalid house identifiers and corrupted progress must never unlock navigation.
+for(const invalid of [-1, -0.5, 1.5, NaN, Infinity, -Infinity]) assert(!isStageUnlocked(invalid,3),`Invalid house ${invalid}`);
+for(const invalidProgress of [-1, NaN, Infinity, -Infinity]) assert(!isStageUnlocked(0,invalidProgress),`Invalid progress ${invalidProgress}`);
+assert(isStageUnlocked(2,2.9));
+assert(!isStageUnlocked(3,2.9));
+
 assert.deepEqual(resolveStageVictory(0,0,6),{kind:'advance',nextProgress:1,nextStage:1});
 assert.deepEqual(resolveStageVictory(5,5,6),{kind:'complete',nextProgress:6});
 assert.deepEqual(resolveStageVictory(3,1,6),{kind:'replay',nextProgress:3});
