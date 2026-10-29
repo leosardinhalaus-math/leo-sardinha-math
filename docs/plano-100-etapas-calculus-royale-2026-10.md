@@ -340,3 +340,13 @@ Ainda é necessário implementar validação de pontuação pelo servidor, ambie
 - **CI observado no SHA dos testes:** `Calculus Royale build and dependency gate`, `Security regressions`, `Secret exposure guard`, `Firestore rules`, `Firebase dependency remediation experiment`, `Git history secret audit`, `Dependency security audit` e `Dependency remediation preview` concluíram **success**. `Build Calculus Royale` ainda `in_progress` nesta consulta. Não alegar build final aprovado até confirmação.
 - **Limites:** os testes de domínio não validam interação real, persistência de vitória, login, pontuação confiável nem antifraude. **Total permanece 66/100**; etapas 61, 66, 67 e 69 seguem abertas.
 - **Rollback:** reverter conjuntamente os commits `546b3d1` e `0ecba14`; sem merge, deploy ou alteração de Supabase de produção.
+
+
+## Continuação — 29/10/2026: integridade de seleção de casas e relógio
+
+- **Evidência pendente anterior resolvida:** no SHA `18df3e78631abc2d74bef79fc3dee27dae82d6c2`, os nove workflows concluíram `success`, incluindo `Calculus Royale build and dependency gate` (run `40698278369`) e `Build Calculus Royale` (run `40698278338`). Isso valida os testes automatizados de relógio com tempo inválido, sem representar teste de sessão em navegador.
+- **Falha de domínio identificada:** `isStageUnlocked` aceitava índices negativos e fracionários quando menores que o progresso, e aceitava índice zero com progresso `Infinity`. O menu usa índices válidos, mas a função de domínio não rejeitava entradas corrompidas.
+- **Correção e regressão:** commit `361ea2ee637bef29fc973e75d28b0206eb682f46` exige índice de casa inteiro, não negativo e progresso finito não negativo; commit `1be072830000291665b886b3644a73db4392e737` adiciona testes de valores negativos, fracionários, `NaN`, infinitos e do comportamento normal com progresso fracionário.
+- **CI confirmado no SHA de testes `1be0728`:** nove workflows concluíram `success`, incluindo `Calculus Royale build and dependency gate` (run `40871366221`), `Build Calculus Royale` (run `40871366196`), regressões de segurança, segredos, histórico, dependências, regras Firestore e experimento Firebase. A PR #4 segue em rascunho. Evidência: https://github.com/leosardinhalaus-math/leo-sardinha-math/actions/runs/40871366221
+- **Limites e estado:** protege uma regra local e evita seleção inválida, mas não comprova testes de toque, arena, autenticação real, pontuação confiável ou sincronização. **Total permanece 66/100**; nenhuma etapa pendente foi marcada.
+- **Rollback:** reverter `1be0728` e `361ea2e` conjuntamente caso apareça regressão. Sem merge, deploy, cobrança ou alteração no Supabase de produção.
