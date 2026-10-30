@@ -180,7 +180,7 @@ input[type=color]{height:44px;padding:2px}
 var st={xp:0,lvl:1};
 try{var s=JSON.parse(localStorage.getItem("raizes-portas")||"null");if(s&&s.lvl)st=s}catch(e){}
 st.alvl=st.alvl||1;st.flvl=st.flvl||1;st.tlvl=st.tlvl||1;st.mode=st.mode||"sede";
-st.xp=Math.max(0,parseInt(st.xp)||0);["lvl","alvl","flvl","tlvl"].forEach(function(k){st[k]=Math.max(1,parseInt(st[k])||1)});if(["sede","portas","arsenal","pesca","tanque"].indexOf(st.mode)<0)st.mode="sede";if(!Array.isArray(st.rk))st.rk=[];
+st.xp=Math.max(0,parseInt(st.xp)||0);["lvl","alvl","flvl","tlvl"].forEach(function(k){st[k]=Math.max(1,parseInt(st[k])||1)});if(["sede","portas","arsenal","pesca","tanque"].indexOf(st.mode)<0)st.mode="sede";if(!Array.isArray(st.rk))st.rk=[];st.rk=st.rk.filter(function(v){return typeof v==="string"&&v.length<=64}).slice(-200);
 function save(){try{localStorage.setItem("raizes-portas",JSON.stringify(st))}catch(e){}}
 var $=function(i){return document.getElementById(i)};
 function gcd(a,b){return b?gcd(b,a%b):Math.abs(a)}
@@ -372,7 +372,7 @@ var AVD={n:'Agente',c:'#2b3a55',h:'#0f1722',a:'#e0b83a'},NOME=/^[\p{L}\p{N} ._-]
 function applyAv(){var a=st.av,cor=/^#[0-9a-f]{6}$/i;if(!(a&&NOME.test(a.n)&&cor.test(a.c)&&cor.test(a.h)&&cor.test(a.a))){a=AVD;delete st.av}P.n=a.n;P.coat=a.c;P.hat=a.h;P.acc=a.a}
 function cs(s){var t=0;for(var i=0;i<s.length;i++)t=(t*31+s.charCodeAt(i))%9973;return t}
 function enc(n,xp){var b='AG1|'+n+'|'+xp;return b+'|'+cs(b)}
-function dec(s){var p=String(s).trim().split('|');if(p.length!==4||p[0]!=='AG1'||!NOME.test(p[1])||!/^\d{1,5}$/.test(p[2])||cs(p.slice(0,3).join('|'))!==+p[3])return null;return {n:p[1],xp:+p[2]}}
+function dec(s){if(typeof s!=="string"||s.length>64)return null;var p=s.trim().split('|');if(p.length!==4||p[0]!=='AG1'||!NOME.test(p[1])||!/^\d{1,5}$/.test(p[2])||cs(p.slice(0,3).join('|'))!==+p[3])return null;return {n:p[1],xp:+p[2]}}
 function myCode(){return enc((st.av||AVD).n,Math.min(st.xp,99999))}
 function showBoard(){var m={};(st.rk||[]).concat([myCode()]).forEach(function(l){var d=dec(l);if(d&&(!m[d.n]||m[d.n]<d.xp))m[d.n]=d.xp});
  var t=$('tb'),rows=Object.keys(m).map(function(k){return [k,m[k]]}).sort(function(a,b){return b[1]-a[1]});t.textContent='';
@@ -383,7 +383,7 @@ $('vs').onclick=function(ev){var n=$('vn').value.trim();if(!NOME.test(n)){ev.pre
 $('brank').onclick=function(){$('rm').value=myCode();$('rx').textContent='';showBoard();$('dr').showModal()};
 $('rc').onclick=function(){var r=$('rm');r.select();var ok=function(){$('rx').textContent='Código copiado. Cole no grupo da turma.'},no=function(){try{document.execCommand('copy')?ok():$('rx').textContent='Selecione o código e copie.'}catch(e){$('rx').textContent='Selecione o código e copie.'}};
  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(r.value).then(ok,no);else no()};
-$('ra').onclick=function(){var L=$('rt').value.split('\n').map(function(s){return s.trim()}).filter(Boolean),good=L.filter(function(s){return dec(s)});
+$('ra').onclick=function(){var raw=$('rt').value.slice(0,16000),L=raw.split('\n').slice(0,200).map(function(s){return s.trim()}).filter(Boolean),good=L.filter(function(s){return s.length<=64&&dec(s)});
  st.rk=(st.rk||[]).concat(good).slice(-200);save();$('rt').value='';showBoard();$('rx').textContent=good.length+' código(s) aceito(s)'+(L.length>good.length?', '+(L.length-good.length)+' inválido(s) ignorado(s)':'')+'.'};
 applyAv();
 // teste das contas e dos dados do mapa. Uso: abrir a página com #teste no final do endereço, ou selfTest() no console.
