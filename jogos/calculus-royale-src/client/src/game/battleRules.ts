@@ -15,9 +15,9 @@ export function elixirMultiplier(elapsedSeconds: number): 1 | 2 | 3 {
 }
 
 /** Mantém a ordem escolhida, remove IDs repetidos/desconhecidos e completa com cartas válidas. */
-export function normalizeDeck(savedIds: string[], availableIds: string[]): string[] {
+export function normalizeDeck(savedIds: unknown, availableIds: string[]): string[] {
   const available = new Set(availableIds);
-  const chosen = [...new Set(savedIds.filter((id) => available.has(id)))].slice(0, DECK_SIZE);
+  const chosen = [...new Set((Array.isArray(savedIds) ? savedIds : []).filter((id): id is string => typeof id === 'string' && available.has(id)))].slice(0, DECK_SIZE);
   for (const id of availableIds) {
     if (chosen.length >= DECK_SIZE) break;
     if (!chosen.includes(id)) chosen.push(id);
@@ -26,7 +26,7 @@ export function normalizeDeck(savedIds: string[], availableIds: string[]): strin
 }
 
 export function battleClockLabel(elapsedSeconds: number): string {
-  const elapsed = Math.max(0, Math.floor(elapsedSeconds));
+  const elapsed = Number.isFinite(elapsedSeconds) ? Math.max(0, Math.floor(elapsedSeconds)) : 0;
   const format = (seconds: number) => `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
   if (elapsed >= REGULATION_SECONDS) return `OT ${format(Math.min(OVERTIME_SECONDS, elapsed - REGULATION_SECONDS))}`;
   return format(REGULATION_SECONDS - elapsed);

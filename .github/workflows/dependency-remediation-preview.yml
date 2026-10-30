@@ -1,0 +1,58 @@
+name: Dependency remediation preview
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/dependency-remediation-preview.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  propose-fixes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        project:
+          - jogos/calculus-royale-src
+          - tools/firebase-tests
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.12.0'
+      - name: Show current vulnerability status
+        continue-on-error: true
+        working-directory: ${{ matrix.project }}
+        run: npm audit --package-lock-only --audit-level=high
+      - name: Preview safe non-force lockfile updates
+        continue-on-error: true
+        working-directory: ${{ matrix.project }}
+        run: npm audit fix --package-lock-only --ignore-scripts --no-fund
+      - name: Confirm package manifests remain unchanged
+        run: git diff --exit-code -- jogos/calculus-royale-src/package.json tools/firebase-tests/package.json
+      - name: Recheck security advisories
+        continue-on-error: true
+        working-directory: ${{ matrix.project }}
+        run: npm audit --package-lock-only --audit-level=high
+      - name: Check that lockfile is installable
+        working-directory: ${{ matrix.project }}
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Validate Calculus Royale typecheck and build
+        if: matrix.project == 'jogos/calculus-royale-src'
+        working-directory: jogos/calculus-royale-src
+        run: |
+          npm run check
+          npm run build
+      - name: Upload proposed patch for review
+        if: always()
+        run: git diff --binary -- jogos/calculus-royale-src/package-lock.json tools/firebase-tests/package-lock.json > remediation.patch
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: remediation-${{ strategy.job-index }}
+          path: remediation.patch
+          retention-days: 7

@@ -2,7 +2,7 @@ import { stepCombat, SPAWN_ZONES, zoneAvailable, type CombatUnit, type CombatEve
 import { BATTLE_TICK_SECONDS, DECK_SIZE, ELIXIR_PER_TICK, OVERTIME_SECONDS, REGULATION_SECONDS, STARTING_ELIXIR, battleClockLabel, compareTowerHealth, elixirMultiplier, normalizeDeck, type MatchOutcome } from "@/game/battleRules";
 import { getStageEncounter } from "@/game/stageEncounters";
 import { getCardProfile, abilityDescription } from "@/game/cardProfiles";
-import { isStageUnlocked, normalizeStageProgress, resolveStageVictory } from "@/game/progression";
+import { isStageUnlocked, normalizeCompletedWorlds, normalizeStageProgress, normalizeWorldIndex, resolveStageVictory } from "@/game/progression";
 import { createChallengePicker, type Challenge } from "@/data/powerUpChallenges";
 import { WORLD_MAPS } from "@/data/worldMaps";
 import { readStorage, storageKeys, writeStorage } from "@/data/saveGame";
@@ -211,7 +211,7 @@ const initialDeck = () => {
 };
 
 export default function GameCanvas() {
-  const [worldIndex, setWorldIndex] = useState(() => Math.min(4, Math.max(0, readStorage(storageKeys.worldIndex, 0))));
+  const [worldIndex, setWorldIndex] = useState(() => normalizeWorldIndex(readStorage<unknown>(storageKeys.worldIndex, 0), worlds.length));
   const [energy, setEnergy] = useState(STARTING_ELIXIR);
   const [enemyTower, setEnemyTower] = useState(() => getWorldEnemyHp(worldIndex, 0));
   const [allyTower, setAllyTower] = useState(96);
@@ -259,9 +259,9 @@ export default function GameCanvas() {
   const battleResolvedRef = useRef(false);
   const [battleLog, setBattleLog] = useState("Arena pronta — escolha uma carta para lançar a primeira prova.");
   const [toast, setToast] = useState("");
-  const [completedWorlds, setCompletedWorlds] = useState<boolean[]>(() => readStorage(storageKeys.worlds, [false, false, false, false, false]));
+  const [completedWorlds, setCompletedWorlds] = useState<boolean[]>(() => normalizeCompletedWorlds(readStorage<unknown>(storageKeys.worlds, []), worlds.length));
   const [stageProgress, setStageProgress] = useState<number[]>(() => {
-    const completed=readStorage<boolean[]>(storageKeys.worlds,[false,false,false,false,false]);
+    const completed=normalizeCompletedWorlds(readStorage<unknown>(storageKeys.worlds,[]),worlds.length);
     return normalizeStageProgress(worlds.map(item=>item.chapters.length),readStorage<unknown>(storageKeys.stages,[]),completed);
   });
   const [cardLevels, setCardLevels] = useState<Record<string, number>>(() => readStorage(storageKeys.levels, {}));
@@ -269,12 +269,12 @@ export default function GameCanvas() {
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const challengePicker = useRef(createChallengePicker());
   const [chapter, setChapter] = useState(() => {
-    const selectedWorld=Math.min(4,Math.max(0,readStorage(storageKeys.worldIndex,0)));
+    const selectedWorld=normalizeWorldIndex(readStorage<unknown>(storageKeys.worldIndex,0),worlds.length);
     const completed=readStorage<boolean[]>(storageKeys.worlds,[false,false,false,false,false]);
     const progress=normalizeStageProgress(worlds.map(item=>item.chapters.length),readStorage<unknown>(storageKeys.stages,[]),completed);
     return Math.min(worlds[selectedWorld].chapters.length-1,progress[selectedWorld]);
   });
-  const [wins, setWins] = useState(() => readStorage(storageKeys.wins, 12));
+  const [wins, setWins] = useState(() => readStorage(storageKeys.wins, 0));
   const [coins, setCoins] = useState(() => readStorage(storageKeys.coins, 320));
   const [soundVolume, setSoundVolume] = useState(() => readStorage(storageKeys.volume, 0.7));
   const [soundMuted, setSoundMuted] = useState(() => readStorage(storageKeys.muted, false));

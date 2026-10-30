@@ -1,0 +1,41 @@
+name: Calculus Royale build and dependency gate
+
+on:
+  pull_request:
+    paths:
+      - 'jogos/calculus-royale-src/**'
+      - '.github/workflows/calculus-build-gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: jogos/calculus-royale-src
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.12.0'
+          cache: npm
+          cache-dependency-path: jogos/calculus-royale-src/package-lock.json
+      - name: Verify dependency advisories
+        run: npm audit --package-lock-only --audit-level=high
+      - name: Reproducible install
+        run: npm ci --no-audit --no-fund
+      - name: TypeScript check
+        run: npm run check
+      - name: Game rules and progression regressions
+        run: |
+          npm run test:combat
+          npm run test:save
+          npm run test:progression
+          npm run test:battle-rules
+          npm run test:cave-encounters
+      - name: Build game and assets
+        run: npm run build

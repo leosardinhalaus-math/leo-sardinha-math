@@ -13,6 +13,7 @@ type Manifest={useGenerated?:boolean;characters?:Record<string,ModelSpec>;worlds
 export type GameHandle={setState:(state:ArenaState)=>void;resetCamera:()=>void;viewIsland:()=>void;dispose:()=>void};
 
 export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(warnings:number)=>void,onError:()=>void,onSelectZone?:(id:string)=>void,stageIndex=0):GameHandle{
+ const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
  const renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:false});
  renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
  renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;
@@ -22,7 +23,7 @@ export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(w
  const rim=new T.DirectionalLight(0x65cfff,1.15);rim.position.set(14,10,-12);scene.add(rim);
  const world=createWorld(index,stageIndex);scene.background=new T.Color(world.sky);scene.fog=new T.FogExp2(world.fog,.008);rim.color.set(world.accent);scene.add(world.root);
  const camera=new T.PerspectiveCamera(42,1,.1,120);const controls=new OrbitControls(camera,canvas);
- controls.enableDamping=true;controls.enableRotate=false;controls.enablePan=false;controls.enableZoom=true;controls.minDistance=7;controls.maxDistance=65;
+ controls.enableDamping=!reducedMotion;controls.enableRotate=false;controls.enablePan=false;controls.enableZoom=true;controls.minDistance=7;controls.maxDistance=65;
  // Câmera fixa ao sul: aliados nascem embaixo e avançam para o norte da tela.
  function resetCamera(){const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight),distance=Math.max(24,11/(Math.tan(T.MathUtils.degToRad(21))*aspect));camera.position.set(-distance*.78,distance*.86,0);controls.target.set(0,.35,0);controls.update();canvas.dataset.cameraMode='combat';}
  function viewIsland(){const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight),distance=Math.max(26,10/(Math.tan(T.MathUtils.degToRad(21))*aspect));camera.position.set(-distance*.78,distance*.9,0);controls.target.set(.6,.28,0);controls.update();canvas.dataset.cameraMode='island';}
@@ -85,19 +86,19 @@ export function createGameScene(canvas:HTMLCanvasElement,index:number,onReady:(w
  function render(){
   if(disposed)return;frame=requestAnimationFrame(render);const dt=Math.min(clock.getDelta(),.05);
   if(document.hidden)return;
-  worldTime+=dt;world.update(worldTime);
+  worldTime+=reducedMotion?0:dt;world.update(worldTime);
   if(ready){synchronize();for(const actor of actors.values()){
    const {visual,unit,enemy,lane}=actor;
    actor.health.scale.x=Math.max(.01,(unit.hp??1)/(unit.maxHp??1));actor.health.quaternion.copy(camera.quaternion);actor.health.quaternion.premultiply(visual.group.quaternion.clone().invert());
-   if(actor.exitAge!==undefined){actor.exitAge+=state.paused&&!state.outcome?0:dt;visual.play(actor.exitMotion??'defeat');visual.mixer.update(state.paused&&!state.outcome?0:dt);if(actor.exitAge>1.1){scene.remove(visual.group);visual.dispose();actor.health.geometry.dispose();(actor.health.material as T.Material).dispose();actors.delete(`${enemy?'e':'a'}${unit.id}`);}continue;}
-   if(state.outcome){visual.play((state.outcome==='victory')!==enemy?'victory':'defeat');visual.mixer.update(dt);continue;}
+   if(actor.exitAge!==undefined){actor.exitAge+=state.paused&&!state.outcome?0:dt;visual.play(actor.exitMotion??'defeat');visual.mixer.update(reducedMotion?0:state.paused&&!state.outcome?0:dt);if(actor.exitAge>1.1){scene.remove(visual.group);visual.dispose();actor.health.geometry.dispose();(actor.health.material as T.Material).dispose();actors.delete(`${enemy?'e':'a'}${unit.id}`);}continue;}
+   if(state.outcome){visual.play((state.outcome==='victory')!==enemy?'victory':'defeat');visual.mixer.update(reducedMotion?0:dt);continue;}
    const target=arenaPosition(unit.progress,enemy,lane);const distance=visual.group.position.distanceTo(target);
-   if(!state.paused){actor.age+=dt;const next=visual.group.position.clone().lerp(target,1-Math.exp(-8*dt));moveWithCollisions(visual.group.position,next,world.obstacles);}
+   if(!state.paused){actor.age+=dt;const next=reducedMotion?target:visual.group.position.clone().lerp(target,1-Math.exp(-8*dt));moveWithCollisions(visual.group.position,next,world.obstacles);}
    actor.attackFor=Math.max(0,actor.attackFor-(state.paused?0:dt));actor.hurtFor=Math.max(0,actor.hurtFor-(state.paused?0:dt));
    const motion=state.paused?'idle':actor.hurtFor>0?'hurt':actor.attackFor>0?'power':actor.age<.65?'summon':distance>.7?'run':distance>.025?'walk':'idle';
-   visual.play(motion);visual.mixer.update(state.paused?0:dt);
+   visual.play(motion);visual.mixer.update(reducedMotion||state.paused?0:dt);
   }}
-  preview?.mixer.update(dt);
+  preview?.mixer.update(reducedMotion?0:dt);
   for(let i=effects.length-1;i>=0;i--)if(!effects[i].update(state.paused&&!state.outcome?0:dt)){scene.remove(effects[i].group);effects[i].dispose();effects.splice(i,1);}
   controls.update();renderer.render(scene,camera);
   canvas.dataset.frames=String(Number(canvas.dataset.frames??0)+1);

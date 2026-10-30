@@ -5,14 +5,14 @@ on:
     branches: [main]
     paths:
       - 'jogos/calculus-royale/**'
-      - 'jogos/calculus-royale-src/client/public/**'
+      - 'jogos/calculus-royale-src/**'
       - 'jogos/laboratorio-digital-matematica/**'
       - 'tests/**'
       - '.github/workflows/security-regressions.yml'
   pull_request:
     paths:
       - 'jogos/calculus-royale/**'
-      - 'jogos/calculus-royale-src/client/public/**'
+      - 'jogos/calculus-royale-src/**'
       - 'jogos/laboratorio-digital-matematica/**'
       - 'tests/**'
       - '.github/workflows/security-regressions.yml'
