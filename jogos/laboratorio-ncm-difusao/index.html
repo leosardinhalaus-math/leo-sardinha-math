@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Experimento didático de geração sequencial, refinamento iterativo e planejamento por conceitos."><title>Laboratório NCM e Difusão · Leo Sardinha.Math</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,Segoe UI,sans-serif;background:#081526;color:#ecf5ff}*{box-sizing:border-box}body{margin:0}header{background:#10253d;padding:16px 5%;border-bottom:1px solid #29435f}a{color:#75dfd3}main{max-width:1050px;margin:auto;padding:28px 18px 70px}h1{font-size:clamp(1.65rem,4vw,2.7rem);margin-bottom:6px}p{line-height:1.6;color:#c4d6e5}.eyebrow{color:#7de1ce;font-weight:700}button{border:1px solid #558fa4;color:#f4f9ff;background:#183954;padding:11px 16px;border-radius:11px;cursor:pointer;font-weight:700}button:focus-visible{outline:3px solid #81e5d6}button[aria-pressed=true],button:hover{background:#187d7e}button:disabled{opacity:.45;cursor:default}.actions{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}.panel{background:#10253a;border:1px solid #294661;border-radius:16px;padding:20px;margin:18px 0}.board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;max-width:400px;margin:20px auto}.cell{aspect-ratio:1;border:1px solid #396781;border-radius:10px;display:grid;place-items:center;background:#17334e;font-size:clamp(19px,5vw,30px);font-weight:800}.cell.fixed{background:#29465d;color:#9de2ff}.cell.pending{color:#97abc1;font-size:clamp(12px,2vw,17px)}.cell.proposed{background:#3a4a4e;color:#ffda93}.cell.solved{background:#175b56;color:#baffed}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.mini{background:#152d45;border-radius:11px;padding:14px}.mini strong{display:block;color:#91e6d4}.note{font-size:.9rem}.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+</style></head><body>
+<header><a href="../../educacao.html">← Educação</a> · Leo Sardinha.Math</header>
+<main><div class="eyebrow">EXPERIMENTO INTERATIVO · RACIOCÍNIO COMPUTACIONAL</div><h1>Como a IA constrói uma solução?</h1><p>Compare três estratégias inspiradas em pesquisas de geração: sequência, refinamento global e construção do geral para o detalhe. O desafio é completar uma grade 4×4 com os números 1 a 4, sem repeti-los em linhas, colunas e blocos 2×2.</p>
+<section class="panel" aria-label="Simulação">
+<div class="actions" role="group" aria-label="Selecionar estratégia">
+<button id="seq" aria-pressed="true" type="button">1. Sequencial</button>
+<button id="diff" aria-pressed="false" type="button">2. Difusão (analogia)</button>
+<button id="ncm" aria-pressed="false" type="button">3. NCM (analogia)</button>
+</div>
+<div id="board" class="board" role="img" aria-label="Grade do desafio"></div>
+<p id="step" aria-live="polite"></p>
+<div class="actions"><button id="next" type="button">Próximo passo</button><button id="auto" type="button">Executar tudo</button><button id="reset" type="button">Recomeçar</button></div>
+</section>
+<section class="grid">
+<div class="mini"><strong>Sequencial</strong><p>Revela uma casa por vez, como analogia da geração autorregressiva. Não reproduz a inferência de um LLM.</p></div>
+<div class="mini"><strong>Difusão</strong><p>Mostra candidatos em todas as casas e refina a grade por rodadas. Não executa uma rede neural de difusão.</p></div>
+<div class="mini"><strong>NCM</strong><p>Começa com grupos e restrições globais e depois detalha as casas em paralelo. Não executa o NCM de Stanford.</p></div>
+</section>
+<section class="panel"><h2>Atividade para a turma</h2><p>Qual abordagem oferece primeiro uma visão do problema inteiro? Qual apresenta uma resposta completa em menos etapas nesta demonstração? Por que o número de etapas de uma animação <strong>não é</strong> uma medida válida da velocidade de modelos reais?</p><p class="note">Esta é uma analogia visual programada com uma solução já conhecida, não um benchmark científico, uma IA treinada ou a reprodução dos resultados do artigo.</p><p>Pesquisa: <a href="https://arxiv.org/abs/2610.14162" target="_blank" rel="noopener noreferrer">Next-Concept Modeling (2026)</a> · <a href="https://github.com/hazyresearch/ncm" target="_blank" rel="noopener noreferrer">código dos pesquisadores</a></p></section>
+</main>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id);
+const puzzle=[1,0,0,4,0,4,1,0,0,1,4,0,4,0,0,1];
+const answer=[1,2,3,4,3,4,1,2,2,1,4,3,4,3,2,1];
+const pending=Array.from({length:16},(_,i)=>puzzle[i]?String(puzzle[i]):'·');
+const unknown=answer.map((v,i)=>puzzle[i]?String(v):'?');
+const final=answer.map(String);
+let mode='seq',idx=0,frames=[];
+function frame(caption,values,styles){return{caption,values,styles:styles||[]}}
+function build(){
+const empty=()=>answer.map((v,i)=>puzzle[i]?String(v):'·');
+frames=[frame('Ponto de partida: observe os números fixos.',empty())];
+if(mode==='seq'){
+let s=empty();answer.forEach((v,i)=>{if(!puzzle[i]){s=[...s];s[i]=String(v);frames.push(frame('Uma nova casa é preenchida; as anteriores permanecem.',s,answer.map((_,j)=>puzzle[j]?'fixed':s[j]!=='·'?'solved':'pending')))}})
+}else if(mode==='diff'){
+let base=answer.map((v,i)=>puzzle[i]?String(v):'1 2 3 4');
+frames.push(frame('Todos os espaços exibem possibilidades ao mesmo tempo.',base,answer.map((_,i)=>puzzle[i]?'fixed':'pending')));
+base=answer.map((v,i)=>puzzle[i]?String(v):v%2?'1 / 3':'2 / 4');
+frames.push(frame('Primeira rodada: as possibilidades são reduzidas globalmente.',base,answer.map((_,i)=>puzzle[i]?'fixed':'proposed')));
+frames.push(frame('Nova rodada: a grade inteira é refinada.',final,answer.map((_,i)=>puzzle[i]?'fixed':'solved')));
+}else{
+frames.push(frame('Planejamento global: quatro regiões 2×2 devem conter 1, 2, 3 e 4.',answer.map((v,i)=>puzzle[i]?String(v):'□'),answer.map((_,i)=>puzzle[i]?'fixed':'pending')));
+frames.push(frame('Planejamento intermediário: linhas e colunas impõem restrições simultâneas.',unknown,answer.map((_,i)=>puzzle[i]?'fixed':'proposed')));
+frames.push(frame('Detalhamento: todas as posições recebem os valores corretos.',final,answer.map((_,i)=>puzzle[i]?'fixed':'solved')));
+}idx=0;render()
+}
+function render(){
+const f=frames[idx];$('board').replaceChildren();
+f.values.forEach((v,i)=>{const d=document.createElement('div');d.className='cell '+(puzzle[i]?'fixed':f.styles[i]||(v==='·'?'pending':'solved'));d.textContent=v;$('board').append(d)});
+$('step').textContent='Etapa '+idx+' de '+(frames.length-1)+': '+f.caption;$('next').disabled=idx>=frames.length-1;
+}
+['seq','diff','ncm'].forEach(id=>$(id).addEventListener('click',()=>{mode=id;['seq','diff','ncm'].forEach(k=>$(k).setAttribute('aria-pressed',String(k===mode)));build()}));
+$('next').addEventListener('click',()=>{if(idx<frames.length-1){idx++;render()}});
+$('auto').addEventListener('click',()=>{idx=frames.length-1;render()});
+$('reset').addEventListener('click',build);
+build();
+})();
+</script></body></html>
