@@ -36,4 +36,7 @@ assert.equal(battleClockLabel(NaN), "03:00");
 assert.equal(battleClockLabel(Infinity), "03:00");
 assert.equal(battleClockLabel(-Infinity), "03:00");
 assert.equal(battleClockLabel(-5), "03:00");
+assert.deepEqual(normalizeDeck(null,catalog),catalog.slice(0,8));
+assert.deepEqual(normalizeDeck({bad:'save'},catalog),catalog.slice(0,8));
+assert.deepEqual(normalizeDeck(['slope',null,42,'limit','slope'],catalog),catalog.slice(0,8));
 console.log("PASS: deck de 8 cartas, rotação compatível, relógio, elixir duplo/triplo e desempate por proporção de torre.");

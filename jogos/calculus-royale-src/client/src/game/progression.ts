@@ -23,3 +23,16 @@ export function resolveStageVictory(progress:number,selectedStage:number,totalSt
  if(nextProgress>=safeTotal)return {kind:'complete',nextProgress};
  return {kind:'advance',nextProgress,nextStage:nextProgress};
 }
+
+/** Repara índices de ilha corrompidos sem tentar indexar um mundo inexistente. */
+export function normalizeWorldIndex(saved: unknown, worldCount: number): number {
+ if (!Number.isInteger(worldCount) || worldCount <= 0 || typeof saved !== 'number' || !Number.isFinite(saved)) return 0;
+ return Math.min(worldCount - 1, Math.max(0, Math.floor(saved)));
+}
+
+/** Apenas booleanos verdadeiros confirmam a conclusão de uma ilha no salvamento local. */
+export function normalizeCompletedWorlds(saved: unknown, worldCount: number): boolean[] {
+ if (!Number.isInteger(worldCount) || worldCount <= 0) return [];
+ const values = Array.isArray(saved) ? saved : [];
+ return Array.from({length: worldCount}, (_, index) => values[index] === true);
+}

@@ -15,9 +15,9 @@ export function elixirMultiplier(elapsedSeconds: number): 1 | 2 | 3 {
 }
 
 /** Mantém a ordem escolhida, remove IDs repetidos/desconhecidos e completa com cartas válidas. */
-export function normalizeDeck(savedIds: string[], availableIds: string[]): string[] {
+export function normalizeDeck(savedIds: unknown, availableIds: string[]): string[] {
   const available = new Set(availableIds);
-  const chosen = [...new Set(savedIds.filter((id) => available.has(id)))].slice(0, DECK_SIZE);
+  const chosen = [...new Set((Array.isArray(savedIds) ? savedIds : []).filter((id): id is string => typeof id === 'string' && available.has(id)))].slice(0, DECK_SIZE);
   for (const id of availableIds) {
     if (chosen.length >= DECK_SIZE) break;
     if (!chosen.includes(id)) chosen.push(id);

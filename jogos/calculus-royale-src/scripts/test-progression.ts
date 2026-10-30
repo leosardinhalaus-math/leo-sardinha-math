@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import {isStageUnlocked,normalizeStageProgress,resolveStageVictory} from '../client/src/game/progression.ts';
+import {isStageUnlocked,normalizeCompletedWorlds,normalizeStageProgress,normalizeWorldIndex,resolveStageVictory} from '../client/src/game/progression.ts';
 
 assert.deepEqual(normalizeStageProgress([6,5],[2,99],[false,false]),[2,5]);
 assert.deepEqual(normalizeStageProgress([6,5],[],[true,false]),[6,0]);
@@ -53,3 +53,15 @@ assert.deepEqual(resolveStageVictory(2.9,2,6),{kind:'advance',nextProgress:3,nex
 assert.deepEqual(resolveStageVictory(0,0,0),{kind:'replay',nextProgress:0});
 assert.deepEqual(resolveStageVictory(0,0,NaN),{kind:'replay',nextProgress:0});
 assert.deepEqual(resolveStageVictory(0,0,-3),{kind:'replay',nextProgress:0});
+
+// Corrupt browser saves must not crash the world/chapter initializers.
+assert.equal(normalizeWorldIndex(2.9,5),2);
+assert.equal(normalizeWorldIndex(99,5),4);
+assert.equal(normalizeWorldIndex(-2,5),0);
+for (const value of [NaN,Infinity,-Infinity,null,'2',{},undefined]) assert.equal(normalizeWorldIndex(value,5),0);
+assert.equal(normalizeWorldIndex(3,0),0);
+assert.deepEqual(normalizeCompletedWorlds(null,5),[false,false,false,false,false]);
+assert.deepEqual(normalizeCompletedWorlds([true,1,'true',false],5),[true,false,false,false,false]);
+assert.deepEqual(normalizeCompletedWorlds([true,false],0),[]);
+assert.deepEqual(normalizeStageProgress([6,5],[1,1],normalizeCompletedWorlds(null,2)),[1,1]);
+assert.deepEqual(normalizeStageProgress([6,5],[1,1],normalizeCompletedWorlds([true,false],2)),[6,1]);
