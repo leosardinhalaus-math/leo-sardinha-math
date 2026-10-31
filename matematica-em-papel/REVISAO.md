@@ -47,7 +47,7 @@
 
 ## Biblioteca e navegação
 
-A aba Modelos reúne HEX, OCT, cubo invertível (guia externo), Poly Puzzle, Sphericon e mini-livro, com ilustrações e atalhos. Prévia dos caleidociclos e do Sphericon calculada a partir das superfícies em 3D. Oito abas navegáveis por teclado e URLs diretas #poly-puzzle, #sphericon e #modelos. Links descritivos atualizados na página inicial e em Educação.
+A aba Modelos reúne HEX, OCT, cubo invertível personalizável, Poly Puzzle, Sphericon e mini-livro, com ilustrações e atalhos. Prévia dos caleidociclos e do Sphericon calculada a partir das superfícies em 3D. Oito abas navegáveis por teclado e URLs diretas #poly-puzzle, #sphericon e #modelos. Links descritivos atualizados na página inicial e em Educação.
 
 ## Verificação da atualização
 
@@ -76,7 +76,7 @@ O módulo de caleidociclos foi refeito a partir da referência visual fornecida 
 - A numeração dos setores, a orientação e o centro da imagem acompanham a paridade das dobradiças e a face revelada.
 - Molde contínuo com abas C e fechamento F1/F2, legenda de corte/vale/montanha e instruções.
 - Impressão de uma página A4 paisagem a 100% e download de SVG independente com as quatro imagens incorporadas.
-- O cubo invertível aparece como **guia externo**, com ligação ao molde e à montagem da referência. Não possui gerador fotográfico local: a rede experimental foi retirada por falta de validação suficiente.
+- **Cubo invertível:** gerador local com quatro fotos, seis pirâmides alternadamente espelhadas e 24 triângulos. A planificação preserva as arestas 1, 1, √3, 2, 2 e √5 do tetraedro de Schatz. Seis peças separadas, abas a/b/c e dobradiças J1–J6 com extremos A/B/C/D identificados. PDF A4 paisagem em uma página e SVG independente.
 
 ## Verificação
 
@@ -88,7 +88,7 @@ O módulo de caleidociclos foi refeito a partir da referência visual fornecida 
 
 Chromium/Playwright: quatro campos de fotos, troca de modelo, recorte, upload válido/inválido, geração, invalidação do resultado antigo, download SVG, ausência de erros JavaScript e largura móvel de 390 px. HEX e OCT exportados em uma página A4 paisagem cada; XML dos SVGs exportados válido. Revisão visual do formulário e dos moldes gerados.
 
-A validação matemática cobre as duas redes e a recomposição das imagens nas posições fechadas. Não substitui montagem física com papel, cola e tolerâncias reais; essa montagem não foi realizada.
+A validação matemática cobre HEX, OCT e o cubo de Schatz, incluindo a recomposição das imagens nas posições de revelação. Não substitui montagem física com papel, cola e tolerâncias reais; essa montagem não foi realizada.
 
 ## Referências
 
@@ -99,3 +99,11 @@ A validação matemática cobre as duas redes e a recomposição das imagens nas
 ## Outros módulos
 
 Origamis, mini-livros, banco de REA e jogos foram preservados. A presente revisão se concentra no gerador fotográfico solicitado na última referência; não constitui validação física ou redesenho das sequências de origami existentes. Os outros módulos mantêm seus próprios controles de JSON e impressão.
+
+## Cubo invertível — personalização
+
+Construção analítica própria a partir de Marcus Engel, [M.C. Escher Kaleidocycles (2003)](https://www.polyhedra-world.nc/stuff/AniKa/kaleidocycles_theory.pdf), seção do cubo invertível. Não utiliza a proporção isósceles dos modelos HEX/OCT.
+
+`node --test tests/invertible-cube.test.cjs` verifica a rigidez de todas as arestas e o fechamento das seis dobradiças em 96 posições do ciclo, a alternância de orientação, as dimensões das planificações e a recomposição das quatro fotos sem sobreposição dos setores. O mapeamento das imagens usa as projeções frontal/traseira em duas posições de revelação, com uma transformação afim independente por face.
+
+Chromium/Playwright: quatro arquivos, geração de 24 faces, quatro imagens incorporadas, impressão em uma página A4 paisagem, download SVG e troca entre cubo, HEX e OCT. Recorte com preenchimento ou foto inteira também testado no contorno triangular. Montagem física não realizada.
