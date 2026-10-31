@@ -915,6 +915,12 @@
         transition-duration: 0.01ms !important;
       }
     }
+
+    #conteudo-matematico{max-width:100%;padding:10px;font:inherit;border-radius:8px}#descricao-conteudo,#conteudo-partida,#ajuda-espelho{line-height:1.5}
+    .frente-a-frente .grade-tabuleiros .area-tabuleiro:first-child{transform:rotate(180deg)}
+    #relatorio-contas{width:min(1100px,96vw);max-height:90vh;border:2px solid #0c4a6e;border-radius:14px;padding:22px;color:#123047;background:#fff}#relatorio-contas::backdrop{background:#082f49bb}
+    .tabela-relatorio{overflow:auto;margin:18px 0}#relatorio-contas table{border-collapse:collapse;width:100%;font-size:.9rem}#relatorio-contas th,#relatorio-contas td{padding:10px;border:1px solid #aac6d8;text-align:left}#relatorio-contas th{background:#e8f5fb}#relatorio-contas .botao-acao{color:#fff;background:#075985}#relatorio-contas p{line-height:1.5}
+    @media print{body.print-report>main,body.print-report>#modal-fundo{display:none!important}body.print-report #relatorio-contas{display:block!important;position:static!important;width:auto!important;max-height:none!important;height:auto!important;overflow:visible!important;border:0;padding:0}body.print-report #relatorio-contas .acoes{display:none!important}body.print-report .tabela-relatorio{overflow:visible}body.print-report #relatorio-contas table{font-size:8pt}body.print-report tr{break-inside:avoid}body.print-report{background:white}body.print-report dialog::backdrop{display:none}}
   </style>
 </head>
 <body>
@@ -930,7 +936,7 @@
         <h1 id="titulo-principal">Batalha Naval Matemática</h1>
         <p class="subtitulo">
           Escolha um modo, resolva os desafios e encontre toda a frota escondida.
-          Quando acertar, você joga novamente; quando errar, a vez passa.
+          Quando acertar um navio, você joga novamente. Um erro na conta ou um tiro na água passa a vez.
         </p>
 
         <p class="acoes"><a class="botao-acao" href="../../index.html">← Página inicial</a><a class="botao-acao" href="../../professor/">👨‍🏫 Área do Professor</a></p>
@@ -948,6 +954,10 @@
               <option value="5">5º ano</option>
             </select>
           </label>
+          <label class="seletor-ano" for="conteudo-matematico">Conteúdo dos desafios:
+            <select id="conteudo-matematico"></select>
+          </label>
+          <p id="descricao-conteudo" aria-live="polite"></p>
         <div class="grade-modos" aria-label="Modos com contas">
           <button id="modo-cooperativo" class="botao-modo cooperativo" type="button">
             <span class="emoji" aria-hidden="true">🤝</span>
@@ -1007,7 +1017,9 @@
           </div>
 
           <div class="acoes">
-            <button id="novo-jogo" class="botao-acao" type="button">🔄 Novo jogo</button>
+            <button id="espelhar" class="botao-acao" type="button" aria-pressed="false">Modo espelhado: desligado</button>
+            <button id="abrir-relatorio" class="botao-acao" type="button">Relatório das contas</button>
+            <button id="novo-jogo" title="Inicia outra partida e limpa o relatório atual; baixe o CSV antes, se quiser guardar." class="botao-acao" type="button">🔄 Novo jogo</button>
             <button id="tela-cheia" class="botao-acao" type="button">⛶ Tela cheia</button>
             <button id="voltar-menu" class="botao-acao" type="button">↩️ Modos</button>
           </div>
@@ -1079,6 +1091,9 @@
           <p id="erro-coordenada" role="alert" aria-live="assertive" hidden></p>
         </section>
 
+        <p id="conteudo-partida"></p>
+        <p id="ajuda-espelho" hidden>Modo espelhado: o primeiro tabuleiro gira 180° para a pessoa do outro lado da mesa. As coordenadas e as regras permanecem as mesmas.</p>
+        <p>Matemática no tabuleiro: localize linhas e colunas, descreva posições e planeje os próximos alvos. Compare as estratégias depois da partida.</p>
         <div class="grade-tabuleiros">
           <section class="area-tabuleiro" aria-labelledby="titulo-tabuleiro-jogador">
             <h3 id="titulo-tabuleiro-jogador">🧒 Seu mar</h3>
@@ -1109,6 +1124,13 @@
     </div>
   </div>
 
+  <dialog id="relatorio-contas" aria-labelledby="titulo-relatorio">
+    <h2 id="titulo-relatorio">Relatório das contas</h2>
+    <p>Registro da partida atual neste navegador. Baixe antes de iniciar um novo jogo ou recarregar a página. Pontos e acertos nos navios não são a avaliação das contas.</p>
+    <div id="resumo-relatorio" aria-live="polite"></div>
+    <div class="tabela-relatorio"><table><thead><tr><th>#</th><th>Jogador</th><th>Alvo</th><th>Conta</th><th>Resposta dada</th><th>Resposta correta</th><th>Resultado</th><th>Conteúdo / BNCC</th></tr></thead><tbody id="linhas-relatorio"></tbody></table></div>
+    <div class="acoes"><button type="button" class="botao-acao" id="csv-relatorio">Baixar CSV</button><button type="button" class="botao-acao" id="imprimir-relatorio">Imprimir / PDF</button><button type="button" class="botao-acao" id="fechar-relatorio">Fechar</button></div>
+  </dialog>
   <noscript>Ative o JavaScript do navegador para jogar.</noscript>
 
   <script>
@@ -1123,6 +1145,7 @@ const FROTA = [
   { nome: "Polvo", tamanho: 2, emoji: "🐙" }
 ];
 
+let historicoContas = [], inicioPartida = new Date().toISOString(), conteudoEscolhido = "todos";
 let modo = null;
 let versaoComContas = true;
 let anoEscolhido = 3;
@@ -1275,6 +1298,7 @@ function iniciarModo(novoModo, comContas = true) {
   modo = novoModo;
   versaoComContas = comContas;
   anoEscolhido = comContas ? Number(seletorAno?.value || 3) : 0;
+  conteudoEscolhido = document.querySelector("#conteudo-matematico").value;
   telaInicial.style.display = "none";
   areaJogo.style.display = "block";
   reiniciarJogo();
@@ -1295,6 +1319,9 @@ function reiniciarJogo() {
   cancelarJogadaComputadorPendente();
   fecharDesafio();
 
+  historicoContas = [];
+  inicioPartida = new Date().toISOString();
+  atualizarConteudoPartida();
   jogadorAtual = 1;
   pontos = 0;
   acertos = 0;
@@ -1942,6 +1969,8 @@ function atualizarControleCoordenada(focar = false) {
 }
 
 function criarDesafio() {
+  const tipoSelecionado = conteudoEscolhido === "todos" ? null : Number(conteudoEscolhido);
+  const tipoDoAno = quantidade => tipoSelecionado || inteiro(1, quantidade);
   const inteiro = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
   const montar = (pergunta, resposta, alternativas, habilidade) => ({
     pergunta,
@@ -1953,7 +1982,7 @@ function criarDesafio() {
   });
 
   if (anoEscolhido === 1) {
-    const soma = Math.random() < 0.55;
+    const soma = tipoSelecionado ? tipoSelecionado === 1 : Math.random() < 0.55;
     const a = inteiro(1, 15), b = inteiro(1, Math.max(1, 20 - a));
     if (soma) return montar(`${a} + ${b} = ?`, a + b, [a + b - 1, a + b + 1], "EF01MA06");
     const maior = Math.max(a, b), menor = Math.min(a, b);
@@ -1961,14 +1990,14 @@ function criarDesafio() {
   }
 
   if (anoEscolhido === 2) {
-    const tipo = inteiro(1, 3), a = inteiro(2, 20), b = inteiro(1, 20);
+    const tipo = tipoDoAno(3), a = inteiro(2, 20), b = inteiro(1, 20);
     if (tipo === 1) return montar(`${a} + ${b} = ?`, a + b, [a + b - 2, a + b + 10], "EF02MA05");
     if (tipo === 2) { const n = inteiro(2, 10); return montar(`Qual é o dobro de ${n}?`, n * 2, [n * 2 - 1, n * 2 + 2], "EF02MA07"); }
     const metade = inteiro(1, 10); return montar(`Qual é a metade de ${metade * 2}?`, metade, [metade + 1, metade + 2], "EF02MA08");
   }
 
   if (anoEscolhido === 3) {
-    const tipo = inteiro(1, 4), a = inteiro(2, 10), b = inteiro(2, 10);
+    const tipo = tipoDoAno(4), a = inteiro(2, 10), b = inteiro(2, 10);
     if (tipo === 1) { const parcela1 = inteiro(20, 99), parcela2 = inteiro(10, 80); return montar(`${parcela1} + ${parcela2} = ?`, parcela1 + parcela2, [parcela1 + parcela2 - 10, parcela1 + parcela2 + 10], "EF03MA05"); }
     if (tipo === 2) { const maior = inteiro(50, 150), menor = inteiro(10, 49); return montar(`${maior} − ${menor} = ?`, maior - menor, [maior - menor - 10, maior - menor + 10], "EF03MA06"); }
     if (tipo === 3) return montar(`${a} × ${b} = ?`, a * b, [a * b - a, a * b + b], "EF03MA07");
@@ -1976,14 +2005,14 @@ function criarDesafio() {
   }
 
   if (anoEscolhido === 4) {
-    const tipo = inteiro(1, 4);
+    const tipo = tipoDoAno(4);
     if (tipo === 1) { const a = inteiro(100, 999), b = inteiro(50, 500); return montar(`${a} + ${b} = ?`, a + b, [a + b - 100, a + b + 10], "EF04MA03"); }
     if (tipo === 2) { const a = inteiro(3, 12), b = inteiro(3, 12); return montar(`${a} × ${b} = ?`, a * b, [a * (b - 1), a * b + b], "EF04MA06"); }
     if (tipo === 3) { const divisor = inteiro(2, 12), quociente = inteiro(2, 12); return montar(`${divisor * quociente} ÷ ${divisor} = ?`, quociente, [divisor, quociente + 3], "EF04MA07"); }
     const termo = inteiro(10, 80), soma = inteiro(81, 150); return montar(`□ + ${termo} = ${soma}. Quanto vale □?`, soma - termo, [soma - termo + 10, soma - termo - 1], "EF04MA15");
   }
 
-  const tipo = inteiro(1, 4);
+  const tipo = tipoDoAno(4);
   if (tipo === 1) { const a = inteiro(10, 90) / 10, b = inteiro(10, 90) / 10, r = (a + b).toFixed(1).replace('.', ','); return montar(`${String(a).replace('.', ',')} + ${String(b).replace('.', ',')} = ?`, r, [(a + b + 1).toFixed(1).replace('.', ','), (a + b - .1).toFixed(1).replace('.', ',')], "EF05MA07"); }
   if (tipo === 2) { const n = [20, 40, 60, 80, 100][inteiro(0, 4)]; return montar(`50% de ${n} = ?`, n / 2, [n / 4, n], "EF05MA06"); }
   if (tipo === 3) { const d = [2, 4, 5, 10][inteiro(0, 3)]; return montar(`Qual fração representa 1 de ${d} partes iguais?`, `1/${d}`, [`${d}/1`, `1/${d + 1}`], "EF05MA03"); }
@@ -1993,7 +2022,7 @@ function criarDesafio() {
 function abrirDesafio() {
   desafioAtual = criarDesafio();
   elementoPergunta.textContent = desafioAtual.pergunta;
-  elementoHabilidade.textContent = `${anoEscolhido}º ano · BNCC ${desafioAtual.habilidade}`;
+  elementoHabilidade.textContent = `${anoEscolhido}º ano · ${nomeConteudo(desafioAtual.habilidade)} · BNCC ${desafioAtual.habilidade}`;
   elementoOpcoes.innerHTML = "";
 
   desafioAtual.opcoes.forEach(opcao => {
@@ -2024,6 +2053,8 @@ function fecharDesafio() {
 
 // Pular não retira pontos nem passa a vez.
 function pularDesafio() {
+  if (!desafioAtual || modalFundo.style.display !== "flex") return;
+  registrarConta(null, "Pulada");
   alvoEscolhido = null;
   fecharDesafio();
   elementoMensagem.textContent = modoPorCoordenada()
@@ -2033,6 +2064,8 @@ function pularDesafio() {
 }
 
 function responderDesafio(resposta) {
+  if (!desafioAtual || modalFundo.style.display !== "flex") return;
+  registrarConta(String(resposta), String(resposta) === String(desafioAtual.resposta) ? "Acerto" : "Erro");
   if (String(resposta) !== String(desafioAtual.resposta)) {
     fecharDesafio();
     alvoEscolhido = null;
@@ -2165,6 +2198,31 @@ function finalizarVitoria() {
   renderizarTabuleiros();
   atualizarControleCoordenada();
 }
+// Conteúdos são recortes didáticos das habilidades; o jogo não substitui a avaliação completa da BNCC.
+const CONTEUDOS = {
+  1:[['Adição até 20','EF01MA06'],['Subtração até 20','EF01MA08']],
+  2:[['Adição','EF02MA05'],['Dobro','EF02MA07'],['Metade','EF02MA08']],
+  3:[['Adição','EF03MA05'],['Subtração','EF03MA06'],['Multiplicação','EF03MA07'],['Divisão exata','EF03MA08']],
+  4:[['Adição','EF04MA03'],['Multiplicação','EF04MA06'],['Divisão exata','EF04MA07'],['Termo desconhecido na adição','EF04MA15']],
+  5:[['Adição de decimais','EF05MA07'],['50% de uma quantidade','EF05MA06'],['Fração unitária','EF05MA03'],['Multiplicação','EF05MA08']]
+};
+function nomeConteudo(codigo){return Object.values(CONTEUDOS).flat().find(x=>x[1]===codigo)?.[0]||'Localização no tabuleiro'}
+function atualizarConteudos(){const select=document.querySelector('#conteudo-matematico');select.replaceChildren();for(const [value,text] of [['todos','Todos os conteúdos do ano'],...CONTEUDOS[Number(seletorAno.value)].map(([nome,codigo],i)=>[String(i+1),`${nome} · ${codigo}`])]){const option=document.createElement('option');option.value=value;option.textContent=text;select.append(option)}descreverConteudo()}
+function descreverConteudo(){const select=document.querySelector('#conteudo-matematico');document.querySelector('#descricao-conteudo').textContent=select.value==='todos'?'Os desafios alternam entre os conteúdos do ano escolhido. Os códigos indicam habilidades relacionadas; as contas exercitam um recorte delas.':`Foco: ${select.selectedOptions[0].textContent}. Explique como calculou antes de escolher a resposta.`}
+function atualizarConteudoPartida(){document.querySelector('#conteudo-partida').textContent=versaoComContas?`${anoEscolhido}º ano · ${conteudoEscolhido==='todos'?'Todos os conteúdos do ano':CONTEUDOS[anoEscolhido][Number(conteudoEscolhido)-1].join(' · ')}`:'Sem contas: leitura de linhas e colunas, localização e estratégia. O relatório não terá cálculos.'}
+function registrarConta(resposta,resultado){historicoContas.push({numero:historicoContas.length+1,jogador:modo==='duelo'?`Jogador ${jogadorAtual}`:modo==='cooperativo'?'Equipe':'Jogador 1',coordenada:alvoEscolhido?formatarCoordenada(alvoEscolhido.linha,alvoEscolhido.coluna):'—',pergunta:desafioAtual.pergunta,resposta:resposta??'—',correta:desafioAtual.resposta,resultado,conteudo:nomeConteudo(desafioAtual.habilidade),habilidade:desafioAtual.habilidade,ano:anoEscolhido,instante:new Date().toISOString()})}
+function resumoContas(registros){const respondidas=registros.filter(x=>x.resultado!=='Pulada').length,certas=registros.filter(x=>x.resultado==='Acerto').length;return `${registros.length} desafios registrados · ${certas} acertos · ${registros.filter(x=>x.resultado==='Erro').length} erros · ${registros.filter(x=>x.resultado==='Pulada').length} puladas · aproveitamento: ${respondidas?Math.round(100*certas/respondidas)+'%':'—'} (puladas não entram no percentual).`}
+function mostrarRelatorio(){const root=document.querySelector('#resumo-relatorio');root.replaceChildren();const add=text=>{const p=document.createElement('p');p.textContent=text;root.append(p)};add(`Início: ${new Date(inicioPartida).toLocaleString('pt-BR')} · ${modo||'Sem partida'} · ${versaoComContas?anoEscolhido+'º ano':'Sem contas'}`);add(resumoContas(historicoContas));if(!historicoContas.length)add('Nenhuma conta registrada nesta partida. As respostas e perguntas puladas aparecerão aqui.');for(const jogador of new Set(historicoContas.map(x=>x.jogador)))add(`${jogador}: ${resumoContas(historicoContas.filter(x=>x.jogador===jogador))}`);for(const codigo of new Set(historicoContas.map(x=>x.habilidade)))add(`${nomeConteudo(codigo)} · ${codigo}: ${resumoContas(historicoContas.filter(x=>x.habilidade===codigo))}`);const tbody=document.querySelector('#linhas-relatorio');tbody.replaceChildren();for(const r of historicoContas){const tr=document.createElement('tr');for(const value of [r.numero,r.jogador,r.coordenada,r.pergunta,r.resposta,r.correta,r.resultado,`${r.conteudo} · ${r.habilidade}`]){const td=document.createElement('td');td.textContent=value;tr.append(td)}tbody.append(tr)}document.querySelector('#relatorio-contas').showModal()}
+function csvContas(){const linhas=[['Número','Jogador','Alvo','Conta','Resposta dada','Resposta correta','Resultado','Conteúdo','BNCC','Ano','Horário','Início da partida'],...historicoContas.map(r=>[r.numero,r.jogador,r.coordenada,r.pergunta,r.resposta,r.correta,r.resultado,r.conteudo,r.habilidade,r.ano,r.instante,inicioPartida])];return '\uFEFF'+linhas.map(l=>l.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')).join('\r\n')}
+document.querySelector('#espelhar').addEventListener('click',e=>{const ativo=areaJogo.classList.toggle('frente-a-frente');e.currentTarget.setAttribute('aria-pressed',String(ativo));e.currentTarget.textContent='Modo espelhado: '+(ativo?'ligado':'desligado');document.querySelector('#ajuda-espelho').hidden=!ativo});
+document.querySelector('#abrir-relatorio').addEventListener('click',mostrarRelatorio);
+document.querySelector('#fechar-relatorio').addEventListener('click',()=>document.querySelector('#relatorio-contas').close());
+document.querySelector('#csv-relatorio').addEventListener('click',()=>{const url=URL.createObjectURL(new Blob([csvContas()],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='batalha-naval-contas.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)});
+document.querySelector('#imprimir-relatorio').addEventListener('click',()=>{document.body.classList.add('print-report');window.print()});
+window.addEventListener('afterprint',()=>document.body.classList.remove('print-report'));
+document.querySelector('#relatorio-contas').addEventListener('close',()=>document.body.classList.remove('print-report'));
+seletorAno.addEventListener('change',atualizarConteudos);document.querySelector('#conteudo-matematico').addEventListener('change',descreverConteudo);atualizarConteudos();
+
   </script>
 </body>
 </html>

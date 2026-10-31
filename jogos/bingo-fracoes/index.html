@@ -43,7 +43,7 @@
     <section class="jogo">
       <div class="painel area-cartela">
         <h2>Cartela aleatória</h2><p class="instrucoes">Toque no desenho correspondente à fração sorteada. Representações equivalentes também valem.</p>
-        <div class="cartela" id="cartela" aria-label="Cartela de bingo com nove representações de frações"></div>
+        <p>Representações em ordem crescente pelo denominador (número de partes do desenho), da esquerda para a direita e de cima para baixo. Empates seguem o numerador. Essa ordem não compara o valor das frações.</p><div class="cartela" id="cartela" aria-label="Cartela de bingo com nove representações de frações"></div>
       </div>
       <aside class="painel sorteio">
         <h2>Sorteio</h2>
@@ -82,10 +82,12 @@
     }
 
     let card=[],deck=[],deckIndex=-1,current=null,marked=new Set(),hits=0,errors=0,outside=[],revealed=false,waiting=false,plays=0;
+    function compararFracoes(a,b){const[n,d]=a.split('/').map(Number),[m,e]=b.split('/').map(Number);return d-e||n-m}
+    function ordenarRepresentacoes(itens){return itens.sort((a,b)=>a.visual.d-b.visual.d||a.visual.n-b.visual.n||compararFracoes(a.key,b.key))}
     function criaItens(keys){return keys.map((key,i)=>({key,visual:fracaoVisual(key),cor:CORES[(i+Math.floor(Math.random()*CORES.length))%CORES.length],forma:FORMAS[Math.floor(Math.random()*FORMAS.length)]}))}
     function buildDeck(){const valoresCartela=[...new Set(card.map(x=>reduz(x.key)))];const extras=amostra(POOL.filter(x=>!valoresCartela.includes(reduz(x))),Math.min(7,POOL.length-valoresCartela.length));const bases=[...new Set([...valoresCartela,...extras.map(reduz)])];deck=shuffle(bases.map(equivalente));deckIndex=-1}
-    function renderCard(){const root=$('#cartela');root.innerHTML='';card.forEach(item=>{const b=document.createElement('button');b.type='button';b.className='casa';b.dataset.key=item.key;b.setAttribute('aria-label',`Representação visual da fração ${item.key}`);b.innerHTML=`<span class="visual">${svgVisual(item)}</span><span class="revelada" hidden>${item.key}</span>`;b.addEventListener('click',()=>chooseCard(b,item.key));root.appendChild(b)})}
-    function setCard(keys){card=criaItens(keys);marked.clear();hits=0;errors=0;outside=[];current=null;waiting=false;revealed=false;plays=0;buildDeck();renderCard();resetRoundUI();updateStats();updateDrawSelect();syncTeacherFromCard();clearCanvas()}
+    function renderCard(){const root=$('#cartela');root.innerHTML='';card.forEach(item=>{const b=document.createElement('button');b.type='button';b.className='casa';b.dataset.key=item.key;b.setAttribute('aria-label',`Representação com ${item.visual.n} de ${item.visual.d} partes coloridas`);b.innerHTML=`<span class="visual">${svgVisual(item)}</span><span class="revelada" hidden>${item.visual.n}/${item.visual.d}</span>`;b.addEventListener('click',()=>chooseCard(b,item.key));root.appendChild(b)})}
+    function setCard(keys){card=ordenarRepresentacoes(criaItens(keys));marked.clear();hits=0;errors=0;outside=[];current=null;waiting=false;revealed=false;plays=0;buildDeck();renderCard();resetRoundUI();updateStats();updateDrawSelect();syncTeacherFromCard();clearCanvas()}
     function randomCard(){setCard(amostra(POOL,9))}
     function resetRoundUI(){ $('#fracaoAtual').textContent='—';$('#equiv').textContent='';$('#mensagem').className='mensagem';$('#mensagem').textContent='Cartela pronta. Comece o sorteio.';$('#historico').innerHTML='<span class="vazio">Nenhuma ainda.</span>';$('#sortear').disabled=false;$('#sortear').textContent='Sortear primeira fração';$('#naoEsta').disabled=true;$('#revelar').disabled=true;$('#revelar').textContent='Mostrar frações (0/9)';$('#listaCartela').innerHTML='<span class="vazio">Disponível após 9 jogadas concluídas.</span>'}
     function matches(s){const r=reduz(s);return card.filter(x=>x.key===r&&!marked.has(x.key))}
@@ -106,11 +108,11 @@
     function updateStats(){$('#marcadas').textContent=`${marked.size}/9`;$('#acertos').textContent=hits;$('#erros').textContent=errors}
     function updateRevealGate(){const b=$('#revelar'),libera=plays>=9;b.disabled=!libera;if(!revealed)b.textContent=libera?'Mostrar frações da cartela':`Mostrar frações (${plays}/9)`;if(!libera)$('#listaCartela').innerHTML='<span class="vazio">Disponível após 9 jogadas concluídas.</span>'}
     function win(){waiting=false;$('#sortear').disabled=true;$('#naoEsta').disabled=true;$('#mensagem').className='mensagem bingo';$('#mensagem').innerHTML='<span class="celebracao">🎉🏆🎉</span><br><strong>BINGO!</strong> A cartela foi completada.';$$('.revelada').forEach(x=>x.hidden=false);revealed=true;$('#revelar').disabled=false;$('#revelar').textContent='Ocultar frações da cartela';showList()}
-    function showList(){$('#listaCartela').innerHTML=card.map(x=>`<span class="chip">${fracHtml(x.key)}</span>`).join('')}
+    function showList(){$('#listaCartela').innerHTML=card.map(x=>`<span class="chip">${fracHtml(`${x.visual.n}/${x.visual.d}`)}</span>`).join('')}
     function toggleReveal(){if(plays<9)return;revealed=!revealed;$$('.revelada').forEach(x=>x.hidden=!revealed);$('#revelar').textContent=revealed?'Ocultar frações da cartela':'Mostrar frações da cartela';revealed?showList():$('#listaCartela').innerHTML='<span class="vazio">Clique em “Mostrar frações da cartela”.</span>'}
-    function updateDrawSelect(){const s=$('#fracaoDesenho');s.innerHTML=outside.length?outside.map(x=>`<option value="${x}">${x}</option>`).join(''):'<option value="">Nenhuma fração disponível</option>'}
+    function updateDrawSelect(){const s=$('#fracaoDesenho');s.innerHTML=outside.length?[...outside].sort(compararFracoes).map(x=>`<option value="${x}">${x}</option>`).join(''):'<option value="">Nenhuma fração disponível</option>'}
 
-    function renderTeacher(){const g=$('#profGrid');g.innerHTML='';POOL.forEach(key=>{const lab=document.createElement('label');lab.className='frac-option';lab.innerHTML=`<input type="checkbox" value="${key}"><span>${fracHtml(key)}</span>`;g.appendChild(lab)});g.addEventListener('change',teacherChanged)}
+    function renderTeacher(){const g=$('#profGrid');g.innerHTML='';[...POOL].sort(compararFracoes).forEach(key=>{const lab=document.createElement('label');lab.className='frac-option';lab.innerHTML=`<input type="checkbox" value="${key}"><span>${fracHtml(key)}</span>`;g.appendChild(lab)});g.addEventListener('change',teacherChanged)}
     function selectedTeacher(){return $$('#profGrid input:checked').map(x=>x.value)}
     function teacherChanged(e){let a=selectedTeacher();if(a.length>9){e.target.checked=false;a=selectedTeacher();$('#profNote').textContent='Escolha no máximo 9 frações.';$('#profNote').className='prof-note erro'}else{$('#profNote').textContent=a.length===9?'Seleção pronta para aplicar.':'Selecione exatamente 9 frações.';$('#profNote').className='prof-note'}$('#profCount').textContent=`${a.length}/9 selecionadas`;$('#aplicarSelecao').disabled=a.length!==9}
     function syncTeacherFromCard(){const keys=new Set(card.map(x=>x.key));$$('#profGrid input').forEach(x=>x.checked=keys.has(x.value));$('#profCount').textContent='9/9 selecionadas';$('#aplicarSelecao').disabled=false;$('#profNote').textContent='A seleção atual corresponde à cartela em jogo.';$('#profNote').className='prof-note'}
