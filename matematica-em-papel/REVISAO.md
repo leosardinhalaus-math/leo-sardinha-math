@@ -67,8 +67,8 @@ O módulo de caleidociclos foi refeito a partir da referência visual fornecida 
 
 ## Gerador corrigido
 
-- **HEX:** seis pirâmides, 24 faces triangulares, quatro composições hexagonais. Base e altura da face: 34 mm.
-- **OCT:** oito pirâmides, 32 faces triangulares, quatro composições quadradas. Base: 38 mm. Altura: 38/√2 mm.
+- **HEX:** seis pirâmides, 24 faces triangulares, quatro composições hexagonais. Base e altura da face: 42 mm.
+- **OCT:** oito pirâmides, 32 faces triangulares, quatro composições quadradas. Base: 45 mm. Altura: 45/√2 mm.
 - Quatro entradas individuais para JPG, PNG ou WEBP até 5 MB; FileReader e verificação de decodificação.
 - Recorte central ou imagem completa, com zoom e posição horizontal/vertical por foto. A miniatura usa o mesmo recorte do molde.
 - Galeria de quatro padrões vetoriais originais, sem downloads ou dependências externas.
@@ -107,3 +107,7 @@ Construção analítica própria a partir de Marcus Engel, [M.C. Escher Kaleidoc
 `node --test tests/invertible-cube.test.cjs` verifica a rigidez de todas as arestas e o fechamento das seis dobradiças em 96 posições do ciclo, a alternância de orientação, as dimensões das planificações e a recomposição das quatro fotos sem sobreposição dos setores. O mapeamento das imagens usa as projeções frontal/traseira em duas posições de revelação, com uma transformação afim independente por face.
 
 Chromium/Playwright: quatro arquivos, geração de 24 faces, quatro imagens incorporadas, impressão em uma página A4 paisagem, download SVG e troca entre cubo, HEX e OCT. Recorte com preenchimento ou foto inteira também testado no contorno triangular. Montagem física não realizada.
+
+## Ampliação para impressão
+
+HEX ampliado de 34 para 42 mm (+24% nas dimensões); OCT de 38 para 45 mm (+18%). No cubo invertível, a dobradiça passa de 14 para 18 mm (+29%), girando três planificações em 90° para aproveitar os espaços horizontais. Todos conservam as proporções geométricas e uma página A4 paisagem, com as abas dentro da área imprimível.

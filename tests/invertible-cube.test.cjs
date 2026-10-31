@@ -10,7 +10,7 @@ test('Schatz: six rigid tetrahedra and all six hinges close throughout a full cy
 });
 test('Six printable nets preserve every 3D edge length and opposite face winding',()=>{
  const ring=api.kCubePose(0),net=api.kCubeGeometry();assert.equal(net.length,6);
- for(const {module,faces}of net){assert.equal(faces.length,4);for(const f of faces){for(let i=0;i<3;i++){near(dist(f.points[i],f.points[(i+1)%3]),14*dist(ring[module][f.ids[i]],ring[module][f.ids[(i+1)%3]]));assert(f.points[i][0]>3&&f.points[i][0]<274);assert(f.points[i][1]>24&&f.points[i][1]<163)}let [a,b,c]=f.points;assert((b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0])>0)}}
+ for(const {module,faces}of net){assert.equal(faces.length,4);for(const f of faces){for(let i=0;i<3;i++){near(dist(f.points[i],f.points[(i+1)%3]),18*dist(ring[module][f.ids[i]],ring[module][f.ids[(i+1)%3]]));assert(f.points[i][0]>3&&f.points[i][0]<274);assert(f.points[i][1]>24&&f.points[i][1]<163)}let [a,b,c]=f.points;assert((b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0])>0)}}
 });
 for(let photo=0;photo<4;photo++)test(`Photo ${photo+1}: six sectors tile the triangle, without overlapping interiors; affine print matches each vertex`,()=>{
  const faces=api.kCubeGeometry().flatMap(p=>p.faces).filter(f=>f.photo===photo),outline=api.kOutline('cube');near(faces.reduce((s,f)=>s+area(f.source),0),area(outline));
