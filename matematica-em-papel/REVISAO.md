@@ -1,5 +1,16 @@
 # Matemática em Papel — modelos e geradores
 
+## Correção: imagens dos livros dobráveis na impressão
+
+- O botão de impressão agora aguarda a leitura dos arquivos, a decodificação de todas as imagens e a atualização do layout. Durante o carregamento, fica indisponível; uma falha informa o erro e não abre uma impressão incompleta.
+- A grade do livro e a área de cada imagem têm dimensões explícitas. Textos e proporções dos arquivos não podem reduzir a imagem a zero.
+- As imagens usam `object-fit: contain`, preservando o arquivo inteiro; o recorte automático com `cover` foi removido apenas dos livros dobráveis.
+- Permanecem a ordem das oito páginas, a inversão da fileira superior, o corte central e o A4 retrato existente.
+- Três testes de preparação da impressão: aguardar arquivo e oito decodificações; bloquear imagem corrompida; não imprimir outra aba quando a seleção muda durante a espera.
+- Chromium/Playwright: oito arquivos alternando 1800×1000 e 800×1600, upload, botão de impressão, exportação/importação JSON e PDF em computador e celular. `pdfimages -list` confirmou as oito imagens com dimensões originais completas, em uma única página A4. No teste anterior, as imagens eram incorporadas com partes cortadas.
+- A correção cobre os formatos aceitos pelo campo: JPG, PNG e WEBP.
+
+
 ## Poly Puzzle
 
 - Gerador de duas fotos, com galeria, recorte, zoom e posicionamento independentes.
