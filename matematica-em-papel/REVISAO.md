@@ -47,7 +47,7 @@
 
 ## Biblioteca e navegação
 
-A aba Modelos reúne HEX, OCT, cubo invertível personalizável, Poly Puzzle, Sphericon e mini-livro, com ilustrações e atalhos. Prévia dos caleidociclos e do Sphericon calculada a partir das superfícies em 3D. Nove abas navegáveis por teclado e URLs diretas #poly-puzzle, #sphericon e #modelos. Links descritivos atualizados na página inicial e em Educação.
+A aba Modelos reúne HEX, OCT, cubo invertível personalizável, Poly Puzzle, Sphericon e mini-livro, com ilustrações e atalhos. Prévia dos caleidociclos e do Sphericon calculada a partir das superfícies em 3D. Dez abas navegáveis por teclado e URLs diretas #poly-puzzle, #sphericon e #modelos. Links descritivos atualizados na página inicial e em Educação.
 
 ## Verificação da atualização
 
@@ -125,3 +125,13 @@ Nova aba Atividades BNCC, em `#atividades-bncc`, com 24 atividades autorais (dua
 Códigos conferidos no [PDF oficial do MEC](https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf). Habilidades apresentadas em sínteses autorais, com ligação à página do código no documento. A seriação do Ensino Médio é expressamente uma sugestão pedagógica do site: a BNCC não fixa EM13MAT por série (explicação do código na página PDF 36). A coleção explora habilidades selecionadas; não pretende cobrir todo o currículo.
 
 Validação em Chromium: 12 seleções, 24 fichas com ilustração, 24 PDFs (versões aluno e professor de cada ano), duas páginas por PDF, ausência de respostas na versão do aluno, impressão individual, preservação da turma ao voltar de um recurso e largura móvel de 390 px. Revisão visual da ficha e do PDF. Testes do catálogo verificam anos completos, identificadores únicos e correspondência dos códigos EF ao ano.
+
+## Ampliação do acervo e fabricação digital
+
+- Atividades BNCC: de 24 para 96, oito por ano/série (1º ao 9º do Fundamental e três séries do Médio). Os 24 roteiros anteriores foram mantidos e 72 novos foram redigidos com problemas, perguntas e respostas próprios; todos preservam objetivo, habilidade, materiais, evidências e apoios. Algumas propostas avançadas se conectam à nova aba de fabricação digital.
+- Origamis: de oito para 20 modelos. Acrescentados gato, raposa, tulipa plana, copo de papel, envelope, marcador de canto, leque, folha sanfonada, casinha, base pipa, livro sanfonado e peixe plano. Cada novo modelo tem base de papel, nível, foco matemático e esquemas vetoriais por etapa. As dobras são esquemas de apoio; montagem física não foi realizada.
+- Nova aba `#fabricacao-digital` (3D e Laser): fundamentos de geometria, medidas, escala, tolerância e investigação; relação explícita com competências da BNCC e com os objetivos do Mais Ciência na Escola; oito projetos com evidências de aprendizagem e referências para o professor. A progressão do Médio é sugerida pelo site. Articulação pedagógica autoral, sem vínculo institucional presumido.
+- Fontes: BNCC oficial do MEC; [Decreto nº 12.049/2024, arts. 2º e 3º](https://www2.camara.leg.br/legin/fed/decret/2024/decreto-12049-11-junho-2024-795750-publicacaooriginal-172028-pe.html); perguntas frequentes da chamada CNPq 13/2024 como referência histórica; documentação Prusa e Epilog para princípios de camadas, materiais e exaustão. Não são apresentados editais antigos como inscrições abertas.
+- Planejador paramétrico: placa retangular com furo central exportada em SVG nominal com dimensões físicas em mm; prisma retangular maciço exportado em STL fechado, com orientação externa. Contas de área, contornos, volume e camadas ideais. Campos são validados e os arquivos exigem preparação no software de fabricação/fatiamento; não incluem instruções de máquina. A avaliação do laboratório considera uso responsável, material aprovado, acessibilidade e revisão de protótipo.
+
+Verificação: 123 testes Node aprovados. Teste geométrico independente do STL verifica volume, 12 triângulos, orientação e duas incidências opostas por aresta; SVG verificado quanto a unidades e contornos. Chromium: 96 fichas nos 12 anos, PDFs aluno/professor com oito páginas por ano, navegação e atalhos, 20 modelos de origami, download SVG/STL, bloqueio de entradas inválidas e largura móvel de 390 px. Guia de fabricação digital exportado em cinco páginas A4; dois novos origamis amostrados em uma página cada. Nenhuma operação real de impressora 3D ou cortadora foi executada.
