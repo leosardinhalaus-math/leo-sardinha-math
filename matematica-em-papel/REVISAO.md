@@ -1,5 +1,21 @@
 # Matemática em Papel — modelos e geradores
 
+## Correção: REA ilustrados e enquadramento das fotos
+
+- Os dez modelos REA agora têm oito ilustrações autorais relacionadas às oito páginas: 80 imagens, sem símbolos genéricos como substitutos. Diagramas de água e Lua, frações, polígonos, cronologia, tempos verbais, quadrinhos, experimento, mapas e algoritmos.
+- A galeria mostra uma ilustração do tema; Usar/Editar carrega as oito imagens. Imprimir aguarda a preparação. Baixar JSON incorpora as oito imagens PNG de 600×600, com atribuição CC BY-SA 4.0.
+- Modelos REA usam fundo branco e texto escuro. As ilustrações acompanham as páginas quando o conteúdo é embaralhado e permanecem nos projetos JSON.
+- Mini-livros: moldura quadrada fixa na largura útil de cada página. A coluna da grade é explícita, evitando que legendas curtas diminuam a foto. Preencher o quadrado é o padrão para fotos; Mostrar imagem inteira preserva as bordas. Há ajuste horizontal/vertical por imagem, salvo no JSON. Projetos antigos recebem configurações compatíveis.
+- Caleidociclos: a normalização da foto considera o contorno real do modelo. Preencher cobre o hexágono ou quadrado sem distorção; Mostrar inteira inscreve toda a foto dentro do polígono, em vez de ainda cortar as bordas após ajustá-la a um quadrado intermediário. Miniatura e molde usam o mesmo arquivo enquadrado. A transformação dos setores para recompor a imagem montada foi preservada.
+
+### Verificação
+
+- 33 testes Node aprovados, incluindo 16 casos novos de foto vertical, horizontal, panorâmica e quadrada em HEX/OCT, nos modos preencher/preservar. Confirmam proporção, limites do recorte e contenção de todos os cantos da foto no polígono.
+- Navegador: dez conjuntos com oito PNGs distintos cada; prévias relacionadas ao conteúdo; exportação/importação JSON com ilustrações; oito imagens no PDF A4; molduras quadradas ocupando toda a largura útil, em tela e impressão; ajuste de posição; larguras móveis de 390 px.
+- Pixel de controle em foto uniforme confirmou que a geração aplica HEX e OCT efetivos, sem usar o índice de um callback como tipo de modelo.
+- A opção Mostrar imagem inteira manteve os oito arquivos de teste completos em uma página A4, em computador e celular; a preparação assíncrona da impressão continuou passando.
+
+
 ## Correção: imagens dos livros dobráveis na impressão
 
 - O botão de impressão agora aguarda a leitura dos arquivos, a decodificação de todas as imagens e a atualização do layout. Durante o carregamento, fica indisponível; uma falha informa o erro e não abre uma impressão incompleta.
