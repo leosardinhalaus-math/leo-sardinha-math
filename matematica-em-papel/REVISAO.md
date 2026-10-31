@@ -111,3 +111,9 @@ Chromium/Playwright: quatro arquivos, geração de 24 faces, quatro imagens inco
 ## Ampliação para impressão
 
 HEX ampliado de 34 para 42 mm (+24% nas dimensões); OCT de 38 para 45 mm (+18%). No cubo invertível, a dobradiça passa de 14 para 18 mm (+29%), girando três planificações em 90° para aproveitar os espaços horizontais. Todos conservam as proporções geométricas e uma página A4 paisagem, com as abas dentro da área imprimível.
+
+## Escolha do papel
+
+O gerador de HEX, OCT e cubo invertível oferece A5, A4 (padrão), A3, Carta, Ofício (330 × 216 mm), Legal e Tabloide. Todos em paisagem, com margem de 10 mm. A planificação, as fotos e as abas recebem a mesma escala, centralizadas na área útil; as cotas impressas acompanham a escala. A seleção invalida o molde anterior e preserva as fotos. O SVG exportado incorpora as dimensões físicas do papel útil e o nome do formato. O tamanho da página PDF é atualizado via regra @page nomeada, sem alterar os outros módulos.
+
+Verificação em Chromium: geração, invalidação e PDF de uma página nas combinações de modelos e formatos, dimensões físicas do PDF, textos atualizados e largura móvel de 390 px.
