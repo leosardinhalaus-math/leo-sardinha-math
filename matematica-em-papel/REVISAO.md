@@ -47,7 +47,7 @@
 
 ## Biblioteca e navegação
 
-A aba Modelos reúne HEX, OCT, cubo invertível personalizável, Poly Puzzle, Sphericon e mini-livro, com ilustrações e atalhos. Prévia dos caleidociclos e do Sphericon calculada a partir das superfícies em 3D. Dez abas navegáveis por teclado e URLs diretas #poly-puzzle, #sphericon e #modelos. Links descritivos atualizados na página inicial e em Educação.
+A aba Modelos reúne HEX, OCT, cubo invertível personalizável, Poly Puzzle, Sphericon e mini-livro, com ilustrações e atalhos. Prévia dos caleidociclos e do Sphericon calculada a partir das superfícies em 3D. Onze abas navegáveis por teclado e URLs diretas #poly-puzzle, #sphericon e #modelos. Links descritivos atualizados na página inicial e em Educação.
 
 ## Verificação da atualização
 
@@ -135,3 +135,13 @@ Validação em Chromium: 12 seleções, 24 fichas com ilustração, 24 PDFs (ver
 - Planejador paramétrico: placa retangular com furo central exportada em SVG nominal com dimensões físicas em mm; prisma retangular maciço exportado em STL fechado, com orientação externa. Contas de área, contornos, volume e camadas ideais. Campos são validados e os arquivos exigem preparação no software de fabricação/fatiamento; não incluem instruções de máquina. A avaliação do laboratório considera uso responsável, material aprovado, acessibilidade e revisão de protótipo.
 
 Verificação: 123 testes Node aprovados. Teste geométrico independente do STL verifica volume, 12 triângulos, orientação e duas incidências opostas por aresta; SVG verificado quanto a unidades e contornos. Chromium: 96 fichas nos 12 anos, PDFs aluno/professor com oito páginas por ano, navegação e atalhos, 20 modelos de origami, download SVG/STL, bloqueio de entradas inválidas e largura móvel de 390 px. Guia de fabricação digital exportado em cinco páginas A4; dois novos origamis amostrados em uma página cada. Nenhuma operação real de impressora 3D ou cortadora foi executada.
+
+## Variação de peças e projetos externos
+
+Laboratório ampliado para dez modelos: placa retangular com furo, disco/arruela, polígono regular com furo e triângulo retângulo em SVG; prisma retangular, cilindro, cone, pirâmide de base retangular, prisma triangular reto e esfera em STL. Campos visíveis acompanham cada peça. Área e volume são analíticos; os sólidos curvos usam malhas trianguladas aproximadas e a interface explica essa diferença. Todos os sólidos são maciços; furos pertencem às opções 2D.
+
+A nova aba `#projetos-externos` importa arquivos locais SVG, STL binário/ASCII, OBJ e JSON exportado pela própria aba. Permite prévia, giro da malha, interpretação da unidade, dimensões da caixa envolvente, área dos triângulos e uma checagem limitada de incidência/orientação de arestas. Autoria, licença, ano, habilidades e notas são campos declarados pelo usuário. O JSON guarda arquivo, ficha e unidade; o arquivo original pode ser baixado separadamente. Não há envio a um servidor nem galeria pública: a importação e a ficha permanecem na memória do navegador até o usuário exportar.
+
+SVG: reconstrução da prévia com lista permitida de geometrias e atributos, sem scripts, eventos, imagens, referências externas ou efeitos. O original é preservado como arquivo; a prévia é simplificada. Limites: 2 MB de texto SVG; malhas com até 50.000 triângulos e 10 MB; JSON incorporado de até 14 MB. OBJ aceita triângulos e polígonos convexos planos de até 32 vértices; faces côncavas precisam de triangulação na origem. Não se afirma reparo ou validação completa para fabricação.
+
+Verificação: 133 testes Node aprovados; as seis malhas geradas têm duas incidências opostas por aresta, volume orientado positivo e erro de volume abaixo de 1% nos sólidos curvos. Parsers STL binário/ASCII e OBJ testados com arquivos válidos e inválidos. Chromium: dez prévias e dez downloads; SVG com script/eventos/referências externas sem execução ou requisição externa; importação de STL e OBJ; reabertura de JSON com autoria/licença/unidade preservadas; navegação sem perda da ficha; entradas inválidas e largura móvel de 390 px. Fabricação física não realizada.
