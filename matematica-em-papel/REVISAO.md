@@ -47,7 +47,7 @@
 
 ## Biblioteca e navegação
 
-A aba Modelos reúne HEX, OCT, cubo invertível personalizável, Poly Puzzle, Sphericon e mini-livro, com ilustrações e atalhos. Prévia dos caleidociclos e do Sphericon calculada a partir das superfícies em 3D. Oito abas navegáveis por teclado e URLs diretas #poly-puzzle, #sphericon e #modelos. Links descritivos atualizados na página inicial e em Educação.
+A aba Modelos reúne HEX, OCT, cubo invertível personalizável, Poly Puzzle, Sphericon e mini-livro, com ilustrações e atalhos. Prévia dos caleidociclos e do Sphericon calculada a partir das superfícies em 3D. Nove abas navegáveis por teclado e URLs diretas #poly-puzzle, #sphericon e #modelos. Links descritivos atualizados na página inicial e em Educação.
 
 ## Verificação da atualização
 
@@ -117,3 +117,11 @@ HEX ampliado de 34 para 42 mm (+24% nas dimensões); OCT de 38 para 45 mm (+18%)
 O gerador de HEX, OCT e cubo invertível oferece A5, A4 (padrão), A3, Carta, Ofício (330 × 216 mm), Legal e Tabloide. Todos em paisagem, com margem de 10 mm. A planificação, as fotos e as abas recebem a mesma escala, centralizadas na área útil; as cotas impressas acompanham a escala. A seleção invalida o molde anterior e preserva as fotos. O SVG exportado incorpora as dimensões físicas do papel útil e o nome do formato. O tamanho da página PDF é atualizado via regra @page nomeada, sem alterar os outros módulos.
 
 Verificação em Chromium: geração, invalidação e PDF de uma página nas combinações de modelos e formatos, dimensões físicas do PDF, textos atualizados e largura móvel de 390 px.
+
+## Atividades por ano — BNCC
+
+Nova aba Atividades BNCC, em `#atividades-bncc`, com 24 atividades autorais (duas para cada ano do 1º ao 9º do Fundamental e cada série do Médio). Cada ficha inclui objetivo, materiais, tempo, roteiro, ilustração, questões para registro, respostas comentadas, critérios de observação, apoio de acessibilidade e atalho para o recurso relacionado. Seleção por ano/série, impressão individual ou das duas atividades da turma, com orientações do professor opcionais.
+
+Códigos conferidos no [PDF oficial do MEC](https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf). Habilidades apresentadas em sínteses autorais, com ligação à página do código no documento. A seriação do Ensino Médio é expressamente uma sugestão pedagógica do site: a BNCC não fixa EM13MAT por série (explicação do código na página PDF 36). A coleção explora habilidades selecionadas; não pretende cobrir todo o currículo.
+
+Validação em Chromium: 12 seleções, 24 fichas com ilustração, 24 PDFs (versões aluno e professor de cada ano), duas páginas por PDF, ausência de respostas na versão do aluno, impressão individual, preservação da turma ao voltar de um recurso e largura móvel de 390 px. Revisão visual da ficha e do PDF. Testes do catálogo verificam anos completos, identificadores únicos e correspondência dos códigos EF ao ano.
