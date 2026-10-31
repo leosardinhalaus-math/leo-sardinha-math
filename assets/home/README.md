@@ -35,3 +35,7 @@ Verificação em Chromium/Playwright:
 - Primeiro atalho por etapa inteiramente visível sem rolagem na tela de 390 × 844.
 - Sem JavaScript: 14 recursos e todos os links de navegação disponíveis; filtros inativos ficam ocultos.
 - Inspeção visual das versões de computador e celular. Esta revisão não equivale a um estudo de uso com turmas nem a uma auditoria completa de acessibilidade.
+
+## Concepção de aprendizagem
+
+A seção Conheça o projeto apresenta a conversa e a investigação coletiva como constitutivas de um ambiente matemático. A frase é apresentada como formulação autoral inspirada em Mateus 18:20, sem ser tratada como citação literal ou como significado matemático do versículo. O convite para comparar estratégias em dupla também aparece na página Educação, na abertura das atividades BNCC e no roteiro de sala de aula do simulador musical.
