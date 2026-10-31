@@ -25,4 +25,20 @@ assert.equal(createSaveStore(legacy).snapshot().schemaVersion,SAVE_SCHEMA_VERSIO
 
 const broken=new MemoryStorage();broken.setItem(SAVE_ENVELOPE_KEY,'{inválido');broken.setItem(storageKeys.worldIndex,'também inválido');
 assert.equal(createSaveStore(broken).read(storageKeys.worldIndex,0),0,'save inválido usa fallback seguro');
-console.log('PASS: save versionado, migração legada, compatibilidade e recuperação de dados inválidos.');
+// Leitura bloqueada por política de privacidade não pode derrubar a inicialização.
+class UnreadableStorage extends MemoryStorage {
+ getItem(_key:string):string|null {throw new Error('SecurityError: access denied');}
+}
+const unreadable=createSaveStore(new UnreadableStorage());
+assert.equal(unreadable.read(storageKeys.coins,7),7);
+assert.deepEqual(unreadable.snapshot().data,{});
+assert.doesNotThrow(()=>unreadable.write(storageKeys.coins,12));
+
+// Envelopes com data=null/array/primitivo são inválidos, mas dados legados válidos sobrevivem.
+const malformed=new MemoryStorage();
+for (const data of [null,[],42,'texto']) {
+ malformed.setItem(SAVE_ENVELOPE_KEY,JSON.stringify({schemaVersion:SAVE_SCHEMA_VERSION,updatedAt:1,data}));
+ malformed.setItem(storageKeys.coins,'9');
+ assert.equal(createSaveStore(malformed).read(storageKeys.coins,0),9);
+}
+console.log('PASS: save versionado, migração, leitura indisponível e recuperação de envelopes inválidos.');

@@ -359,3 +359,12 @@ Ainda é necessário implementar validação de pontuação pelo servidor, ambie
 - **Testes adicionados:** `scripts/test-progression.ts` cobre `NaN`, infinito, negativos, strings, objetos, `null`, índices fracionários e bandeiras inválidas; `scripts/test-battle-rules.ts` cobre deck nulo, objeto e elementos de tipos errados. A verificação automatizada no GitHub Actions **ainda deve ser consultada para o SHA desta alteração**; não atribuir sucesso antecipadamente.
 - **Limite:** cobre entradas corrompidas dessas três estruturas; não é teste E2E de carregamento no navegador, não valida armazenamento inteiro nem segurança de pontuação. **66/100 etapas verificadas**; nenhuma etapa nova marcada.
 - **Risco/rollback:** mudança local e reversível em `progression.ts`, `battleRules.ts`, `GameCanvas.tsx` e testes; reverter o commit único se houver regressão. Sem merge, deploy, custos ou alterações de segurança no Supabase.
+
+
+## Continuação — 31/10/2026: tolerância a armazenamento local indisponível
+
+- **Problema por inspeção:** `createSaveStore` capturava exceções de `setItem`, mas chamadas a `getItem` e o acesso a `window.localStorage` podiam lançar `SecurityError` em navegadores com armazenamento bloqueado. Um envelope JSON com `data: null` ou lista também não era rejeitado como formato inválido.
+- **Mudança na PR #4:** leitura encapsulada em `safeRead`, acesso ao armazenamento do navegador protegido por `try/catch` e rejeição de envelopes com `data` nulo ou não-objeto de mapa. O fallback e a migração legada permanecem; sem alteração de esquema, backend ou API.
+- **Regressões acrescentadas:** `scripts/test-save-game.ts` simula `getItem` lançando exceção, verifica `read` com fallback, `snapshot` e `write` sem interrupção, e cobre envelopes `data: null`, lista e valores primitivos com recuperação da chave legada. A verificação de CI deste commit **está pendente neste registro**; consultar `Calculus Royale build and dependency gate` antes de afirmar aprovação.
+- **Limites:** testes unitários em armazenamento simulado; não são testes de navegador real, não confirmam persistência quando o navegador bloqueia armazenamento, nem pontuação autoritativa. **66/100 etapas comprovadas**, nenhuma nova marcação.
+- **Rollback:** reverter este commit se houver regressão. PR segue draft, sem merge, deploy, custo novo ou alteração em Supabase de produção.

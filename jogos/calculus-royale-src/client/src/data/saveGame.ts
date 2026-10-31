@@ -32,15 +32,22 @@ const parse = <T,>(value:string|null):T|undefined => {
   if(value===null)return undefined;
   try{return JSON.parse(value) as T;}catch{return undefined;}
 };
-const browserStorage = ():StorageLike|undefined => typeof window==='undefined'?undefined:window.localStorage;
+// Em alguns navegadores/modos privados, até acessar localStorage pode lançar SecurityError.
+const browserStorage = ():StorageLike|undefined => {
+  if (typeof window === 'undefined') return undefined;
+  try { return window.localStorage; } catch { return undefined; }
+};
+const safeRead = (target: StorageLike | undefined, key: string): string | null => {
+  try { return target?.getItem(key) ?? null; } catch { return null; }
+};
 
 // Mantém as chaves antigas por compatibilidade e agrega uma cópia versionada,
 // pronta para migrações futuras e sincronização opcional.
 export function createSaveStore(storage?:StorageLike){
  const target=storage??browserStorage();
  const envelope=():SaveEnvelope=>{
-  const saved=parse<SaveEnvelope>(target?.getItem(SAVE_ENVELOPE_KEY)??null);
-  if(!saved||typeof saved!=='object'||typeof saved.data!=='object')return emptyEnvelope();
+  const saved=parse<SaveEnvelope>(safeRead(target,SAVE_ENVELOPE_KEY));
+  if(!saved||typeof saved!=='object'||typeof saved.data!=='object'||!saved.data||Array.isArray(saved.data))return emptyEnvelope();
   return {...saved,schemaVersion:SAVE_SCHEMA_VERSION,data:{...saved.data}};
  };
  const persist=(next:SaveEnvelope)=>{try{target?.setItem(SAVE_ENVELOPE_KEY,JSON.stringify(next));}catch{/* armazenamento indisponível ou cheio */}};
@@ -49,7 +56,7 @@ export function createSaveStore(storage?:StorageLike){
    if(!target)return fallback;
    const saved=envelope(),fromEnvelope=saved.data[key];
    if(fromEnvelope!==undefined)return fromEnvelope as T;
-   const legacy=parse<T>(target.getItem(key));
+   const legacy=parse<T>(safeRead(target,key));
    if(legacy===undefined)return fallback;
    saved.data[key]=legacy;saved.updatedAt=Date.now();persist(saved);
    return legacy;
