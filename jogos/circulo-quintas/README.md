@@ -33,3 +33,7 @@ A comparação de afinação usa (3/2)^12 / 2^7 = 531441/524288 ≈ 1,0136432647
 Testes independentes cobrem todos os saltos e inícios, acordes do exemplo, enarmonia, limite do parser, 24 permutações distintas, fechamento por composição, relações de D₁₂, posições geométricas, conservação das cordas sob transposição, contagens de arestas, invariância de classes nas disposições de vozes, frequências e coma pitagórico.
 
 Chromium/Playwright: construção de acordes, T₇ nas duas ordens, I₀ aplicada duas vezes, modos de ligação, ciclo de salto 4, osciladores Web Audio, progressão completa, parada, entrada inválida como texto, SVG independente, PDF de uma página, largura móvel de 390 px, seleção por teclado e link na página Educação. O teste de áudio verifica geração e parâmetros; não substitui avaliação de escuta em diferentes dispositivos.
+
+## Revisão da explicação do coma
+
+A seção de afinação detalha a construção de frequências, a razão exata CP = 531441/524288, o valor de 23,46 cents (0,2346 semitom), a impossibilidade de fechamento puro pela fatoração única e a correção por quinta q = (3/2)/CP^(1/12) = 2^(7/12). Explicita que a discrepância é finita e que a distribuição ocorre por fatores de frequência equivalentes a ajustes aditivos de 1,955 cent nas doze quintas, em vez de parcelas lineares de porcentagem nos semitons. O fechamento temperado é apresentado como compromisso que preserva oitavas puras, sem afirmar que todos os intervalos se tornam puros. Controles de áudio e cálculo permanecem disponíveis.
