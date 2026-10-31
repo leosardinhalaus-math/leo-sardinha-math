@@ -1,4 +1,40 @@
-# Matemática em Papel — revisão do gerador fotográfico
+# Matemática em Papel — modelos e geradores
+
+## Poly Puzzle
+
+- Gerador de duas fotos, com galeria, recorte, zoom e posicionamento independentes.
+- Dissecação autoral de 21 peças: hexágono regular na frente, quadrado de área igual no verso. Usa triangulação, passagem por um retângulo e duas operações de recorte/recomposição por um paralelogramo. Não reproduz o recorte do FoldPlay.
+- As peças são isometrias com inversão de orientação entre as duas montagens, apropriadas para virar o papel e revelar a segunda foto.
+- Prévia das duas montagens, solução numerada opcional, dois SVGs independentes e duas páginas A4 paisagem para duplex pela borda curta.
+- Registro de impressão com cruzes A/B/C: conferir contra a luz antes de cortar.
+- Revisão corrigiu uma colisão de IDs entre os dois SVGs da prévia, que poderia exibir a primeira imagem no verso; IDs e referências agora são independentes.
+
+## Sphericon
+
+- Quatro setores de meio-cone, raio de base 35 mm, geratriz 35√2 mm e ângulo π/√2 rad (127,279°).
+- Acabamento com foto ou galeria, incluindo uma ilustração autoral de torta.
+- Curvas AB/CD segmentadas em doze abas cada, com códigos em sentidos opostos. Bordas retas R1…R4 unem ponta a extremo do arco.
+- Visualização da forma em 3D com controle de giro; ela não simula a física do rolamento.
+- Molde SVG independente e uma página A4 paisagem, com instruções de montagem em português.
+- Referências: [Sphericon, Wolfram MathWorld](https://mathworld.wolfram.com/Sphericon.html) e [Paper Sphericon, Nick Rauh](https://maththem.blogspot.com/2023/08/paper-sphericon.html). Geometria e desenhos implementados originalmente, sem copiar os arquivos dessas páginas.
+
+## Biblioteca e navegação
+
+A aba Modelos reúne HEX, OCT, cubo invertível (guia externo), Poly Puzzle, Sphericon e mini-livro, com ilustrações e atalhos. Prévia dos caleidociclos e do Sphericon calculada a partir das superfícies em 3D. Oito abas navegáveis por teclado e URLs diretas #poly-puzzle, #sphericon e #modelos. Links descritivos atualizados na página inicial e em Educação.
+
+## Verificação da atualização
+
+- `node --test tests/kaleidocycle-geometry.test.cjs tests/paper-materials-geometry.test.cjs`: 14 testes aprovados.
+- Poly Puzzle: igualdade de áreas, distâncias conservadas, determinante −1 e ortogonalidade das transformações de todas as peças. Cobertura independente de 2.809 pontos em cada formato, sem lacunas ou sobreposição.
+- Sphericon: medidas dos setores e arcos, área da superfície e coincidência em 3D de todos os pares de bordas curvas e retas, com orientação invertida.
+- Chromium/Playwright: oito abas, geração, solução, upload inválido, SVGs com IDs únicos, referências de imagens independentes, impressão em duas páginas para o puzzle e uma para o Sphericon, giro, interrupção da animação ao sair da aba, teclado e largura de 390 px.
+- Revisão visual da biblioteca, das duas faces impressas do puzzle e do Sphericon.
+
+**Limite:** não houve montagem física com tesoura, cola e impressora. Os testes de geometria não medem a espessura do papel nem a tolerância da impressão duplex. As instruções orientam conferir o registro e experimentar as emendas antes da montagem definitiva.
+
+---
+
+## Revisão anterior: gerador fotográfico de caleidociclos
 
 O módulo de caleidociclos foi refeito a partir da referência visual fornecida pelo usuário: seleção de modelo, quatro fotos independentes, recorte, galeria, geração e instruções de montagem.
 
