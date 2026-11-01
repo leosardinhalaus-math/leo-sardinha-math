@@ -1,0 +1,1 @@
+'use strict';importScripts('core.js');self.onmessage=event=>{try{const result=PrimeLab.sieve(event.data.n,{segmentBytes:event.data.segmentBytes,compare:event.data.compare,onProgress:value=>self.postMessage({type:'progress',value})});self.postMessage({type:'result',result})}catch(error){self.postMessage({type:'error',message:error.message})}};
