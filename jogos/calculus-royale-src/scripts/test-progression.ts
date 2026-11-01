@@ -65,3 +65,12 @@ assert.deepEqual(normalizeCompletedWorlds([true,1,'true',false],5),[true,false,f
 assert.deepEqual(normalizeCompletedWorlds([true,false],0),[]);
 assert.deepEqual(normalizeStageProgress([6,5],[1,1],normalizeCompletedWorlds(null,2)),[1,1]);
 assert.deepEqual(normalizeStageProgress([6,5],[1,1],normalizeCompletedWorlds([true,false],2)),[6,1]);
+
+// The chapter initializer must normalize corrupt completion flags before computing stages.
+assert.deepEqual(normalizeStageProgress([6,5],[1,1],null),[1,1]);
+assert.deepEqual(normalizeStageProgress([6,5],[1,1],{0:true}),[1,1]);
+assert.deepEqual(normalizeStageProgress([6,5],[1,1],[1,'true']),[1,1]);
+assert.deepEqual(normalizeStageProgress([6,5],[1,1],[true,false]),[6,1]);
+const chapterInitializer=gameCanvas.match(/const \[chapter, setChapter\] = useState\(\(\) => \{([\s\S]*?)\n  \}\);/);
+assert.ok(chapterInitializer,'chapter initializer must exist');
+assert.match(chapterInitializer[1],/normalizeCompletedWorlds\(readStorage<unknown>\(storageKeys\.worlds,\s*\[\]\),\s*worlds\.length\)/);

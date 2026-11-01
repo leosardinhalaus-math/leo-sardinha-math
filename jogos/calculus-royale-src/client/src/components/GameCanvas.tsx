@@ -270,7 +270,7 @@ export default function GameCanvas() {
   const challengePicker = useRef(createChallengePicker());
   const [chapter, setChapter] = useState(() => {
     const selectedWorld=normalizeWorldIndex(readStorage<unknown>(storageKeys.worldIndex,0),worlds.length);
-    const completed=readStorage<boolean[]>(storageKeys.worlds,[false,false,false,false,false]);
+    const completed=normalizeCompletedWorlds(readStorage<unknown>(storageKeys.worlds,[]),worlds.length);
     const progress=normalizeStageProgress(worlds.map(item=>item.chapters.length),readStorage<unknown>(storageKeys.stages,[]),completed);
     return Math.min(worlds[selectedWorld].chapters.length-1,progress[selectedWorld]);
   });

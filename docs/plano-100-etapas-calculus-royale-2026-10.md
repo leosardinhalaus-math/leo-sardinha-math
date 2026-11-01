@@ -368,3 +368,12 @@ Ainda é necessário implementar validação de pontuação pelo servidor, ambie
 - **Regressões acrescentadas:** `scripts/test-save-game.ts` simula `getItem` lançando exceção, verifica `read` com fallback, `snapshot` e `write` sem interrupção, e cobre envelopes `data: null`, lista e valores primitivos com recuperação da chave legada. A verificação de CI deste commit **está pendente neste registro**; consultar `Calculus Royale build and dependency gate` antes de afirmar aprovação.
 - **Limites:** testes unitários em armazenamento simulado; não são testes de navegador real, não confirmam persistência quando o navegador bloqueia armazenamento, nem pontuação autoritativa. **66/100 etapas comprovadas**, nenhuma nova marcação.
 - **Rollback:** reverter este commit se houver regressão. PR segue draft, sem merge, deploy, custo novo ou alteração em Supabase de produção.
+
+
+## Continuação — 01/11/2026: conclusão de ilhas corrompida na inicialização (CI pendente)
+
+- **Falha localizada por inspeção:** a inicialização de `chapter` ainda passava diretamente `completed-worlds` do armazenamento a `normalizeStageProgress`. Um salvamento `null` ou objeto, apesar da normalização no estado `completedWorlds`, podia causar exceção ao acessar o índice; valores truthy não booleanos também podiam declarar ilhas concluídas.
+- **Correção na PR #4:** `GameCanvas.tsx` usa `normalizeCompletedWorlds` também no inicializador de `chapter`; `normalizeStageProgress` aceita dados de conclusão desconhecidos e reconhece somente `true` booleano. Salvamentos válidos preservam o comportamento anterior.
+- **Regressões:** `scripts/test-progression.ts` cobre `null`, objeto e bandeiras truthy inválidas, além de verificar a chamada normalizada no inicializador real. **Aguardar GitHub Actions no SHA deste commit antes de afirmar aprovação.** Não é teste E2E no navegador.
+- **Etapas:** permanecem **66/100**; não marcar 61, 67, 69 ou outras pendentes sem comprovação. Pontuação local não é antifraude.
+- **Rollback:** reverter este commit único caso haja regressão; nenhuma mudança em `main`, Supabase, deploy, cobrança ou PR draft.

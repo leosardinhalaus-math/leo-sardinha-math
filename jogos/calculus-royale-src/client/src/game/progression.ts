@@ -3,9 +3,10 @@ export type StageVictory =
   | { kind: 'advance'; nextProgress: number; nextStage: number }
   | { kind: 'complete'; nextProgress: number };
 
-export function normalizeStageProgress(lengths:number[],saved:unknown,completedWorlds:boolean[]){
+export function normalizeStageProgress(lengths:number[],saved:unknown,completedWorlds:unknown){
  const values=Array.isArray(saved)?saved:[];
- return lengths.map((length,index)=>completedWorlds[index]
+ const completed=Array.isArray(completedWorlds)?completedWorlds:[];
+ return lengths.map((length,index)=>completed[index]===true
   ? length
   : Math.max(0,Math.min(length,Number.isFinite(values[index])?Math.floor(values[index] as number):0)));
 }
