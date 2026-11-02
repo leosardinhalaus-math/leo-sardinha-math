@@ -14,6 +14,7 @@ function render(){if(!story)return;
  $('.activity-grid').hidden=mode==='digital'&&step!==3&&step!==4;$('.reasoning').hidden=mode==='digital'&&step!==6;
  $('#answer-form').hidden=mode==='digital'&&step===4;
  $('#scene-position').textContent=`Etapa ${step+1} de 7 · ${['O encontro','O impasse','Sua hipótese','Sua vez de investigar','O desfecho','Outra pergunta','O que você leva'][step]}`;
+ const cast=window.TahanCharacters.forStory(variant.id);const portrait=$('#scene-character-image');if(portrait.getAttribute('src')!==cast.image)portrait.src=cast.image;portrait.alt=cast.alt;$('#scene-character-caption').textContent=cast.caption;
  $('#journey-progress').value=step+1;$('#scene-title').textContent=scene.title;$('#scene-text').innerHTML=scene.paragraphs.map(p=>`<p>${escape(p)}</p>`).join('');
  $('#scene-choice').hidden=!quiz;$('#scene-hypothesis').hidden=step!==2;
  if(quiz){$('#scene-choice').innerHTML=`<h4>${escape(quiz.prompt)}</h4><div class="story-options" role="group" aria-label="${escape(quiz.prompt)}">${quiz.options.map((o,i)=>`<button type="button" data-story-option="${i}" aria-pressed="${answers[step]?.selected===i}"><span aria-hidden="true">${String.fromCharCode(65+i)}</span>${escape(o)}</button>`).join('')}</div><p class="story-feedback${answers[step]?.correct?' correct':''}" id="story-feedback" role="status" aria-live="polite">${answers[step]?escape(answers[step].correct?quiz.feedback:'Essa ideia ainda não atende à pergunta. Releia a cena e compare as alternativas.'):''}</p>`;}

@@ -1,6 +1,6 @@
 'use strict';
 (()=>{
-const M=window.TahanMath,C=window.TahanContent,B=window.TahanBNCC;
+const M=window.TahanMath,C=window.TahanContent,B=window.TahanBNCC,A=window.TahanCharacters;
 const $=s=>document.querySelector(s),ids=Object.keys(C),states={};
 let current='camelos',mode='digital',round=1;
 const fmt=n=>Number(n).toLocaleString('pt-BR');
@@ -11,7 +11,8 @@ J.init(()=>preparePrint(false));
 function remember(id,key){try{localStorage.setItem('tahan-last-'+id,String(key));}catch{}}
 function previous(id){try{return localStorage.getItem('tahan-last-'+id);}catch{return null;}}
 ids.forEach(id=>{states[id]=M.next(id,previous(id));remember(id,states[id].key);});
-const cards=ids.map((id,i)=>{const c=C[id];return `<article class="story-card" data-source="${c.book}"><div class="card-art" aria-hidden="true"><span class="card-index">AVENTURA / 0${i+1}</span>${id==='magico'?'<div class="art-grid">'+[8,1,6,3,5,7,4,9,2].map(n=>`<span>${n}</span>`).join('')+'</div>':`<span class="art-number">${c.icon}</span>`}</div><div class="card-body"><p class="card-topic">${c.topic}</p><h3>${c.short}</h3><p>${c.hook}</p><div class="card-footer"><span>${c.time}</span><button type="button" data-open="${id}" aria-label="Explorar ${c.short}">Explorar →</button></div></div></article>`;}).join('');
+$('#character-gallery').innerHTML=Object.values(A.groups).map(group=>`<article class="character-card"><img src="${group.image}" width="1200" height="800" loading="lazy" decoding="async" alt="${group.alt}"><div><p class="eyebrow">${group.title}</p><h3>${group.names}</h3><p>${group.description}</p></div></article>`).join('');
+const cards=ids.map((id,i)=>{const c=C[id],cast=A.forStory(id);return `<article class="story-card" data-source="${c.book}"><div class="card-art has-characters"><img src="${cast.image}" width="1200" height="800" loading="lazy" decoding="async" alt=""><span class="card-index">AVENTURA / 0${i+1}</span></div><div class="card-body"><p class="card-topic">${c.topic}</p><h3>${c.short}</h3><p>${c.hook}</p><div class="card-footer"><span>${c.time}</span><button type="button" data-open="${id}" aria-label="Explorar ${c.short}">Explorar →</button></div></div></article>`;}).join('');
 $('#cards').innerHTML=cards;
 $('#activity-select').innerHTML=ids.map(id=>`<option value="${id}">${C[id].short}</option>`).join('');
 $('#bncc-table').innerHTML=ids.map(id=>{const c=C[id];return `<tr><td><a href="#oficina" data-open="${id}">${c.short}</a></td><td>${c.year}</td><td>${c.codes.join('<br>')}</td><td>${c.evidence}</td></tr>`;}).join('');

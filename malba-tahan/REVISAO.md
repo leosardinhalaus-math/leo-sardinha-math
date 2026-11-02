@@ -44,3 +44,9 @@ A chave do último exemplo é guardada localmente para evitar repetição imedia
 A atualização desenvolveu os oito recontos em 56 etapas no total. O caderno do estudante passou a 17 páginas e o guia do professor a 31 páginas. O estudante recebe o desenvolvimento narrativo até a investigação, sem desfecho numérico antecipado. O guia reúne as sete cenas e as resoluções.
 
 Verificação da atualização: 160 exemplos de narrativas conferidos com seus dados; oito percursos completos no Chromium, com as 56 etapas, escolhas, hipóteses, conferência, consulta assistida, nova rodada e modos de tela e papel. Larguras de 320, 390 e 768 px verificadas, sem transbordamento horizontal.
+
+## Personagens em estilo anime
+
+Quatro ilustrações originais apresentam os personagens em contextos de viagem, mercado, salão e jardim. Beremiz e seu companheiro mantêm a mesma referência visual. As imagens representam personagens dos recontos; não são retratos do autor.
+
+O elenco aparece em uma galeria, nos cartões das oito aventuras e ao lado das etapas narrativas. As imagens possuem descrição alternativa quando informativas; nos cartões, a imagem é decorativa porque o título já identifica a aventura. Os arquivos WebP são locais, com dimensões reservadas e carregamento tardio na galeria. As ilustrações evitam quantidades e resultados que poderiam antecipar as respostas dos desafios.
