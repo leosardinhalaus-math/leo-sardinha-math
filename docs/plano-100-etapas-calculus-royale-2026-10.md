@@ -377,3 +377,12 @@ Ainda é necessário implementar validação de pontuação pelo servidor, ambie
 - **Regressões:** `scripts/test-progression.ts` cobre `null`, objeto e bandeiras truthy inválidas, além de verificar a chamada normalizada no inicializador real. **Aguardar GitHub Actions no SHA deste commit antes de afirmar aprovação.** Não é teste E2E no navegador.
 - **Etapas:** permanecem **66/100**; não marcar 61, 67, 69 ou outras pendentes sem comprovação. Pontuação local não é antifraude.
 - **Rollback:** reverter este commit único caso haja regressão; nenhuma mudança em `main`, Supabase, deploy, cobrança ou PR draft.
+
+
+## Continuação — 02/11/2026: contadores locais inválidos na inicialização (CI pendente)
+
+- **Falha por inspeção:** valores persistidos de vitórias, moedas e essência eram carregados sem validação de tipo. Por exemplo, uma vitória após salvar `wins="3"` podia concatenar `"3" + 1` em vez de produzir 4; valores nulos, objetos ou infinitos podiam afetar saldos e a interface.
+- **Correção proposta na PR #4:** `normalizeSavedCounter` em `client/src/data/saveGame.ts` aceita apenas inteiros seguros não negativos, preserva valores válidos e usa o valor padrão para dados inválidos. Os três inicializadores em `GameCanvas.tsx` utilizam a função. Não altera API, banco, ranking nem salvamentos válidos.
+- **Testes acrescentados:** `scripts/test-save-game.ts` verifica entradas inválidas, limites numéricos e o uso explícito da função nos inicializadores. **Não afirmar CI aprovado até aparecer execução do SHA novo.** Os commits `a99a1bd`, `e568d32` e `b5c0aaf` também não apresentavam runs associados na consulta de 02/11; último conjunto de nove workflows verdes observado em `d10d243` (30/10).
+- **Limites:** verificação de robustez local, não autenticação real, teste E2E nem validação antifraude de pontuação. **Total permanece 66/100**; nenhuma etapa pendente foi marcada.
+- **Rollback:** reverter o commit desta rodada. PR segue draft; sem merge, deploy, alteração de Supabase ou custo novo.

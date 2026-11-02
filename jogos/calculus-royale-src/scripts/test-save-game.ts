@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import {createSaveStore,SAVE_ENVELOPE_KEY,SAVE_SCHEMA_VERSION,storageKeys} from '../client/src/data/saveGame.ts';
+import {readFileSync} from 'node:fs';
+import {createSaveStore,normalizeSavedCounter,SAVE_ENVELOPE_KEY,SAVE_SCHEMA_VERSION,storageKeys} from '../client/src/data/saveGame.ts';
 
 class MemoryStorage{
  private values=new Map<string,string>();
@@ -41,4 +42,19 @@ for (const data of [null,[],42,'texto']) {
  malformed.setItem(storageKeys.coins,'9');
  assert.equal(createSaveStore(malformed).read(storageKeys.coins,0),9);
 }
-console.log('PASS: save versionado, migração, leitura indisponível e recuperação de envelopes inválidos.');
+// Dados locais não confiáveis não devem transformar vitórias em concatenação de texto,
+// nem introduzir NaN, frações ou objetos nos saldos usados pela interface.
+for (const invalid of [null, undefined, '7', -1, 2.5, NaN, Infinity, -Infinity, {}, [], Number.MAX_SAFE_INTEGER + 1]) {
+ assert.equal(normalizeSavedCounter(invalid, 0), 0);
+ assert.equal(normalizeSavedCounter(invalid, 320), 320);
+}
+assert.equal(normalizeSavedCounter(0, 320), 0);
+assert.equal(normalizeSavedCounter(18, 0), 18);
+assert.equal(normalizeSavedCounter(Number.MAX_SAFE_INTEGER, 0), Number.MAX_SAFE_INTEGER);
+assert.equal(normalizeSavedCounter('3', NaN), 0);
+const gameCanvas = readFileSync(new URL('../client/src/components/GameCanvas.tsx', import.meta.url), 'utf8');
+for (const [key, fallback] of [['wins',0], ['coins',320], ['essence',6]] as const) {
+ assert.ok(gameCanvas.includes(`normalizeSavedCounter(readStorage<unknown>(storageKeys.${key}, ${fallback}), ${fallback})`),
+   `O contador ${key} deve ser normalizado na inicialização`);
+}
+console.log('PASS: save versionado, recuperação de envelopes e contadores locais validados.');

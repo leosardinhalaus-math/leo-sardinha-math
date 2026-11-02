@@ -5,7 +5,7 @@ import { getCardProfile, abilityDescription } from "@/game/cardProfiles";
 import { isStageUnlocked, normalizeCompletedWorlds, normalizeStageProgress, normalizeWorldIndex, resolveStageVictory } from "@/game/progression";
 import { createChallengePicker, type Challenge } from "@/data/powerUpChallenges";
 import { WORLD_MAPS } from "@/data/worldMaps";
-import { readStorage, storageKeys, writeStorage } from "@/data/saveGame";
+import { normalizeSavedCounter, readStorage, storageKeys, writeStorage } from "@/data/saveGame";
 import { getCardImage, getCardImageFallback } from "@/data/cardArt";
 import RoyaleCard from "./RoyaleCard";
 import SpecialItemsBoard from "./SpecialItemsBoard";
@@ -265,7 +265,7 @@ export default function GameCanvas() {
     return normalizeStageProgress(worlds.map(item=>item.chapters.length),readStorage<unknown>(storageKeys.stages,[]),completed);
   });
   const [cardLevels, setCardLevels] = useState<Record<string, number>>(() => readStorage(storageKeys.levels, {}));
-  const [essence, setEssence] = useState(() => readStorage(storageKeys.essence, 6));
+  const [essence, setEssence] = useState(() => normalizeSavedCounter(readStorage<unknown>(storageKeys.essence, 6), 6));
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const challengePicker = useRef(createChallengePicker());
   const [chapter, setChapter] = useState(() => {
@@ -274,8 +274,8 @@ export default function GameCanvas() {
     const progress=normalizeStageProgress(worlds.map(item=>item.chapters.length),readStorage<unknown>(storageKeys.stages,[]),completed);
     return Math.min(worlds[selectedWorld].chapters.length-1,progress[selectedWorld]);
   });
-  const [wins, setWins] = useState(() => readStorage(storageKeys.wins, 0));
-  const [coins, setCoins] = useState(() => readStorage(storageKeys.coins, 320));
+  const [wins, setWins] = useState(() => normalizeSavedCounter(readStorage<unknown>(storageKeys.wins, 0), 0));
+  const [coins, setCoins] = useState(() => normalizeSavedCounter(readStorage<unknown>(storageKeys.coins, 320), 320));
   const [soundVolume, setSoundVolume] = useState(() => readStorage(storageKeys.volume, 0.7));
   const [soundMuted, setSoundMuted] = useState(() => readStorage(storageKeys.muted, false));
   const [audioSettingsOpen, setAudioSettingsOpen] = useState(false);

@@ -70,5 +70,11 @@ export function createSaveStore(storage?:StorageLike){
  };
 }
 
+/** Valida contadores locais antes de aritmética; não valida pontuação no servidor. */
+export function normalizeSavedCounter(value: unknown, fallback: number): number {
+ const valid = (n: unknown): n is number => typeof n === 'number' && Number.isSafeInteger(n) && n >= 0;
+ return valid(value) ? value : (valid(fallback) ? fallback : 0);
+}
+
 export const readStorage=<T,>(key:StorageKey,fallback:T)=>createSaveStore().read(key,fallback);
 export const writeStorage=<T,>(key:StorageKey,value:T)=>createSaveStore().write(key,value);
