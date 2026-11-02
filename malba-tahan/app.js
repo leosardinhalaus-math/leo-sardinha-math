@@ -6,7 +6,8 @@ let current='camelos',mode='digital',round=1;
 const fmt=n=>Number(n).toLocaleString('pt-BR');
 const safe=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const input=(label,i)=>`<label>${label}<input name="answer-${i}" data-answer="${i}" type="text" inputmode="numeric" autocomplete="off" aria-label="${label}"></label>`;
-const names={camelos:'Camelo',paes:'Pão',quatros:'4',vasos:'Vaso',xadrez:'Casa',magico:'Número',amigos:'Divisor',perfeitos:'Divisor'};
+const J=window.TahanJourney;
+J.init(()=>preparePrint(false));
 function remember(id,key){try{localStorage.setItem('tahan-last-'+id,String(key));}catch{}}
 function previous(id){try{return localStorage.getItem('tahan-last-'+id);}catch{return null;}}
 ids.forEach(id=>{states[id]=M.next(id,previous(id));remember(id,states[id].key);});
@@ -72,9 +73,9 @@ function render(){
  $('#hint').open=false;$('#solution').open=false;$('#hint-content').innerHTML=hint(v);$('#solution-content').innerHTML=solution(v);
  $('#materials').textContent=c.materials;$('#paper-steps').innerHTML=c.steps.map(s=>`<li>${s}</li>`).join('');
  $('#objective').textContent=c.objective;$('#evidence').textContent=c.evidence;$('#activity-bncc').innerHTML=c.codes.map(code=>`<p><span class="code">${code}</span>${B[code]}</p>`).join('');$('#extension').textContent=c.extension;$('#caution').textContent=c.caution;$('#activity-source').textContent='Inspiração: '+c.source;
- $('#challenge-counter').textContent='RODADA '+String(round).padStart(2,'0');$('#reflection').value='';setMode(mode);preparePrint(false);
+ $('#challenge-counter').textContent='RODADA '+String(round).padStart(2,'0');$('#reflection').value='';J.start(v);$('#hypothesis-prompt').textContent=window.TahanStories.create(v).hypothesis;setMode(mode);preparePrint(false);
 }
-function setMode(value){mode=value;$('#oficina').classList.toggle('paper-mode',mode==='paper');document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===mode));}
+function setMode(value){mode=value;J.setMode(value);$('#oficina').classList.toggle('paper-mode',mode==='paper');document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===mode));}
 function openActivity(id,scroll=true){if(!C[id])return;current=id;round=1;render();if(scroll){$('#oficina').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});$('#activity-title').setAttribute('tabindex','-1');$('#activity-title').focus({preventScroll:true});}}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-open]');if(b){e.preventDefault();openActivity(b.dataset.open);}});
 $('#activity-select').addEventListener('change',e=>openActivity(e.target.value,false));
@@ -84,6 +85,7 @@ $('#new-variant').addEventListener('click',()=>{states[current]=M.next(current,s
 $('#surprise').addEventListener('click',e=>{e.preventDefault();const other=ids.filter(id=>id!==current);openActivity(other[Math.floor(Math.random()*other.length)]);});
 $('#answer-form').addEventListener('submit',e=>{e.preventDefault();const v=states[current],values=[...document.querySelectorAll('[data-answer]')].map(x=>x.value);const result=M.check(v,values);
  if(v.id==='perfeitos'&&result.ok&&$('#classification').value!==v.classification){result.ok=false;result.message='A soma está certa. Compare-a com o número investigado para revisar a classificação.';}
+ if(result.ok)J.markSolved();
  $('#feedback').classList.toggle('correct',result.ok);$('#feedback').textContent=result.ok?'Sua ideia atende às condições! Agora explique como chegou a ela e compare com uma solução.':result.message||'Ainda há uma condição para revisar. Releia os dados e experimente a pista. Você pode tentar de novo.';
 });
 function printablePieces(v){switch(v.id){
@@ -97,7 +99,7 @@ case 'amigos':return `<table><tr><th>Número</th><th>Divisores próprios</th><th
 case 'perfeitos':return '<p>Divisores próprios: ___________________________________________________</p><p>Soma: ____________ Classificação: _______________________</p>';
 }}
 function preparePrint(teacher){const v=states[current],c=C[current],reflection=$('#reflection').value;
- $('#print-sheet').innerHTML=`<div class="print-brand">Leo Sardinha.Math / Malba Tahan · ${teacher?'GUIA DO PROFESSOR COM RESOLUÇÃO':'FICHA DE INVESTIGAÇÃO · SEM RESPOSTAS'}</div><p class="print-meta">${c.year} · ${c.time} · ${c.codes.join(' / ')} · Exemplo ${safe(v.key)}</p><h1>${c.short}</h1><p>Nome: __________________________________ Turma: __________ Data: __________</p><p>${c.intro}</p>${description(v)}<section><h2>Investigue com as mãos</h2><p><b>Materiais:</b> ${c.materials}</p><ol>${c.steps.map(s=>`<li>${s}</li>`).join('')}</ol></section><section><h2>Peças e quadro de registro</h2>${printablePieces(v)}</section><section><h2>Minha hipótese, meu caminho e minha descoberta</h2>${reflection?`<p>${safe(reflection).replace(/\n/g,'<br>')}</p>`:''}<div class="response-lines"></div></section><p class="print-meta">Inspiração: ${c.source} Textos e exemplos adaptados para esta oficina. Relações com a BNCC propostas pelo projeto.</p>${teacher?`<h2>Resolução comentada</h2>${solution(v)}<h3>Objetivo e evidência</h3><p>${c.objective}</p><p>${c.evidence}</p><h3>Associações com a BNCC · sínteses</h3>${c.codes.map(code=>`<p><b>${code}</b>: ${B[code]}</p>`).join('')}<h3>Ampliação</h3><p>${c.extension}</p><h3>Revisão e hipóteses</h3><p>${c.caution}</p><p>BNCC oficial: basenacionalcomum.mec.gov.br · pp. 301–304 e 313–314.</p>`:''}`;
+ $('#print-sheet').innerHTML=`<div class="print-brand">Leo Sardinha.Math / Malba Tahan · ${teacher?'GUIA DO PROFESSOR COM RESOLUÇÃO':'FICHA DE INVESTIGAÇÃO · SEM RESPOSTAS'}</div><p class="print-meta">${c.year} · ${c.time} · ${c.codes.join(' / ')} · Exemplo ${safe(v.key)}</p><h1>${c.short}</h1><p>Nome: __________________________________ Turma: __________ Data: __________</p>${J.printStory(teacher)}<h2>Seu desafio nesta rodada</h2>${description(v)}<section><h2>Investigue com as mãos</h2><p><b>Materiais:</b> ${c.materials}</p><ol>${c.steps.map(s=>`<li>${s}</li>`).join('')}</ol></section><section><h2>Peças e quadro de registro</h2>${printablePieces(v)}</section><section><h2>Minha hipótese, meu caminho e minha descoberta</h2>${reflection?`<p>${safe(reflection).replace(/\n/g,'<br>')}</p>`:''}<div class="response-lines"></div></section><p class="print-meta">Inspiração: ${c.source} Textos e exemplos adaptados para esta oficina. Relações com a BNCC propostas pelo projeto.</p>${teacher?`<h2>Resolução comentada</h2>${solution(v)}<h3>Objetivo e evidência</h3><p>${c.objective}</p><p>${c.evidence}</p><h3>Associações com a BNCC · sínteses</h3>${c.codes.map(code=>`<p><b>${code}</b>: ${B[code]}</p>`).join('')}<h3>Ampliação</h3><p>${c.extension}</p><h3>Revisão e hipóteses</h3><p>${c.caution}</p><p>BNCC oficial: basenacionalcomum.mec.gov.br · pp. 301–304 e 313–314.</p>`:''}`;
 }
 $('#print-student').addEventListener('click',()=>{preparePrint(false);window.print();});$('#print-teacher').addEventListener('click',()=>{preparePrint(true);window.print();});
 $('#reflection').addEventListener('input',()=>preparePrint(false));window.addEventListener('afterprint',()=>preparePrint(false));

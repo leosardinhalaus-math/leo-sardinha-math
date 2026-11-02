@@ -4,7 +4,7 @@ Seção integrada ao Leo Sardinha.Math, em `malba-tahan/`, com entradas pela pá
 
 ## Escrita e edição
 
-Foram selecionados oito episódios ou temas dos dois PDFs enviados. As aberturas, os comandos e os roteiros são textos próprios de adaptação educativa; os livros não são distribuídos na seção. Cada oficina informa capítulo ou seção de origem. As variantes são identificadas como adaptações, sem atribuir ao autor números inventados pelo gerador.
+Foram selecionados oito episódios ou temas dos dois PDFs enviados. Os recontos, diálogos, comandos e roteiros são textos próprios de adaptação educativa; os livros não são distribuídos na seção. Cada oficina informa capítulo ou seção de origem. As variantes são identificadas como adaptações, sem atribuir ao autor números inventados pelo gerador.
 
 A apresentação do autor foi conferida nos Clubes da OBMEP: https://clubes.obmep.org.br/blog/bb_malba-tahan/
 
@@ -25,7 +25,11 @@ O foco é o 6º ano. A oficina do tabuleiro inclui extensão para o 8º ano. As 
 
 ## Digital e analógico
 
-Cada oficina oferece novos exemplos, pistas, uma resolução comentada, espaço de reflexão e roteiros com materiais acessíveis. A impressão mantém o exemplo atual. O guia do professor inclui respostas; a ficha do estudante não inclui a resolução. Os PDFs reunidos usam uma seleção fixa de exemplos, distinta dos sorteios da interface.
+Cada oficina apresenta um reconto de aproximadamente 630 a 680 palavras em sete etapas, com encontro, impasse, hipótese, investigação, desfecho, nova pergunta e epílogo. O percurso se inspira no jogo existente em `jogos/35-camelos/`, preservado. As falas e cenas são recriadas e identificadas como recontos autorais.
+
+As etapas incluem duas perguntas com alternativas e comentários, registro de hipótese (com opção de continuar sem registrar), cálculo, pistas e consulta assistida à resolução. O avanço após o cálculo depende de resposta conferida ou escolha de estudar a solução. Há navegação para voltar e acesso direto ao desafio.
+
+Cada oficina também oferece novos exemplos, uma resolução comentada, espaço de reflexão e roteiros com materiais acessíveis. A impressão mantém o exemplo atual. O guia do professor inclui respostas; a ficha do estudante não inclui a resolução. Os PDFs reunidos usam uma seleção fixa de exemplos, distinta dos sorteios da interface.
 
 A chave do último exemplo é guardada localmente para evitar repetição imediata entre visitas quando o navegador permite. Sem armazenamento, os desafios continuam funcionando. Os registros escritos ficam apenas na página aberta e são descartados ao trocar de desafio. Nenhum dado é enviado a servidor.
 
@@ -33,4 +37,10 @@ A chave do último exemplo é guardada localmente para evitar repetição imedia
 
 - 4.000 exemplos: partilhas, divisores, somas, quadrados, respostas e variação sem repetição imediata.
 - Teste em Chromium: oito oficinas, respostas corretas, filtro por livro, troca de modo, nova rodada, impressão e largura de 390 px; sem erro JavaScript.
-- PDFs: oito páginas no caderno e dezesseis no guia; verificação textual da separação de respostas e inspeção visual.
+- PDFs: histórias ampliadas nas fichas do estudante e recontos completos com desfechos e resoluções no guia; verificação textual da separação de respostas e inspeção visual.
+
+## Ampliação das histórias
+
+A atualização desenvolveu os oito recontos em 56 etapas no total. O caderno do estudante passou a 17 páginas e o guia do professor a 31 páginas. O estudante recebe o desenvolvimento narrativo até a investigação, sem desfecho numérico antecipado. O guia reúne as sete cenas e as resoluções.
+
+Verificação da atualização: 160 exemplos de narrativas conferidos com seus dados; oito percursos completos no Chromium, com as 56 etapas, escolhas, hipóteses, conferência, consulta assistida, nova rodada e modos de tela e papel. Larguras de 320, 390 e 768 px verificadas, sem transbordamento horizontal.
