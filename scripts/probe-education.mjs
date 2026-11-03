@@ -5,7 +5,7 @@ let response,error;
 for(let attempt=0;attempt<2;attempt++){try{response=await get('/healthz');if(response.status===200)break;error=Error('Health HTTP '+response.status)}catch(e){error=e}if(attempt===0)await new Promise(r=>setTimeout(r,5000))}
 if(!response||response.status!==200)throw error||Error('Health indisponível');
 const health=(await response.text()).trim();let mode;
-if(health==='ok')mode='configured';else {let data;try{data=JSON.parse(health)}catch{}if(data?.status==='setup')mode='setup';else throw Error('Health não reconhecido')}
+if(health==='ok')mode='configured';else {let data;try{data=JSON.parse(health)}catch{}if(data?.status==='setup')mode='setup';else if(data?.status==='ready'&&['auth-test','activities'].includes(data.mode))mode='configured';else throw Error('Health não reconhecido')}
 console.log(JSON.stringify({check:'health',status:200,mode}));
 for(const path of ['/','/educacao.html','/jogos/batalha-naval/','/assets/musica-atividades/exercicios.pdf','/login']){
  const r=await get(path);let good=false;

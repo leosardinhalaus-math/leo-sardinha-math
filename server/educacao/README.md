@@ -44,3 +44,7 @@ Calculus Royale tem integração Supabase e alternativa Firebase preparada, aind
 ## Endereços externos e vínculo com a conta
 
 A lista aceita e-mails simples de contas para as quais o Google é autoridade (Gmail ou claim hd de conta gerenciada). Para endereço de terceiro sem hd, exige entrada privada no formato `{ "email": "adulto@example.test", "sub": "identificador-estavel-conferido" }`. Não inserir um sub presumido, não publicar a lista e não enviar tokens pelo chat. O sub é usado para impedir que a autorização dependa apenas de uma caixa postal externa que possa mudar de titular. Entradas duplicadas ou incompletas são recusadas. Nenhuma conta real foi adicionada ou convertida nesta revisão.
+
+## Etapa de teste do próprio responsável
+
+O padrão agora é `EDU_ACTIVITIES_ENABLED=false`: mesmo uma sessão válida só chega à tela de diagnóstico do login. Jogos, PDFs e atividades continuam bloqueados no servidor. Isso separa testar OAuth de liberar conteúdo a alunos enquanto os documentos são revisados. A configuração e a ordem segura de atualização estão em [TESTE_TECNICO_LOGIN.md](TESTE_TECNICO_LOGIN.md). Não representa aprovação jurídica, publicação de política definitiva ou comprovação de consentimento.
