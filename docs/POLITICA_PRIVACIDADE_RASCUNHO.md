@@ -14,6 +14,10 @@ Este documento está sendo preparado para o site público Leo Sardinha.Math e su
 
 O site público e o portal restrito são ambientes diferentes. O primeiro continua disponível no GitHub Pages. O portal do Render está em configuração; os controles descritos como futuros só valerão depois de implantados e testados. Restringir um ambiente não torna privadas as cópias ou os arquivos já publicados no outro.
 
+## Escolha para a primeira fase
+
+A primeira fase será preparada **sem cadastro infantil e sem guardar nomes, respostas ou desempenho individual dos alunos no servidor do portal**. O acesso será do adulto autorizado; os resultados das atividades locais ficarão no aparelho. Arquivos que o adulto decidir baixar ou imprimir ficam sob seus cuidados. Isso não elimina dados técnicos de conexão tratados pelos provedores. Qualquer ampliação para registros individuais exigirá nova avaliação antes de ser implementada.
+
 ## 2. Quais dados podem ser tratados
 
 | Situação | Dados envolvidos | Observação |

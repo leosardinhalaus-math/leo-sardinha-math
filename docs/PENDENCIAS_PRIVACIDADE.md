@@ -10,6 +10,10 @@ Responsável: Leonardo Sardinha, conforme identificado na página Sobre. Contato
 
 Render: **Oregon (US West), Estados Unidos**, conforme informação do responsável em 3 de novembro de 2026. A informação não foi aplicada como configuração nova e não confirma todos os locais de tratamento dos provedores.
 
+## Escopo escolhido para a primeira fase
+
+Preparar atividades supervisionadas sem cadastro infantil e sem guardar nomes, respostas ou desempenho individual dos alunos no servidor do portal. Foi acrescentado um comunicado para revisão pelas famílias: COMUNICADO_FAMILIAS_RASCUNHO.md. A escolha reduz a coleta, mas não dispensa definir o tratamento dos dados do adulto e dos dados técnicos de conexão.
+
 ## Conferência técnica do piloto
 
 O inventário das quatro atividades locais, das sessões e dos campos do Render está disponível na aba Inventário técnico da página de revisão e em INVENTARIO_PILOTO_REVISAO.md. A verificação no código não substitui confirmar configurações da conta de hospedagem.
