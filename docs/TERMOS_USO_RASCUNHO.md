@@ -2,11 +2,11 @@
 
 **RASCUNHO PARA REVISÃO — NÃO VIGENTE.**
 
-Versão de trabalho: 3 de novembro de 2026. Este documento não ativa serviços, não concede acesso e não substitui a política de privacidade. Responsável e contato precisam ser preenchidos antes da adoção.
+Versão de trabalho: 3 de novembro de 2026. Este documento não ativa serviços, não concede acesso e não substitui a política de privacidade. A identificação do responsável e o contato foram preenchidos; as demais pendências precisam ser concluídas antes da adoção.
 
 ## 1. O projeto
 
-O Leo Sardinha.Math reúne atividades, jogos, simulações, exercícios e materiais para exploração da matemática. Por enquanto é um projeto independente. Nome/identificação do responsável: **[PREENCHER]**. Contato de suporte: **[PREENCHER]**.
+O Leo Sardinha.Math reúne atividades, jogos, simulações, exercícios e materiais para exploração da matemática. Por enquanto é um projeto independente. Nome/identificação do responsável: **Leonardo Sardinha**. Contato de suporte e privacidade: **leosardinhalaus@gmail.com**.
 
 O material pode apoiar estudos e práticas educativas, mas não constitui certificação, histórico escolar ou garantia de resultado de aprendizagem. As relações com a BNCC descrevem propostas pedagógicas e recortes de habilidades, não aprovação ou homologação pelo MEC.
 
@@ -64,6 +64,6 @@ Sugestões, pedidos de correção e problemas de acesso poderão ser enviados ao
 
 ## 9. Adoção
 
-**[PENDENTE: responsável, contatos, escopo de serviços ativos e data de vigência.]**
+**[PENDENTE: escopo confirmado de serviços ativos, decisões de tratamento e data de vigência.]**
 
 Não exigir concordância com este rascunho como se ele fosse um documento final. Quando adotados, os termos deverão estar acessíveis antes do uso e suas alterações relevantes deverão ser comunicadas de modo adequado ao público.

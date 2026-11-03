@@ -6,9 +6,9 @@ Versão de trabalho: 3 de novembro de 2026. Este texto não ativa o login, não 
 
 ## 1. Responsável e alcance
 
-Responsável pelo tratamento: **[PREENCHER: nome completo ou identificação da instituição responsável]**.
+Responsável pelo tratamento: **Leonardo Sardinha**.
 
-Contato de privacidade: **[PREENCHER: canal que poderá ser publicado e será efetivamente atendido]**.
+Contato de privacidade: **leosardinhalaus@gmail.com**.
 
 Este documento está sendo preparado para o site público Leo Sardinha.Math e sua futura área Educação no Render. O projeto é, neste momento, independente; não se presume vínculo institucional pela utilização de um e-mail acadêmico.
 

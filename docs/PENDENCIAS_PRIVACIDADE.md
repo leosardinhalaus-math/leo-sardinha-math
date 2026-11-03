@@ -2,9 +2,13 @@
 
 Rascunhos: POLITICA_PRIVACIDADE_RASCUNHO.md e TERMOS_USO_RASCUNHO.md. Não são documentos vigentes e não devem ser copiados integralmente para variáveis do Render sem revisão.
 
+## Identificação preenchida para os rascunhos
+
+Responsável: Leonardo Sardinha, conforme identificado na página Sobre. Contato autorizado para publicação: leosardinhalaus@gmail.com. Isso não preenche as configurações do Render nem torna os textos vigentes.
+
 ## Dados e decisões ainda necessários
 
-1. Nome completo/identificação do responsável e contatos de suporte e privacidade que ele autorize publicar.
+1. Conferência final da identificação e do contato já preenchidos nos rascunhos.
 2. Finalidades, fundamento legal de cada tratamento e avaliação do melhor interesse, sem presumir consentimento pela autenticação Google.
 3. Inventário confirmado dos módulos online antigos: autenticação, dados de perfil/progresso, políticas de acesso e retenção.
 4. Região e condições dos provedores, logs, contratos e transferências internacionais pertinentes.
