@@ -9,6 +9,8 @@ services:
     startCommand: node server/educacao/launch.mjs
     healthCheckPath: /healthz
     envVars:
+      - key: EDU_SUPERVISED_PILOT
+        value: 'true'
       - key: NODE_VERSION
         value: '24'
       - key: EDU_CONTENT_ROOT

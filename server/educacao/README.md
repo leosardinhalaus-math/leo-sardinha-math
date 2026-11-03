@@ -2,6 +2,10 @@
 
 Esta implementação precisa de servidor Node 22.16+ com HTTPS em um domínio novo, sem Service Workers preexistentes. GitHub Pages não executa este servidor e continua público. Nenhum botão ou redirecionamento no navegador é apresentado como proteção dos arquivos.
 
+## Uso supervisionado preparado
+
+Para o contexto de alunos a partir de 6 anos, o padrão agora é um piloto com entrada por adulto e apenas quatro atividades locais. Aplicações com cadastro próprio, nuvem ou leitores externos ficam bloqueadas na origem protegida. Veja [REVISAO_USO_SUPERVISIONADO.md](REVISAO_USO_SUPERVISIONADO.md) para limites, inventário, testes e pendências de ativação. Não foi implementado cadastro infantil ou coleta de consentimento parental.
+
 ## O que foi implementado
 
 Google OAuth/OIDC com authorization code, PKCE S256, state e nonce de uso único; assinatura RS256 por JWKS do Google, emissor, audiência, expiração, horário e e-mail verificado. Só solicita `openid email`; não pede perfil, contatos, Gmail ou Drive. Credenciais ficam no ambiente do servidor. Tokens Google são descartados após a identidade ser validada.
