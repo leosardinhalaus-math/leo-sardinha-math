@@ -14,6 +14,10 @@ O cabeçalho Service-Worker: script é recusado. A implantação exige origem no
 
 CSP atual protege base-uri, object-src e frame-ancestors. Não é uma política completa contra XSS: as atividades existentes contêm scripts inline e integrações externas, que precisam de auditoria individual. Não há alegação de auditoria integral ou conformidade jurídica certificada.
 
+## Implantação guiada sem hospedagem existente
+
+Foi adicionado um blueprint Render no plano Free e um roteiro em [ATIVAR_RENDER_GOOGLE.md](ATIVAR_RENDER_GOOGLE.md). O launcher inicia em modo restrito de configuração quando faltam campos obrigatórios: não serve atividades e não inicia OAuth. A exportação .edu-dist exclui arquivos internos, segredos com nomes reconhecidos e links simbólicos; não é um detector universal de dados pessoais. Conta Render e cliente Google ainda precisam ser configurados pelo titular.
+
 ## O que falta para ativar
 
 1. Hospedagem com servidor/reverse proxy HTTPS, domínio novo e armazenamento seguro de configuração. Aplicar limites por IP e tamanho de requisição no proxy; o limite conservador da aplicação usa o IP da conexão, que pode ser o próprio proxy. Não confiar indiscriminadamente em X-Forwarded-For.

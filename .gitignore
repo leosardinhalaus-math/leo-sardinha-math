@@ -9,3 +9,6 @@ __pycache__/
 # Rebuilt lossless montage; original portraits remain in the repository.
 assets/source/cards_grid.webp
 assets/*.import
+
+# Exportação de implantação; nunca versionar o conteúdo gerado
+.edu-dist/

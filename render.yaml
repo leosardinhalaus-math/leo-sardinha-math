@@ -1,0 +1,17 @@
+# Piloto gratuito; não cria banco, disco pago ou credenciais Google.
+services:
+  - type: web
+    name: leo-sardinha-educacao
+    runtime: node
+    plan: free
+    autoDeployTrigger: off
+    buildCommand: node server/educacao/export-site.mjs
+    startCommand: node server/educacao/launch.mjs
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_VERSION
+        value: '24'
+      - key: EDU_CONTENT_ROOT
+        value: .edu-dist
+      - key: EDU_ALLOWLIST_FILE
+        value: /etc/secrets/edu-allowlist.json
