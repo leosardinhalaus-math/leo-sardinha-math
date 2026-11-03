@@ -6,6 +6,10 @@ Rascunhos: POLITICA_PRIVACIDADE_RASCUNHO.md e TERMOS_USO_RASCUNHO.md. Não são 
 
 Responsável: Leonardo Sardinha, conforme identificado na página Sobre. Contato autorizado para publicação: leosardinhalaus@gmail.com. Isso não preenche as configurações do Render nem torna os textos vigentes.
 
+## Conferência técnica do piloto
+
+O inventário das quatro atividades locais, das sessões e dos campos do Render está disponível na aba Inventário técnico da página de revisão e em INVENTARIO_PILOTO_REVISAO.md. A verificação no código não substitui confirmar configurações da conta de hospedagem.
+
 ## Dados e decisões ainda necessários
 
 1. Conferência final da identificação e do contato já preenchidos nos rascunhos.

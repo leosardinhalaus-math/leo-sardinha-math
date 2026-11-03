@@ -40,3 +40,7 @@ Calculus Royale tem integração Supabase e alternativa Firebase preparada, aind
 ## Verificação
 
 `node --test tests/education-auth.test.cjs`: assinatura e claims, e-mail autorizado exato, negação de rotas diretas e desvios por symlink, headers, cookie, PKCE e callback falso. Testes usam dados fictícios, sem contas reais. Login real e implantação HTTPS ainda não foram testados, pois dependem da configuração Google e hospedagem. A suíte completa permanece disponível em `node --test tests/*.test.cjs`.
+
+## Endereços externos e vínculo com a conta
+
+A lista aceita e-mails simples de contas para as quais o Google é autoridade (Gmail ou claim hd de conta gerenciada). Para endereço de terceiro sem hd, exige entrada privada no formato `{ "email": "adulto@example.test", "sub": "identificador-estavel-conferido" }`. Não inserir um sub presumido, não publicar a lista e não enviar tokens pelo chat. O sub é usado para impedir que a autorização dependa apenas de uma caixa postal externa que possa mudar de titular. Entradas duplicadas ou incompletas são recusadas. Nenhuma conta real foi adicionada ou convertida nesta revisão.
