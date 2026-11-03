@@ -28,6 +28,12 @@ O inventário das quatro atividades locais, das sessões e dos campos do Render 
 6. Conferência do piloto na origem definitiva e da retirada das rotas públicas equivalentes, antes de anunciar restrição efetiva.
 7. Data de vigência e forma de apresentar mudanças aos usuários.
 
+## Próxima etapa técnica, sem liberação para alunos
+
+A página de revisão reúne os campos não secretos e o procedimento de teste das próprias contas do responsável. Primeiro é necessário atualizar o código no Render e conferir o marcador auth-test-gate-v1 em /healthz. Mantenha EDU_ACTIVITIES_ENABLED=false e EDU_SUPERVISED_PILOT=true. O resultado esperado, após configuração, é mode: auth-test: login reconhecido, mas jogos e PDFs bloqueados.
+
+Os avisos desse teste não substituem a definição das condições de uso educacional. O roteiro integral é server/educacao/TESTE_TECNICO_LOGIN.md. Nenhuma configuração é aplicada automaticamente pela página.
+
 ## O que esta preparação não modifica
 
 Não preenche EDU_CONTROLLER_NAME, EDU_PRIVACY_CONTACT, EDU_LEGAL_BASIS_NOTICE ou EDU_PROVIDER_NOTICE no Render. Não altera a lista de acesso, segredos, cadastro de usuários ou status de implantação. Não adiciona banner de consentimento genérico nem bloqueio visual apresentado como controle de acesso.
