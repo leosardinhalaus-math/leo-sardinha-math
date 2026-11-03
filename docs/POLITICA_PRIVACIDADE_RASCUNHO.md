@@ -18,7 +18,7 @@ O site público e o portal restrito são ambientes diferentes. O primeiro contin
 
 | Situação | Dados envolvidos | Observação |
 |---|---|---|
-| Navegação | Dados técnicos de conexão, como IP, horário e informações do navegador, conforme o provedor | Configurações, retenção e regiões dos provedores ainda precisam ser confirmadas |
+| Navegação | Dados técnicos de conexão, como IP, horário e informações do navegador, conforme o provedor | Região do serviço Render: Oregon (US West), EUA, informada pelo responsável; demais configurações e retenção ainda precisam ser confirmadas |
 | Futuro login Google do adulto | Identificador da conta e e-mail verificado | O portal solicita somente `openid email`; não recebe a senha nem solicita Gmail, contatos ou Drive |
 | Autorização de acesso | E-mails da lista privada de adultos autorizados | Não há cadastro público de alunos no piloto |
 | Sessão do portal | Identificador aleatório em cookie, dados mínimos da sessão e token de proteção contra requisições indevidas | Os tokens Google são descartados pelo portal após verificar a identidade |
@@ -72,9 +72,11 @@ Alguns jogos podem manter configurações ou progresso no armazenamento local do
 
 Podem participar do funcionamento: GitHub/GitHub Pages na parte pública; Render na futura hospedagem do portal; Google na autenticação; e, em determinadas aplicações, Supabase, Firebase, GeoGebra ou TurboWarp, conforme sua configuração e utilização.
 
+O responsável informou que o serviço Render está configurado em **Oregon (US West), Estados Unidos**. Essa informação identifica a região do serviço; não comprova a localização de todos os logs, backups, suporte ou tratamentos do Google e demais provedores. As transferências internacionais pertinentes ainda precisam de avaliação e documentação.
+
 A presença nessa lista não significa que todos estejam ativos em todas as páginas, nem que todos tenham o mesmo papel jurídico. Integrações com conta, nuvem e leitores externos permanecem fora do piloto até revisão.
 
-**[PENDENTE: confirmar serviços efetivamente ativos, responsabilidades, contratos, regiões, dados enviados, retenção e eventual mecanismo aplicável às transferências internacionais.]**
+**[PENDENTE: confirmar serviços efetivamente ativos, responsabilidades, contratos, locais dos demais tratamentos, dados enviados, retenção e eventual mecanismo aplicável às transferências internacionais.]**
 
 O piloto não solicita autorização para acessar arquivos pessoais no Drive, mensagens ou contatos. Não se prevê comercializar dados de alunos ou publicar seu desempenho. Qualquer alteração de finalidade exigirá avaliação e informação adequadas.
 

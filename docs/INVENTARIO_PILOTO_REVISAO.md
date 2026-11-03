@@ -50,7 +50,7 @@ Calculus Royale, demais jogos e leitores Scratch/GeoGebra ficam fora do piloto a
 
 Google: autenticação com escopos openid email; não se solicita Gmail, Drive ou contatos. O Google pode tratar dados técnicos conforme seus serviços e políticas. A documentação orienta usar sub como identificador estável; email_verified não garante autoridade sobre qualquer endereço externo.
 
-Render: fornece hospedagem e HTTPS. A documentação informa que a retenção dos logs depende do plano do workspace; não se deve confundir plano Free do serviço com todos os planos e configurações da conta. Região, retenção efetiva, logs e eventual encaminhamento externo devem ser confirmados no painel. Não se presume armazenamento no Brasil.
+Render: fornece hospedagem e HTTPS. A documentação informa que a retenção dos logs depende do plano do workspace; não se deve confundir plano Free do serviço com todos os planos e configurações da conta. O responsável informou no painel a região **Oregon (US West), Estados Unidos**, em 3 de novembro de 2026. A retenção efetiva, os logs e eventual encaminhamento externo ainda devem ser confirmados. A região do serviço não determina, por si só, todos os locais de tratamento do provedor.
 
 GitHub Pages: mantém a parte pública. O repositório, a história e arquivos anteriormente públicos não se tornam privados porque existe um portal no Render.
 
@@ -63,7 +63,7 @@ Supabase/Firebase/GeoGebra/TurboWarp: não são usados para cadastrar alunos ou 
 | EDU_CONTROLLER_NAME | Leonardo Sardinha | Identificação fornecida; não aplicada automaticamente |
 | EDU_PRIVACY_CONTACT | leosardinhalaus@gmail.com | Contato autorizado; não aplicado automaticamente |
 | EDU_LEGAL_BASIS_NOTICE | Finalidades e fundamento a serem definidos e documentados | Não preencher com uma presunção para destravar o acesso |
-| EDU_PROVIDER_NOTICE | Aviso final sobre operadores, regiões e transferências | Aguardar confirmação do painel e avaliação das condições |
+| EDU_PROVIDER_NOTICE | Aviso final sobre operadores, regiões e transferências | Região do serviço Render confirmada; demais condições e transferências ainda em avaliação |
 
 Nenhuma dessas informações muda os segredos do Render. Não há autorização para ativação automática ou para incluir contas de alunos.
 
@@ -76,4 +76,4 @@ Nenhuma dessas informações muda os segredos do Render. Não há autorização 
 - Tratamento de dados pelo Render: https://render.com/dpa
 - Privacidade do Render: https://render.com/privacy
 
-As fontes descrevem os produtos; não confirmam contratos, região ou opções da conta concreta do responsável.
+As fontes descrevem os produtos; não confirmam contratos ou opções da conta concreta do responsável. A região Render foi informada separadamente pelo responsável.
