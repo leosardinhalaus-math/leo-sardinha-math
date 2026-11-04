@@ -1,6 +1,18 @@
 'use strict';
-(()=>{document.body.classList.add('js');const menu=document.getElementById('home-menu'),toggle=document.getElementById('menu-toggle');toggle.hidden=false;const setMenu=open=>{menu.classList.toggle('is-open',open);toggle.setAttribute('aria-expanded',String(open))};toggle.addEventListener('click',()=>setMenu(toggle.getAttribute('aria-expanded')!=='true'));menu.addEventListener('keydown',e=>{if(e.key==='Escape'){setMenu(false);toggle.focus()}});menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>setMenu(false)));
-const cards=[...document.querySelectorAll('.resource-card')],filters=[...document.querySelectorAll('[data-filter]')],more=document.getElementById('show-more'),count=document.getElementById('catalog-count'),catalog=document.getElementById('atividades'),hashes={all:'atividades',fundamental:'fundamental',medio:'ensino-medio',superior:'ensino-superior',professor:'professores'},labels={all:'recursos',fundamental:'recursos para o Fundamental',medio:'recursos para o Médio',superior:'recursos para o superior',professor:'recursos para professores'};let selected='all',limit=6;
-function update(){const matches=cards.filter(card=>selected==='all'||card.dataset.audiences.split(' ').includes(selected));cards.forEach(card=>card.hidden=true);matches.slice(0,limit).forEach(card=>card.hidden=false);filters.forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.filter===selected)));more.hidden=matches.length<=limit;count.textContent=`${matches.length} ${labels[selected]} · mostrando ${Math.min(limit,matches.length)}.`}
-function select(value,scroll=false,write=true){selected=Object.hasOwn(hashes,value)?value:'all';limit=6;update();if(write)history.replaceState(null,'','#'+hashes[selected]);if(scroll){catalog.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});catalog.focus({preventScroll:true})}}
-filters.forEach(button=>button.addEventListener('click',()=>select(button.dataset.filter)));document.querySelectorAll('[data-audience]').forEach(link=>link.addEventListener('click',e=>{e.preventDefault();select(link.dataset.audience,true)}));more.addEventListener('click',()=>{let before=cards.filter(card=>!card.hidden).length;limit+=6;update();cards.filter(card=>!card.hidden)[before]?.querySelector('a')?.focus()});function fromHash(){let value=Object.keys(hashes).find(key=>hashes[key]===location.hash.slice(1));select(value||'all',false,false);if(value)requestAnimationFrame(()=>catalog.scrollIntoView({block:'start',behavior:'instant'}))}window.addEventListener('hashchange',fromHash);fromHash();})();
+(()=>{
+  const menu=document.getElementById('home-menu'),toggle=document.getElementById('menu-toggle');
+  if(!menu||!toggle)return;
+  document.body.classList.add('js');
+  toggle.hidden=false;
+  const setMenu=open=>{menu.classList.toggle('is-open',open);toggle.setAttribute('aria-expanded',String(open));};
+  toggle.addEventListener('click',()=>setMenu(toggle.getAttribute('aria-expanded')!=='true'));
+  menu.addEventListener('keydown',event=>{if(event.key==='Escape'){setMenu(false);toggle.focus();}});
+  menu.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>setMenu(false)));
+  // Preserve old links to the former home catalog.
+  function redirectOldCatalog(){if(['#atividades','#fundamental','#ensino-medio','#ensino-superior','#professores'].includes(location.hash)){
+    history.replaceState(null,'','#explorar');
+    document.getElementById('explorar').scrollIntoView({block:'start',behavior:'instant'});
+  }}
+  window.addEventListener('hashchange',redirectOldCatalog);
+  redirectOldCatalog();
+})();
