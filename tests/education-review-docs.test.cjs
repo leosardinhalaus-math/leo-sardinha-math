@@ -22,3 +22,12 @@ test('filtro recusa raiz do código, caminhos de escape e pais simbólicos',asyn
  try{await fs.writeFile(path.join(outside,'termos-rascunho.pdf'),'preserve');await fs.symlink(outside,path.join(dir,'docs'));await assert.rejects(api.filterDocumentReview(dir),/Symlink/);assert.equal(await fs.readFile(path.join(outside,'termos-rascunho.pdf'),'utf8'),'preserve');}
  finally{await fs.rm(dir,{recursive:true,force:true});await fs.rm(outside,{recursive:true,force:true})}
 });
+
+test('verificação pública exige Início e Educação disponíveis, além dos documentos retirados',async()=>{
+ const {probeReviewHidden}=await import('../scripts/probe-review-hidden.mjs');
+ await assert.rejects(probeReviewHidden(async()=>new Response(null,{status:404}),()=>{}),/Main site or Education/);
+ const checks=[];
+ await probeReviewHidden(async url=>new Response(null,{status:['/leo-sardinha-math/','/leo-sardinha-math/educacao.html'].includes(new URL(url).pathname)?200:404}),value=>checks.push(value));
+ assert.equal(checks.filter(x=>x.preserved).length,2);assert.equal(checks.filter(x=>x.hidden).length,7);
+ await assert.rejects(probeReviewHidden(async()=>new Response(null,{status:200}),()=>{}),/Review route is still available/);
+});

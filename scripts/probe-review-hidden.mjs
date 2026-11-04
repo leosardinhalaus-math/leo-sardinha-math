@@ -9,10 +9,15 @@ export const retiredReviewRoutes=[
  '/docs/termos-rascunho.pdf',
  '/docs/POLITICA_PRIVACIDADE_RASCUNHO.md'
 ];
-export async function probeReviewHidden(fetchImpl=fetch){
+export async function probeReviewHidden(fetchImpl=fetch,log=value=>console.log(JSON.stringify(value))){
+ for(const route of ['/','/educacao.html']){
+  const r=await fetchImpl(reviewSite+route,{redirect:'manual',signal:AbortSignal.timeout(20000),headers:{'Cache-Control':'no-cache','User-Agent':'Document-review-publication-check'}});
+  log({check:route,status:r.status,preserved:r.status===200});
+  if(r.status!==200)throw Error('Main site or Education is not available: '+route+' HTTP '+r.status);
+ }
  for(const route of retiredReviewRoutes){
   const r=await fetchImpl(reviewSite+route,{redirect:'manual',signal:AbortSignal.timeout(20000),headers:{'Cache-Control':'no-cache','User-Agent':'Document-review-publication-check'}});
-  console.log(JSON.stringify({check:route,status:r.status,hidden:[404,410].includes(r.status)}));
+  log({check:route,status:r.status,hidden:[404,410].includes(r.status)});
   if(![404,410].includes(r.status))throw Error('Review route is still available: '+route+' HTTP '+r.status);
  }
 }
