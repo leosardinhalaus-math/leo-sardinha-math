@@ -1,5 +1,5 @@
 // Sondagem pública: sem credenciais, cookies persistidos ou alterações no serviço.
-const origin='https://leo-sardinha-educacao.onrender.com';
+const origin='https://leo-sardinha-educacao-v2.onrender.com';
 async function get(path){return fetch(origin+path,{redirect:'manual',signal:AbortSignal.timeout(60000),headers:{'User-Agent':'Education-security-smoke-test'}})}
 let response,error;
 for(let attempt=0;attempt<2;attempt++){try{response=await get('/healthz');if(response.status===200)break;error=Error('Health HTTP '+response.status)}catch(e){error=e}if(attempt===0)await new Promise(r=>setTimeout(r,5000))}

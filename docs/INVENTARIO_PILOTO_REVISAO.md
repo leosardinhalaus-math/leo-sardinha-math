@@ -2,7 +2,7 @@
 
 **RASCUNHO PARA REVISÃO — NÃO VIGENTE.**
 
-Este inventário descreve o código preparado, não certifica a configuração atual da hospedagem. A ativação permanece pausada. Não contém a lista privada de contas, client secret ou tokens.
+Atualização: 4 de novembro de 2026. Este inventário distingue o código revisado e o resultado do teste informado pelo responsável; não certifica todas as configurações da hospedagem. A liberação de atividades permanece pausada. Não contém a lista privada de contas, client secret ou tokens.
 
 ## 1. Informações já confirmadas pelo responsável
 
@@ -10,7 +10,9 @@ Responsável: **Leonardo Sardinha**.
 
 Contato de privacidade autorizado para publicação: **leosardinhalaus@gmail.com**.
 
-Projeto independente, com público previsto de 6 a 30 anos. Piloto proposto: entrada somente por adulto autorizado, sem cadastro infantil e sem perfil individual de aprendizagem.
+Projeto independente, com público previsto de 6 a 30 anos. Uso previsto em casa/com famílias e em escolas ou cursos, confirmado em 4 de novembro de 2026. Piloto proposto: entrada somente por adulto autorizado, sem cadastro infantil e sem perfil individual de aprendizagem. Os fluxos de acompanhamento e preparação institucional estão em PROPOSTA_OPERACAO_PILOTO.md; não há instituição identificada, lista de alunos ou novas contas autorizadas por esta revisão.
+
+Origem do teste: https://leo-sardinha-educacao-v2.onrender.com. O responsável confirmou Login reconhecido, saída para a tela de acesso e novo login. A versão de correção da saída é 22b4af2; a origem anterior não é o endereço de referência para novos testes. Isso não comprova teste real de ambas as contas, revogação, negação de conta não autorizada ou remoção das cópias públicas.
 
 ## 2. Dados e prazos no código do portal
 
@@ -50,7 +52,7 @@ Calculus Royale, demais jogos e leitores Scratch/GeoGebra ficam fora do piloto a
 
 Google: autenticação com escopos openid email; não se solicita Gmail, Drive ou contatos. O Google pode tratar dados técnicos conforme seus serviços e políticas. A documentação orienta usar sub como identificador estável; email_verified não garante autoridade sobre qualquer endereço externo.
 
-Render: fornece hospedagem e HTTPS. A documentação informa que a retenção dos logs depende do plano do workspace; não se deve confundir plano Free do serviço com todos os planos e configurações da conta. O responsável informou no painel a região **Oregon (US West), Estados Unidos**, em 3 de novembro de 2026. A retenção efetiva, os logs e eventual encaminhamento externo ainda devem ser confirmados. A região do serviço não determina, por si só, todos os locais de tratamento do provedor.
+Render: fornece hospedagem e HTTPS. A documentação informa que a retenção dos logs depende do plano do workspace; não se deve confundir plano Free do serviço com todos os planos e configurações da conta. O responsável informou no painel a região **Oregon (US West), Estados Unidos**, em 3 de novembro de 2026. O plano Hobby foi confirmado em 4 de novembro de 2026, ao qual a documentação atribui 7 dias no explorador de logs. Em 4 de novembro de 2026, a captura do responsável mostrou Set default em Log Streams, sem destino padrão configurado. Retenções de outros dados técnicos ainda devem ser confirmadas. A região do serviço não determina, por si só, todos os locais de tratamento do provedor.
 
 GitHub Pages: mantém a parte pública. O repositório, a história e arquivos anteriormente públicos não se tornam privados porque existe um portal no Render.
 
@@ -60,14 +62,32 @@ Supabase/Firebase/GeoGebra/TurboWarp: não são usados para cadastrar alunos ou 
 
 | Campo | Valor ou decisão | Estado |
 |---|---|---|
-| EDU_CONTROLLER_NAME | Leonardo Sardinha | Identificação fornecida; não aplicada automaticamente |
-| EDU_PRIVACY_CONTACT | leosardinhalaus@gmail.com | Contato autorizado; não aplicado automaticamente |
-| EDU_LEGAL_BASIS_NOTICE | Finalidades e fundamento a serem definidos e documentados | Não preencher com uma presunção para destravar o acesso |
-| EDU_PROVIDER_NOTICE | Aviso final sobre operadores, regiões e transferências | Região do serviço Render confirmada; demais condições e transferências ainda em avaliação |
+| EDU_CONTROLLER_NAME | Leonardo Sardinha | Identificação fornecida; processo ready reportado pelo responsável |
+| EDU_PRIVACY_CONTACT | leosardinhalaus@gmail.com | Contato autorizado; processo ready reportado pelo responsável |
+| EDU_LEGAL_BASIS_NOTICE | Aviso restrito ao teste das próprias contas | Configurado para o teste; não é fundamento aprovado para alunos |
+| EDU_PROVIDER_NOTICE | Aviso do teste sobre Google, Render e Oregon | Configurado para o teste; condições finais e transferências continuam em avaliação |
 
-Nenhuma dessas informações muda os segredos do Render. Não há autorização para ativação automática ou para incluir contas de alunos.
+O retorno status: ready indica que as variáveis obrigatórias não estão vazias e a lista passou na validação; não comprova que o conteúdo de cada aviso foi aprovado. Nenhuma dessas informações muda os segredos do Render. Não há autorização para ativação automática ou para incluir contas de alunos.
 
-## 7. Fontes consultadas
+## 7. Retenção documentada pelo provedor
+
+A documentação pública do Render consultada em 4 de novembro de 2026 informa retenção de logs de 7 dias em workspace Hobby, 14 dias em Pro e 30 dias em Scale/Enterprise. São prazos do explorador de logs; não equivalem à exclusão de todos os dados do provedor. O plano Free da instância não confirma sozinho o plano do workspace nem a ausência de encaminhamento externo de logs.
+
+## 8. Limites constatados na revisão LGPD e ECA
+
+A revisão documental não encontrou evidência de mecanismo implantado de aferição de idade, verificação de vínculo com responsável legal, coleta verificável de consentimento parental, teste de acessibilidade com o público ou avaliação formal completa de risco por atividade. A conta autorizada é controle de acesso do adulto. Essas lacunas não são consideradas resolvidas por esta revisão nem pela existência de CSP e cookies seguros.
+
+Não enviar respostas ao servidor não exclui tratamento local de dados pessoais. O fluxo em aparelhos compartilhados e os registros próprios de instituições devem ser avaliados. A proposta agora contém critérios de respeito, proteção de imagem e informação simples; esses critérios ainda exigem aplicação e verificação nas atividades antes da liberação. Consulte RELATORIO_REVISAO_LGPD_ECA.md.
+
+## 9. Evidência local adicional de 4 de novembro de 2026
+
+EVIDENCIAS_PILOTO_2026-11-04.json registra interações limitadas no Chromium em contextos novos. Não houve requisições externas, erros JavaScript, cookies ou chaves de localStorage/sessionStorage criados pelas aplicações nesse teste. A sessão do portal real, todos os estados possíveis, caches e logs do provedor não foram medidos por essa execução.
+
+Na cópia local, a ficha HTML e o gerador PDF de Música em Círculo agora usam registro opcional sem identificação pessoal, em lugar de Nome/Turma/Data. O ajuste está incluído nesta revisão autorizada para publicação; a implantação no Render deve ser verificada separadamente. O relatório da Batalha Naval inclui respostas, ano e horários; os rótulos Jogador 1/Equipe não garantem anonimato por contexto. Os riscos e a preparação institucional estão detalhados em AVALIACAO_RISCOS_PILOTO.md e FICHA_PREPARACAO_INSTITUCIONAL.md.
+
+O plano Hobby do workspace foi confirmado pelo responsável em 4 de novembro de 2026. A referência documental aplicável é de 7 dias no explorador de logs. A captura de Log Streams enviada pelo responsável mostra Set default, sem destino padrão configurado naquela tela; retenções de outros dados técnicos continuam pendentes de conferência. Não se afirma exclusão global dos dados após 7 dias.
+
+## 10. Fontes consultadas
 
 - Google OpenID Connect: https://developers.google.com/identity/openid-connect/openid-connect
 - Verificação da identidade e autoridade do e-mail: https://developers.google.com/identity/gsi/web/guides/verify-google-id-token

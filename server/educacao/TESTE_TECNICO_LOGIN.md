@@ -2,6 +2,10 @@
 
 Enquanto as políticas estão em revisão, o caminho é testar apenas o acesso das duas contas do próprio responsável. Não usar esta etapa com alunos. `EDU_ACTIVITIES_ENABLED` fica **false** por padrão; o servidor bloqueia jogos, PDFs e arquivos educacionais mesmo após autenticar. A tela só confirma o login e oferece saída. O bloqueio continua valendo se alguém tentar uma URL direta.
 
+## Resultado registrado em 4 de novembro de 2026
+
+Origem de referência: https://leo-sardinha-educacao-v2.onrender.com . O responsável reportou status ready/mode auth-test e confirmou login, autorização, saída e novo acesso. A correção da política Referrer-Policy para same-origin está em 22b4af2; ela permite validar o Origin do POST sem aceitar origem null. A origem anterior não é o destino para novos testes. Não se afirma que ambas as contas, revogação e acesso de conta não autorizada tenham sido testados no Google real. As atividades permanecem bloqueadas.
+
 ## Ordem segura no Render
 
 1. Mantenha `EDU_ACTIVITIES_ENABLED=false` e `EDU_SUPERVISED_PILOT=true`.

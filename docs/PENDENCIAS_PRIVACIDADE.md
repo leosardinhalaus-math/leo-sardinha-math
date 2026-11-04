@@ -1,41 +1,51 @@
-# Preparação dos documentos — pendências de adoção
+# Preparação dos documentos — revisão de 4 de novembro de 2026
 
-Rascunhos: POLITICA_PRIVACIDADE_RASCUNHO.md e TERMOS_USO_RASCUNHO.md. Não são documentos vigentes e não devem ser copiados integralmente para variáveis do Render sem revisão.
+**RASCUNHO PARA REVISÃO — NÃO VIGENTE.**
 
-## Identificação preenchida para os rascunhos
+Responsável: Leonardo Sardinha. Contato autorizado para publicação: leosardinhalaus@gmail.com. Projeto independente, sem vínculo institucional presumido.
 
-Responsável: Leonardo Sardinha, conforme identificado na página Sobre. Contato autorizado para publicação: leosardinhalaus@gmail.com. Isso não preenche as configurações do Render nem torna os textos vigentes.
+## O que já avançou
 
-## Região do serviço informada
+- Novo portal de referência: https://leo-sardinha-educacao-v2.onrender.com .
+- O responsável reportou status ready, mode auth-test e confirmou entrada, conta reconhecida, saída e novo acesso.
+- A correção da saída foi publicada em 22b4af2. Foi reproduzido no Chromium que no-referrer pode enviar Origin null no POST; same-origin preserva a validação da origem. Os testes verificam sessão encerrada e recusa de origens indevidas e CSRF inválido.
+- Uso nos dois contextos confirmado: em casa/com famílias e em escolas ou cursos. A proposta de operação descreve os cuidados específicos de cada contexto.
+- Identificação, contato e região Oregon (US West), Estados Unidos, foram informados. Isso não confirma todos os locais de tratamento dos provedores.
+- Política, termos, inventário e comunicado às famílias foram atualizados para refletir o teste. Há proposta concreta de operação em PROPOSTA_OPERACAO_PILOTO.md.
 
-Render: **Oregon (US West), Estados Unidos**, conforme informação do responsável em 3 de novembro de 2026. A informação não foi aplicada como configuração nova e não confirma todos os locais de tratamento dos provedores.
+A evidência informada pelo responsável não equivale a uma inspeção administrativa do Render nem a teste de todas as contas.
 
-## Escopo escolhido para a primeira fase
+## Decisões preparadas para revisão
 
-Preparar atividades supervisionadas sem cadastro infantil e sem guardar nomes, respostas ou desempenho individual dos alunos no servidor do portal. Foi acrescentado um comunicado para revisão pelas famílias: COMUNICADO_FAMILIAS_RASCUNHO.md. A escolha reduz a coleta, mas não dispensa definir o tratamento dos dados do adulto e dos dados técnicos de conexão.
+A proposta de operação detalha fundamento por finalidade, necessidade, limites, revisão mensal da lista de adultos, exclusão de suporte rotineiro até 90 dias após encerramento e roteiro de direitos e incidentes. Os prazos são propostas de governança, não configurações já aplicadas. Não é solicitado consentimento genérico nem presumida adoção pelo funcionamento do login.
 
-## Conferência técnica do piloto
+## Conferências ainda necessárias
 
-O inventário das quatro atividades locais, das sessões e dos campos do Render está disponível na aba Inventário técnico da página de revisão e em INVENTARIO_PILOTO_REVISAO.md. A verificação no código não substitui confirmar configurações da conta de hospedagem.
+| Item | O que falta | Como concluir |
+|---|---|---|
+| Contextos confirmados | Uso em casa/com famílias e em escolas ou cursos, informado em 4/11/2026 | Preparar os dois fluxos; para cada instituição, ainda registrar responsáveis e papéis por canal privado, sem listas de alunos |
+| Fundamentos e melhor interesse | Decisão por operação e riscos do uso por menores | Revisar proposta e documentar avaliação; se a base exigir consentimento parental, definir procedimento específico antes do tratamento |
+| ECA e ECA Digital | Demonstrar medidas aplicáveis e adequação etária | Partir da oferta dirigida a menores, revisar proteção integral e registrar riscos e salvaguardas; guia de escopo da ANPD de 28/10/2026 incluído na revisão; login adulto não demonstra cumprimento |
+| Render | Plano Hobby confirmado e tela de Log Streams conferida | Referência de 7 dias no explorador; captura mostra Set default, sem destino padrão configurado. Retenções de outros dados e condições dos provedores permanecem em avaliação |
+| Provedores e transferências | Termos aplicáveis e mecanismo pertinente | Conferir condições de Google/Render e o mecanismo do art. 33 da LGPD; contrato estrangeiro ou região informada não bastam como comprovação |
+| Acesso | Completar verificações que ainda não foram reportadas | Segunda conta autorizada, conta fora da lista, revogação e links diretos de jogos/PDFs; testes fictícios não substituem evidência real |
+| Publicação e migração | Separar recursos abertos e o que se pretende restringir | Definir rotas, informar links antigos e impedir novas entregas onde cabível; repositório/histórico/cópias já públicos não se tornam privados |
+| Adoção | Aprovação do texto e data efetiva | Registrar decisão e publicar versão acessível no portal; só então planejar liberação das atividades revisadas |
 
-## Dados e decisões ainda necessários
+## Revisão LGPD e ECA solicitada
 
-1. Conferência final da identificação e do contato já preenchidos nos rascunhos.
-2. Finalidades, fundamento legal de cada tratamento e avaliação do melhor interesse, sem presumir consentimento pela autenticação Google.
-3. Inventário confirmado dos módulos online antigos: autenticação, dados de perfil/progresso, políticas de acesso e retenção.
-4. Condições dos provedores, logs, contratos, outros locais de tratamento e transferências internacionais pertinentes. A região do serviço Render já foi informada.
-5. Revisão periódica da lista de adultos, atendimento de direitos e procedimento de incidentes.
-6. Conferência do piloto na origem definitiva e da retirada das rotas públicas equivalentes, antes de anunciar restrição efetiva.
-7. Data de vigência e forma de apresentar mudanças aos usuários.
+O relatório RELATORIO_REVISAO_LGPD_ECA.md reúne base normativa, correções e critérios de fechamento. Foram acrescentados direitos completos do titular, proteção de imagem, autonomia progressiva, respeito e informação simples para estudantes. Permanecem pendentes a demonstração das medidas de idade e supervisão pertinentes, a avaliação de riscos e acessibilidade, as condições dos provedores e a adoção dos procedimentos. Não usar a revisão como selo de conformidade.
 
-## Próxima etapa técnica, sem liberação para alunos
+## Avaliação das aplicações e preparação institucional
 
-A página de revisão reúne os campos não secretos e o procedimento de teste das próprias contas do responsável. Primeiro é necessário atualizar o código no Render e conferir o marcador auth-test-gate-v1 em /healthz. Mantenha EDU_ACTIVITIES_ENABLED=false e EDU_SUPERVISED_PILOT=true. O resultado esperado, após configuração, é mode: auth-test: login reconhecido, mas jogos e PDFs bloqueados.
+Foram preparados AVALIACAO_RISCOS_PILOTO.md e FICHA_PREPARACAO_INSTITUCIONAL.md, com evidências locais em EVIDENCIAS_PILOTO_2026-11-04.json. Nas interações limitadas no Chromium não houve requisições externas, cookies ou chaves de localStorage/sessionStorage criados pelas quatro aplicações. Isso não certifica produção, todos os fluxos ou provedores.
 
-Os avisos desse teste não substituem a definição das condições de uso educacional. O roteiro integral é server/educacao/TESTE_TECNICO_LOGIN.md. Nenhuma configuração é aplicada automaticamente pela página.
+As fichas de música foram ajustadas na cópia local para substituir Nome/Turma/Data por registro opcional sem identificação pessoal. O código e o PDF ajustados estão incluídos nesta revisão autorizada para publicação; o estado do Render deve ser verificado separadamente. Relatórios da Batalha Naval podem ser identificáveis pelo contexto, pelas respostas e horários; a necessidade de guardar essa granularidade precisa ser avaliada.
 
-## O que esta preparação não modifica
+Plano do workspace Render: Hobby, confirmado pelo responsável em 4 de novembro de 2026. A documentação pública informa retenção de 7 dias no explorador de logs para esse plano. A captura enviada mostra Set default em Log Streams, sem destino padrão configurado. Retenções de outros dados dos provedores ainda não foram confirmadas; o prazo do explorador não garante exclusão de todos os dados técnicos.
 
-Não preenche EDU_CONTROLLER_NAME, EDU_PRIVACY_CONTACT, EDU_LEGAL_BASIS_NOTICE ou EDU_PROVIDER_NOTICE no Render. Não altera a lista de acesso, segredos, cadastro de usuários ou status de implantação. Não adiciona banner de consentimento genérico nem bloqueio visual apresentado como controle de acesso.
+## Estado atual
 
-Não se publicou uma política final no rodapé do site. Os textos ficam no repositório como rascunhos identificados, para leitura e revisão pelo responsável.
+EDU_ACTIVITIES_ENABLED=false e EDU_SUPERVISED_PILOT=true. O teste de login está funcionando; jogos e PDFs continuam bloqueados nesse modo. Esta revisão não altera variáveis, lista privada, segredos ou o status do serviço. Não publica política final nem autoriza uso com alunos.
+
+Plano Hobby e ausência de destino padrão em Log Streams foram registrados com base nas informações e captura do responsável. As próximas frentes são a revisão das condições dos provedores e das transferências, os procedimentos de proteção de menores e a decisão sobre publicação dos rascunhos. Não solicitar novamente os dois dados já conferidos.

@@ -21,7 +21,7 @@ for kind in ['exercicios','gabarito','bncc']:
   if i:content.append(PageBreak())
   content.extend([p({'exercicios':'Exercícios','gabarito':'Gabarito comentado','bncc':'Justificativa pedagógica e BNCC'}[kind],'Title'),p(t['title'],'Heading1'),p(t['years']),p('Habilidades relacionadas: '+', '.join(t['codes']))])
   if kind=='exercicios':
-   content.extend([p('Nome: __________________________________ Turma: __________ Data: __________'),p('Exemplo resolvido: '+t['example']),p('Convenções: C=0, C♯=1, D=2, E♭=3, E=4, F=5, F♯=6, G=7, A♭=8, A=9, B♭=10, B=11. Nas questões sobre classes de notas, usamos temperamento igual. Registre seu raciocínio; áudio não é necessário.')])
+   content.extend([p('Registro opcional da atividade: __________ (sem nome ou identificação pessoal)'),p('Exemplo resolvido: '+t['example']),p('Convenções: C=0, C♯=1, D=2, E♭=3, E=4, F=5, F♯=6, G=7, A♭=8, A=9, B♭=10, B=11. Nas questões sobre classes de notas, usamos temperamento igual. Registre seu raciocínio; áudio não é necessário.')])
    for j,q in enumerate(t['questions']):content.append(KeepTogether([p(str(j+1)+'. '+q['question']),Spacer(1,52),p('________________________________________________________________________')]))
   elif kind=='gabarito':
    for j,q in enumerate(t['questions']):content.extend([p(str(j+1)+'. '+q['question'],'Heading3'),p(q['answer'])])

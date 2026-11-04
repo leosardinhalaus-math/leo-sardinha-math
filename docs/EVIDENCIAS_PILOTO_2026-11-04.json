@@ -1,0 +1,451 @@
+{
+  "reviewDate": "2026-11-04",
+  "scope": "Verificação técnica local com Chromium; não comprova produção ou conformidade jurídica",
+  "results": [
+    {
+      "activity": "batalha-naval",
+      "scope": "Cópia local, sem login real nem alunos; interações limitadas",
+      "actions": [
+        "Seleção do modo desafio",
+        "Sorteio de frota"
+      ],
+      "requests": [
+        {
+          "method": "GET",
+          "url": "LOCAL_ORIGIN/jogos/batalha-naval/",
+          "resource": "document"
+        }
+      ],
+      "externalRequests": [],
+      "javascriptErrors": [],
+      "storageKeys": {
+        "localStorage": [],
+        "sessionStorage": []
+      },
+      "cookieNames": [],
+      "formFields": [
+        {
+          "tag": "select",
+          "id": "ano-escolar",
+          "type": "select-one"
+        },
+        {
+          "tag": "select",
+          "id": "conteudo-matematico",
+          "type": "select-one"
+        },
+        {
+          "tag": "input",
+          "id": "entrada-coordenada",
+          "type": "text"
+        }
+      ],
+      "downloadNames": []
+    },
+    {
+      "activity": "bingo-fracoes",
+      "scope": "Cópia local, sem login real nem alunos; interações limitadas",
+      "actions": [
+        "Sorteio de fração"
+      ],
+      "requests": [
+        {
+          "method": "GET",
+          "url": "LOCAL_ORIGIN/jogos/bingo-fracoes/",
+          "resource": "document"
+        }
+      ],
+      "externalRequests": [],
+      "javascriptErrors": [],
+      "storageKeys": {
+        "localStorage": [],
+        "sessionStorage": []
+      },
+      "cookieNames": [],
+      "formFields": [
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "",
+          "type": "checkbox"
+        },
+        {
+          "tag": "select",
+          "id": "fracaoDesenho",
+          "type": "select-one"
+        }
+      ],
+      "downloadNames": []
+    },
+    {
+      "activity": "missao-primos",
+      "scope": "Cópia local, sem login real nem alunos; interações limitadas",
+      "actions": [
+        "Cálculo padrão N=1000",
+        "Download CSV de estatísticas numéricas"
+      ],
+      "requests": [
+        {
+          "method": "GET",
+          "url": "LOCAL_ORIGIN/jogos/missao-primos/",
+          "resource": "document"
+        },
+        {
+          "method": "GET",
+          "url": "LOCAL_ORIGIN/jogos/missao-primos/style.css",
+          "resource": "stylesheet"
+        },
+        {
+          "method": "GET",
+          "url": "LOCAL_ORIGIN/jogos/missao-primos/core.js",
+          "resource": "script"
+        },
+        {
+          "method": "GET",
+          "url": "LOCAL_ORIGIN/jogos/missao-primos/app.js",
+          "resource": "script"
+        },
+        {
+          "method": "GET",
+          "url": "LOCAL_ORIGIN/jogos/missao-primos/worker.js",
+          "resource": "script"
+        },
+        {
+          "method": "GET",
+          "url": "LOCAL_ORIGIN/jogos/missao-primos/core.js",
+          "resource": "other"
+        }
+      ],
+      "externalRequests": [],
+      "javascriptErrors": [],
+      "storageKeys": {
+        "localStorage": [],
+        "sessionStorage": []
+      },
+      "cookieNames": [],
+      "formFields": [
+        {
+          "tag": "select",
+          "id": "grid-limit",
+          "type": "select-one"
+        },
+        {
+          "tag": "input",
+          "id": "limit",
+          "type": "text"
+        },
+        {
+          "tag": "select",
+          "id": "segment",
+          "type": "select-one"
+        },
+        {
+          "tag": "input",
+          "id": "compare",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "estimate",
+          "type": "checkbox"
+        }
+      ],
+      "downloadNames": [
+        "missao-primos-1000.csv"
+      ]
+    },
+    {
+      "activity": "circulo-quintas",
+      "scope": "Cópia local, sem login real nem alunos; interações limitadas",
+      "actions": [
+        "Troca de círculo",
+        "Transposição",
+        "Síntese de acorde",
+        "Download SVG"
+      ],
+      "requests": [
+        {
+          "method": "GET",
+          "url": "LOCAL_ORIGIN/jogos/circulo-quintas/",
+          "resource": "document"
+        },
+        {
+          "method": "GET",
+          "url": "LOCAL_ORIGIN/jogos/circulo-quintas/style.css",
+          "resource": "stylesheet"
+        },
+        {
+          "method": "GET",
+          "url": "LOCAL_ORIGIN/jogos/circulo-quintas/music-math.js",
+          "resource": "script"
+        },
+        {
+          "method": "GET",
+          "url": "LOCAL_ORIGIN/jogos/circulo-quintas/app.js",
+          "resource": "script"
+        },
+        {
+          "method": "GET",
+          "url": "LOCAL_ORIGIN/assets/music-education.css",
+          "resource": "stylesheet"
+        },
+        {
+          "method": "GET",
+          "url": "LOCAL_ORIGIN/assets/music-education-data.js",
+          "resource": "script"
+        },
+        {
+          "method": "GET",
+          "url": "LOCAL_ORIGIN/assets/music-education.js",
+          "resource": "script"
+        }
+      ],
+      "externalRequests": [],
+      "javascriptErrors": [],
+      "storageKeys": {
+        "localStorage": [],
+        "sessionStorage": []
+      },
+      "cookieNames": [],
+      "formFields": [
+        {
+          "tag": "select",
+          "id": "layout",
+          "type": "select-one"
+        },
+        {
+          "tag": "select",
+          "id": "root",
+          "type": "select-one"
+        },
+        {
+          "tag": "select",
+          "id": "quality",
+          "type": "select-one"
+        },
+        {
+          "tag": "select",
+          "id": "connections",
+          "type": "select-one"
+        },
+        {
+          "tag": "input",
+          "id": "trail",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "ghost",
+          "type": "checkbox"
+        },
+        {
+          "tag": "select",
+          "id": "voicing",
+          "type": "select-one"
+        },
+        {
+          "tag": "input",
+          "id": "transpose",
+          "type": "range"
+        },
+        {
+          "tag": "select",
+          "id": "reflection",
+          "type": "select-one"
+        },
+        {
+          "tag": "select",
+          "id": "cycle-start",
+          "type": "select-one"
+        },
+        {
+          "tag": "select",
+          "id": "cycle-step",
+          "type": "select-one"
+        },
+        {
+          "tag": "textarea",
+          "id": "progression",
+          "type": "textarea"
+        },
+        {
+          "tag": "input",
+          "id": "tempo",
+          "type": "range"
+        },
+        {
+          "tag": "input",
+          "id": "sound",
+          "type": "checkbox"
+        },
+        {
+          "tag": "input",
+          "id": "base-frequency",
+          "type": "number"
+        },
+        {
+          "tag": "select",
+          "id": "music-track",
+          "type": "select-one"
+        }
+      ],
+      "downloadNames": [
+        "musica-em-circulo.svg"
+      ]
+    }
+  ]
+}

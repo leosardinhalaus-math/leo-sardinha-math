@@ -8,7 +8,7 @@ Contexto informado pelo responsável: projeto independente com público de 6 a 3
 
 O piloto usa uma página de entrada própria, sem formulário para nome, data de nascimento, foto, e-mail ou senha da criança. O cadastro de adultos não é aberto: a lista continua privada e manual. Os caminhos de outras aplicações são recusados no servidor antes da entrega, inclusive se o adulto tentar a URL direta; a verificação é repetida depois da resolução de symlinks. A CSP do piloto limita conexões a self e recusa iframes. Links externos de referência ainda podem levar a outros sites; acompanhamento adulto permanece necessário.
 
-Essas restrições só valerão na origem do servidor quando a versão for implantada. O GitHub Pages atual e cópias previamente baixadas continuam públicos. Não houve alteração de segredos, contas ou configurações reais no Render, e o login Google de produção ainda não foi testado.
+O portal de referência é https://leo-sardinha-educacao-v2.onrender.com, em modo auth-test. Em 4 de novembro de 2026, o responsável confirmou login reconhecido, saída e novo acesso. As quatro atividades continuam bloqueadas até decisão de liberação. O GitHub Pages atual e cópias previamente baixadas continuam públicos. A revisão documental não altera segredos, contas ou configurações reais. O teste informado não comprova todos os cenários reais de autorização e revogação.
 
 ## Inventário da revisão estática
 
@@ -27,15 +27,16 @@ A revisão é técnica, baseada nos arquivos disponíveis e testes. Não certifi
 
 ## Pendências que exigem o titular
 
-- Nome completo/identificação do responsável pelo tratamento e contato de privacidade que poderá ser publicado.
+- Identificação e contato já informados: Leonardo Sardinha, leosardinhalaus@gmail.com. Proposta de operação preparada em docs/PROPOSTA_OPERACAO_PILOTO.md; adoção ainda pendente.
 - Definição documentada de finalidade e fundamento legal, considerando melhor interesse e idade. Se consentimento for a base escolhida para dados da criança, implementar procedimento específico, destacado e verificável do responsável; esta versão não o coleta.
-- Aviso real dos provedores, retenção de logs, localização do serviço e transferências pertinentes. A região do serviço Render deve ser conferida no painel.
+- Aviso real dos provedores, retenção de logs, localização do serviço e transferências pertinentes. A região informada é Oregon (US West), Estados Unidos; confirmar plano do workspace, retenção e Log Streams.
 - Se houver relação com escola ou instituição, esclarecer os papéis e responsabilidades antes de usar dados de alunos.
-- Fazer deploy manual da versão nova no Render (as atualizações automáticas estão desligadas), preencher as informações obrigatórias e testar as duas contas, logout, revogação e links diretos. Enquanto faltar configuração, o launcher mantém 503 e não serve atividades.
+- Login, saída e novo acesso já reportados no serviço v2. Completar segunda conta, recusa de não autorizado, revogação e links diretos, sem presumir política vigente a partir de ready.
+- Avaliar o ECA Digital e suas medidas pertinentes; login de adulto não comprova idade, parentesco ou cumprimento das obrigações aplicáveis.
 - Somente após validar a origem nova, planejar a retirada das rotas antigas do GitHub Pages. Não quebrar os links públicos antes de o substituto estar verificado.
 
 Lei de referência: https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm — considerar os artigos 6º, 9º, 14 e 18, além do fundamento aplicável. O melhor interesse não se resume a um checkbox ou à autenticação Google.
 
 ## Verificação
 
-218 testes Node na suíte local. O teste integrado do piloto usa provedor Google simulado, assinatura RSA e identidades fictícias: verifica callback, sessão de adulto autorizado, bloqueio autenticado de aplicações fora do piloto, CSP e revogação imediata. Não deve ser confundido com teste no Google real ou Render. Os testes existentes continuam cobrindo cookies, PKCE, claims inválidos, acesso direto sem sessão, exportação sem segredos e modo de configuração fechado.
+A suíte de Educação passou em 19 testes após a correção da saída. O total de outras suítes não é usado como prova de conformidade do piloto. O teste integrado do piloto usa provedor Google simulado, assinatura RSA e identidades fictícias: verifica callback, sessão de adulto autorizado, bloqueio autenticado de aplicações fora do piloto, CSP e revogação imediata. Não deve ser confundido com teste no Google real ou Render. Os testes existentes continuam cobrindo cookies, PKCE, claims inválidos, acesso direto sem sessão, exportação sem segredos e modo de configuração fechado.
