@@ -1,6 +1,8 @@
 # Ativação guiada — Render e Google
 
-Estado: pacote pronto; conta de hospedagem, domínio do serviço e cliente Google ainda não criados. Nenhuma área foi declarada privada ou retirada do GitHub Pages nesta etapa.
+Estado atualizado em 4 de novembro de 2026: serviço de referência https://leo-sardinha-educacao-v2.onrender.com em teste técnico. O responsável confirmou login, autorização, saída e novo acesso. Plano do workspace Hobby e ausência de destino padrão em Log Streams conferidos por informação/captura. Os rascunhos foram publicados para revisão; não são políticas vigentes.
+
+As seções 1 a 3 abaixo são referência para manutenção ou reconstrução. Não recriar hospedagem, cliente OAuth ou segredos para repetir um teste já concluído. O serviço anterior não é o destino dos novos testes. Atividades permanecem bloqueadas: EDU_ACTIVITIES_ENABLED=false e EDU_SUPERVISED_PILOT=true. A implantação não restringe o GitHub Pages público ou seu histórico.
 
 ## 1. Criar a hospedagem gratuita de teste
 
@@ -52,13 +54,19 @@ Salve e faça um novo deploy/reinício pelo painel. Não invente fundamento lega
 Na URL Render, verificar:
 
 - Sem sessão, abrir diretamente Educação, um jogo e um PDF: deve encaminhar ao login, sem enviar o conteúdo.
-- Entrar com cada conta autorizada e conferir as atividades.
-- Entrar com uma terceira conta de teste: deve ser recusada pelo site mesmo após autenticar no Google.
+- Entrar com cada conta autorizada e conferir Login reconhecido. No modo auth-test, jogos e PDFs continuam bloqueados mesmo depois do login.
+- Quando houver uma conta adulta de teste disponível fora da lista, verificar a recusa. Um bloqueio pela configuração do Google não comprova recusa pela lista do portal; não criar contas ou ampliar a lista apenas para simular esse resultado.
 - Sair da sessão e repetir URLs diretas. Testar expiração e remoção de uma conta da lista.
 - Conferir a página de privacidade com os dados reais do responsável.
 - Conferir os jogos: a origem nova recusa Service Workers, e o leitor externo TurboWarp precisa de adaptação para arquivos privados; não liberar `.sb3` publicamente como atalho.
 
 Somente depois dessa conferência, alterar o link Educação no site principal e excluir as rotas equivalentes dos artefatos do GitHub Pages. Revisar os workflows para que não as publiquem de novo. A origem pública antiga e a história pública do repositório não se tornam privadas com a criação do serviço novo.
+
+## Verificação automatizada complementar
+
+node scripts/probe-education.mjs verifica publicamente o serviço v2, sem iniciar OAuth ou usar conta real. Exige health ready/auth-test e os marcadores de versão, verifica GET/HEAD em rotas privadas, sessão inválida, ausência de cache e recusa de caminhos internos. Uma mudança inesperada para activities faz a verificação falhar; a expectativa só deve mudar junto de uma liberação deliberada e revisada.
+
+O teste automatizado não confirma idade, vínculo parental, contratos ou a autenticação de cada conta real. Para o teste da segunda conta já autorizada, usar o fluxo Google diretamente e compartilhar somente a mensagem final, nunca callback, código, token ou cookie.
 
 ## Fontes de configuração
 
