@@ -90,6 +90,7 @@ jobs:
           git fetch origin main
           mkdir -p build/site/jogos/calculus-royale-godot
           git archive origin/main | tar -x -C build/site
+          node scripts/filter-document-review.mjs build/site
           rm -rf build/site/assets/models_3d build/site/assets/source
           cp -R build/web/. build/site/jogos/calculus-royale-godot/
           touch build/site/.nojekyll

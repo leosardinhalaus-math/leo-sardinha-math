@@ -1,12 +1,14 @@
 # Ativação guiada — Render e Google
 
-Estado atualizado em 4 de novembro de 2026: serviço de referência https://leo-sardinha-educacao-v2.onrender.com em teste técnico. O responsável confirmou login, autorização, saída e novo acesso. Plano do workspace Hobby e ausência de destino padrão em Log Streams conferidos por informação/captura. Os rascunhos foram publicados para revisão; não são políticas vigentes.
+> Revisão documental temporariamente retirada do site. Identificação e contato neste roteiro são marcadores de revisão: não copiá-los para a configuração em produção. As cópias de revisão são mantidas fora do repositório; não reinserir dados pessoais, evidências brutas ou PDFs sem conferência.
+
+Estado atualizado em 4 de novembro de 2026: serviço de referência [ENDEREÇO PÚBLICO DO PROJETO] em teste técnico. O responsável confirmou login com as duas contas iniciais, saída, novo acesso e bloqueio da Batalha Naval por URL direta na mesma aba autenticada. Plano do workspace Hobby e ausência de destino padrão em Log Streams conferidos por informação/captura. Os rascunhos foram publicados para revisão; não são políticas vigentes.
 
 As seções 1 a 3 abaixo são referência para manutenção ou reconstrução. Não recriar hospedagem, cliente OAuth ou segredos para repetir um teste já concluído. O serviço anterior não é o destino dos novos testes. Atividades permanecem bloqueadas: EDU_ACTIVITIES_ENABLED=false e EDU_SUPERVISED_PILOT=true. A implantação não restringe o GitHub Pages público ou seu histórico.
 
 ## 1. Criar a hospedagem gratuita de teste
 
-Abra https://render.com/deploy?repo=https://github.com/leosardinhalaus-math/leo-sardinha-math e entre/crie sua conta no Render. Confirme que o serviço `leo-sardinha-educacao` usa o plano **Free** antes de concluir. O blueprint não cria banco nem disco pago e desliga atualizações automáticas. Não selecione upgrade pago para seguir este roteiro.
+Abra [ENDEREÇO PÚBLICO DO PROJETO] e entre/crie sua conta no Render. Confirme que o serviço `leo-[IDENTIFICAÇÃO REMOVIDA]-educacao` usa o plano **Free** antes de concluir. O blueprint não cria banco nem disco pago e desliga atualizações automáticas. Não selecione upgrade pago para seguir este roteiro.
 
 O Render vai ler `render.yaml`, exportar apenas recursos web para `.edu-dist` e executar `launch.mjs`. A URL HTTPS será atribuída pelo próprio Render; o nome final pode variar. Esta URL é o próximo dado que deve ser informado ao assistente. Ela não é segredo.
 
@@ -45,7 +47,7 @@ No serviço → **Environment**, adicione estas variáveis, sem aspas adicionais
 
 A origem é obtida de `RENDER_EXTERNAL_URL`, fornecida pelo Render. Se houver domínio personalizado, configurar explicitamente EDU_ORIGIN e alterar também o callback no Google.
 
-Ainda em Environment → **Secret Files**, crie `edu-allowlist.json` com um array JSON dos dois e-mails autorizados, por exemplo no formato `["conta1@dominio", "conta2@dominio"]`, substituindo pelos endereços reais já informados. O arquivo fica em `/etc/secrets/edu-allowlist.json`, fora da raiz publicada. O exemplo neste documento não autoriza contas reais.
+Ainda em Environment → **Secret Files**, crie `edu-allowlist.json` com um array JSON dos dois e-mails autorizados, por exemplo no formato `["conta1@dominio", "conta2@dominio"]`, substituindo pelos endereços reais já informados. O arquivo fica em `[CAMINHO PRIVADO OMITIDO]`, fora da raiz publicada. O exemplo neste documento não autoriza contas reais.
 
 Salve e faça um novo deploy/reinício pelo painel. Não invente fundamento legal ou aviso de operadores só para preencher campos: os textos são apresentados aos usuários. O mecanismo técnico não certifica conformidade com a LGPD.
 
@@ -66,7 +68,7 @@ Somente depois dessa conferência, alterar o link Educação no site principal e
 
 node scripts/probe-education.mjs verifica publicamente o serviço v2, sem iniciar OAuth ou usar conta real. Exige health ready/auth-test e os marcadores de versão, verifica GET/HEAD em rotas privadas, sessão inválida, ausência de cache e recusa de caminhos internos. Uma mudança inesperada para activities faz a verificação falhar; a expectativa só deve mudar junto de uma liberação deliberada e revisada.
 
-O teste automatizado não confirma idade, vínculo parental, contratos ou a autenticação de cada conta real. Para o teste da segunda conta já autorizada, usar o fluxo Google diretamente e compartilhar somente a mensagem final, nunca callback, código, token ou cookie.
+O teste automatizado não confirma idade, vínculo parental, contratos ou a autenticação de cada conta real. O teste da segunda conta e o bloqueio do jogo autenticado já foram confirmados pelo responsável. Em qualquer teste adicional de conta real, compartilhar somente a mensagem final, nunca callback, código, token ou cookie.
 
 ## Fontes de configuração
 

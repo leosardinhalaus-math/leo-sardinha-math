@@ -1,5 +1,7 @@
 # Diagnóstico de configuração sem segredos
 
+> Revisão documental temporariamente retirada do site. Identificação e contato neste roteiro são marcadores de revisão: não copiá-los para a configuração em produção. As cópias de revisão são mantidas fora do repositório; não reinserir dados pessoais, evidências brutas ou PDFs sem conferência.
+
 O painel Render pode indicar Live enquanto o launcher aguarda configuração. Isso significa que o processo está de pé, não que o login já esteja pronto.
 
 A versão com diagnóstico mantém o marcador `build: auth-test-gate-v1` e acrescenta:

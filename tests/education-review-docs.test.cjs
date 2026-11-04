@@ -1,3 +1,24 @@
-const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs');const page=fs.readFileSync('docs/revisao-privacidade.html','utf8'),guide=fs.readFileSync('server/educacao/TESTE_TECNICO_LOGIN.md','utf8');
-test('revisão mantém bloqueio de atividades, identifica teste técnico e não pede segredos',()=>{assert(page.includes('auth-test-gate-v1'));assert(page.includes('mode: auth-test'));assert(page.includes('Uso por alunos:</strong> não liberado'));for(const key of ['EDU_ACTIVITIES_ENABLED','EDU_SUPERVISED_PILOT','EDU_CONTROLLER_NAME','EDU_PRIVACY_CONTACT','EDU_LEGAL_BASIS_NOTICE','EDU_PROVIDER_NOTICE'])assert(page.includes('data-copy-value="'+key+'"'));assert(!page.includes('data-copy-value="EDU_GOOGLE_CLIENT_SECRET"'));assert(!page.includes('type="password"'));assert(page.includes('id="value-EDU_ACTIVITIES_ENABLED">false</pre>'));assert(page.includes('Oregon (US West)'))});
-test('avisos exibidos são derivados do roteiro operacional, sem simular aprovação para alunos',()=>{for(const key of ['EDU_LEGAL_BASIS_NOTICE','EDU_PROVIDER_NOTICE']){const text=guide.match(new RegExp('### '+key+'[^\\n]*\\n\\n> ([^\\n]+)'))[1];assert(page.includes(text))}assert(page.includes('Não são fundamento legal aprovado'));assert(page.includes('Atualize o código antes'))});
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs/promises'),os=require('node:os'),path=require('node:path');
+let api;test.before(async()=>api=await import('../scripts/filter-document-review.mjs'));
+test('revisão documental pausada não mantém arquivos de publicação na origem',async()=>{
+ assert.equal(api.reviewPublication.paused,true);
+ for(const p of api.reviewPaths())await assert.rejects(fs.lstat(p),e=>e.code==='ENOENT',p+' must remain outside the published source');
+ assert(await fs.stat('educacao.html'));assert(await fs.stat('jogos/batalha-naval/index.html'));
+});
+test('artefato remove revisão e downloads sem remover Educação ou documentação alheia',async()=>{
+ const dir=await fs.mkdtemp(path.join(os.tmpdir(),'review-paused-'));
+ try{
+  for(const p of ['docs/revisao-publica/index.html','docs/revisao-publica/provedores.pdf','docs/revisao-privacidade.html','docs/termos-rascunho.pdf','docs/FIREBASE.md','educacao.html','jogos/batalha-naval/index.html']){await fs.mkdir(path.dirname(path.join(dir,p)),{recursive:true});await fs.writeFile(path.join(dir,p),'fixture');}
+  await api.filterDocumentReview(dir);
+  for(const p of ['docs/revisao-publica','docs/revisao-privacidade.html','docs/termos-rascunho.pdf'])await assert.rejects(fs.lstat(path.join(dir,p)),e=>e.code==='ENOENT');
+  for(const p of ['docs/FIREBASE.md','educacao.html','jogos/batalha-naval/index.html'])assert(await fs.stat(path.join(dir,p)));
+  assert.deepEqual(await api.filterDocumentReview(dir),[]);
+ }finally{await fs.rm(dir,{recursive:true,force:true})}
+});
+test('filtro recusa raiz do código, caminhos de escape e pais simbólicos',async()=>{
+ await assert.rejects(api.filterDocumentReview('.'),/staged/);
+ assert.throws(()=>api.reviewPaths({directories:['../outside'],files:[]}),/Invalid/);
+ const dir=await fs.mkdtemp(path.join(os.tmpdir(),'review-symlink-')),outside=await fs.mkdtemp(path.join(os.tmpdir(),'review-outside-'));
+ try{await fs.writeFile(path.join(outside,'termos-rascunho.pdf'),'preserve');await fs.symlink(outside,path.join(dir,'docs'));await assert.rejects(api.filterDocumentReview(dir),/Symlink/);assert.equal(await fs.readFile(path.join(outside,'termos-rascunho.pdf'),'utf8'),'preserve');}
+ finally{await fs.rm(dir,{recursive:true,force:true});await fs.rm(outside,{recursive:true,force:true})}
+});
