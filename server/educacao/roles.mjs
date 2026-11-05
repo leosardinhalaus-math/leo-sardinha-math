@@ -10,11 +10,11 @@ export function canAccessArea(role,area){
 export function areaLanding(area,{csrf,activitiesEnabled,role,esc}){
  const logout=`<form method="post" action="/auth/logout"><input type="hidden" name="csrf" value="${esc(csrf)}"><button type="submit">Sair desta sessão</button></form>`;
  if(area==='admin')return {
-  title:'Administração · preparação',
-  body:`<p>Seu acesso administrativo foi conferido no servidor.</p><dl><dt>Portal de atividades</dt><dd>${activitiesEnabled?'Atividades habilitadas na configuração':'Teste técnico; atividades bloqueadas'}</dd><dt>Materiais reservados</dt><dd>Publicação ainda não implementada neste painel.</dd><dt>Gestão de contas</dt><dd>A lista privada continua sendo mantida na hospedagem.</dd></dl><p>Este painel permite conferir o estado do acesso. Não altera contas, publica arquivos ou edita o site.</p><p><a href="/professores/">Área reservada de professores</a></p>${logout}`
+  title:'Administração',
+  body:`<p>Seu acesso administrativo foi conferido no servidor.</p><dl><dt>Portal de atividades</dt><dd>${activitiesEnabled?'Atividades habilitadas na configuração':'Teste técnico; atividades bloqueadas'}</dd><dt>Materiais reservados</dt><dd><a href="/admin/materiais">Enviar, revisar e publicar materiais</a></dd><dt>Gestão de contas</dt><dd>A lista privada continua sendo mantida na hospedagem.</dd></dl><p>A publicação de PDFs tem um fluxo próprio de rascunho e revisão. A gestão de contas e a edição do site continuam fora deste painel.</p><p><a href="/professores/">Área reservada de professores</a></p>${logout}`
  };
  return {
   title:'Professores · área reservada',
-  body:`<p>Seu acesso à área reservada foi conferido. As atividades educativas públicas continuam disponíveis no site principal, sem este login.</p><p>Ainda não há materiais exclusivos publicados nesta área. Os rascunhos da revisão documental continuam retirados.</p>${role==='admin'?'<p><a href="/admin/">Administração</a></p>':''}${logout}`
+  body:`<p>Seu acesso à área reservada foi conferido. As atividades educativas públicas continuam disponíveis no site principal, sem este login.</p><p><a href="/professores/materiais">Consultar materiais reservados</a>. Os rascunhos da revisão documental continuam retirados.</p>${role==='admin'?'<p><a href="/admin/">Administração</a></p>':''}${logout}`
  };
 }

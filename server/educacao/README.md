@@ -6,7 +6,7 @@ Esta implementação precisa de servidor Node 22.16+ com HTTPS em um domínio no
 
 ## Separação entre conteúdo aberto e acesso reservado
 
-Diretriz atualizada em 5 de novembro de 2026: manter as atividades educativas públicas e usar login somente para funções ou materiais que tenham necessidade definida de restrição. A Educação no GitHub Pages continua aberta. O portal Render permanece em teste técnico, com atividades bloqueadas; a implementação agora prepara permissões distintas de professor e administrador, com páginas de conferência de acesso. O painel ainda não edita o site, publica arquivos ou altera contas. Essas operações exigem implementação e armazenamento próprios.
+Diretriz atualizada em 5 de novembro de 2026: manter as atividades educativas públicas e usar login somente para funções ou materiais que tenham necessidade definida de restrição. A Educação no GitHub Pages continua aberta. O portal Render permanece em teste técnico, com atividades bloqueadas; a implementação agora prepara permissões distintas de professor e administrador, com páginas de conferência de acesso. O fluxo de publicação de PDFs reservados está implementado, com armazenamento externo privado e ativação separada. O painel não edita o site nem altera contas.
 
 Um recurso reservado deve ficar fora do repositório e dos artefatos públicos, com autorização conferida no servidor antes de cada entrega. A escolha deve ser feita por recurso: não retirar toda a Educação nem modificar seu link para o portal de teste. O setor de revisão documental e seus downloads continuam retirados. O histórico e cópias já publicados não são apagados por essa separação.
 
@@ -18,7 +18,7 @@ Para o contexto de alunos a partir de 6 anos, o padrão agora é um piloto com e
 
 Google OAuth/OIDC com authorization code, PKCE S256, state e nonce de uso único; assinatura RS256 por JWKS do Google, emissor, audiência, expiração, horário e e-mail verificado. Só solicita `openid email`; não pede perfil, contatos, Gmail ou Drive. Credenciais ficam no ambiente do servidor. Tokens Google são descartados após a identidade ser validada.
 
-Sessão opaca aleatória no servidor, cookie __Host Secure/HttpOnly/SameSite=Lax. Expira em 30 minutos de inatividade ou 8 horas absolutas. A lista privada de contas é relida em cada acesso: remover um e-mail bloqueia o acesso seguinte. Sem cadastro público, perfil público ou ranking. As páginas reservadas de conferência são /admin/ e /professores/. A administração é somente de consulta nesta etapa; a manutenção da lista continua sendo função do operador do servidor.
+Sessão opaca aleatória no servidor, cookie __Host Secure/HttpOnly/SameSite=Lax. Expira em 30 minutos de inatividade ou 8 horas absolutas. A lista privada de contas é relida em cada acesso: remover um e-mail bloqueia o acesso seguinte. Sem cadastro público, perfil público ou ranking. As páginas reservadas de conferência são /admin/ e /professores/. A publicação de materiais tem ativação separada; a manutenção da lista continua sendo função do operador do servidor.
 
 Autorização para páginas, jogos, PDFs e arquivos; negação padrão, validação após realpath para evitar desvios por links simbólicos, proteção de diretórios internos e ausência de cache em respostas. Logout POST com verificação de origem e CSRF; sair não encerra a conta Google. Logs do aplicativo contêm apenas tipo de evento e horário, sem e-mail, IP, cookie, código OAuth ou token. O provedor de hospedagem pode manter logs próprios: sua configuração é parte da ativação.
 
@@ -62,3 +62,7 @@ O padrão agora é `EDU_ACTIVITIES_ENABLED=false`: mesmo uma sessão válida só
 ## Permissões de administrador e professor
 
 Veja [PAPEIS_ACESSO.md](PAPEIS_ACESSO.md). As entradas antigas da lista continuam válidas para professor, sem promoção automática a administrador. O papel é conferido na lista privada em cada requisição; parâmetros de URL, cabeçalhos e claims extras do Google não concedem privilégios. A atribuição explícita de administrador é feita pelo operador na hospedagem. Os caminhos /professor/ e /educacao.html do site público permanecem abertos no GitHub Pages.
+
+## Materiais exclusivos para professores
+
+O fluxo de PDF, rascunho, revisão, publicação e retirada está em [MATERIAIS_RESERVADOS.md](MATERIAIS_RESERVADOS.md). Ele usa Supabase privado, separado dos arquivos públicos, e permanece desativado por padrão. Não salva materiais no disco efêmero do Render Free.

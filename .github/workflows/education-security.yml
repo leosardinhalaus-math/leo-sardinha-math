@@ -19,6 +19,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
+      - name: Install reserved-server dependencies
+        run: npm ci --prefix server/educacao
       - name: Test authorization and supervised pilot with fictional identities
         run: node --test tests/education-*.test.cjs
       - name: Check public responses on Render without logging in

@@ -7,10 +7,10 @@ As atividades públicas permanecem abertas. Esta separação só se aplica à or
 | Papel | /professores/ | /admin/ |
 |---|---|---|
 | Sem sessão ou fora da lista | Login obrigatório; conta não autorizada recusada | Login obrigatório; conta não autorizada recusada |
-| teacher | Página reservada, ainda sem materiais publicados | Recusado |
-| admin | Página reservada | Painel de conferência do estado do acesso |
+| teacher | Acesso somente aos materiais publicados | Recusado |
+| admin | Página reservada | Painel e publicação de materiais, quando configurados |
 
-O painel administrativo é somente de consulta. Não há upload, publicação de materiais, editor do site ou formulário para conceder acesso nesta versão. Esses recursos não devem gravar dados no disco efêmero do Render Free como se fossem persistentes. Antes de implementá-los, definir a primeira função e armazenamento adequado.
+A publicação de PDFs está implementada no fluxo descrito em [MATERIAIS_RESERVADOS.md](MATERIAIS_RESERVADOS.md), com armazenamento externo privado e ativação separada. O editor do site e o formulário para conceder acesso não fazem parte desta versão. A lista continua sendo mantida pelo operador na hospedagem.
 
 ## Configuração privada
 

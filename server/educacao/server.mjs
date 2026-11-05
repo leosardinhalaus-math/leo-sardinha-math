@@ -1,5 +1,6 @@
 import {deploymentInfo} from './setup.mjs';
 import {reservedArea,canAccessArea,areaLanding} from './roles.mjs';
+import {createMaterialsHandler,isMaterialsPath} from './materials.mjs';
 import {pilotAllowed,pilotLanding,authTestLanding,supervisedCsp} from './supervised.mjs';
 import http from 'node:http';import {readFile,realpath,stat} from 'node:fs/promises';import {createReadStream} from 'node:fs';import path from 'node:path';import {createHash} from 'node:crypto';import {random,equal,verifiedClaims,validAllowlist,identityAllowed,identityRole,publicPath,deniedPath} from './security.mjs';
 const env=process.env,origin=new URL(env.EDU_ORIGIN||'https://invalid.local');
@@ -23,6 +24,7 @@ async function keys(force=false){if(force||Date.now()>jwks.until){const r=await 
 async function claims(token,nonce){let list=await keys();const header=JSON.parse(Buffer.from(token.split('.')[0],'base64url'));if(!list.some(k=>k.kid===header.kid))list=await keys(true);return verifiedClaims(token,list,{clientId:env.EDU_GOOGLE_CLIENT_ID,nonce})}
 const types={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'application/javascript; charset=utf-8','.mjs':'application/javascript; charset=utf-8','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp','.pdf':'application/pdf','.wasm':'application/wasm','.mp4':'video/mp4','.woff2':'font/woff2'};
 let starts=new Map(),startWindow=Date.now();
+const materialsHandler=createMaterialsHandler(env);
 const server=http.createServer(async(req,res)=>{headers(res);try{
  if(req.headers['service-worker']==='script')return send(res,403,'Service Workers desativados na área restrita.');if(req.url==='/healthz'&&req.method==='GET')return send(res,200,JSON.stringify({status:'ready',mode:activitiesEnabled?'activities':'auth-test',build:'auth-test-gate-v1',...deploymentInfo(env)}),'application/json');const u=new URL(req.url,origin.origin);if(u.origin!==origin.origin)return send(res,400,'Requisição inválida.');let pathname;try{pathname=decodeURIComponent(u.pathname)}catch{return send(res,400,'Endereço inválido.')}if(pathname.includes('\\')||pathname.includes('\0'))return send(res,400,'Endereço inválido.');
  if(pathname==='/privacidade-educacao.html')return send(res,200,shell('Privacidade na Educação',`<p>Responsável pelo tratamento: ${esc(env.EDU_CONTROLLER_NAME)}.</p><p>${activitiesEnabled?'Finalidade e fundamento legal':'Aviso do teste técnico'}: ${esc(env.EDU_LEGAL_BASIS_NOTICE)}.</p><p>Operadores, hospedagem e transferências: ${esc(env.EDU_PROVIDER_NOTICE)}.</p><p>Usamos o identificador da conta Google e o e-mail verificado para autenticar e conferir a lista de pessoas autorizadas. Não recebemos a senha do Google e não solicitamos contatos, arquivos do Drive ou acesso ao Gmail.</p><p>Os identificadores de sessão ficam somente no servidor e em cookie essencial, HttpOnly e Secure. A sessão expira após 30 minutos de inatividade ou 8 horas desde o acesso. A tentativa de login expira em 10 minutos. Não adicionamos publicidade ou análise de comportamento.</p><p>A lista de autorização permanece até sua revisão ou remoção pelo responsável. Contas não autorizadas são recusadas sem criar perfil no site. O Google e a hospedagem também tratam dados de conexão conforme suas políticas; sair desta área não encerra a conta Google.</p><p>Para informações sobre o responsável pelo tratamento, finalidades, fundamento legal aplicável, acesso, correção, exclusão e demais direitos, contate: ${esc(env.EDU_PRIVACY_CONTACT)}.</p><p>No piloto supervisionado, a lista deve conter somente adultos autorizados; não há cadastro infantil ou coleta de consentimento parental implementada. O portal não solicita dados de identificação da criança. O uso de contas de crianças e adolescentes exige orientação da escola ou responsável e avaliação do melhor interesse. A autorização técnica de um e-mail não substitui essa avaliação. Evite incluir dados pessoais nos nomes de arquivos ou nos registros pedagógicos baixados.</p><p>${supervised?'No piloto supervisionado, os leitores GeoGebra e TurboWarp ficam fora do escopo e seus caminhos são bloqueados. Links externos de referência podem levar a outros sites.':'Aplicações educacionais podem carregar serviços externos como GeoGebra e TurboWarp quando acionados. Consulte suas políticas antes do uso institucional.'}</p>`));
@@ -42,10 +44,11 @@ const server=http.createServer(async(req,res)=>{headers(res);try{
  }
  const area=reservedArea(pathname);
  if(area){
-  if(!['GET','HEAD'].includes(req.method))return send(res,405,'Método não permitido.');
+  if(!['GET','HEAD'].includes(req.method)&&!isMaterialsPath(pathname))return send(res,405,'Método não permitido.');
   const s=await session(req);if(!s)return go(res,'/login');
   const role=identityRole(s,await accessList());
   if(!canAccessArea(role,area))return send(res,403,shell('Permissão insuficiente','<p>Esta conta não tem permissão para administrar o site.</p>'));
+  if(isMaterialsPath(pathname))return materialsHandler(req,res,{pathname,url:u,role,s,origin:origin.origin,esc,shell,send,go,equal,audit,reauthorize:async needed=>{const current=await session(req);return current&&canAccessArea(identityRole(current,await accessList()),needed)}});
   const base=area==='admin'?'/admin':'/professores';
   if(![base,base+'/'].includes(pathname))return send(res,404,'Não encontrado.');
   const page=areaLanding(area,{csrf:s.csrf,activitiesEnabled,role,esc});

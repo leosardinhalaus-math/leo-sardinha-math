@@ -39,3 +39,6 @@ assets/*.import
 /docs/instituicoes-rascunho.pdf
 /docs/provedores-rascunho.pdf
 /scripts/build-privacy-review.py
+
+# Dependências são instaladas pelo lockfile; nunca publicar node_modules.
+node_modules/
