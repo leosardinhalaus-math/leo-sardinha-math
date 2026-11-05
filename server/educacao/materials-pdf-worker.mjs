@@ -7,7 +7,7 @@ try{
  if(!bytes.subarray(0,5).equals(Buffer.from('%PDF-')))throw Error();
  const pdf=await PDFDocument.load(bytes,{updateMetadata:false,ignoreEncryption:false});
  if(pdf.getPageCount()<1||pdf.getPageCount()>200)throw Error();
- const forbidden=new Set(['JS','JavaScript','OpenAction','AA','A','Launch','EmbeddedFiles','EmbeddedFile','EF','AF','XFA','AcroForm','RichMedia','ByteRange']);
+ const forbidden=new Set(['JS','JavaScript','OpenAction','AA','Launch','EmbeddedFiles','EmbeddedFile','EF','AF','XFA','AcroForm','RichMedia','ByteRange']);
  const visited=new WeakSet();
  function inspect(object){
   if(!object||typeof object!=='object'||visited.has(object))return;visited.add(object);

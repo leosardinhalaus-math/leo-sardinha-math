@@ -8,7 +8,7 @@ As seções 1 a 3 abaixo são referência para manutenção ou reconstrução. N
 
 ## Separação entre conteúdo aberto e acesso reservado
 
-Diretriz atualizada em 5 de novembro de 2026: manter as atividades educativas públicas e usar login somente para funções ou materiais que tenham necessidade definida de restrição. A Educação no GitHub Pages continua aberta. O portal Render permanece em teste técnico, com atividades bloqueadas; a implementação agora prepara permissões distintas de professor e administrador, com páginas de conferência de acesso. O painel ainda não edita o site, publica arquivos ou altera contas. Essas operações exigem implementação e armazenamento próprios.
+Diretriz atualizada em 5 de novembro de 2026: manter as atividades educativas públicas e usar login somente para funções ou materiais que tenham necessidade definida de restrição. A Educação no GitHub Pages continua aberta. O portal Render permanece em teste técnico, com atividades bloqueadas; a implementação agora prepara permissões distintas de professor e administrador, com páginas de conferência de acesso. O fluxo de publicação de PDFs está preparado, com armazenamento externo privado e ativação separada; veja MATERIAIS_RESERVADOS.md. O painel não edita o site nem altera contas.
 
 Um recurso reservado deve ficar fora do repositório e dos artefatos públicos, com autorização conferida no servidor antes de cada entrega. A escolha deve ser feita por recurso: não retirar toda a Educação nem modificar seu link para o portal de teste. O setor de revisão documental e seus downloads continuam retirados. O histórico e cópias já publicados não são apagados por essa separação.
 
