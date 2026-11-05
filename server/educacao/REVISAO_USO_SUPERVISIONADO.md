@@ -4,6 +4,12 @@
 
 Contexto informado pelo responsável: projeto independente com público de 6 a 30 anos. Esta etapa não ativa cadastro infantil, não cadastra alunos e não presume que uma conta Google comprove maioridade. A lista inicial deve conter somente os dois endereços do próprio responsável, mantidos fora do repositório.
 
+## Separação entre conteúdo aberto e acesso reservado
+
+Diretriz atualizada em 5 de novembro de 2026: manter as atividades educativas públicas e usar login somente para funções ou materiais que tenham necessidade definida de restrição. A Educação no GitHub Pages continua aberta. O portal Render permanece em teste técnico, com atividades bloqueadas; a implementação agora prepara permissões distintas de professor e administrador, com páginas de conferência de acesso. O painel ainda não edita o site, publica arquivos ou altera contas. Essas operações exigem implementação e armazenamento próprios.
+
+Um recurso reservado deve ficar fora do repositório e dos artefatos públicos, com autorização conferida no servidor antes de cada entrega. A escolha deve ser feita por recurso: não retirar toda a Educação nem modificar seu link para o portal de teste. O setor de revisão documental e seus downloads continuam retirados. O histórico e cópias já publicados não são apagados por essa separação.
+
 ## O que ficou preparado
 
 `EDU_SUPERVISED_PILOT=true` é o padrão do servidor e consta no blueprint Render. O responsável pode testar quatro atividades locais: Batalha Naval, Bingo de Frações, Missão Primos e Música em Círculo. Há instruções específicas de adequação etária na entrada: a atividade de primos começa no 6º ano; o círculo musical contém aprofundamentos que não devem ser exigidos de crianças de 6 anos.
@@ -29,13 +35,13 @@ A revisão é técnica, baseada nos arquivos disponíveis e testes. Não certifi
 
 ## Pendências que exigem o titular
 
-- Identificação e contato já informados: [RESPONSÁVEL A DEFINIR ANTES DA ADOÇÃO], [CONTATO A DEFINIR ANTES DA ADOÇÃO]. Proposta de operação preparada em docs/PROPOSTA_OPERACAO_PILOTO.md; adoção ainda pendente.
+- Identificação e contato já informados: [RESPONSÁVEL A DEFINIR ANTES DA ADOÇÃO], [CONTATO A DEFINIR ANTES DA ADOÇÃO]. Proposta de operação preservada nas cópias privadas de revisão; adoção ainda pendente.
 - Definição documentada de finalidade e fundamento legal, considerando melhor interesse e idade. Se consentimento for a base escolhida para dados da criança, implementar procedimento específico, destacado e verificável do responsável; esta versão não o coleta.
-- Aviso real dos provedores, retenção de logs, localização do serviço e transferências pertinentes. A região informada é [REGIÃO A CONFIRMAR NA CONFIGURAÇÃO]; confirmar plano do workspace, retenção e Log Streams.
+- Aviso real dos provedores, retenção de logs, localização do serviço e transferências pertinentes. Região e plano já foram informados pelo responsável e registrados nas cópias privadas. Não repetir a coleta desses dados; concluir as condições aplicáveis dos provedores e distinguir retenção no explorador de logs das demais retenções.
 - Se houver relação com escola ou instituição, esclarecer os papéis e responsabilidades antes de usar dados de alunos.
-- Duas contas, saída, novo acesso e bloqueio do jogo na mesma aba autenticada já reportados no serviço v2. Completar recusa de não autorizado, revogação e PDF autenticado, sem presumir política vigente a partir de ready.
+- Duas contas, saída, novo acesso e bloqueio do jogo na mesma aba autenticada já reportados no serviço v2. No teste solicitado de PDF com sessão ativa, o responsável também enviou a tela de atividades bloqueadas; a captura registra o resultado visual, sem comprovar isoladamente URL, sessão ou código HTTP. Completar recusa de não autorizado e revogação, sem presumir política vigente a partir de ready.
 - Avaliar o ECA Digital e suas medidas pertinentes; login de adulto não comprova idade, parentesco ou cumprimento das obrigações aplicáveis.
-- Somente após validar a origem nova, planejar a retirada das rotas antigas do GitHub Pages. Não quebrar os links públicos antes de o substituto estar verificado.
+- Preservar as atividades abertas no GitHub Pages. Avaliar separadamente qualquer função ou material reservado; a existência do piloto não justifica retirar toda a Educação pública.
 
 Lei de referência: https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm — considerar os artigos 6º, 9º, 14 e 18, além do fundamento aplicável. O melhor interesse não se resume a um checkbox ou à autenticação Google.
 

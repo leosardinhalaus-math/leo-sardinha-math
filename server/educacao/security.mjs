@@ -6,5 +6,31 @@ export function allowed(email,entries){return entries.some(x=>typeof x==='string
 export function publicPath(path){return ['/','/index.html','/sobre.html','/privacidade-educacao.html','/assets/site.css','/assets/home.css','/assets/home.js'].includes(path)||/^\/assets\/home\/[a-zA-Z0-9_./-]+\.(png|jpg|jpeg|webp|svg|woff2?)$/.test(path)}
 export function deniedPath(path){return path.split('/').some(p=>p.startsWith('.')||['server','tests','tools','node_modules','docs','scripts','.git'].includes(p))||!(/\.(html|css|js|mjs|json|svg|png|jpg|jpeg|webp|gif|ico|pdf|mp4|mp3|wav|ogg|woff|woff2|ttf|sb3|ggb|wasm|pck|zip)$/i.test(path)||path.endsWith('/'))}
 
-export function validAllowlist(entries){if(!Array.isArray(entries)||!entries.length||entries.length>10000)return false;const emails=[];for(const entry of entries){const email=typeof entry==='string'?entry:entry?.email;if(typeof email!=='string'||!/^[^\s@]+@[^\s@]+$/.test(email))return false;if(typeof entry!=='string'&&(typeof entry!=='object'||typeof entry.sub!=='string'||!entry.sub||Object.keys(entry).some(k=>!['email','sub'].includes(k))))return false;emails.push(email.toLowerCase())}return new Set(emails).size===emails.length}
-export function identityAllowed(identity,entries){return entries.some(entry=>{if(typeof entry==='string')return identity.googleHostedEmail===true&&entry.toLowerCase()===identity.email.toLowerCase();return entry&&typeof entry.email==='string'&&entry.email.toLowerCase()===identity.email.toLowerCase()&&typeof entry.sub==='string'&&entry.sub===identity.sub})}
+export function validAllowlist(entries){
+ if(!Array.isArray(entries)||!entries.length||entries.length>10000)return false;
+ const emails=[];
+ for(const entry of entries){
+  const email=typeof entry==='string'?entry:entry?.email;
+  if(typeof email!=='string'||!/^[^\s@]+@[^\s@]+$/.test(email))return false;
+  if(typeof entry!=='string'){
+   if(!entry||typeof entry!=='object'||Array.isArray(entry)||Object.keys(entry).some(k=>!['email','sub','role'].includes(k)))return false;
+   if('role' in entry&&!['teacher','admin'].includes(entry.role))return false;
+   if('sub' in entry&&(typeof entry.sub!=='string'||!entry.sub))return false;
+   if(!('sub' in entry)&&!('role' in entry))return false;
+  }
+  emails.push(email.toLowerCase());
+ }
+ return new Set(emails).size===emails.length;
+}
+function matchesIdentity(identity,entry){
+ const email=typeof entry==='string'?entry:entry.email;
+ if(typeof identity?.email!=='string'||email.toLowerCase()!==identity.email.toLowerCase())return false;
+ if(typeof entry==='object'&&'sub' in entry)return entry.sub===identity.sub;
+ return identity.googleHostedEmail===true;
+}
+export function identityRole(identity,entries){
+ if(!validAllowlist(entries))return null;
+ const entry=entries.find(entry=>matchesIdentity(identity,entry));
+ return entry?(typeof entry==='object'?entry.role||'teacher':'teacher'):null;
+}
+export function identityAllowed(identity,entries){return identityRole(identity,entries)!==null}

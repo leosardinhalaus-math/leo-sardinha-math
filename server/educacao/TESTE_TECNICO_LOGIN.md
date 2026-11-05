@@ -4,9 +4,15 @@
 
 Enquanto as políticas estão em revisão, o caminho é testar apenas o acesso das duas contas do próprio responsável. Não usar esta etapa com alunos. `EDU_ACTIVITIES_ENABLED` fica **false** por padrão; o servidor bloqueia jogos, PDFs e arquivos educacionais mesmo após autenticar. A tela só confirma o login e oferece saída. O bloqueio continua valendo se alguém tentar uma URL direta.
 
+## Separação entre conteúdo aberto e acesso reservado
+
+Diretriz atualizada em 5 de novembro de 2026: manter as atividades educativas públicas e usar login somente para funções ou materiais que tenham necessidade definida de restrição. A Educação no GitHub Pages continua aberta. O portal Render permanece em teste técnico, com atividades bloqueadas; a implementação agora prepara permissões distintas de professor e administrador, com páginas de conferência de acesso. O painel ainda não edita o site, publica arquivos ou altera contas. Essas operações exigem implementação e armazenamento próprios.
+
+Um recurso reservado deve ficar fora do repositório e dos artefatos públicos, com autorização conferida no servidor antes de cada entrega. A escolha deve ser feita por recurso: não retirar toda a Educação nem modificar seu link para o portal de teste. O setor de revisão documental e seus downloads continuam retirados. O histórico e cópias já publicados não são apagados por essa separação.
+
 ## Resultado registrado em 4 de novembro de 2026
 
-Origem de referência: [ENDEREÇO PÚBLICO DO PROJETO] . O responsável reportou status ready/mode auth-test e confirmou login, autorização, saída e novo acesso. A correção da política Referrer-Policy para same-origin está em 22b4af2; ela permite validar o Origin do POST sem aceitar origem null. A origem anterior não é o destino para novos testes. As duas contas da lista inicial já apresentaram Login reconhecido segundo o responsável. A captura posterior também confirmou Atividades ainda não liberadas ao acessar a Batalha Naval na mesma aba autenticada. Não foi reportado teste real de PDF autenticado, revogação ou conta fora da lista. As atividades permanecem bloqueadas.
+Origem de referência: [ENDEREÇO PÚBLICO DO PROJETO] . O responsável reportou status ready/mode auth-test e confirmou login, autorização, saída e novo acesso. A correção da política Referrer-Policy para same-origin está em 22b4af2; ela permite validar o Origin do POST sem aceitar origem null. A origem anterior não é o destino para novos testes. As duas contas da lista inicial já apresentaram Login reconhecido segundo o responsável. A captura posterior também confirmou Atividades ainda não liberadas ao acessar a Batalha Naval na mesma aba autenticada. No teste solicitado de PDF com sessão ativa, o responsável também enviou captura da tela de atividades bloqueadas. A imagem registra o resultado visual relatado; não comprova isoladamente a URL, o estado da sessão ou o código HTTP. Revogação real e conta fora da lista permanecem pendentes. As atividades permanecem bloqueadas.
 
 ## Ordem segura no Render
 

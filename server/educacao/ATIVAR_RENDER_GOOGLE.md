@@ -2,9 +2,15 @@
 
 > Revisão documental temporariamente retirada do site. Identificação e contato neste roteiro são marcadores de revisão: não copiá-los para a configuração em produção. As cópias de revisão são mantidas fora do repositório; não reinserir dados pessoais, evidências brutas ou PDFs sem conferência.
 
-Estado atualizado em 4 de novembro de 2026: serviço de referência [ENDEREÇO PÚBLICO DO PROJETO] em teste técnico. O responsável confirmou login com as duas contas iniciais, saída, novo acesso e bloqueio da Batalha Naval por URL direta na mesma aba autenticada. Plano do workspace Hobby e ausência de destino padrão em Log Streams conferidos por informação/captura. Os rascunhos foram publicados para revisão; não são políticas vigentes.
+Estado atualizado em 4 de novembro de 2026: serviço de referência [ENDEREÇO PÚBLICO DO PROJETO] em teste técnico. O responsável confirmou login com as duas contas iniciais, saída, novo acesso e bloqueio da Batalha Naval por URL direta na mesma aba autenticada. Plano do workspace Hobby e ausência de destino padrão em Log Streams conferidos por informação/captura. Os rascunhos chegaram a ser publicados para revisão e foram posteriormente retirados, junto de seus downloads; não são políticas vigentes.
 
 As seções 1 a 3 abaixo são referência para manutenção ou reconstrução. Não recriar hospedagem, cliente OAuth ou segredos para repetir um teste já concluído. O serviço anterior não é o destino dos novos testes. Atividades permanecem bloqueadas: EDU_ACTIVITIES_ENABLED=false e EDU_SUPERVISED_PILOT=true. A implantação não restringe o GitHub Pages público ou seu histórico.
+
+## Separação entre conteúdo aberto e acesso reservado
+
+Diretriz atualizada em 5 de novembro de 2026: manter as atividades educativas públicas e usar login somente para funções ou materiais que tenham necessidade definida de restrição. A Educação no GitHub Pages continua aberta. O portal Render permanece em teste técnico, com atividades bloqueadas; a implementação agora prepara permissões distintas de professor e administrador, com páginas de conferência de acesso. O painel ainda não edita o site, publica arquivos ou altera contas. Essas operações exigem implementação e armazenamento próprios.
+
+Um recurso reservado deve ficar fora do repositório e dos artefatos públicos, com autorização conferida no servidor antes de cada entrega. A escolha deve ser feita por recurso: não retirar toda a Educação nem modificar seu link para o portal de teste. O setor de revisão documental e seus downloads continuam retirados. O histórico e cópias já publicados não são apagados por essa separação.
 
 ## 1. Criar a hospedagem gratuita de teste
 
@@ -51,7 +57,7 @@ Ainda em Environment → **Secret Files**, crie `edu-allowlist.json` com um arra
 
 Salve e faça um novo deploy/reinício pelo painel. Não invente fundamento legal ou aviso de operadores só para preencher campos: os textos são apresentados aos usuários. O mecanismo técnico não certifica conformidade com a LGPD.
 
-## 4. Conferir antes de migrar
+## 4. Conferir a origem de teste e qualquer recurso reservado
 
 Na URL Render, verificar:
 
@@ -62,7 +68,7 @@ Na URL Render, verificar:
 - Conferir a página de privacidade com os dados reais do responsável.
 - Conferir os jogos: a origem nova recusa Service Workers, e o leitor externo TurboWarp precisa de adaptação para arquivos privados; não liberar `.sb3` publicamente como atalho.
 
-Somente depois dessa conferência, alterar o link Educação no site principal e excluir as rotas equivalentes dos artefatos do GitHub Pages. Revisar os workflows para que não as publiquem de novo. A origem pública antiga e a história pública do repositório não se tornam privadas com a criação do serviço novo.
+Manter o link Educação apontando para o conteúdo público. Para qualquer recurso especificamente escolhido como reservado, concluir sua conferência antes de disponibilizá-lo no servidor e removê-lo dos artefatos públicos atuais. Revisar os workflows para que não o publiquem de novo. O portal de teste não deve substituir a navegação pública. A história pública do repositório e cópias anteriores não se tornam privadas com a criação do serviço novo.
 
 ## Verificação automatizada complementar
 
