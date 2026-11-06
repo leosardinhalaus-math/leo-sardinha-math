@@ -20,8 +20,11 @@ for(const type of ['hex','oct']){
  });
  for(let phase=0;phase<4;phase++)test(`${type}: foto ${phase+1} recomposta em um único polígono após o fechamento`,()=>{
   // Construção independente em 3D: eixos de dobradiças consecutivas ortogonais.
+  // No segundo par de imagens, inverta o eixo vertical orientado: A/B são
+  // extremos identificados da mesma dobradiça, não pontos intercambiáveis.
+  // Usar +Z nos dois pares ocultava o erro das fotos 2 e 4.
   const g=api.kClassicGeometry(type),n=g.n,h=api.kaleidoTypes[type].alt,d=Math.sqrt(h*h-.25),verticalEven=phase===0||phase===2;
-  const u=Array.from({length:n},(_,i)=>{let vertical=verticalEven?i%2===0:i%2===1,angle=(verticalEven?i-1:i)*2*Math.PI/n;return vertical?[0,0,1]:[Math.cos(angle),Math.sin(angle),0]});
+  const u=Array.from({length:n},(_,i)=>{let vertical=verticalEven?i%2===0:i%2===1,angle=(verticalEven?i-1:i)*2*Math.PI/n;return vertical?[0,0,verticalEven?1:-1]:[Math.cos(angle),Math.sin(angle),0]});
   let m=[[0,0,0]];
   for(let i=0;i<n;i++)m.push(add(m[i],mul(cross(u[i],u[(i+1)%n]),d*(i%2?-1:1))));
   assert(Math.hypot(...m[n])<1e-10,'As duas extremidades do anel devem coincidir.');m.pop();
@@ -40,3 +43,4 @@ for(const type of ['hex','oct']){
   source.forEach((p,i)=>assert(Math.hypot(t[0]*p[0]+t[2]*p[1]+t[4]-projection[i][0],t[1]*p[0]+t[3]*p[1]+t[5]-projection[i][1])<1e-10,'Os pedaços da foto precisam se encontrar sem espelhamento ou troca de setores.'));
  });
 }
+
