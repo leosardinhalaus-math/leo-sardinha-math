@@ -20,6 +20,8 @@ create index education_materials_catalog on public.education_materials (created_
 create index education_materials_published on public.education_materials (created_at desc,id desc) where status='published';
 alter table public.education_materials enable row level security;
 alter table public.education_materials force row level security;
+create policy education_materials_no_browser_access on public.education_materials
+ for all to anon,authenticated using (false) with check (false);
 revoke all on public.education_materials from public,anon,authenticated;
 grant select,insert,update,delete on public.education_materials to service_role;
 insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types)
