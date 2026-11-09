@@ -1,5 +1,0 @@
-{
-  "name": "leo-sardinha-reserved-server",
-  "private": true,
-  "dependencies": { "pdf-lib": "1.17.1" }
-}
