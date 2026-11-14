@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#153b31">
+<title>Ateliê Kente</title>
+<meta name="description" content="Pinte uma grade de coordenadas com padrões inspirados no kente de Gana.">
+<style>
+:root{color-scheme:light;--ink:#1e382c;--forest:#153b31;--muted:#526258;--paper:#fffdf6;--border:#dfd8c5;--blank:#fffaf0}
+*{box-sizing:border-box}body{margin:0;background:#f1ebdc;color:var(--ink);font:16px/1.45 "DM Sans",system-ui,sans-serif}
+button,input{font:inherit}button{cursor:pointer;color:inherit;-webkit-tap-highlight-color:transparent}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #aa4d24;outline-offset:3px}
+.wrap{width:min(100% - 40px,970px);margin:auto}
+.hero{background:var(--forest);color:#fff6df;border-bottom:5px solid #d49b3b}
+.hero .wrap{display:flex;justify-content:space-between;align-items:center;gap:22px;padding:27px 0 30px}
+h1{font:normal clamp(39px,8vw,66px)/1 Georgia,serif;letter-spacing:-.045em;margin:0 0 7px}
+.hero p{margin:0;color:#e9ddc3;font-size:.95rem}
+.hero-band{width:min(30vw,230px);height:57px;display:grid;grid-template-columns:repeat(16,1fr);grid-template-rows:repeat(4,1fr);gap:1px;transform:rotate(-3deg);border:1px solid #b19455;overflow:hidden;flex-shrink:0}
+.work{display:grid;grid-template-columns:218px minmax(0,1fr);gap:18px;align-items:start;padding:20px 0}
+.panel,.canvas{background:var(--paper);border:1px solid var(--border);border-radius:18px;padding:17px;box-shadow:0 6px 18px #3829180b}
+.panel h2,.canvas h2{margin:0;font:normal 1.5rem/1.13 Georgia,serif}
+.preview{display:grid;grid-template-columns:repeat(10,1fr);aspect-ratio:1;border:1px solid #514833;margin:10px 0 8px}
+.preview i,.hero-band i{background:var(--pigment)}
+.pattern-name{text-align:center;min-height:1.45em;font-weight:650;font-size:.84rem}
+.carousel{display:grid;grid-template-columns:37px 1fr 37px;align-items:center;gap:4px;text-align:center;margin-top:4px;font-size:.81rem;color:var(--muted)}
+.action,.arrow{background:#f6f1e5;border:1px solid var(--border);border-radius:9px;min-height:40px;padding:6px 9px;font-size:.85rem}
+.arrow{padding:0;font-size:1.25rem;line-height:1}
+.action:hover,.arrow:hover{background:#eee6d6}
+.action:disabled{opacity:.5;cursor:default}
+.tools{display:grid;gap:7px;margin-top:13px;padding-top:13px;border-top:1px solid var(--border)}
+.tools .action{text-align:left;min-height:42px}
+.symbol{display:inline-block;margin-right:4px}
+.color-label{display:flex;align-items:center;gap:8px;font-size:.88rem;font-weight:650;margin-top:3px}
+#ink{width:43px;height:42px;padding:3px;border:1px solid var(--border);border-radius:8px;background:#f6f1e5;cursor:pointer}
+#ink::-webkit-color-swatch{border:0;border-radius:4px}#ink::-moz-color-swatch{border:0;border-radius:4px}
+.swatches{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.swatch{width:100%;min-height:32px;border:1px solid #29221740;border-radius:6px;background:var(--pigment);padding:0}
+.swatch[aria-pressed=true]{outline:2px solid var(--ink);outline-offset:1px}
+.canvas-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.canvas-top .actions{display:flex;gap:5px}
+.help,.status{font-size:.85rem;color:var(--muted);margin:0 0 8px}
+.status{margin:9px 0 0;min-height:1.45em}
+.matrix{display:grid;grid-template-columns:25px repeat(10,minmax(0,1fr));align-items:center;max-width:585px;margin:0 auto;isolation:isolate}
+.axis{text-align:center;font-size:.83rem;font-weight:700;color:#4f5b4b;align-self:stretch;display:grid;place-items:center;min-height:23px}
+.cell{display:block;width:100%;min-width:0;aspect-ratio:1;border:0;border-right:1px solid #ab9e85;border-bottom:1px solid #ab9e85;border-radius:0;padding:0;background:var(--pigment,var(--blank));touch-action:none;user-select:none;appearance:none}
+.cell.top{border-top:1px solid #ab9e85}.cell.left{border-left:1px solid #ab9e85}
+.cell:focus-visible{position:relative;z-index:1;outline-offset:-3px}
+.culture{margin:0 0 20px;color:var(--muted);font-size:.83rem}
+a{color:#28513e;text-underline-offset:3px}
+.print-title{display:none}
+@media(max-width:660px){
+ .wrap{width:calc(100% - 22px)}.work{grid-template-columns:119px minmax(0,1fr);gap:8px;padding:12px 0}
+ .hero .wrap{padding:19px 0}.hero-band{height:43px}.hero p{font-size:.8rem}
+ .panel,.canvas{padding:9px;border-radius:12px}.panel h2,.canvas h2{font-size:1.14rem}
+ .canvas-top{flex-wrap:wrap}.action,.help,.status,.color-label{font-size:.76rem}
+ .pattern-name,.carousel{font-size:.71rem}.carousel{grid-template-columns:32px 1fr 32px}
+ .tools .action{padding-inline:5px}.symbol{margin-right:2px}
+ .matrix{grid-template-columns:16px repeat(10,minmax(0,1fr))}.axis{font-size:.69rem;min-height:18px}
+ .swatches{gap:5px;grid-template-columns:repeat(3,minmax(0,1fr))}.swatch{min-height:29px}
+}
+@media(max-width:365px){.work{grid-template-columns:105px minmax(0,1fr)}.panel,.canvas{padding:7px}.hero-band{display:none}}
+@page{size:A4;margin:16mm}
+@media print{
+ body{background:white;color:#000;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+ .wrap{width:auto}.hero,.panel,.canvas-top,.help,.status,.culture{display:none}
+ .work,.canvas{display:block;padding:0;margin:0;border:0;background:transparent;box-shadow:none}
+ .print-title{display:block;margin:0 0 6mm;font:19pt Georgia,serif;text-align:center}
+ .matrix{width:10.6cm;max-width:none;grid-template-columns:.6cm repeat(10,1cm);grid-template-rows:.6cm repeat(10,1cm)}
+ .axis{min-height:0;color:#000}
+ .cell{width:1cm;height:1cm;background:var(--pigment,white);border-color:#505050}
+ .cell:focus-visible{outline:none}
+}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+<div><h1>Ateliê Kente</h1><p>Pinte padrões inspirados na tecelagem de Gana.</p></div>
+<div class="hero-band" id="hero-band" aria-hidden="true"></div>
+</div></header>
+<main class="wrap">
+<div class="work">
+<aside class="panel" aria-labelledby="models-title">
+<h2 id="models-title">Modelos</h2>
+<div id="preview" class="preview" role="img"></div>
+<div id="pattern-name" class="pattern-name" aria-live="polite"></div>
+<div class="carousel">
+<button id="previous" class="arrow" aria-label="Modelo anterior">‹</button>
+<span id="count"></span>
+<button id="next" class="arrow" aria-label="Próximo modelo">›</button>
+</div>
+<div class="tools">
+<button id="fill" class="action"><span class="symbol" aria-hidden="true">🧹</span> Preencher</button>
+<button id="clear" class="action"><span class="symbol" aria-hidden="true">⚡</span> Limpar</button>
+<label class="color-label"><input type="color" id="ink" value="#d79a2d"> Cor da tinta</label>
+<div id="swatches" class="swatches" aria-label="Paleta de cores"></div>
+</div>
+</aside>
+<section class="canvas" aria-labelledby="board-title">
+<div class="canvas-top"><h2 id="board-title">Sua grade</h2><div class="actions">
+<button class="action" id="undo" disabled>Desfazer</button>
+<button class="action" id="print" title="Imprimir quadrados de 1 cm">Imprimir</button>
+</div></div>
+<p class="help">Toque ou deslize para pintar. A1 fica no canto superior esquerdo.</p>
+<div class="print-title">Ateliê Kente · Grade de coordenadas</div>
+<div class="matrix" id="matrix" aria-label="Grade de pintura de A1 a J10"></div>
+<p id="status" class="status" role="status"></p>
+</section>
+</div>
+<p class="culture">Os modelos são criações geométricas inspiradas nas faixas tecidas do kente. <a href="https://ich.unesco.org/en/RL/craftsmanship-of-traditional-woven-textile-kente-02130" target="_blank" rel="noopener noreferrer">Conheça a tradição do kente na UNESCO</a>.</p>
+</main>
+<script>
+"use strict";
+const inks = [
+  ["Ouro", "#d79a2d"], ["Terracota", "#af462e"], ["Verde", "#206b50"],
+  ["Preto", "#272520"], ["Azul", "#285486"], ["Creme", "#f2ddb2"],
+  ["Roxo", "#733b64"], ["Laranja", "#e47736"]
+];
+const mod = (n, d) => ((n % d) + d) % d;
+const patterns = [
+  ["Faixas entrelaçadas", (r,c) => c % 5 === 0 ? 3 : c % 5 === 4 ? 0 : [1,0,2,5,2][mod(r + 2 * Math.floor(c / 5),5)]],
+  ["Losangos", (r,c) => { const d = Math.abs(2*r-9) + Math.abs(2*c-9); return d < 5 ? 0 : d < 9 ? 3 : d < 13 ? 1 : 2; }],
+  ["Escada dourada", (r,c) => [3,0,0,1,1][mod(c-Math.floor(r/2),5)]],
+  ["Setas", (r,c) => [3,5,2,2,4][mod(r-Math.min(c,9-c),5)]],
+  ["Trama xadrez", (r,c) => (r+c)%5===0 ? 0 : [2,3,1,5][2*(Math.floor(r/2)%2)+Math.floor(c/2)%2]],
+  ["Zigue-zague", (r,c) => [0,3,1,1,7][mod(r-Math.min(c%6,6-c%6),5)]],
+  ["Triângulos espelhados", (r,c) => (r%5+c%5)<4 ? (Math.floor(r/5)===Math.floor(c/5)? 4 : 6) : (r%5+c%5)===4 ? 3 : 0],
+  ["Cruzes", (r,c) => r%5===2 || c%5===2 ? (r%5===2 && c%5===2 ? 1 : 0) : (r+c)%2 ? 2 : 3],
+  ["Molduras", (r,c) => [3,0,2,5,1][Math.min(r,c,9-r,9-c)]],
+  ["Ondas em faixas", (r,c) => [4,2,0,7,3][mod(Math.floor(c/2)+[0,0,1,2,2,1][r%6],5)]]
+];
+const $ = id => document.getElementById(id);
+const storageKey = "atelie-kente-v1";
+const validColor = value => typeof value === "string" && /^#[0-9a-f]{6}$/.test(value);
+let saved;
+try { saved = JSON.parse(localStorage.getItem(storageKey)); } catch {}
+let colors = Array.isArray(saved?.colors) && saved.colors.length===100 &&
+  saved.colors.every(color => color===null || validColor(color)) ? saved.colors : Array(100).fill(null);
+let ink = validColor(saved?.ink) ? saved.ink : inks[0][1];
+let model = Number.isInteger(saved?.model) && saved.model>=0 && saved.model<patterns.length ? saved.model : 0;
+const history = [];
+const cells = [];
+const matrix = $("matrix");
+let stroke = null;
+let pointerSelection = null;
+
+function store() {
+  try { localStorage.setItem(storageKey, JSON.stringify({ colors, ink, model })); } catch {}
+}
+function block(color) {
+  const item = document.createElement("i");
+  item.style.setProperty("--pigment",color);
+  return item;
+}
+function showPattern() {
+  const [name, getColor] = patterns[model];
+  $("preview").replaceChildren(...Array.from({length:100}, (_,i) =>
+    block(inks[getColor(Math.floor(i/10),i%10)][1])));
+  $("preview").setAttribute("aria-label", "Modelo: " + name);
+  $("pattern-name").textContent = name;
+  $("count").textContent = (model+1) + " / " + patterns.length;
+}
+function cycle(direction) {
+  model = mod(model+direction,patterns.length);
+  showPattern();
+  store();
+}
+function axis(text) {
+  const el = document.createElement("span");
+  el.className = "axis";
+  el.textContent = text;
+  matrix.append(el);
+}
+function paintCell(index,color) {
+  colors[index] = color;
+  const tile = cells[index];
+  if (color) tile.style.setProperty("--pigment",color);
+  else tile.style.removeProperty("--pigment");
+}
+function renderBoard() {
+  colors.forEach((color,index) => paintCell(index,color));
+}
+function commit(before,message) {
+  if (before.some((color,i) => colors[i]!==color)) {
+    history.push(before);
+    if (history.length>40) history.shift();
+    $("undo").disabled = false;
+    store();
+  }
+  $("status").textContent = message;
+}
+function position(index) {
+  return "ABCDEFGHIJ"[Math.floor(index/10)] + (index%10+1);
+}
+function paintOne(index) {
+  const before = colors.slice();
+  paintCell(index,ink);
+  commit(before,position(index) + " pintada.");
+}
+function setInk(color) {
+  ink = color;
+  $("ink").value = color;
+  for (const button of $("swatches").children) {
+    button.setAttribute("aria-pressed",String(button.dataset.color===ink));
+  }
+  store();
+}
+function fillBoard(color,message) {
+  const before = colors.slice();
+  colors.fill(color);
+  renderBoard();
+  commit(before,message);
+}
+function hit(x,y) {
+  const tile = document.elementFromPoint(x,y)?.closest(".cell");
+  return tile && matrix.contains(tile) ? Number(tile.dataset.index) : null;
+}
+function paintBetween(from,to) {
+  const r0 = Math.floor(from/10), c0 = from%10;
+  const dr = Math.floor(to/10)-r0, dc = to%10-c0;
+  const steps = Math.max(Math.abs(dr), Math.abs(dc), 1);
+  for (let i=0;i<=steps;i++) {
+    paintCell(10*Math.round(r0+dr*i/steps)+Math.round(c0+dc*i/steps),stroke.ink);
+  }
+}
+
+axis("");
+for (let column=1;column<=10;column++) axis(column);
+for (let row=0;row<10;row++) {
+  axis("ABCDEFGHIJ"[row]);
+  for (let column=0;column<10;column++) {
+    const index = row*10+column;
+    const tile = document.createElement("button");
+    tile.type = "button";
+    tile.className = "cell" + (row===0?" top":"") + (column===0?" left":"");
+    tile.dataset.index = index;
+    tile.setAttribute("aria-label", "Pintar " + position(index));
+    tile.tabIndex = index===0 ? 0 : -1;
+    tile.addEventListener("click",event => {
+      if (event.detail===0) paintOne(index);
+    });
+    cells.push(tile);
+    matrix.append(tile);
+  }
+}
+function focusTile(index) {
+  if (pointerSelection!==null) cells[pointerSelection].tabIndex=-1;
+  else cells[0].tabIndex=-1;
+  pointerSelection=index;
+  cells[index].tabIndex=0;
+  cells[index].focus({preventScroll:true});
+}
+matrix.addEventListener("keydown",event => {
+  if (!event.target.matches(".cell")) return;
+  const index=Number(event.target.dataset.index);
+  const offsets={ArrowUp:index>=10?-10:0,ArrowDown:index<90?10:0,
+    ArrowLeft:index%10>0?-1:0,ArrowRight:index%10<9?1:0};
+  if (!Object.hasOwn(offsets,event.key)) return;
+  event.preventDefault();
+  focusTile(index+offsets[event.key]);
+});
+matrix.addEventListener("pointerdown",event => {
+  if (stroke || event.button!==0 || !event.target.matches(".cell")) return;
+  const index = Number(event.target.dataset.index);
+  stroke = { pointer:event.pointerId, before:colors.slice(), ink, last:index };
+  matrix.setPointerCapture(event.pointerId);
+  focusTile(index);
+  paintCell(index,stroke.ink);
+});
+matrix.addEventListener("pointermove",event => {
+  if (!stroke || event.pointerId!==stroke.pointer) return;
+  const index = hit(event.clientX,event.clientY);
+  if (index===null) {
+    stroke.last=null;
+    return;
+  }
+  paintBetween(stroke.last ?? index,index);
+  stroke.last=index;
+});
+function endStroke(event) {
+  if (!stroke || event.pointerId!==stroke.pointer) return;
+  if (event.type==="pointerup") {
+    const index=hit(event.clientX,event.clientY);
+    if (index!==null) {
+      paintBetween(stroke.last ?? index,index);
+      stroke.last=index;
+    }
+  }
+  const message=stroke.last===null ? "Pincelada aplicada." : position(stroke.last) + " pintada.";
+  commit(stroke.before,message);
+  stroke=null;
+}
+for (const event of ["pointerup","pointercancel","lostpointercapture"]) matrix.addEventListener(event,endStroke);
+for (const [name,color] of inks) {
+  const button = document.createElement("button");
+  button.type="button";
+  button.className="swatch";
+  button.dataset.color=color;
+  button.setAttribute("aria-label",name);
+  button.title=name;
+  button.style.setProperty("--pigment",color);
+  button.addEventListener("click",() => setInk(color));
+  $("swatches").append(button);
+}
+for (let i=0;i<64;i++) {
+  const r=Math.floor(i/16), c=i%16;
+  $("hero-band").append(block(inks[[3,0,1,2,5,2,1,0][mod(c-r*2,8)]][1]));
+}
+$("ink").addEventListener("input",event => setInk(event.target.value));
+$("previous").addEventListener("click",() => cycle(-1));
+$("next").addEventListener("click",() => cycle(1));
+$("fill").addEventListener("click",() => fillBoard(ink,"Grade preenchida com a cor da tinta."));
+$("clear").addEventListener("click",() => fillBoard(null,"Grade limpa."));
+$("undo").addEventListener("click",() => {
+  if (!history.length) return;
+  colors=history.pop();
+  renderBoard();
+  $("undo").disabled=history.length===0;
+  $("status").textContent="Última ação desfeita.";
+  store();
+});
+$("print").addEventListener("click",() => window.print());
+setInk(ink);
+showPattern();
+renderBoard();
+</script>
+</body>
+</html>

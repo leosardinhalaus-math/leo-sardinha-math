@@ -7,7 +7,7 @@ export const catalogo=[
  {id:'poligonos',icone:'⬡',cor:'#8bc79c',titulo:'Polígonos Regulares',resumo:'Desenhe lados e ângulos como uma tartaruga.'},
  {id:'divisores',icone:'▦',cor:'#75bcd5',titulo:'Divisores de um Número',resumo:'Construa retângulos e encontre pares de fatores.'},
  {id:'cpf',icone:'#',cor:'#a7a3d9',titulo:'Dígitos Verificadores do CPF',resumo:'Entenda os pesos e restos em um exemplo didático.'},
- {id:'kente',icone:'🧵',cor:'#e9a974',titulo:'Matemática do Tecido Kente',resumo:'Crie padrões, encontre pares e resolva sequências.'},
+ {id:'kente',icone:'🧵',cor:'#e9a974',titulo:'Matemática do Tecido Kente',resumo:'Pinte por coordenadas no Ateliê Kente, encontre pares e resolva sequências.'},
  {id:'estacao',icone:'✎',cor:'#e0a9bb',titulo:'Estação Papel > Digital',resumo:'Compare maneiras de resolver a mesma questão.'}
 ];
 export const criterios={pedagogicas:['Interatividade','Autonomia','Cooperação','Cognição','Afetividade'],tecnologicas:['Disponibilidade','Acessibilidade','Confiabilidade','Portabilidade','Facilidade de instalação','Interoperabilidade','Usabilidade','Manutenibilidade','Granularidade','Agregação','Durabilidade','Reusabilidade']};
