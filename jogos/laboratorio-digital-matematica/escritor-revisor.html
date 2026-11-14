@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Prepare um texto e revise pontuação, espaçamento e estrutura nas atividades do Laboratório Digital de Matemática.">
+  <title>Escritor e Revisor · Laboratório Digital de Matemática</title>
+  <link rel="stylesheet" href="./css/tema.css">
+  <link rel="stylesheet" href="./css/estilos.css">
+  <style>
+    .editorial-grade{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;align-items:start}
+    .editorial-grade h2{margin-top:0}
+    .editorial-campo{display:grid;gap:.3rem;margin:.7rem 0}
+    .editorial-campo :is(input,select,textarea){width:100%;min-width:0;padding:.6rem;border:1px solid var(--linha);border-radius:.55rem;color:var(--texto);background:var(--claro)}
+    .editorial-campo textarea{resize:vertical;line-height:1.5}
+    .editorial-grade output{display:block;white-space:pre-line}
+    @media(max-width:720px){.editorial-grade{grid-template-columns:minmax(0,1fr)}}
+  </style>
+</head>
+<body>
+  <header class="cabecalho"><a href="./#/" class="marca">⬡ Laboratório Digital <span>de Matemática</span></a></header>
+  <main>
+    <a id="voltar" href="./#/">← Voltar ao laboratório</a>
+    <h1>Escritor e Revisor</h1>
+    <p>Crie um roteiro editável e revise a pontuação, o espaçamento e a estrutura do texto. Os rascunhos ficam neste navegador.</p>
+    <label class="editorial-campo">Setor <select id="setor"></select></label>
+    <p id="sugestao"></p>
+    <div class="editorial-grade">
+      <section class="painel" aria-labelledby="titulo-escritor">
+        <h2 id="titulo-escritor">Escritor</h2>
+        <label class="editorial-campo">Tema ou título <input id="tema-texto" maxlength="160"></label>
+        <label class="editorial-campo">Público <select id="publico"><option>Estudantes</option><option>Professores</option><option>Famílias</option><option>Público geral</option></select></label>
+        <label class="editorial-campo">Formato <select id="formato"><option value="atividade">Atividade educativa</option><option value="artigo">Artigo</option><option value="historia">História</option><option value="resumo">Resumo</option></select></label>
+        <div class="barra-acoes"><button type="button" id="roteiro">Criar roteiro</button></div>
+        <label class="editorial-campo">Rascunho <textarea id="rascunho" rows="11"></textarea></label>
+        <div class="barra-acoes"><button type="button" id="enviar">Enviar ao Revisor</button><button type="button" id="exportar-rascunho">Exportar rascunho</button></div>
+        <p id="escritor-status" role="status"></p>
+      </section>
+      <section class="painel" aria-labelledby="titulo-revisor">
+        <h2 id="titulo-revisor">Revisor</h2>
+        <label class="editorial-campo">Texto a revisar <textarea id="revisao" rows="11"></textarea></label>
+        <div class="barra-acoes"><button type="button" id="analisar">Analisar texto</button><button type="button" id="corrigir">Ajustar espaçamento</button><button type="button" id="exportar-revisao">Exportar revisão</button></div>
+        <h3>Observações</h3>
+        <output id="observacoes" for="revisao">A análise aponta aspectos mecânicos e sugestões de estrutura. Confira também o sentido e os cálculos.</output>
+      </section>
+    </div>
+  </main>
+  <script type="module" src="./js/escritor.js"></script>
+</body>
+</html>

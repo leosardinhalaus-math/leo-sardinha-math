@@ -90,6 +90,14 @@ export async function navegar(){
     const modulo=await import(`../modulos/${caminhos[slug]}/index.js${revisao}`);
     if(location.hash.replace(/^#\/?/,'').split('/')[0]!==slug)return;
     atual=modulo;modulo.montar(main);
+    const editorial=document.createElement('a');
+    editorial.className='botao';
+    editorial.href='./escritor-revisor.html?setor='+encodeURIComponent(slug);
+    editorial.textContent='Escritor e Revisor';
+    const acoes=document.createElement('div');
+    acoes.className='barra-acoes';
+    acoes.append(editorial);
+    main.append(acoes);
     if(catalogo.some(c=>c.id===slug)){
       const heading=main.querySelector('h1');
       if(heading){
