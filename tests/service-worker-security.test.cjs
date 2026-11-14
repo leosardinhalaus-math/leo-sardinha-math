@@ -8,7 +8,7 @@ const origin='https://example.github.io';
 const targets=[
  {file:'jogos/calculus-royale/sw.js',scope:'/leo-sardinha-math/jogos/calculus-royale/',cache:'calculus-royale-v5',prefix:'calculus-royale-',navigation:true},
  {file:'jogos/calculus-royale-src/client/public/sw.js',scope:'/leo-sardinha-math/jogos/calculus-royale/',cache:'calculus-royale-v5',prefix:'calculus-royale-',navigation:true},
- {file:'jogos/laboratorio-digital-matematica/service-worker.js',scope:'/leo-sardinha-math/jogos/laboratorio-digital-matematica/',cache:'ldm-v25',prefix:'ldm-v',navigation:false}
+ {file:'jogos/laboratorio-digital-matematica/service-worker.js',scope:'/leo-sardinha-math/jogos/laboratorio-digital-matematica/',cache:'ldm-v26',prefix:'ldm-v',navigation:false}
 ];
 
 function harness(target,options={}){
