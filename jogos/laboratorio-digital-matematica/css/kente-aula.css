@@ -39,3 +39,4 @@
 
 .k-flag{display:grid;place-items:center;width:135px;aspect-ratio:3/2;background:linear-gradient(#ce1126 0 33.33%,#fcd116 33.33% 66.67%,#006b3f 66.67%);color:#111;border:1px solid var(--linha)}
 .k-flag span{font-size:2rem;line-height:1}
+.k-lesson [hidden]{display:none}
