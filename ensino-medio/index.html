@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ensino Médio · Matemática e BNCC · Leo Sardinha.Math</title>
+<meta name="description" content="43 habilidades de Matemática da BNCC, conexões com os jogos, atividades com materiais reutilizados e percursos sugeridos para o 1º ano.">
+<link rel="stylesheet" href="../assets/site.css"><link rel="stylesheet" href="style.css?v=1">
+<script defer src="math.js?v=1"></script><script defer src="app.js?v=1"></script></head>
+<body><a class="skip" href="#conteudo">Pular para o conteúdo</a>
+<header class="site-header"><nav class="nav" aria-label="Navegação principal"><a class="brand" href="../index.html">Leo Sardinha<span>.Math</span></a><div class="menu"><a href="../educacao.html">Educação</a><a href="../professor/">Área do Professor</a><a href="#mapa">Mapa BNCC</a><a href="#laboratorio">Funções</a></div></nav></header>
+<main class="wrap" id="conteudo"><header class="page-head"><p class="eyebrow">Matemática e suas Tecnologias</p><h1 class="page-title">Do jogo à<br>investigação.</h1><p class="lead">Um mapa do Ensino Médio para escolher o recurso, construir uma atividade e observar o que o estudante aprendeu.</p><div class="metrics"><span><b>43</b> habilidades mapeadas</span><span><b>4</b> percursos sugeridos</span><span><b>43</b> roteiros complementares</span></div></header>
+<aside class="notice"><strong>1º ano é uma proposta de percurso, não uma lista oficial separada.</strong> A BNCC apresenta as habilidades EM13MAT para toda a etapa, sem seriação. Os percursos abaixo são sugestões para o 1º ano: ajuste ao currículo da rede, aos pré-requisitos e ao tempo disponível. Não é necessário trabalhar os 35 vínculos dos percursos em um único ano nem em um projeto de dois meses. As outras 8 habilidades permanecem no mapa como ampliação da etapa. <a href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=531">Fonte: BNCC, p. 530</a>.</aside>
+<section aria-labelledby="percursos"><h2 id="percursos">Por onde começar no 1º ano</h2><p>Quatro entradas articuladas, sem duração obrigatória. Cada percurso reúne possibilidades; o professor seleciona as habilidades que correspondem ao planejamento da escola.</p><div class="paths">
+<a href="#mapa" data-pick="1"><small>Percurso 1</small><h3>Medir, representar, programar</h3><p>Diagnóstico de razões e unidades; recortes, crivo e algoritmos. Produto: solução explicada para uma demanda da escola.</p></a>
+<a href="#mapa" data-pick="2"><small>Percurso 2</small><h3>Descobrir funções</h3><p>Da tabela à expressão e ao gráfico: retas, parábolas, sistemas, PA e modelos por faixas.</p></a>
+<a href="#mapa" data-pick="3"><small>Percurso 3</small><h3>Crescer e comparar</h3><p>Tabuleiro de grãos, afinação musical, PG, exponenciais, logaritmos e orçamento.</p></a>
+<a href="#mapa" data-pick="4"><small>Percurso 4</small><h3>Investigar dados e chances</h3><p>Barcos de papelão, contagem e sorteio; pesquisa amostral, gráficos, centro e dispersão.</p></a></div></section>
+<section class="teaching"><h2>Construir antes de formalizar</h2><p>Use papel de rascunho, embalagens limpas, tampinhas e barbante reaproveitado. Cada dupla constrói seu modelo, registra uma previsão, testa e explica. Cor deve vir acompanhada de forma ou símbolo. Sem vidro e sem necessidade de impressão colorida.</p><p><strong>Encontro de 40 minutos:</strong> 5 min para a pergunta, 15 min de construção, 10 min de investigação, 5 min de registro e 5 min de conferência e organização. Um roteiro pode exigir vários encontros: não significa domínio de uma habilidade em 40 minutos.</p><p>Para um projeto de dois meses, reserve aproximadamente 8 encontros e escolha um conjunto pequeno de habilidades relacionadas. Pesquisas, programação e planilhas exigem etapas adicionais. O papel prepara as habilidades digitais, mas não substitui sua implementação; organize acesso compartilhado quando necessário.</p></section>
+<section id="laboratorio" class="lab" aria-labelledby="lab-title"><p class="eyebrow">Novo recurso · funções</p><h2 id="lab-title">Uma fórmula. Três representações.</h2><p>Altere o modelo e compare expressão, tabela e gráfico. Antes de calcular, preveja a forma e escolha um domínio que faça sentido para o problema.</p>
+<noscript><p>Ative JavaScript para usar o explorador. Todos os roteiros e conferências abaixo continuam disponíveis.</p></noscript>
+<form id="function-form"><div class="lab-controls"><label>Família<select id="family"><option value="linear">Afim · ax + b</option><option value="quadratic">Quadrática · ax² + bx + c</option><option value="exponential">Exponencial · a · qˣ</option><option value="logarithmic">Logarítmica · log_q(x)</option></select></label>
+<label id="a-label">a<input id="coef-a" type="number" value="2" min="-10000" max="10000" step="any" required></label><label id="b-label">b<input id="coef-b" type="number" value="3" min="-10000" max="10000" step="any" required></label><label id="c-label" hidden>c<input id="coef-c" type="number" value="0" min="-10000" max="10000" step="any" required></label><label id="q-label" hidden>Base q<input id="base-q" type="number" value="2" min="0.0001" max="100" step="any" required></label>
+<label>x inicial<input id="x-min" type="number" value="-4" min="-1000" max="1000" step="any" required></label><label>x final<input id="x-max" type="number" value="4" min="-1000" max="1000" step="any" required></label></div><button type="submit">Comparar representações</button></form>
+<p id="lab-status" role="status"></p><p id="formula" class="formula"></p><div class="representations"><div><svg id="plot" viewBox="0 0 600 350" role="img" aria-labelledby="plot-title plot-description"><title id="plot-title">Gráfico da função</title><desc id="plot-description">A tabela ao lado apresenta valores da mesma função.</desc></svg><p class="muted">Os eixos se ajustam ao intervalo escolhido; compare as escalas ao trocar parâmetros. A linha representa um modelo contínuo, mesmo quando o contexto só admite índices inteiros.</p></div><div class="table-wrap"><table><caption>Valores amostrados no intervalo</caption><thead><tr><th scope="col">x</th><th scope="col">f(x)</th></tr></thead><tbody id="values"></tbody></table></div></div></section>
+<section id="mapa" aria-labelledby="mapa-title"><h2 id="mapa-title">Encontre a habilidade e a atividade</h2><p>As descrições são sínteses autorais. Cada cartão aponta para o texto oficial e explica o alcance do recurso.</p><details class="legend"><summary>Como interpretar as conexões</summary><ul><li><strong>Recurso relacionado:</strong> já oferece parte central da investigação; precisa da ampliação e do registro indicados.</li><li><strong>Base parcial:</strong> funciona como contexto ou pré-requisito. Não atende sozinho à habilidade.</li><li><strong>Novo roteiro em papel:</strong> lacuna no acervo digital anterior; a atividade proposta está disponível no cartão.</li><li><strong>Novo laboratório:</strong> o explorador acima oferece apoio para a atividade, sem substituir modelagem e argumentação.</li></ul><p>Mapear uma habilidade não certifica que ela foi integralmente ensinada ou aprendida.</p></details>
+<div class="filters"><label>Buscar código, tema ou recurso<input id="search" type="search" placeholder="Ex.: EM13MAT304, barcos, gráfico"></label><label>Percurso<select id="block"><option value="all">Toda a etapa · 43 habilidades</option value="priority">Possibilidades para o 1º ano</option value="1">1 · Medidas e algoritmos</option><option value="2">2 · Funções e modelos</option><option value="3">3 · Crescimento e finanças</option><option value="4">4 · Dados e decisões</option><option value="0">Ampliação na etapa</option></select></label><label>Conexão<select id="status"><option value="all">Todas as conexões</option value="relacionado">Recurso relacionado</option><option value="parcial">Base parcial</option><option value="lacuna">Novo roteiro em papel</option><option value="novo">Novo laboratório</option></select></label></div>
+<div class="toolbar"><button id="clear" type="button">Limpar filtros</button><button id="expand" type="button">Abrir atividades visíveis</button><button id="print" type="button">Imprimir seleção</button><label><input id="with-answers" type="checkbox"> Incluir conferências na impressão</label></div><p id="results" role="status">43 habilidades disponíveis.</p><p class="muted">A impressão inclui somente os cartões filtrados. Sem filtros, imprime o mapa inteiro. Use a busca por código para uma única ficha.</p><div id="skills"><article class="skill" id="EM13MAT101" data-block="2" data-status="novo">
+ <div class="skill-top"><a class="code" href="#EM13MAT101">EM13MAT101</a><span class="badge novo">Novo laboratório</span></div>
+ <h3>Variação e leitura crítica</h3><p>Interpretar situações sociais, econômicas ou naturais usando gráficos e taxas de variação.</p><p class="placement">2 · Funções e modelos</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="#laboratorio">Laboratório de funções · novo</a>. O novo explorador relaciona valores e gráficos; a análise crítica do contexto precisa ser registrada.</p><p class="muted">Novo recurso desta adaptação.</p>
+ <h4>Construir e investigar</h4><p>Construa uma tabela para duas propostas fictícias de transporte: A(x)=5+2x e B(x)=3x, com x em quilômetros. Desenhe os gráficos e discuta o que a taxa por quilômetro representa.</p>
+ <h4>Pergunta para conferir</h4><p>Em que distância os custos se igualam? O modelo faz sentido para distâncias negativas?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>Em 5 km, ambas custam R$ 15. O domínio do contexto é x≥0; o modelo não prevê congestionamentos nem outras tarifas.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Explica taxa, valor inicial, domínio e uma limitação do modelo.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=534">Consultar texto oficial · página impressa 533</a>
+ </details></article>
+<article class="skill" id="EM13MAT102" data-block="4" data-status="lacuna">
+ <div class="skill-top"><a class="code" href="#EM13MAT102">EM13MAT102</a><span class="badge lacuna">Novo roteiro em papel</span></div>
+ <h3>Gráficos que podem enganar</h3><p>Examinar tabelas, gráficos e amostras de pesquisas, identificando escolhas que distorcem interpretações.</p><p class="placement">4 · Dados, contagem e decisões</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p>Roteiro em papel · novo. Não foi encontrado um módulo de leitura crítica de pesquisas no acervo auditado.</p><p class="muted">Sem recurso específico anterior.</p>
+ <h4>Construir e investigar</h4><p>Em papel reutilizado, represente 40 e 44 respostas em dois gráficos de barras: um eixo começa em zero, outro em 39. Rotule a escala e compare a impressão visual. Depois analise uma notícia escolhida pelo professor: fonte, data e seleção dos participantes.</p>
+ <h4>Pergunta para conferir</h4><p>O aumento de 40 para 44 foi de 10% ou de 100%? A escala muda o resultado?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>Foi de 10%. A escala altera a impressão visual, não os dados; a notícia exige conferir se a amostra representa a população.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Corrige a interpretação e explica escala e limite da amostra.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=534">Consultar texto oficial · página impressa 533</a>
+ </details></article>
+<article class="skill" id="EM13MAT103" data-block="1" data-status="lacuna">
+ <div class="skill-top"><a class="code" href="#EM13MAT103">EM13MAT103</a><span class="badge lacuna">Novo roteiro em papel</span></div>
+ <h3>Unidades nas notícias</h3><p>Interpretar medidas em textos científicos ou midiáticos e converter unidades, inclusive de dados digitais.</p><p class="placement">1 · Medidas, linguagem e algoritmos</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p>Roteiro em papel · novo. As atividades existentes não oferecem leitura sistemática de textos sobre unidades e conversões.</p><p class="muted">Sem recurso específico anterior.</p>
+ <h4>Construir e investigar</h4><p>Crie fichas de papelão com bit, byte, MB e Mb/s. Leia um anúncio fictício de 80 Mb/s e um arquivo de 100 MB. Declare que M representa 10⁶ e desconsidere perdas apenas neste modelo.</p>
+ <h4>Pergunta para conferir</h4><p>Qual o tempo mínimo teórico de transferência? Por que o tempo real pode ser maior?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>100 MB correspondem a 800 Mb: 800/80=10 s. Taxa variável, cabeçalhos e limitações dos equipamentos podem elevar o tempo.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Converte com unidades explícitas e diferencia modelo e observação.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=534">Consultar texto oficial · página impressa 533</a>
+ </details></article>
+<article class="skill" id="EM13MAT104" data-block="1" data-status="lacuna">
+ <div class="skill-top"><a class="code" href="#EM13MAT104">EM13MAT104</a><span class="badge lacuna">Novo roteiro em papel</span></div>
+ <h3>Taxas e índices sociais</h3><p>Investigar o cálculo de taxas e índices socioeconômicos para argumentar sobre a realidade.</p><p class="placement">1 · Medidas, linguagem e algoritmos</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p>Roteiro em papel · novo. Frações ajudam como pré-requisito, mas o site não tinha investigação específica de índices socioeconômicos.</p><p class="muted">Sem recurso específico anterior.</p>
+ <h4>Construir e investigar</h4><p>Monte uma cesta fictícia com 2 unidades de arroz a R$ 5 e 1 de feijão a R$ 8. No segundo mês, os preços são R$ 6 e R$ 8. Compare a variação da cesta com a média simples das duas variações percentuais; consulte depois a metodologia de um índice real.</p>
+ <h4>Pergunta para conferir</h4><p>Qual foi a variação do custo da cesta? Ela representa a inflação de todas as famílias?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>De R$ 18 para R$ 20: aproximadamente 11,11%. Não; composição e pesos de cada cesta importam. A média simples de 20% e 0% seria 10%.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Explica ponderação e limites da generalização.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=534">Consultar texto oficial · página impressa 533</a>
+ </details></article>
+<article class="skill" id="EM13MAT105" data-block="1" data-status="relacionado">
+ <div class="skill-top"><a class="code" href="#EM13MAT105">EM13MAT105</a><span class="badge relacionado">Recurso relacionado</span></div>
+ <h3>Transformações e arte</h3><p>Construir e analisar figuras com isometrias, homotetias e suas composições.</p><p class="placement">1 · Medidas, linguagem e algoritmos</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="../jogos/circulo-quintas/?trilha=em">Música em Círculo</a>. O círculo permite rotações e reflexões; translação e homotetia precisam do complemento em papel.</p><p class="muted">Abrir Exploração completa para acessar Afinação.</p>
+ <h4>Construir e investigar</h4><p>Recorte um motivo triangular em embalagem limpa. Copie-o numa malha; faça reflexão, translação e rotação, explicando o que se conserva. Amplie com fator 2. Compare com as transformações dos acordes no simulador completo.</p>
+ <h4>Pergunta para conferir</h4><p>Ao ampliar o triângulo com fator 2, o perímetro e a área mudam pelo mesmo fator?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>O perímetro duplica e a área quadruplica; ângulos se conservam. Isometrias conservam também comprimentos e áreas.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Distingue isometria de homotetia e justifica invariantes.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=534">Consultar texto oficial · página impressa 533</a>
+ </details></article>
+<article class="skill" id="EM13MAT106" data-block="4" data-status="parcial">
+ <div class="skill-top"><a class="code" href="#EM13MAT106">EM13MAT106</a><span class="badge parcial">Base parcial</span></div>
+ <h3>Decisões e risco</h3><p>Reconhecer escolhas cotidianas que dependem da avaliação de riscos probabilísticos.</p><p class="placement">4 · Dados, contagem e decisões</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="../jogos/batalha-naval/">Batalha Naval</a>. O jogo oferece decisões sob incerteza, mas não desenvolve sozinho a análise de riscos cotidianos.</p><p class="muted">Escolher modo sem contas; o Cara a Cara é uma construção em papel proposta aqui.</p>
+ <h4>Construir e investigar</h4><p>Use 20 cartões iguais: 5 representam chuva. Sorteie e reponha para simular dias. Compare levar ou não proteção para livros e discuta a consequência de cada decisão; os cartões são um modelo fictício, não uma previsão meteorológica.</p>
+ <h4>Pergunta para conferir</h4><p>Uma chance de 25% de chuva garante que choverá uma vez a cada quatro dias?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>Não. É uma probabilidade do modelo; não determina a sequência de resultados. A consequência de molhar os livros também pesa na decisão.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Distingue probabilidade de certeza e considera consequências.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=534">Consultar texto oficial · página impressa 533</a>
+ </details></article>
+<article class="skill" id="EM13MAT201" data-block="1" data-status="parcial">
+ <div class="skill-top"><a class="code" href="#EM13MAT201">EM13MAT201</a><span class="badge parcial">Base parcial</span></div>
+ <h3>Medir para transformar a escola</h3><p>Propor ações para demandas locais apoiadas em medidas de comprimento, área, volume, capacidade ou massa.</p><p class="placement">1 · Medidas, linguagem e algoritmos</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="../matematica-em-papel/">Matemática em Papel</a>. Os modelos de papel ajudam a construir protótipos; falta investigar uma demanda real da comunidade.</p><p class="muted">Suporte para construção; acrescentar medições e justificativas.</p>
+ <h4>Construir e investigar</h4><p>Escolham com a turma um espaço que precisa de organização. Meçam uma prateleira e construam caixas de papelão reaproveitado. Façam orçamento de material e apresentem uma proposta com medidas, destinatários e avaliação do resultado.</p>
+ <h4>Pergunta para conferir</h4><p>Numa prateleira de 60×30 cm cabem seis caixas de base 20×15 cm, sem folga?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>Sim: 3 caixas no comprimento e 2 na profundidade. Verificar a altura e acrescentar folga no projeto real.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Usa medições para justificar e avaliar uma intervenção realizável.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=535">Consultar texto oficial · página impressa 534</a>
+ </details></article>
+<article class="skill" id="EM13MAT202" data-block="4" data-status="lacuna">
+ <div class="skill-top"><a class="code" href="#EM13MAT202">EM13MAT202</a><span class="badge lacuna">Novo roteiro em papel</span></div>
+ <h3>Pesquisa com a turma</h3><p>Planejar pesquisa amostral e comunicar resultados com gráficos, tendência central e dispersão.</p><p class="placement">4 · Dados, contagem e decisões</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p>Roteiro em papel · novo. Não havia sequência completa de planejamento amostral e relatório estatístico.</p><p class="muted">Sem recurso específico anterior.</p>
+ <h4>Construir e investigar</h4><p>Investiguem o tempo dedicado a uma atividade escolar sem identificar colegas. Definam população, pergunta, sorteio da amostra e forma de registro. Organizem dados, gráficos, média, mediana, amplitude e desvio padrão; discutam não respostas.</p>
+ <h4>Pergunta para conferir</h4><p>Uma amostra só de voluntários do clube de leitura representa toda a escola?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>Não necessariamente: a adesão pode selecionar estudantes com hábitos diferentes. É preciso explicitar a limitação e melhorar a seleção.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Relatório com plano amostral, medidas, gráficos e limites; não apenas coleta.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=535">Consultar texto oficial · página impressa 534</a>
+ </details></article>
+<article class="skill" id="EM13MAT203" data-block="3" data-status="lacuna">
+ <div class="skill-top"><a class="code" href="#EM13MAT203">EM13MAT203</a><span class="badge lacuna">Novo roteiro em papel</span></div>
+ <h3>Planejar com planilhas</h3><p>Usar aplicativos e criar planilhas para analisar ações e tomar decisões matematicamente fundamentadas.</p><p class="placement">3 · Crescimento, música e finanças</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p>Roteiro em papel · novo. Não foi localizado um simulador de orçamento com criação de planilha pelo estudante.</p><p class="muted">Sem recurso específico anterior.</p>
+ <h4>Construir e investigar</h4><p>Planeje a construção de jogos com receita fictícia de R$ 100 e despesas de R$ 35, R$ 20 e R$ 15. Faça primeiro a tabela em papel, depois uma planilha com fórmulas para total e saldo; altere uma despesa e observe a atualização.</p>
+ <h4>Pergunta para conferir</h4><p>Se a despesa de R$ 20 passar para R$ 28, qual será o saldo?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>O saldo inicial é R$ 30 e o novo saldo é R$ 22. A fórmula deve referenciar células, sem digitar novamente o resultado.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Planilha funcional e justificativa da decisão. A etapa em papel é preparação; acesso compartilhado a um computador conclui a habilidade digital.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=535">Consultar texto oficial · página impressa 534</a>
+ </details></article>
+<article class="skill" id="EM13MAT301" data-block="2" data-status="novo">
+ <div class="skill-top"><a class="code" href="#EM13MAT301">EM13MAT301</a><span class="badge novo">Novo laboratório</span></div>
+ <h3>Sistemas de equações</h3><p>Resolver e elaborar problemas com sistemas lineares de duas equações e duas incógnitas, usando álgebra e gráficos.</p><p class="placement">2 · Funções e modelos</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="#laboratorio">Laboratório de funções · novo</a>. O novo laboratório trabalha gráficos de funções; a resolução e verificação do sistema são complementares.</p><p class="muted">Novo recurso desta adaptação.</p>
+ <h4>Construir e investigar</h4><p>Crie fichas de ingresso inteiro e meia-entrada. Uma venda fictícia tem 20 ingressos, preços de R$ 10 e R$ 5, e arrecada R$ 150. Modele com x+y=20 e 10x+5y=150. Represente y=20−x e y=30−2x.</p>
+ <h4>Pergunta para conferir</h4><p>Quantos ingressos de cada tipo foram vendidos?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>10 inteiros e 10 meias. O ponto (10,10) pertence às duas retas e satisfaz as duas equações.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Modela, resolve por dois registros e verifica a resposta no contexto.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=537">Consultar texto oficial · página impressa 536</a>
+ </details></article>
+<article class="skill" id="EM13MAT302" data-block="2" data-status="novo">
+ <div class="skill-top"><a class="code" href="#EM13MAT302">EM13MAT302</a><span class="badge novo">Novo laboratório</span></div>
+ <h3>Modelar com funções</h3><p>Construir modelos de primeiro ou segundo grau e avaliar soluções em contextos variados.</p><p class="placement">2 · Funções e modelos</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="#laboratorio">Laboratório de funções · novo</a>. O novo explorador oferece funções afins e quadráticas; o estudante precisa construir o modelo.</p><p class="muted">Novo recurso desta adaptação.</p>
+ <h4>Construir e investigar</h4><p>Com barbante reaproveitado de 20 unidades, proponha canteiros retangulares. Registre largura x e comprimento 10−x. Compare a área A(x)=x(10−x) com o custo linear C(x)=3x+2 de uma faixa de material.</p>
+ <h4>Pergunta para conferir</h4><p>Por que a área não cresce indefinidamente quando x aumenta?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>O outro lado diminui. Para 0&lt;x&lt;10, a área máxima é 25 em x=5; além disso o modelo deixa de representar um retângulo com lados positivos.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Distingue modelos linear e quadrático, escolhe domínio e verifica resultados.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=537">Consultar texto oficial · página impressa 536</a>
+ </details></article>
+<article class="skill" id="EM13MAT303" data-block="3" data-status="relacionado">
+ <div class="skill-top"><a class="code" href="#EM13MAT303">EM13MAT303</a><span class="badge relacionado">Recurso relacionado</span></div>
+ <h3>Juros simples e compostos</h3><p>Comparar o crescimento linear e exponencial em situações de juros simples e compostos.</p><p class="placement">3 · Crescimento, música e finanças</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="../malba-tahan/#oficina">Malba Tahan · tabuleiro e grãos</a>. As duplicações do tabuleiro ajudam a perceber crescimento multiplicativo; juros precisam de um novo contexto.</p><p class="muted">Selecionar “O tabuleiro e os grãos” na oficina.</p>
+ <h4>Construir e investigar</h4><p>Em uma situação fictícia, aplique R$ 100 a 10% por período. Construa tabelas de 0 a 4 períodos para juros simples e compostos. Use o laboratório para comparar 100+10t e 100·1,1ᵗ.</p>
+ <h4>Pergunta para conferir</h4><p>Após dois períodos, os montantes são iguais?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>Não: R$ 120 em juros simples e R$ 121 em compostos. O juro composto incide sobre o montante acumulado.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Compara tabelas e gráficos e explica a base de cálculo de cada caso.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=537">Consultar texto oficial · página impressa 536</a>
+ </details></article>
+<article class="skill" id="EM13MAT304" data-block="3" data-status="relacionado">
+ <div class="skill-top"><a class="code" href="#EM13MAT304">EM13MAT304</a><span class="badge relacionado">Recurso relacionado</span></div>
+ <h3>Crescimento exponencial</h3><p>Resolver e criar problemas que envolvam funções exponenciais e variação de grandezas.</p><p class="placement">3 · Crescimento, música e finanças</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="../jogos/circulo-quintas/?trilha=em">Música em Círculo</a>. A afinação usa potências de 2; o tabuleiro de Malba Tahan também modela duplicações.</p><p class="muted">Abrir Exploração completa para acessar Afinação.</p>
+ <h4>Construir e investigar</h4><p>Construa cartões de frequências para 220, 440, 880 e 1760 Hz. Relacione cada cartão ao número de oitavas n em f(n)=220·2ⁿ. Use a seção Afinação do simulador completo e crie uma pergunta inversa.</p>
+ <h4>Pergunta para conferir</h4><p>Qual frequência corresponde a três oitavas acima de 220 Hz?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>1760 Hz; cada oitava multiplica por 2. Os acréscimos absolutos não são constantes.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Formula um problema e explica o crescimento multiplicativo e as unidades.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=537">Consultar texto oficial · página impressa 536</a>
+ </details></article>
+<article class="skill" id="EM13MAT305" data-block="3" data-status="relacionado">
+ <div class="skill-top"><a class="code" href="#EM13MAT305">EM13MAT305</a><span class="badge relacionado">Recurso relacionado</span></div>
+ <h3>Logaritmos como inversão</h3><p>Resolver e criar problemas logarítmicos, interpretando a variação das grandezas.</p><p class="placement">3 · Crescimento, música e finanças</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="../jogos/circulo-quintas/?trilha=em">Música em Círculo</a>. O cálculo de cents usa logaritmos; precisa de introdução à função inversa e ao domínio.</p><p class="muted">Abrir Exploração completa para acessar Afinação.</p>
+ <h4>Construir e investigar</h4><p>Retome f(n)=220·2ⁿ e isole n=log₂(f/220). Faça cartões que emparelhem frequências e oitavas. Compare tabelas e os gráficos da exponencial e de sua inversa.</p>
+ <h4>Pergunta para conferir</h4><p>1760 Hz estão quantas oitavas acima de 220 Hz? O logaritmo aceita frequência zero?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>3 oitavas, pois 1760/220=8=2³. No modelo real, f&gt;0; log₂(0) não está definido.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Usa o logaritmo como inversão e explica domínio e unidade do resultado.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=537">Consultar texto oficial · página impressa 536</a>
+ </details></article>
+<article class="skill" id="EM13MAT306" data-block="0" data-status="parcial">
+ <div class="skill-top"><a class="code" href="#EM13MAT306">EM13MAT306</a><span class="badge parcial">Base parcial</span></div>
+ <h3>Fenômenos periódicos</h3><p>Modelar fenômenos periódicos reais e comparar suas representações com seno e cosseno.</p><p class="placement">Ampliação na etapa</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="../jogos/circulo-quintas/?trilha=em">Música em Círculo</a>. Ouvir notas e ver um círculo não equivale a estudar o gráfico de uma onda; o recurso é apenas contexto.</p><p class="muted">Abrir Exploração completa para acessar Afinação.</p>
+ <h4>Construir e investigar</h4><p>Faça marcas igualmente espaçadas num disco de papelão e registre a altura de um ponto durante a rotação. Compare o desenho com y=sen(t). Em seguida interprete um modelo de onda sonora y=sen(2π·440t), com t em segundos.</p>
+ <h4>Pergunta para conferir</h4><p>Qual é o período da onda de 440 Hz?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>T=1/440 s, aproximadamente 0,00227 s. A altura do ponto no disco ilustra a forma periódica, mas não é uma medição acústica.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Relaciona período e frequência e compara modelo e fenômeno.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=537">Consultar texto oficial · página impressa 536</a>
+ </details></article>
+<article class="skill" id="EM13MAT307" data-block="1" data-status="parcial">
+ <div class="skill-top"><a class="code" href="#EM13MAT307">EM13MAT307</a><span class="badge parcial">Base parcial</span></div>
+ <h3>Área por diferentes caminhos</h3><p>Deduzir e aplicar expressões de área usando decomposição, recomposição ou aproximação.</p><p class="placement">1 · Medidas, linguagem e algoritmos</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="../matematica-em-papel/">Matemática em Papel</a>. As construções em papel favorecem recortes, mas a dedução deve ser explicitada.</p><p class="muted">Suporte para construção; acrescentar medições e justificativas.</p>
+ <h4>Construir e investigar</h4><p>Recorte um trapézio de bases 8 e 4 cm e altura 3 cm em embalagem fina. Use duas cópias para recompor um paralelogramo e obtenha a expressão da área. Compare com decomposição em retângulo e triângulos.</p>
+ <h4>Pergunta para conferir</h4><p>Qual a área do trapézio e por que aparece a divisão por 2?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>18 cm². Duas cópias formam um paralelogramo de base 12 e altura 3, com área 36 cm².</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Apresenta dois métodos e justifica a fórmula a partir do recorte.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=537">Consultar texto oficial · página impressa 536</a>
+ </details></article>
+<article class="skill" id="EM13MAT308" data-block="0" data-status="parcial">
+ <div class="skill-top"><a class="code" href="#EM13MAT308">EM13MAT308</a><span class="badge parcial">Base parcial</span></div>
+ <h3>Triângulos e medidas indiretas</h3><p>Resolver e criar problemas com relações métricas, congruência, semelhança e leis dos senos ou cossenos.</p><p class="placement">Ampliação na etapa</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="../matematica-em-papel/">Matemática em Papel</a>. Dobras e malhas apoiam a visualização; não há investigação específica das relações métricas no acervo auditado.</p><p class="muted">Suporte para construção; acrescentar medições e justificativas.</p>
+ <h4>Construir e investigar</h4><p>Construa um triângulo de lados 3, 4 e 5 com tiras de papelão e outro com lados dobrados. Compare razões e ângulos. Amplie a investigação para dois lados de 5 e 7 com ângulo entre eles de 60°, usando a lei dos cossenos.</p>
+ <h4>Pergunta para conferir</h4><p>Qual o terceiro lado do segundo problema?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>√39, aproximadamente 6,24: c²=25+49−2·5·7·cos60°=39.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Escolhe uma relação adequada, explicita dados e testa a plausibilidade.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=537">Consultar texto oficial · página impressa 536</a>
+ </details></article>
+<article class="skill" id="EM13MAT309" data-block="0" data-status="parcial">
+ <div class="skill-top"><a class="code" href="#EM13MAT309">EM13MAT309</a><span class="badge parcial">Base parcial</span></div>
+ <h3>Embalagens e sólidos</h3><p>Resolver e elaborar problemas de áreas totais e volumes de prismas, pirâmides e corpos redondos.</p><p class="placement">Ampliação na etapa</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="../matematica-em-papel/">Matemática em Papel</a>. A seção de papel permite modelos tridimensionais, mas nem todos são prismas e corpos redondos mensuráveis.</p><p class="muted">Suporte para construção; acrescentar medições e justificativas.</p>
+ <h4>Construir e investigar</h4><p>Abra uma caixa reaproveitada e desenhe sua planificação. Para uma caixa fechada ideal de 10×6×4 cm, calcule material e capacidade. Compare depois com um cilindro de raio 3 cm e altura 4 cm, diferenciando área e volume.</p>
+ <h4>Pergunta para conferir</h4><p>Quais a área total e o volume da caixa? E o volume do cilindro?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>Caixa: 248 cm² e 240 cm³. Cilindro: 36π cm³. Abas e espessura foram ignoradas no modelo.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Diferencia unidades e inclui perdas ou abas ao propor uma embalagem real.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=538">Consultar texto oficial · página impressa 537</a>
+ </details></article>
+<article class="skill" id="EM13MAT310" data-block="4" data-status="parcial">
+ <div class="skill-top"><a class="code" href="#EM13MAT310">EM13MAT310</a><span class="badge parcial">Base parcial</span></div>
+ <h3>Contar possibilidades</h3><p>Resolver e elaborar problemas de agrupamentos ordenados ou não com princípios aditivo e multiplicativo.</p><p class="placement">4 · Dados, contagem e decisões</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="../jogos/batalha-naval/">Batalha Naval</a>. O tema naval pode receber características combináveis; o jogo atual não contém o Cara a Cara de barcos.</p><p class="muted">Escolher modo sem contas; o Cara a Cara é uma construção em papel proposta aqui.</p>
+ <h4>Construir e investigar</h4><p>Desenhe barcos em cartões de embalagens: 2 tipos de vela, 2 quantidades de janelas e 2 símbolos. Faça uma árvore de possibilidades. Conte depois pares de barcos diferentes para formar uma frota, sem distinguir a ordem.</p>
+ <h4>Pergunta para conferir</h4><p>Quantos barcos distintos e quantas frotas de dois barcos podem ser formados?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>8 barcos e 8·7/2=28 pares. Se houvesse papel diferente para cada barco, a ordem poderia importar.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Explica o produto, a divisão por 2 e cria um problema com categorias alternativas.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=538">Consultar texto oficial · página impressa 537</a>
+ </details></article>
+<article class="skill" id="EM13MAT311" data-block="4" data-status="parcial">
+ <div class="skill-top"><a class="code" href="#EM13MAT311">EM13MAT311</a><span class="badge parcial">Base parcial</span></div>
+ <h3>Espaço amostral</h3><p>Descrever possibilidades de experimentos aleatórios e calcular probabilidades por contagem.</p><p class="placement">4 · Dados, contagem e decisões</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="../jogos/batalha-naval/">Batalha Naval</a>. As coordenadas são um suporte; a probabilidade exige regra de sorteio explicitamente uniforme.</p><p class="muted">Escolher modo sem contas; o Cara a Cara é uma construção em papel proposta aqui.</p>
+ <h4>Construir e investigar</h4><p>Construa uma malha 4×4 em papelão e 16 cartões iguais com coordenadas. Marque quatro casas como barco. Sorteie um cartão sem olhar; liste o espaço amostral e os casos favoráveis antes de experimentar.</p>
+ <h4>Pergunta para conferir</h4><p>Qual a probabilidade de atingir o barco no primeiro sorteio?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>4/16=1/4, se cada cartão tem a mesma chance. Um adversário escolhendo estrategicamente não é esse experimento.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Lista o espaço amostral e justifica a hipótese de equiprobabilidade.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=538">Consultar texto oficial · página impressa 537</a>
+ </details></article>
+<article class="skill" id="EM13MAT312" data-block="0" data-status="parcial">
+ <div class="skill-top"><a class="code" href="#EM13MAT312">EM13MAT312</a><span class="badge parcial">Base parcial</span></div>
+ <h3>Experimentos sucessivos</h3><p>Resolver e elaborar problemas de probabilidade em sequências de experimentos aleatórios.</p><p class="placement">Ampliação na etapa</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="../jogos/batalha-naval/">Batalha Naval</a>. O tabuleiro fornece contexto; a regra de reposição e a árvore de probabilidades são novas.</p><p class="muted">Escolher modo sem contas; o Cara a Cara é uma construção em papel proposta aqui.</p>
+ <h4>Construir e investigar</h4><p>Faça uma urna de caixa de papelão com 4 cartões de barco e 12 de água. Calcule dois acertos consecutivos com reposição e sem reposição. Simule em duplas, anotando a regra adotada.</p>
+ <h4>Pergunta para conferir</h4><p>Qual é a probabilidade de dois acertos nos dois casos?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>Com reposição: (4/16)²=1/16. Sem reposição: (4/16)·(3/15)=1/20.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Desenha a árvore, atualiza a segunda probabilidade e explica a diferença.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=538">Consultar texto oficial · página impressa 537</a>
+ </details></article>
+<article class="skill" id="EM13MAT313" data-block="1" data-status="lacuna">
+ <div class="skill-top"><a class="code" href="#EM13MAT313">EM13MAT313</a><span class="badge lacuna">Novo roteiro em papel</span></div>
+ <h3>Medidas e precisão</h3><p>Expressar medidas, usar notação científica e reconhecer algarismos significativos e incerteza.</p><p class="placement">1 · Medidas, linguagem e algoritmos</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p>Roteiro em papel · novo. O tabuleiro aborda números grandes, mas quantidade exata de grãos não substitui incerteza de uma medida.</p><p class="muted">Sem recurso específico anterior.</p>
+ <h4>Construir e investigar</h4><p>Meça a mesma tira de papelão com régua graduada em centímetros e depois em milímetros. Registre a resolução do instrumento e compare leituras. Reescreva 0,00450 m em notação científica, preservando a precisão declarada.</p>
+ <h4>Pergunta para conferir</h4><p>Como escrever essa medida e quantos algarismos significativos há?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>4,50×10⁻³ m, com três algarismos significativos. Zeros finais após a vírgula registram precisão; a medida não é exata.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Distingue contagem de medição e registra unidade, precisão e variação observada.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=538">Consultar texto oficial · página impressa 537</a>
+ </details></article>
+<article class="skill" id="EM13MAT314" data-block="1" data-status="lacuna">
+ <div class="skill-top"><a class="code" href="#EM13MAT314">EM13MAT314</a><span class="badge lacuna">Novo roteiro em papel</span></div>
+ <h3>Grandezas compostas</h3><p>Resolver e criar problemas com grandezas obtidas por razões ou produtos de outras.</p><p class="placement">1 · Medidas, linguagem e algoritmos</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p>Roteiro em papel · novo. Não foi identificado módulo específico de análise dimensional e grandezas compostas.</p><p class="muted">Sem recurso específico anterior.</p>
+ <h4>Construir e investigar</h4><p>Faça fichas para distância, tempo, velocidade, potência e energia. Combine as unidades e crie duas situações: percurso de 120 km em 2 h e aparelho de 0,06 kW ligado por 5 h.</p>
+ <h4>Pergunta para conferir</h4><p>Quais a velocidade média e a energia consumida?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>60 km/h e 0,30 kWh. kW é potência; kWh é energia. Média não significa velocidade constante em todo o percurso.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Calcula, interpreta unidades e cria um exemplo com razão e outro com produto.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=538">Consultar texto oficial · página impressa 537</a>
+ </details></article>
+<article class="skill" id="EM13MAT315" data-block="1" data-status="relacionado">
+ <div class="skill-top"><a class="code" href="#EM13MAT315">EM13MAT315</a><span class="badge relacionado">Recurso relacionado</span></div>
+ <h3>Algoritmos e fluxogramas</h3><p>Investigar algoritmos de resolução de problemas e registrá-los, quando possível, em fluxogramas.</p><p class="placement">1 · Medidas, linguagem e algoritmos</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="../jogos/missao-primos/">Missão Primos</a>. O crivo mostra exclusões por múltiplos e permite investigar um algoritmo real.</p><p class="muted">Explorar o crivo e registrar seu procedimento.</p>
+ <h4>Construir e investigar</h4><p>Use uma grade de papel de 1 a 30 e reproduza o crivo. Registre decisões e repetições num fluxograma. Troque o esquema com outra dupla para executá-lo sem explicação oral.</p>
+ <h4>Pergunta para conferir</h4><p>Por que 1 deve ser excluído? E por que basta testar primos até √30?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>1 não tem exatamente dois divisores positivos. Todo composto até 30 possui um fator primo até √30; testar 2, 3 e 5 basta.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Outra dupla executa o algoritmo e o autor justifica o critério de parada.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=538">Consultar texto oficial · página impressa 537</a>
+ </details></article>
+<article class="skill" id="EM13MAT316" data-block="4" data-status="lacuna">
+ <div class="skill-top"><a class="code" href="#EM13MAT316">EM13MAT316</a><span class="badge lacuna">Novo roteiro em papel</span></div>
+ <h3>Centro e dispersão</h3><p>Resolver e elaborar problemas que envolvam média, moda, mediana, amplitude, variância e desvio padrão.</p><p class="placement">4 · Dados, contagem e decisões</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p>Roteiro em papel · novo. Não foi identificado módulo completo dessas medidas no acervo auditado.</p><p class="muted">Sem recurso específico anterior.</p>
+ <h4>Construir e investigar</h4><p>Represente com pilhas de tampinhas os conjuntos A={2,4,6} e B={4,4,4}. Redistribua para mostrar a média. Calcule mediana, moda, amplitude e a variância populacional; explique por que as médias não bastam.</p>
+ <h4>Pergunta para conferir</h4><p>Qual conjunto é mais disperso?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>A: média 4, mediana 4, sem moda, amplitude 4, variância 8/3 e desvio padrão √(8/3)≈1,63. B: média, mediana e moda 4; dispersões zero.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Explica a dispersão e declara que dividiu por N ao tratar os conjuntos como populações.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=538">Consultar texto oficial · página impressa 537</a>
+ </details></article>
+<article class="skill" id="EM13MAT401" data-block="2" data-status="novo">
+ <div class="skill-top"><a class="code" href="#EM13MAT401">EM13MAT401</a><span class="badge novo">Novo laboratório</span></div>
+ <h3>Da fórmula à reta</h3><p>Converter funções de primeiro grau entre fórmula e gráfico, distinguindo proporcionalidade.</p><p class="placement">2 · Funções e modelos</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="#laboratorio">Laboratório de funções · novo</a>. O novo explorador oferece fórmula, tabela e gráfico em uma mesma tela.</p><p class="muted">Novo recurso desta adaptação.</p>
+ <h4>Construir e investigar</h4><p>Monte tabelas para y=2x e y=2x+3 usando cartões x=0,1,2,3. Marque os pontos numa malha e compare com o laboratório. Discuta o que ocorre ao duplicar x.</p>
+ <h4>Pergunta para conferir</h4><p>As duas funções representam proporcionalidade direta?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>Só y=2x: passa pela origem e preserva y/x para x≠0. O termo constante 3 impede a proporcionalidade em y=2x+3.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Converte os registros e justifica o papel do termo constante.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=540">Consultar texto oficial · página impressa 539</a>
+ </details></article>
+<article class="skill" id="EM13MAT402" data-block="2" data-status="novo">
+ <div class="skill-top"><a class="code" href="#EM13MAT402">EM13MAT402</a><span class="badge novo">Novo laboratório</span></div>
+ <h3>Da fórmula à parábola</h3><p>Converter funções quadráticas entre fórmula e gráfico, reconhecendo proporcionalidade ao quadrado.</p><p class="placement">2 · Funções e modelos</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="#laboratorio">Laboratório de funções · novo</a>. O novo explorador permite comparar parábolas; a interpretação do contexto faz parte do roteiro.</p><p class="muted">Novo recurso desta adaptação.</p>
+ <h4>Construir e investigar</h4><p>Recorte quadrados de lados 1,2,3,4 e registre áreas. Compare y=x² e y=x²+2 no laboratório. Use também valores negativos para entender a função, distinguindo-os de medidas de lados.</p>
+ <h4>Pergunta para conferir</h4><p>Quando o lado dobra, a área do quadrado dobra?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>Quadruplica. Em y=x², y é proporcional a x²; em y=x²+2, não. Lados físicos têm x&gt;0.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Distingue o domínio geométrico do algébrico e explica a relação quadrática.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=540">Consultar texto oficial · página impressa 539</a>
+ </details></article>
+<article class="skill" id="EM13MAT403" data-block="3" data-status="parcial">
+ <div class="skill-top"><a class="code" href="#EM13MAT403">EM13MAT403</a><span class="badge parcial">Base parcial</span></div>
+ <h3>Exponencial e logaritmo</h3><p>Relacionar tabelas e gráficos de exponenciais e logaritmos, analisando domínio, imagem e crescimento.</p><p class="placement">3 · Crescimento, música e finanças</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="../jogos/circulo-quintas/?trilha=em">Música em Círculo</a>. A afinação oferece uma relação exponencial e cálculos logarítmicos, mas os gráficos precisam de construção complementar.</p><p class="muted">Abrir Exploração completa para acessar Afinação.</p>
+ <h4>Construir e investigar</h4><p>Construa pares para y=2ˣ com x=−2,−1,0,1,2. Inverta cada par para obter y=log₂x. Desenhe numa mesma escala e observe a reflexão na reta y=x.</p>
+ <h4>Pergunta para conferir</h4><p>Qual o domínio de log₂x e a imagem de 2ˣ?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>Domínio do logaritmo: x&gt;0. Imagem da exponencial: y&gt;0. Ambas crescem; a inversão troca domínio e imagem.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Relaciona os pares, identifica domínio/imagem e explica a inversão.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=540">Consultar texto oficial · página impressa 539</a>
+ </details></article>
+<article class="skill" id="EM13MAT404" data-block="2" data-status="lacuna">
+ <div class="skill-top"><a class="code" href="#EM13MAT404">EM13MAT404</a><span class="badge lacuna">Novo roteiro em papel</span></div>
+ <h3>Funções por partes</h3><p>Analisar e converter funções definidas por uma ou mais sentenças, com seus intervalos de validade.</p><p class="placement">2 · Funções e modelos</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p>Roteiro em papel · novo. O acervo auditado não tinha estudo específico de tarifas por faixas.</p><p class="muted">Sem recurso específico anterior.</p>
+ <h4>Construir e investigar</h4><p>Crie uma tarifa fictícia de água: C(x)=2x para 0≤x≤10; C(x)=20+3(x−10) para x&gt;10. Faça tabela, gráfico em papel e explique cada faixa; a tarifa não representa uma concessionária real.</p>
+ <h4>Pergunta para conferir</h4><p>Quanto custam 10 e 12 unidades? Há salto no preço ao passar de 10?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>R$ 20 e R$ 26. Não há salto: as duas expressões coincidem no limite 10, mas a taxa marginal muda de 2 para 3.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Identifica intervalos, imagem e crescimento e interpreta o encontro das partes.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=540">Consultar texto oficial · página impressa 539</a>
+ </details></article>
+<article class="skill" id="EM13MAT405" data-block="1" data-status="relacionado">
+ <div class="skill-top"><a class="code" href="#EM13MAT405">EM13MAT405</a><span class="badge relacionado">Recurso relacionado</span></div>
+ <h3>Programar uma solução</h3><p>Implementar algoritmos em uma linguagem de programação usando conceitos iniciais.</p><p class="placement">1 · Medidas, linguagem e algoritmos</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="../laboratorio-scratch-geogebra/">Scratch e GeoGebra</a>. Há projetos Scratch editáveis e roteiros; o aluno deve modificar e testar, não só executar.</p><p class="muted">Projetos e roteiros editáveis.</p>
+ <h4>Construir e investigar</h4><p>Escreva um algoritmo que recebe n, inicia soma=0 e adiciona os inteiros de 1 até n. Monte cartões de comando e depois implemente em Scratch com variável e repetição. Teste n=1,3,5 e trate entrada inválida.</p>
+ <h4>Pergunta para conferir</h4><p>Que resultado deve aparecer para n=5?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>15. Defina n como inteiro positivo e avise quando a entrada não satisfaz essa condição.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Programa funcional, testes registrados e explicação de uma correção. Papel prepara; a implementação digital é necessária.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=540">Consultar texto oficial · página impressa 539</a>
+ </details></article>
+<article class="skill" id="EM13MAT406" data-block="4" data-status="lacuna">
+ <div class="skill-top"><a class="code" href="#EM13MAT406">EM13MAT406</a><span class="badge lacuna">Novo roteiro em papel</span></div>
+ <h3>Tabelas de frequência</h3><p>Construir e interpretar tabelas e gráficos de frequência a partir de pesquisas amostrais.</p><p class="placement">4 · Dados, contagem e decisões</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p>Roteiro em papel · novo. Não há recurso específico que acompanhe dados de uma pesquisa amostral até o gráfico.</p><p class="muted">Sem recurso específico anterior.</p>
+ <h4>Construir e investigar</h4><p>Faça um sorteio de participantes de uma turma para perguntar o número de livros lidos em um período definido. Como treino, use 0,1,1,2,2,2,3,3,4,4. Monte frequências absoluta e relativa e um gráfico com título, fonte e período.</p>
+ <h4>Pergunta para conferir</h4><p>Qual a frequência relativa de 2 livros no conjunto de treino?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>3/10=30%. As frequências absolutas somam 10 e as relativas 100%. Os dados de treino são fictícios.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Constrói representações coerentes e identifica população, amostra e variável.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=540">Consultar texto oficial · página impressa 539</a>
+ </details></article>
+<article class="skill" id="EM13MAT407" data-block="4" data-status="lacuna">
+ <div class="skill-top"><a class="code" href="#EM13MAT407">EM13MAT407</a><span class="badge lacuna">Novo roteiro em papel</span></div>
+ <h3>Escolher o gráfico</h3><p>Interpretar e comparar conjuntos usando diferentes diagramas, incluindo histogramas e box-plots.</p><p class="placement">4 · Dados, contagem e decisões</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p>Roteiro em papel · novo. Os gráficos de jogos não substituem comparação estatística de distribuições.</p><p class="muted">Sem recurso específico anterior.</p>
+ <h4>Construir e investigar</h4><p>Em papel, represente A={1,2,2,3,4,4,5} e B={1,1,1,3,5,5,5} com ramos e folhas e box-plots. Para os quartis, exclua a mediana e tome a mediana de cada metade. Compare o que cada representação evidencia.</p>
+ <h4>Pergunta para conferir</h4><p>As duas distribuições têm a mesma mediana? O que as diferencia?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>Ambas têm mediana 3; A tem Q1=2 e Q3=4, B tem Q1=1 e Q3=5. B tem maior intervalo interquartil. Convenções de quartis podem variar.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Escolhe e justifica uma representação e informa a convenção usada.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=540">Consultar texto oficial · página impressa 539</a>
+ </details></article>
+<article class="skill" id="EM13MAT501" data-block="2" data-status="novo">
+ <div class="skill-top"><a class="code" href="#EM13MAT501">EM13MAT501</a><span class="badge novo">Novo laboratório</span></div>
+ <h3>Descobrir uma função afim</h3><p>Investigar tabelas, formular conjecturas e generalizar relações de primeiro grau.</p><p class="placement">2 · Funções e modelos</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="#laboratorio">Laboratório de funções · novo</a>. O novo laboratório verifica a conjectura; a descoberta começa pela tabela, sem entregar a fórmula.</p><p class="muted">Novo recurso desta adaptação.</p>
+ <h4>Construir e investigar</h4><p>Alinhe quadrados de papelão compartilhando lados e conte palitos necessários: 1 quadrado usa 4; 2 usam 7; 3 usam 10. Continue, desenhe pontos e proponha a regra para n quadrados.</p>
+ <h4>Pergunta para conferir</h4><p>Quantos palitos serão usados em 20 quadrados alinhados?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>61, pois P(n)=3n+1. Cada novo quadrado acrescenta três lados. O domínio da contagem é inteiro positivo.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Deduz a fórmula a partir da construção e verifica um caso novo.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=542">Consultar texto oficial · página impressa 541</a>
+ </details></article>
+<article class="skill" id="EM13MAT502" data-block="2" data-status="novo">
+ <div class="skill-top"><a class="code" href="#EM13MAT502">EM13MAT502</a><span class="badge novo">Novo laboratório</span></div>
+ <h3>Descobrir uma relação quadrática</h3><p>Investigar tabelas e gráficos para reconhecer e generalizar relações do tipo y=ax².</p><p class="placement">2 · Funções e modelos</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="#laboratorio">Laboratório de funções · novo</a>. O laboratório permite testar y=ax²; o padrão deve ser produzido e justificado pelos alunos.</p><p class="muted">Novo recurso desta adaptação.</p>
+ <h4>Construir e investigar</h4><p>Construa painéis quadrados com tampinhas em lados de 1,2,3,4 unidades. Registre N=1,4,9,16 e primeiras diferenças. Faça depois três painéis de cada tamanho e generalize.</p>
+ <h4>Pergunta para conferir</h4><p>Três painéis de lado 10 exigem quantas tampinhas?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>300, pois N(n)=3n². Diferenças primeiras crescem; a segunda diferença é constante 6 nessa sequência.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Relaciona a contagem geométrica à expressão e testa além dos exemplos.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=542">Consultar texto oficial · página impressa 541</a>
+ </details></article>
+<article class="skill" id="EM13MAT503" data-block="2" data-status="novo">
+ <div class="skill-top"><a class="code" href="#EM13MAT503">EM13MAT503</a><span class="badge novo">Novo laboratório</span></div>
+ <h3>Máximos e mínimos</h3><p>Investigar extremos de funções quadráticas em contextos com apoio digital.</p><p class="placement">2 · Funções e modelos</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="#laboratorio">Laboratório de funções · novo</a>. O novo explorador permite examinar o vértice; não exige derivadas.</p><p class="muted">Novo recurso desta adaptação.</p>
+ <h4>Construir e investigar</h4><p>Retome o canteiro de perímetro 20. Experimente larguras 1 a 9 com tiras e registre A(x)=−x²+10x. Use o gráfico digital e complete o quadrado para justificar o máximo.</p>
+ <h4>Pergunta para conferir</h4><p>Qual a maior área e como justificá-la sem derivar?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>25, em x=5, pois A(x)=25−(x−5)²≤25. O quadrado de lado 5 atinge o máximo.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Articula exploração digital e justificativa algébrica, com domínio físico.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=542">Consultar texto oficial · página impressa 541</a>
+ </details></article>
+<article class="skill" id="EM13MAT504" data-block="0" data-status="lacuna">
+ <div class="skill-top"><a class="code" href="#EM13MAT504">EM13MAT504</a><span class="badge lacuna">Novo roteiro em papel</span></div>
+ <h3>De onde vêm os volumes</h3><p>Investigar fórmulas de volume de prismas, pirâmides, cilindros e cones, incluindo Cavalieri.</p><p class="placement">Ampliação na etapa</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p>Roteiro em papel · novo. Modelos de papel não bastam para justificar as relações de volume e Cavalieri.</p><p class="muted">Sem recurso específico anterior.</p>
+ <h4>Construir e investigar</h4><p>Empilhe cartões retangulares iguais, primeiro alinhados e depois inclinados, sem espaçá-los. Compare seções na mesma altura e discuta Cavalieri. Construa cone e cilindro de mesma base e altura; compare capacidades com grãos, sem tratar o experimento como prova exata.</p>
+ <h4>Pergunta para conferir</h4><p>Qual o volume de um cone de raio 3 e altura 6?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>18π unidades cúbicas; o cilindro correspondente tem 54π. A relação de 1/3 exige justificativa matemática, além da experiência de enchimento.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Relaciona seções, altura e volume e distingue evidência experimental de demonstração.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=542">Consultar texto oficial · página impressa 541</a>
+ </details></article>
+<article class="skill" id="EM13MAT505" data-block="0" data-status="parcial">
+ <div class="skill-top"><a class="code" href="#EM13MAT505">EM13MAT505</a><span class="badge parcial">Base parcial</span></div>
+ <h3>Ladrilhar o plano</h3><p>Investigar polígonos e composições que cobrem o plano e generalizar padrões de ladrilhamento.</p><p class="placement">Ampliação na etapa</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="../matematica-em-papel/">Matemática em Papel</a>. Recortes de polígonos são um suporte; é necessário testar cobertura sem lacunas nem sobreposição.</p><p class="muted">Suporte para construção; acrescentar medições e justificativas.</p>
+ <h4>Construir e investigar</h4><p>Recorte triângulos equiláteros, quadrados e hexágonos regulares em embalagens. Monte pisos e some os ângulos ao redor de um vértice. Tente repetir com pentágonos regulares iguais.</p>
+ <h4>Pergunta para conferir</h4><p>Por que pentágonos regulares iguais não formam esse ladrilhamento simples?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>Cada ângulo mede 108° e nenhum número inteiro de 108° soma 360°. Triângulos, quadrados e hexágonos usam 6, 4 e 3 peças por vértice.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Usa a soma de ângulos para explicar sucessos e um contraexemplo.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=542">Consultar texto oficial · página impressa 541</a>
+ </details></article>
+<article class="skill" id="EM13MAT506" data-block="2" data-status="parcial">
+ <div class="skill-top"><a class="code" href="#EM13MAT506">EM13MAT506</a><span class="badge parcial">Base parcial</span></div>
+ <h3>Perímetro e área variam</h3><p>Representar a variação do perímetro e da área de polígonos regulares e classificar as funções.</p><p class="placement">2 · Funções e modelos</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="../matematica-em-papel/">Matemática em Papel</a>. Os recortes dão o objeto concreto; o novo explorador complementa os gráficos.</p><p class="muted">Suporte para construção; acrescentar medições e justificativas.</p>
+ <h4>Construir e investigar</h4><p>Construa quadrados de lados 1,2,3,4 em papel reaproveitado. Faça tabelas de P=4l e A=l² e use o laboratório para comparar os gráficos, indicando unidades diferentes.</p>
+ <h4>Pergunta para conferir</h4><p>Se o lado triplicar, o que ocorre com perímetro e área?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>O perímetro triplica e a área multiplica por 9. P é linear em l; A é quadrática em l, para l&gt;0.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Conecta tabela, gráfico, fórmula e mudança de escala.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=542">Consultar texto oficial · página impressa 541</a>
+ </details></article>
+<article class="skill" id="EM13MAT507" data-block="2" data-status="parcial">
+ <div class="skill-top"><a class="code" href="#EM13MAT507">EM13MAT507</a><span class="badge parcial">Base parcial</span></div>
+ <h3>PA e funções afins</h3><p>Relacionar progressões aritméticas a funções afins em domínio discreto e deduzir propriedades.</p><p class="placement">2 · Funções e modelos</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="../malba-tahan/#oficina">Malba Tahan · tabuleiro e grãos</a>. O tabuleiro oferece um contraste com duplicações; PA precisa de uma sequência nova.</p><p class="muted">Selecionar “O tabuleiro e os grãos” na oficina.</p>
+ <h4>Construir e investigar</h4><p>Em cartões, monte a sequência 5,8,11,14. Desenhe os pontos (n,aₙ) e compare com a reta aₙ=5+3(n−1), usando n inteiro positivo. Emparelhe termos para deduzir a soma.</p>
+ <h4>Pergunta para conferir</h4><p>Qual o décimo termo e a soma dos dez primeiros?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>a₁₀=32; S₁₀=10(5+32)/2=185. A reta contínua é extensão do modelo discreto.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Deduz termo geral e soma e explica por que os índices são discretos.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=542">Consultar texto oficial · página impressa 541</a>
+ </details></article>
+<article class="skill" id="EM13MAT508" data-block="3" data-status="relacionado">
+ <div class="skill-top"><a class="code" href="#EM13MAT508">EM13MAT508</a><span class="badge relacionado">Recurso relacionado</span></div>
+ <h3>PG e funções exponenciais</h3><p>Relacionar progressões geométricas a funções exponenciais em domínio discreto e deduzir propriedades.</p><p class="placement">3 · Crescimento, música e finanças</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="../malba-tahan/#oficina">Malba Tahan · tabuleiro e grãos</a>. A aventura do tabuleiro calcula duplicações, termo final e soma, oferecendo uma conexão direta de conteúdo.</p><p class="muted">Selecionar “O tabuleiro e os grãos” na oficina.</p>
+ <h4>Construir e investigar</h4><p>Na aventura dos grãos, use 1 grão inicial e 8 casas. Registre aₙ=2ⁿ⁻¹ e a soma acumulada. Multiplique a soma por 2 e subtraia a soma original para deduzir Sₙ=2ⁿ−1.</p>
+ <h4>Pergunta para conferir</h4><p>Na oitava casa há 255 grãos?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>Não: há 128 na oitava casa e 255 no total das oito. Termo e soma são objetos diferentes.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Deduz a soma, distingue domínio discreto e relaciona PG à exponencial.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=542">Consultar texto oficial · página impressa 541</a>
+ </details></article>
+<article class="skill" id="EM13MAT509" data-block="0" data-status="lacuna">
+ <div class="skill-top"><a class="code" href="#EM13MAT509">EM13MAT509</a><span class="badge lacuna">Novo roteiro em papel</span></div>
+ <h3>Mapas e deformações</h3><p>Investigar deformações de ângulos e áreas causadas por projeções cartográficas.</p><p class="placement">Ampliação na etapa</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p>Roteiro em papel · novo. Não foi encontrado recurso de projeções cartográficas; malhas e coordenadas não cobrem essa habilidade.</p><p class="muted">Sem recurso específico anterior.</p>
+ <h4>Construir e investigar</h4><p>Desenhe uma malha em uma esfera de papel e tente representá-la em uma folha. Compare mapas fornecidos pelo professor em projeção cilíndrica conforme e equivalente; identifique o que cada um preserva e distorce. Não use um mapa sem informar a projeção.</p>
+ <h4>Pergunta para conferir</h4><p>Um mapa que preserva ângulos locais preserva necessariamente áreas?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>Não. Conformidade e equivalência são propriedades distintas; um globo não pode ser achatado preservando todas as medidas.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Compara projeções identificadas e justifica a escolha para uma finalidade.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=542">Consultar texto oficial · página impressa 541</a>
+ </details></article>
+<article class="skill" id="EM13MAT510" data-block="4" data-status="novo">
+ <div class="skill-top"><a class="code" href="#EM13MAT510">EM13MAT510</a><span class="badge novo">Novo laboratório</span></div>
+ <h3>Duas variáveis e tendências</h3><p>Investigar dados de duas variáveis numéricas e avaliar quando uma reta descreve a relação.</p><p class="placement">4 · Dados, contagem e decisões</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="#laboratorio">Laboratório de funções · novo</a>. O novo explorador ajuda a comparar uma reta com pontos; dados reais exigem coleta e análise dos desvios.</p><p class="muted">Novo recurso desta adaptação.</p>
+ <h4>Construir e investigar</h4><p>Meça comprimento e largura de folhas de papel de tamanhos variados, ou use dados fictícios (1,2),(2,4),(3,5),(4,8). Faça um diagrama de dispersão, compare com y=2x e calcule os desvios verticais.</p>
+ <h4>Pergunta para conferir</h4><p>Todos os pontos do treino pertencem à reta y=2x? A relação prova causalidade?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>Não: em x=3, o observado é 5 e a reta prevê 6; resíduo −1. Uma associação, isoladamente, não prova causa.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Distingue observação de previsão e comenta desvios e limites do ajuste.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=542">Consultar texto oficial · página impressa 541</a>
+ </details></article>
+<article class="skill" id="EM13MAT511" data-block="0" data-status="parcial">
+ <div class="skill-top"><a class="code" href="#EM13MAT511">EM13MAT511</a><span class="badge parcial">Base parcial</span></div>
+ <h3>Nem toda chance é igual</h3><p>Distinguir espaços amostrais discretos ou contínuos e resultados equiprováveis ou não.</p><p class="placement">Ampliação na etapa</p>
+ <details><summary>Ver conexão, atividade e avaliação</summary>
+ <h4>O que sincroniza com o site</h4><p><a href="../jogos/batalha-naval/">Batalha Naval</a>. O sorteio de coordenadas é discreto; é preciso construir outros experimentos para ampliar a habilidade.</p><p class="muted">Escolher modo sem contas; o Cara a Cara é uma construção em papel proposta aqui.</p>
+ <h4>Construir e investigar</h4><p>Compare cartões iguais numerados 1 a 4, uma roleta de papel com setores de 180°,90°,45°,45° e um ponteiro cuja posição angular é lida sem arredondar. Explicite o modelo de rotação uniforme.</p>
+ <h4>Pergunta para conferir</h4><p>Na roleta, cada setor tem chance de 1/4? E a posição angular é discreta?</p>
+ <div class="response" aria-hidden="true"></div>
+ <details class="answer"><summary>Conferência comentada</summary><p>Não: as chances são 1/2,1/4,1/8,1/8. O setor é uma variável discreta; a posição angular ideal pertence a um intervalo contínuo.</p></details>
+ <h4>Evidência de aprendizagem</h4><p>Relaciona probabilidades às medidas e diferencia resultado categórico e contínuo.</p>
+ <a class="source" href="https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf#page=542">Consultar texto oficial · página impressa 541</a>
+ </details></article></div><p id="empty" hidden>Nenhuma habilidade encontrada. Limpe os filtros ou tente outro termo.</p></section>
+<section class="audit"><h2>O que fica como apoio ou aprofundamento</h2><p><strong>Bingo de Frações e 35 Camelos:</strong> recomposição de aprendizagens de frações, não cobertura direta de uma habilidade do Ensino Médio. <strong>Raízes e NCM/Difusão:</strong> contextos para discutir estratégias; jogar não equivale a implementar algoritmos.</p><p><strong>Calculus Royale, Ilha das Derivadas, Ilha do Cálculo e Bingo das Quádricas:</strong> aprofundamento. Derivadas, Lagrange e superfícies quádricas não são pré-requisitos deste percurso do 1º ano. O projeto de Cara a Cara Naval está proposto aqui em papel; não é anunciado como função já implementada no jogo digital.</p><p>As relações foram conferidas no conteúdo do site em 17/11/2026. O laboratório digital com acesso oculto não integra os links deste mapa.</p></section>
+<footer class="page-footer"><p>Referência: BNCC homologada, Matemática e suas Tecnologias, competências 1 a 5, páginas impressas 533–541. Organização anual e atividades: propostas pedagógicas deste site.</p><a href="../educacao.html">← Voltar a Educação</a> · <a href="curriculo.json" download>Baixar mapa em JSON</a></footer></main><footer class="footer">Leo Sardinha.Math · Aprender, construir e argumentar</footer></body></html>

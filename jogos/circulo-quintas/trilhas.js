@@ -24,12 +24,12 @@ const tracks=[
  ['Comparando saltos','Teste saltos de 2, 3, 5 e 7. Registre as posições e compare os ciclos.',[],'cycle'],
  ['As mesmas notas, outro desenho','Prepare Dó–Mi–Sol. Compare o círculo cromático e o de quintas. Ouça as notas juntas e depois em sequência.', [0,4,7],'compare']]}
 ];
-let year=0,step=0,attempt=[],heardTimer;const records=new Map();
+let year=new URLSearchParams(location.search).get('trilha')==='em'?5:0,step=0,attempt=[],heardTimer;const records=new Map();
 function el(tag,text,attrs={}){const e=document.createElement(tag);if(text!==undefined)e.textContent=text;for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);return e}
 function button(text,fn){const b=el('button',text,{type:'button'});b.onclick=fn;return b}
 const title=el('h2','Uma descoberta de cada vez'),label=el('label','Escolha sua turma',{for:'trail-year'}),select=el('select',undefined,{id:'trail-year'});
 tracks.forEach((t,i)=>select.append(el('option',`${i+1}º ano · ${t.title}`,{value:i})));select.append(el('option','Exploração completa · aprofundamento',{value:5}));
-const content=el('div');host.append(title,label,select,content);
+const content=el('div');host.append(title,label,select,content);select.value=String(year);
 function feedback(text){document.querySelector('#trail-feedback').textContent=text}
 function remember(){const t=document.querySelector('#trail-record');if(t)records.set(`${year}-${step}`,t.value)}
 function show(){
