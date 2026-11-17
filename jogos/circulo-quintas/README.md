@@ -37,3 +37,7 @@ Chromium/Playwright: construção de acordes, T₇ nas duas ordens, I₀ aplicad
 ## Revisão da explicação do coma
 
 A seção de afinação detalha a construção de frequências, a razão exata CP = 531441/524288, o valor de 23,46 cents (0,2346 semitom), a impossibilidade de fechamento puro pela fatoração única e a correção por quinta q = (3/2)/CP^(1/12) = 2^(7/12). Explicita que a discrepância é finita e que a distribuição ocorre por fatores de frequência equivalentes a ajustes aditivos de 1,955 cent nas doze quintas, em vez de parcelas lineares de porcentagem nos semitons. O fechamento temperado é apresentado como compromisso que preserva oitavas puras, sem afirmar que todos os intervalos se tornam puros. Controles de áudio e cálculo permanecem disponíveis.
+
+## Trilhas dos anos iniciais
+
+Entrada por ano escolar (1º ao 5º), com três missões por ano, feedback sem pontuação, registro temporário e impressão. O círculo cromático inicia as trilhas; a comparação com quintas aparece no 5º ano. A exploração completa preserva os recursos anteriores. O registro é local à página, sem coleta de dados ou persistência após recarregar. As trilhas são propostas pedagógicas, sem atribuição automática de códigos BNCC.
