@@ -1,0 +1,41 @@
+name: Ensino Medio curriculum and browser checks
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ensino-medio/**'
+      - 'jogos/circulo-quintas/trilhas.js'
+      - 'tests/ensino-medio*'
+      - '.github/workflows/ensino-medio.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check curriculum and math
+        run: node --test tests/ensino-medio.test.cjs tests/music-circle.test.cjs tests/music-education.test.cjs
+      - name: Install browser test tooling
+        run: |
+          npm install --prefix "$RUNNER_TEMP/em-browser" --no-package-lock playwright@1.62.1
+          "$RUNNER_TEMP/em-browser/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Check filters, graphs, mobile layout and print
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/em-http.log" 2>&1 &
+          for attempt in 1 2 3 4 5; do
+            if curl --fail --silent http://127.0.0.1:8765/ensino-medio/ > /dev/null; then break; fi
+            sleep 1
+          done
+          NODE_PATH="$RUNNER_TEMP/em-browser/node_modules" node tests/ensino-medio.browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ensino-medio-browser-evidence
+          path: em-qa/
+          retention-days: 7
